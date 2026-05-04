@@ -1,10 +1,10 @@
-# Preparation for Claude Code Mastery Training
+# Preparation
 
 Dear participant,
 
-We are looking forward to welcoming you to the **Mastering AI-Assisted Software
-Engineering** training. To make the most of our time together, we ask you to
-complete a few preparation steps before the session.
+We are looking forward to welcoming you to the **Claude Code Mastery Training**
+training. To make the most of our time together, we ask you to complete a few
+preparation steps before the session.
 
 ## What to prepare
 
