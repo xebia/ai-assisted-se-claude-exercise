@@ -1,4 +1,4 @@
-# Preparation for AI-Assisted Software Engineering Training
+# Preparation for Claude Code Mastery Training
 
 Dear participant,
 
