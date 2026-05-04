@@ -1,5 +1,3 @@
-# Preparation
-
 Dear participant,
 
 We are looking forward to welcoming you to the **Claude Code Mastery Training**
