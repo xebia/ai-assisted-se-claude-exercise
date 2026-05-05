@@ -54,8 +54,8 @@ git --version
 
 ### 5. Course materials on GitHub
 
-We will be working with the **bookstore** starter project during the training.
-Clone it locally before the session:
+We will be working with the **BookStore API** starter project during the
+training. Clone it locally before the session:
 
 ```bash
 git clone https://github.com/xebia/ai-assisted-se-claude-exercise
