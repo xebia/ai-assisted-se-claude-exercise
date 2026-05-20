@@ -64,7 +64,7 @@ git clone https://github.com/xebia/ai-assisted-se-claude-exercise
 Then enter the project folder and run it to verify everything works:
 
 ```bash
-cd ai-assisted-se-claude-excercise
+cd ai-assisted-se-claude-exercise/bookstore-go
 go run .
 ```
 

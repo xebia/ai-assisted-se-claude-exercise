@@ -26,10 +26,10 @@ import (
 var dbPath string
 
 func main() {
-	// Default: bookstore/store.db relative to this source file.
+	// Default: bookstore-go/store.db relative to this source file.
 	// Works with both `go run .` and a compiled binary in the same directory.
 	_, src, _, _ := runtime.Caller(0)
-	defaultDB := filepath.Join(filepath.Dir(src), "..", "bookstore", "store.db")
+	defaultDB := filepath.Join(filepath.Dir(src), "..", "bookstore-go", "store.db")
 
 	flag.StringVar(&dbPath, "db", defaultDB, "path to the SQLite database file")
 	flag.Parse()

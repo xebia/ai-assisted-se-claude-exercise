@@ -15,8 +15,8 @@ responses with and without each extension loaded.
 
 The bookstore uses a SQLite database (`store.db`). Without MCP, Claude has to
 guess column names. With MCP, it can query the schema and run real SQL. The
-server lives at `mcp-sqlite/main.go` (sibling of `bookstore/`) and exposes two
-tools:
+server lives at `mcp-sqlite/main.go` (sibling of `bookstore-go/`) and exposes
+two tools:
 
 - `get_table_definitions` — returns `CREATE TABLE` statements and column info
 - `execute_query` — executes a read-only `SELECT` query and returns JSON rows
@@ -25,7 +25,7 @@ tools:
 start the bookstore server once (it seeds on first run):
 
 ```bash
-cd bookstore && go run . &
+cd bookstore-go && go run . &
 # wait ~2 seconds, then stop it — we just need store.db to exist
 kill %1
 cd ..
@@ -34,7 +34,7 @@ cd ..
 Verify the file exists:
 
 ```bash
-ls -lh bookstore/store.db
+ls -lh bookstore-go/store.db
 ```
 
 **Step 2** — Compile the MCP server to a binary:
@@ -136,10 +136,10 @@ model (Haiku) and only gets read access — it can never modify code.
 **Step 1** — Create the agents directory:
 
 ```bash
-mkdir -p bookstore/.claude/agents
+mkdir -p bookstore-go/.claude/agents
 ```
 
-**Step 2** — Create `bookstore/.claude/agents/security-auditor.md`:
+**Step 2** — Create `bookstore-go/.claude/agents/security-auditor.md`:
 
 ```markdown
 ---
