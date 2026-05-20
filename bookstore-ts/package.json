@@ -1,0 +1,13 @@
+{
+  "name": "bookstore-ts",
+  "module": "src/main.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run src/main.ts",
+    "seed": "bun run src/main.ts --seed",
+    "test": "bun test"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  }
+}
