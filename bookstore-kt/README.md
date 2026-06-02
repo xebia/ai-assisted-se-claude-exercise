@@ -5,15 +5,24 @@ server (`com.sun.net.httpserver`), JDBC, and a vendored `sqlite-jdbc` JAR.
 The project manages books, authors, and reviews. It contains several
 intentional issues for participants to discover with AI assistance.
 
-Requires `kotlinc` (Kotlin 1.9+) and `java` (21+) on the PATH.
+Requires Java 17+ on the PATH. Use either Gradle or Maven to build and run.
 
-Run:
+**Gradle** (wrapper included, no installation needed):
 
 ```bash
-./build.sh        # downloads sqlite-jdbc on first run, compiles main + tests
-./run.sh          # starts on :8080, seeds on first run
-./run.sh --seed   # wipes and reseeds
-./test.sh         # runs the test suite
+./gradlew build             # compile main + tests
+./gradlew run               # starts on :8080, seeds on first run
+./gradlew run --args="--seed"  # wipes and reseeds
+./gradlew runTests          # runs the test suite
+```
+
+**Maven** (requires `mvn` on the PATH):
+
+```bash
+mvn compile                                          # compile
+mvn exec:java -Dexec.mainClass=MainKt               # starts on :8080
+mvn exec:java -Dexec.mainClass=MainKt -Dexec.args="--seed"  # wipes and reseeds
+mvn test                                             # runs the test suite
 ```
 
 The custom test runner in `src/test/kotlin/TestRunner.kt` discovers `@Test`
