@@ -74,8 +74,8 @@ Then enter the project folder and build it to verify everything works
 
 ```bash
 cd ai-assisted-se-claude-exercise/bookstore-kt
-./build.sh
-./run.sh
+./gradlew run
+# or: ./mvnw package -DskipTests && java -jar target/bookstore-1.0-SNAPSHOT.jar
 ```
 
 ## Quick checklist
@@ -89,7 +89,7 @@ cd ai-assisted-se-claude-exercise/bookstore-kt
   terminal)
 - The Claude Code extension is installed in VSCode
 - Git is installed (`git --version` works in your terminal)
-- You have cloned the bookstore project from GitHub and `./build.sh` finishes
+- You have cloned the bookstore project from GitHub and `./gradlew run` (or `./mvnw package -DskipTests`) finishes
   without errors
 
 ## Questions?

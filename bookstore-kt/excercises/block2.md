@@ -9,7 +9,7 @@ tests.
 
 ## Tasks
 
-1. **Run the test suite** (1 min) — run `./test.sh` and note every failing
+1. **Run the test suite** (1 min) — run `./mvnw test` (or `./gradlew test`) and note every failing
    test. Write down the list. Compare with your neighbor — you should both see
    the same failures.
 
@@ -25,14 +25,14 @@ tests.
      ask: _"What happens when page is 0 or negative? Add tests for those
      cases in src/test/kotlin/bookstore/util/PaginationTest.kt (use the
      @Test from bookstore.Test), watch them fail, then fix the function"_
-   - Run `./test.sh` — both new tests must pass before moving on.
+   - Run `./mvnw test` (or `./gradlew test`) — both new tests must pass before moving on.
    - Compare fixes: what guard did your AI add? Where exactly?
 
 4. **Fix: `createBookReturns201` and `deleteBookReturns204`** (3 min)
    - Open `src/main/kotlin/bookstore/handler/BookHandler.kt`, paste both test
      failures, ask: _"These two tests are failing. What are the correct HTTP
      status codes and why?"_
-   - Apply the fixes. Run `./test.sh`.
+   - Apply the fixes. Run `./mvnw test` (or `./gradlew test`).
    - Compare: did your AI explain _why_ REST conventions require 201 and 204?
 
 5. **Fix: `createReviewNonexistentBook`** (4 min) — use plan mode for this one.
@@ -40,7 +40,7 @@ tests.
      change to make this test pass — don't write any code yet, just explain
      the steps"_
    - Review the plan, then ask: _"Now implement it"_
-   - Run `./test.sh`.
+   - Run `./mvnw test` (or `./gradlew test`).
    - Compare: did your AI add the existence check in the handler or the store?
 
 6. **Fix: `createReviewValidation*`** (3 min)
@@ -48,14 +48,14 @@ tests.
      should this validation live and how should it be implemented?"_
    - Discuss the answer with your neighbor before accepting it — handler,
      middleware, or store?
-   - Implement, run `./test.sh` — all 4 must pass.
+   - Implement, run `./mvnw test` (or `./gradlew test`) — all 4 must pass.
 
 7. **Hunt the hidden bug** (2 min) — one bug has no failing test. Ask: _"Are
    there any other bugs or code quality issues in this codebase that the
    tests don't catch?"_
    - Compare: did your AI find it? What was it?
 
-8. **Final check** (1 min) — run `./test.sh`. All tests should now pass. If
+8. **Final check** (1 min) — run `./mvnw test` (or `./gradlew test`). All tests should now pass. If
    not, share the remaining failure with your AI and fix it.
 
 ## Pair Discussion (5 min)

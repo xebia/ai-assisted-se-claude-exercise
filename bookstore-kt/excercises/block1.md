@@ -33,7 +33,7 @@ Do them in order, compare your AI's answers with your neighbor after each.
    size zero. Put it in src/test/kotlin/bookstore/util/PaginationTest.kt and
    use kotlin.test assertions plus the local @Test annotation from
    bookstore.Test"_
-   - Run `./test.sh` and check pagination tests pass. Compare test cases
+   - Run `./mvnw test` (or `./gradlew test`) and check pagination tests pass. Compare test cases
      across the group
 
 6. **Refactor** — Ask: _"Refactor src/main/kotlin/bookstore/Server.kt to

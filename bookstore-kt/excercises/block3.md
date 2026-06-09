@@ -13,7 +13,7 @@ using the same codebase you already know.
    - It should include: Kotlin/JVM using only the JDK HTTP server and JDBC
      (no frameworks; sqlite-jdbc is the only library), handler → store
      layering, test conventions (custom @Test annotation + custom runner),
-     how to run tests via `./test.sh`
+     how to run tests via `./mvnw test` (or `./gradlew test`)
    - Add these rules: _"All handlers must validate input before calling the
      store. All new endpoints need tests. Never add external dependencies
      beyond sqlite-jdbc."_
@@ -46,7 +46,7 @@ using the same codebase you already know.
      src/main/kotlin/bookstore/store/BookStore.kt that filters by exact
      author match. Write a test that creates 3 books by 'Author A' and 2 by
      'Author B', then asserts booksByAuthorName('Author A') returns exactly
-     3 results. Run `./test.sh` and confirm it passes."_
+     3 results. Run `./mvnw test` (or `./gradlew test`) and confirm it passes."_
    - _"The paginate function in src/main/kotlin/bookstore/util/Pagination.kt
      should return (size, 0) (not negative offsets) when page is 0 or
      negative. Write a test that asserts the offset is non-negative for

@@ -25,7 +25,8 @@ two tools:
 start the bookstore server once (it seeds on first run):
 
 ```bash
-cd bookstore-kt && ./build.sh && ./run.sh &
+cd bookstore-kt && ./gradlew run &
+# or: ./mvnw package -DskipTests && java -jar target/bookstore-1.0-SNAPSHOT.jar &
 # wait ~2 seconds, then stop it — we just need store.db to exist
 kill %1
 cd ..

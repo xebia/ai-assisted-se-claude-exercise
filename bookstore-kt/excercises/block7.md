@@ -44,8 +44,8 @@ git merge <worktree-branch-name>
 If there are merge conflicts, ask AI to help resolve them.
 
 Then run the full quality gate checklist. Ask AI: _"Run these quality checks on
-the bookstore and report results: (1) `./build.sh` — main and tests compile
-cleanly, (2) `./test.sh` — all tests pass, (3) verify both new endpoints
+the bookstore and report results: (1) `./mvnw package -DskipTests` (or `./gradlew build -x test`) — main and tests compile
+cleanly, (2) `./mvnw test` (or `./gradlew test`) — all tests pass, (3) verify both new endpoints
 exist and follow existing patterns, (4) check that no existing tests broke."_
 
 ---

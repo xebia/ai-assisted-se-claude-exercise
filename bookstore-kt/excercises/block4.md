@@ -43,7 +43,7 @@ documents in a `spec/` folder — no special tooling, just markdown.
    tests. Write tests in
    src/test/kotlin/bookstore/handler/BookHandlerTest.kt covering: search by
    author, search by title substring, filter by minRating, combined filters,
-   empty results, and pagination. Run `./test.sh` after each change."_
+   empty results, and pagination. Run `./mvnw test` (or `./gradlew test`) after each change."_
    - Use the "fix until green" pattern — share failures with AI until all
      tests pass
 
