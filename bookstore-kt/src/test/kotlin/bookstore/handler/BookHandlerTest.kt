@@ -2,7 +2,7 @@ package bookstore.handler
 
 import bookstore.TestEnv
 import bookstore.util.Json
-import bookstore.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class BookHandlerTest {

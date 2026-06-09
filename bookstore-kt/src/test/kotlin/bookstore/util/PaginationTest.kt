@@ -1,6 +1,6 @@
 package bookstore.util
 
-import bookstore.Test
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
 class PaginationTest {
