@@ -70,7 +70,7 @@ func (h *BookHandler) CreateBook(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "failed to create book")
 		return
 	}
-	writeJSON(w, http.StatusCreated, book)
+	writeJSON(w, http.StatusOK, book)
 }
 
 func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
@@ -83,5 +83,5 @@ func (h *BookHandler) DeleteBook(w http.ResponseWriter, r *http.Request) {
 		writeError(w, http.StatusInternalServerError, "failed to delete book")
 		return
 	}
-	w.WriteHeader(http.StatusNoContent)
+	writeJSON(w, http.StatusOK, map[string]string{"status": "deleted"})
 }

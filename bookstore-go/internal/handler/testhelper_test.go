@@ -21,7 +21,7 @@ func newTestMux(t *testing.T) (mux *http.ServeMux, books *store.BookStore, autho
 
 	bh := handler.NewBookHandler(books, authors)
 	ah := handler.NewAuthorHandler(authors)
-	rh := handler.NewReviewHandler(reviews, books)
+	rh := handler.NewReviewHandler(reviews)
 
 	mux = http.NewServeMux()
 	mux.HandleFunc("GET /api/books", bh.ListBooks)

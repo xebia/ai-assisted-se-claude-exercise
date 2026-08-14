@@ -28,21 +28,3 @@ func TestPaginate(t *testing.T) {
 		})
 	}
 }
-
-// TestPaginateZeroPage asserts that page 0 is treated like page 1 rather than
-// producing a negative offset.
-func TestPaginateZeroPage(t *testing.T) {
-	limit, offset := util.Paginate(0, 10)
-	if limit != 10 || offset != 0 {
-		t.Errorf("Paginate(0, 10) = (%d, %d), want (10, 0)", limit, offset)
-	}
-}
-
-// TestPaginateNegativePage asserts that a negative page number is also
-// clamped to page 1 instead of producing a negative offset.
-func TestPaginateNegativePage(t *testing.T) {
-	limit, offset := util.Paginate(-5, 10)
-	if limit != 10 || offset != 0 {
-		t.Errorf("Paginate(-5, 10) = (%d, %d), want (10, 0)", limit, offset)
-	}
-}

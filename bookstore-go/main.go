@@ -45,7 +45,7 @@ func main() {
 
 	bh := handler.NewBookHandler(books, authors)
 	ah := handler.NewAuthorHandler(authors)
-	rh := handler.NewReviewHandler(reviews, books)
+	rh := handler.NewReviewHandler(reviews)
 
 	http.HandleFunc("GET /api/books", bh.ListBooks)
 	http.HandleFunc("GET /api/books/{id}", bh.GetBook)
