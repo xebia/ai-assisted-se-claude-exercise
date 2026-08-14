@@ -27,7 +27,7 @@ func (h *AuthorHandler) ListAuthors(w http.ResponseWriter, r *http.Request) {
 func (h *AuthorHandler) GetAuthor(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(r.PathValue("id"))
 	if err != nil {
-		writeError(w, http.StatusInternalServerError, "invalid id") // bug: should be 400
+		writeError(w, http.StatusBadRequest, "invalid id")
 		return
 	}
 	author, err := h.authors.Get(id)
