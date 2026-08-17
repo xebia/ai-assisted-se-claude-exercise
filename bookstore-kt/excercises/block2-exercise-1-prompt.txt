@@ -1,0 +1,9 @@
+You're the tech lead onboarding me onto this codebase. It's a Kotlin REST API; entry point is @Main.kt.
+
+Produce docs/orientation.md with two sections:
+
+1. Package tree — every top-level package, one line each on what it owns. Open at least one file per package before describing it; don't infer from the package name.
+
+2. Request flow — the path a request takes from Main.kt to the database and back, layer by layer, with file:line per hop. Read the route registration first, then follow one real route the whole way. Flag any endpoint that doesn't follow the pattern.
+
+Done means: every package listed, every hop cited, and no claim I can't verify by opening the file you named."

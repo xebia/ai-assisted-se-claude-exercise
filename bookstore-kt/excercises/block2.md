@@ -13,12 +13,16 @@ tests.
    test. Write down the list. Compare with your neighbor — you should both see
    the same failures.
 
-2. **Understand the project first** (2 min) — before fixing anything, ask:
-   _"Give me an overview of the BookStore API: package structure, how a
-   request flows from Main.kt through to the database, and what each package
-   is responsible for"_
-   - Compare summaries. Did your AI explain the handler → store layering
-     correctly?
+2. **Understand the project first** (5 min) :
+   - You are a tech lead onboarding on this project and you want to get an understanding of how this project is structured. 
+   - Your task is to create an effective prompt that delivers the overview in an `docs/overview.md` that contains: 
+     1. **Package tree** — one line per package on what it owns
+     2. **Request flow** — the path a request takes from `Main.kt` to the database and
+           back, layer by layer, with `file:line` per hop
+   - Write the prompt to accomplish this task: 
+     - **Techniques worth reaching for:** CONTEXT-TASK-FORMAT · Role framing · Scope it · Direct it · Define done · `@file` reference · Examples
+     - One of those has no added value. Which, and why?
+   - Then run `/verify-exercise 1` — Claude will check your prompt and provide feedback. 
 
 3. **Fix pagination for zero/negative pages** (4 min)
    - Open `src/main/kotlin/bookstore/util/Pagination.kt`, select `paginate()`,
