@@ -20,15 +20,20 @@ can't explain.
    prompt for you.
 3. **Revise** until you get the greenlight — or overrule with *"run it
    anyway"* and the coach will tell you what to watch.
-4. **Run** the final prompt for real.
-5. **Debrief** — tell the coach what happened. Did its predictions come true?
-   That comparison is where the learning lands.
+4. **Ship it** — the coach dispatches your exact prompt, verbatim, to a
+   fresh sub-agent that has seen none of your conversation. What you wrote is
+   all it gets: if your prompt leans on context from the chat, the sub-agent
+   won't have it — and if you didn't ask for proof, the report won't contain
+   any. (Task 5 is the exception: you run that one yourself, in plan mode —
+   reviewing the plan needs you in the loop.)
+5. **Debrief** — walk through the sub-agent's report with the coach. Did its
+   predictions come true? That comparison is where the learning lands.
 
 **Note**: `CLAUDE.md` keeps this project in training mode — Claude asks a
 leading question before handing you an answer, and investigates by searching
 rather than reading whole files. A greenlit prompt is exempt: it already
-passed review and runs straight. Genuinely stuck or short on time? Say *"just
-tell me"*.
+passed review, and the coach ships it to a clean sub-agent where it runs
+straight. Stuck or short on time? Say *"just tell me"*.
 
 ## Tasks
 
@@ -46,7 +51,7 @@ tell me"*.
      prompt, composed by you): CONTEXT-TASK-FORMAT · Role framing · Scope it
      · Direct it · Define done · `@file` · Examples. One of those buys you
      nothing here — which, and why? Tell the coach your answer.
-   - Draft → `/prompt-coach 2` → revise → run.
+   - Draft → `/prompt-coach 2` → revise → ship.
    - **Payoff:** run `/verify-exercise 1` — it grades the prompt you actually
      sent against the file it actually produced, claim by claim. Behind on
      time? It works standalone; run it after the session.
@@ -60,7 +65,7 @@ tell me"*.
      Examples (there's a table test right next to the function) · Constrain
      it · Define done. And: *you* decide what `page = 0` should do — don't
      delegate the requirement.
-   - Draft → `/prompt-coach 3` → revise → run → `go test ./internal/util/...`
+   - Draft → `/prompt-coach 3` → revise → ship → `go test ./internal/util/...`
      → debrief.
 
 4. **The failing-test prompt** (5 min) — `TestCreateBookReturns201` and
@@ -69,7 +74,7 @@ tell me"*.
    - Techniques in play (see *Providing Error Context*): error context —
      verbatim, not paraphrased · Scope it · Constrain it (the tests are the
      spec) · Define done. What `/effort` does this task deserve?
-   - Draft → `/prompt-coach 4` → revise → run →
+   - Draft → `/prompt-coach 4` → revise → ship →
      `go test ./internal/handler/...` → debrief.
 
 5. **The plan-mode prompt** (7 min) — `TestCreateReviewNonexistentBook`

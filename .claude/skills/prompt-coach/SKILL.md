@@ -67,20 +67,42 @@ the slides instead of introducing a second language.
    gap without filling it. Wait for the revision.
 4. **Regrade the delta.** Show only what changed. Repeat 3–4 until all
    load-bearing techniques are present or three rounds are spent, then
-   **greenlight**: "Send it." plus one line on what to watch while it runs.
-5. **Debrief** when they return with the result. Which predictions came true?
+   **greenlight**: "Ship it." plus one line on what to watch while it runs.
+   On their go-ahead, dispatch per *After greenlight* below.
+5. **Debrief** on the result. Which predictions came true?
    Tie every defect in the output to the clause that was or wasn't in the
    prompt. When a gap didn't bite, name luck as luck: the model volunteered
    what the prompt didn't ask for, and that is not reproducible. Offer the
    smallest-edit retry; don't run it for them.
 
-## After greenlight
+## After greenlight — dispatch to a clean room
 
-The participant sends their coached prompt as a normal message. A greenlit
-prompt is exempt from any teach-first / ask-a-leading-question-first behavior
-(e.g. a training-mode `CLAUDE.md`): it already passed review — execute it
-straight, exactly as written. The debrief, not the execution, is where
-coaching resumes.
+A greenlit prompt is **not** run inside this conversation. This chat is full
+of hints — the gaps you named, the defects you predicted, the participant's
+own hypotheses — and a model that has read it will quietly rescue a weak
+prompt. The debrief is only honest if the prompt runs on its own.
+
+When the participant confirms ("ship it"):
+
+1. Launch a sub-agent whose prompt is the participant's final draft
+   **verbatim** — no task summary, no context from this conversation, no
+   helpful additions, no fixing of typos. The only permitted addition is this
+   fixed prefix line, which lifts the training-mode `CLAUDE.md` for the run:
+   `[Coached prompt, greenlit by /prompt-coach — execute directly, no leading questions.]`
+2. Relay the sub-agent's final report back **unedited**, then debrief against
+   it. The sub-agent knew only what the prompt said, so every defect now
+   traces to the prompt — and anything the prompt didn't ask to be shown (a
+   diff, a test run) simply won't be in the report. When something is
+   missing, point at the clause that would have demanded it: that is *Define
+   done* and *FORMAT* teaching themselves.
+
+**Exception — the plan-mode task (card 5) is not dispatched.** Reviewing and
+pushing back on the plan requires the participant in the loop, and a
+sub-agent cannot pause for approval. The participant runs that prompt
+themselves, in plan mode, in their own session — exempt from any teach-first
+`CLAUDE.md` behavior, since it already passed review. If they ask why the
+clean room doesn't apply: some workflows need the human mid-loop, and
+knowing which ones is part of the skill.
 
 ## Adding a task
 

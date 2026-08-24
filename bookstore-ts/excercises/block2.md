@@ -20,9 +20,14 @@ can't explain.
    prompt for you.
 3. **Revise** until you get the greenlight — or overrule with *"run it
    anyway"* and the coach will tell you what to watch.
-4. **Run** the final prompt for real.
-5. **Debrief** — tell the coach what happened. Did its predictions come true?
-   That comparison is where the learning lands.
+4. **Ship it** — the coach dispatches your exact prompt, verbatim, to a
+   fresh sub-agent that has seen none of your conversation. What you wrote is
+   all it gets: if your prompt leans on context from the chat, the sub-agent
+   won't have it — and if you didn't ask for proof, the report won't contain
+   any. (Task 5 is the exception: you run that one yourself, in plan mode —
+   reviewing the plan needs you in the loop.)
+5. **Debrief** — walk through the sub-agent's report with the coach. Did its
+   predictions come true? That comparison is where the learning lands.
 
 ## Tasks
 
@@ -40,7 +45,7 @@ can't explain.
      prompt, composed by you): CONTEXT-TASK-FORMAT · Role framing · Scope it
      · Direct it · Define done · `@file` · Examples. One of those buys you
      nothing here — which, and why? Tell the coach your answer.
-   - Draft → `/prompt-coach 2` → revise → run.
+   - Draft → `/prompt-coach 2` → revise → ship.
    - **Payoff:** run `/verify-exercise 1` — it grades the prompt you actually
      sent against the file it actually produced, claim by claim. Behind on
      time? It works standalone; run it after the session.
@@ -54,7 +59,7 @@ can't explain.
      Examples (there's a table-style test in `tests/util/pagination.test.ts`)
      · Constrain it · Define done. And: *you* decide what `page = 0` should
      do — don't delegate the requirement.
-   - Draft → `/prompt-coach 3` → revise → run → `bun test tests/util/` →
+   - Draft → `/prompt-coach 3` → revise → ship → `bun test tests/util/` →
      debrief.
 
 4. **The failing-test prompt** (5 min) — `CreateBook returns 201` and
@@ -63,7 +68,7 @@ can't explain.
    - Techniques in play (see *Providing Error Context*): error context —
      verbatim, not paraphrased · Scope it · Constrain it (the tests are the
      spec) · Define done. What `/effort` does this task deserve?
-   - Draft → `/prompt-coach 4` → revise → run →
+   - Draft → `/prompt-coach 4` → revise → ship →
      `bun test tests/handler/book.test.ts` → debrief.
 
 5. **The plan-mode prompt** (7 min) — `CreateReview for non-existent book

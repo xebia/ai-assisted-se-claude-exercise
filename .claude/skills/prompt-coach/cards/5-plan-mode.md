@@ -69,9 +69,12 @@ helps; it's one paste, not the crux this time).
 
 ## Greenlight bar
 
-All four load-bearing present. Remind them in the greenlight: their next job
-is to *push back on at least one step of the plan* before approving — reading
-a plan isn't reviewing it.
+All four load-bearing present. **This task is the exception to clean-room
+dispatch:** don't launch a sub-agent — the participant runs the prompt
+themselves, in plan mode, so they can review the plan and approve or reject
+it. Remind them in the greenlight: their next job is to *push back on at
+least one step of the plan* before approving — reading a plan isn't
+reviewing it.
 
 ## Held back
 
