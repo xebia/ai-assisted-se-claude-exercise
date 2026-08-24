@@ -1,70 +1,105 @@
-# Exercise 2: Bug Fixing & Code Understanding
+# Exercise 2: The Prompt Is the Deliverable
 
-**Block**: 2 — Understanding Codebases & Bug Fixing **Duration**: 30 minutes
+**Block**: 2 — Bug Fixing & Effective Prompting **Duration**: 30 minutes
 **Project**: Same BookStore API. The test suite has deliberate failures baked
 in.
 
-**Goal**: Use AI to systematically find and fix bugs by working through failing
-tests.
+**Goal**: Practice composing prompts with the Block 2 techniques —
+CONTEXT-TASK-FORMAT, Scope/Constrain/Direct/Define done, role framing,
+Examples, verbatim error context, `/effort`, plan mode. The bugs are your
+practice targets, not the goal: a green test run is how you *verify* a prompt
+worked. An unfixed bug whose prompt gap you can name beats a lucky fix you
+can't explain.
+
+## How every task works
+
+1. **Draft** your prompt for the task, in full. Don't send it as work yet.
+2. **Coach** — run `/prompt-coach <task number>` and paste your draft. Claude
+   grades it against this block's techniques, predicts what each gap will
+   cost, and nudges you with one question at a time. It will never write the
+   prompt for you.
+3. **Revise** until you get the greenlight — or overrule with *"run it
+   anyway"* and the coach will tell you what to watch.
+4. **Run** the final prompt for real.
+5. **Debrief** — tell the coach what happened. Did its predictions come true?
+   That comparison is where the learning lands.
 
 ## Tasks
 
-1. **Run the test suite** (1 min) — run `python3 -m unittest` and note every
-   failing test. Write down the list. Compare with your neighbor — you should
-   both see the same failures.
+1. **Baseline** (2 min) — run `python3 -m unittest` and note every failing
+   test. Compare with your neighbor — you should both see the same failures.
+   No coaching for this one: not every message needs a framework, and knowing
+   when not to reach for one is part of the skill.
 
-2. **Understand the project first** (2 min) — before fixing anything, ask:
-   _"Give me an overview of the BookStore API: package structure, how a
-   request flows from main.py through to the database, and what each module
-   is responsible for"_
-   - Compare summaries. Did your AI explain the handler → store layering
-     correctly?
+2. **The orientation prompt** (9 min) — you're onboarding onto this codebase.
+   One prompt must produce `docs/orientation.md` containing:
+   1. **Module tree** — one line per package/module on what it owns
+   2. **Request flow** — `main.py` → database and back, layer by layer, with
+      `file:line` per hop
+   - Techniques in play (see the *Prompt Analysis* slide — this is that
+     prompt, composed by you): CONTEXT-TASK-FORMAT · Role framing · Scope it
+     · Direct it · Define done · `@file` · Examples. One of those buys you
+     nothing here — which, and why? Tell the coach your answer.
+   - Draft → `/prompt-coach 2` → revise → run.
+   - **Payoff:** run `/verify-exercise 1` — it grades the prompt you actually
+     sent against the file it actually produced, claim by claim. Behind on
+     time? It works standalone; run it after the session.
 
-3. **Fix pagination for zero/negative pages** (4 min)
-   - Open `bookstore/util/pagination.py`, select `paginate()`, ask: _"What
-     happens when page is 0 or negative? Add tests for those cases in
-     tests/util/test_pagination.py, watch them fail, then fix the function"_
-   - Run `python3 -m unittest tests.util.test_pagination` — both new tests
-     must pass before moving on.
-   - Compare fixes: what guard did your AI add? Where exactly?
+3. **The test-first prompt** (6 min) — `paginate()` in
+   `bookstore/util/pagination.py` breaks on `page = 0` and negative pages,
+   and no test covers those cases. One prompt: failing tests first, then the
+   fix, then proof of both. This is Prompt A from the *Which Prompt is
+   Better?* slide — now it's yours to write.
+   - Techniques in play: Scope it · Direct it (test-first, explicitly) ·
+     Examples (there's a table-style test in
+     `tests/util/test_pagination.py`) · Constrain it · Define done. And:
+     *you* decide what `page = 0` should do — don't delegate the requirement.
+   - Draft → `/prompt-coach 3` → revise → run →
+     `python3 -m unittest tests.util.test_pagination` → debrief.
 
-4. **Fix: `test_create_book_returns_201` and `test_delete_book_returns_204`**
-   (3 min)
-   - Open `bookstore/handler/book.py`, paste both test failures, ask: _"These
-     two tests are failing. What are the correct HTTP status codes and why?"_
-   - Apply the fixes. Run `python3 -m unittest tests.handler.test_book`.
-   - Compare: did your AI explain _why_ REST conventions require 201 and 204?
+4. **The failing-test prompt** (5 min) — `test_create_book_returns_201` and
+   `test_delete_book_returns_204` have been failing since your baseline run.
+   One prompt fixes both.
+   - Techniques in play (see *Providing Error Context*): error context —
+     verbatim, not paraphrased · Scope it · Constrain it (the tests are the
+     spec) · Define done. What `/effort` does this task deserve?
+   - Draft → `/prompt-coach 4` → revise → run →
+     `python3 -m unittest tests.handler.test_book` → debrief.
 
-5. **Fix: `test_create_review_nonexistent_book`** (4 min) — use plan mode for
-   this one.
-   - Paste the failing test output and ask: _"Think through what needs to
-     change to make this test pass — don't write any code yet, just explain
-     the steps"_
-   - Review the plan, then ask: _"Now implement it"_
-   - Run `python3 -m unittest tests.handler.test_review`.
-   - Compare: did your AI add the existence check in the handler or the store?
+5. **The plan-mode prompt** (7 min) — `test_create_review_nonexistent_book`
+   expects `404`, gets `201` — and where the fix belongs is genuinely
+   debatable. Use plan mode.
+   - Techniques in play (see *Plan Mode* and *Prompting & Extended
+     Thinking*): plan mode (no code until you approve) · directed thinking —
+     name what the plan must reason through · Scope it · Define done. Demand
+     a recommendation with rationale, not an options menu.
+   - Draft the *planning* prompt → `/prompt-coach 5` → revise → run in plan
+     mode → **push back on at least one step**, then approve → implement →
+     `python3 -m unittest tests.handler.test_review` → debrief.
 
-6. **Fix: `test_create_review_validation`** (3 min)
-   - Paste the 4 failing subtests, ask: _"All four subtests are failing. Where
-     should this validation live and how should it be implemented?"_
-   - Discuss the answer with your neighbor before accepting it — handler,
-     middleware, or store?
-   - Implement, run `python3 -m unittest tests.handler.test_review` — all 4
-     subtests must pass.
+6. **Wrap** (1 min) — run `python3 -m unittest`. **It will not be green —
+   that's by design.** The `test_create_review_validation` subtests are still
+   failing, and one bug in this codebase has no test at all. Tell your pair
+   which techniques prompts for those two would need.
 
-7. **Hunt the hidden bug** (2 min) — one bug has no failing test. Ask: _"Are
-   there any other bugs or code quality issues in this codebase that the
-   tests don't catch?"_
-   - Compare: did your AI find it? What was it?
+## Bonus (only if time remains)
 
-8. **Final check** (1 min) — run `python3 -m unittest`. All tests should now
-   pass. If not, share the remaining failure with your AI and fix it.
+Uncoached — apply what the coach kept flagging:
+
+- Fix `test_create_review_validation` (all 4 subtests). Decide *before
+  prompting*: handler, middleware, or store?
+- Hunt the testless bug with a review prompt. Which specialist reviews
+  (*Role framing*), which module (*Scope it*), looking at what (*Direct
+  it*)?
+- Fix-until-green — but count your cycles. More than 2 means the prompt, not
+  the code, needs work.
 
 ## Pair Discussion (5 min)
 
-Compare with your partner: which bug was hardest to fix? Did plan mode make a
-difference on bug 5? What did the AI miss? Choose **one take-away** to present
-to the group.
+Which single clause in one of your prompts bought the most? Which missing
+technique actually cost you — did the coach's prediction come true? Where did
+you overrule the coach, and were you right? Choose **one take-away** to
+present to the group.
 
 ## Group Share (5 min)
 

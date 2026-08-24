@@ -1,91 +1,111 @@
-# Exercise 2: Bug Fixing & Code Understanding
+# Exercise 2: The Prompt Is the Deliverable
 
-**Block**: 2 — Understanding Codebases & Bug Fixing **Duration**: 30 minutes
+**Block**: 2 — Bug Fixing & Effective Prompting **Duration**: 30 minutes
 **Project**: Same BookStore API. The test suite has deliberate failures baked
 in.
 
-**Goal**: Use AI to systematically find and fix bugs by working through failing
-tests — and practice deciding what to ask, not just what to paste.
+**Goal**: Practice composing prompts with the Block 2 techniques —
+CONTEXT-TASK-FORMAT, Scope/Constrain/Direct/Define done, role framing,
+Examples, verbatim error context, `/effort`, plan mode. The bugs are your
+practice targets, not the goal: a green test run is how you *verify* a prompt
+worked. An unfixed bug whose prompt gap you can name beats a lucky fix you
+can't explain.
 
-**Note**: This project now has a `CLAUDE.md` in training mode. Your AI will
-push back with a question before handing you an answer, and will investigate
-the code by searching rather than reading whole files — closer to how it'd
-have to behave in a codebase too large to load in one shot. If you're
-genuinely stuck or short on time, say "just tell me" and it'll drop that and
-answer directly.
+## How every task works
+
+1. **Draft** your prompt for the task, in full. Don't send it as work yet.
+2. **Coach** — run `/prompt-coach <task number>` and paste your draft. Claude
+   grades it against this block's techniques, predicts what each gap will
+   cost, and nudges you with one question at a time. It will never write the
+   prompt for you.
+3. **Revise** until you get the greenlight — or overrule with *"run it
+   anyway"* and the coach will tell you what to watch.
+4. **Run** the final prompt for real.
+5. **Debrief** — tell the coach what happened. Did its predictions come true?
+   That comparison is where the learning lands.
+
+**Note**: `CLAUDE.md` keeps this project in training mode — Claude asks a
+leading question before handing you an answer, and investigates by searching
+rather than reading whole files. A greenlit prompt is exempt: it already
+passed review and runs straight. Genuinely stuck or short on time? Say *"just
+tell me"*.
 
 ## Tasks
 
-For every fix below: **state your own hypothesis first** — in the chat, in
-your own words — before your AI gives you its take. You don't need to be
-right. The point is arriving with a guess, not an empty prompt.
+1. **Baseline** (2 min) — run `go test ./...` and note every failing test.
+   Compare with your neighbor — you should both see the same failures. No
+   coaching for this one: it's exactly the kind of no-learning-goal request
+   the training mode leaves alone.
 
-1. **Run the test suite** (1 min) — run `go test ./...` and note every failing
-   test. Write down the list. Compare with your neighbor — you should both see
-   the same failures.
+2. **The orientation prompt** (9 min) — you're onboarding onto this codebase.
+   One prompt must produce `docs/orientation.md` containing:
+   1. **Package tree** — one line per package on what it owns
+   2. **Request flow** — `main.go` → database and back, layer by layer, with
+      `file:line` per hop
+   - Techniques in play (see the *Prompt Analysis* slide — this is that
+     prompt, composed by you): CONTEXT-TASK-FORMAT · Role framing · Scope it
+     · Direct it · Define done · `@file` · Examples. One of those buys you
+     nothing here — which, and why? Tell the coach your answer.
+   - Draft → `/prompt-coach 2` → revise → run.
+   - **Payoff:** run `/verify-exercise 1` — it grades the prompt you actually
+     sent against the file it actually produced, claim by claim. Behind on
+     time? It works standalone; run it after the session.
 
-2. **Understand the project, your way** (2 min) — before fixing anything, get
-   a working mental model of how a request flows from `main.go` to the
-   database and back. How you get there is up to you: one message, several
-   follow-ups, asking it to trace one specific endpoint — your call.
-   - Be ready to explain the handler → store layering out loud, without
-     looking at your screen. Compare with your neighbor: did you arrive at
-     the same model through different conversations?
+3. **The test-first prompt** (6 min) — `Paginate()` in
+   `internal/util/pagination.go` breaks on `page = 0` and negative pages, and
+   no test covers those cases. One prompt: failing tests first, then the fix,
+   then proof of both. This is Prompt A from the *Which Prompt is Better?*
+   slide — now it's yours to write.
+   - Techniques in play: Scope it · Direct it (test-first, explicitly) ·
+     Examples (there's a table test right next to the function) · Constrain
+     it · Define done. And: *you* decide what `page = 0` should do — don't
+     delegate the requirement.
+   - Draft → `/prompt-coach 3` → revise → run → `go test ./internal/util/...`
+     → debrief.
 
-3. **Fix: `TestPaginateZeroPage` and `TestPaginateNegativePage`** (4 min)
-   - Don't paste the test output verbatim as your entire message. Look at
-     `internal/util/pagination.go` yourself first, form a guess about what
-     breaks and why, then bring your AI in to confirm or correct you.
-   - Run `go test ./internal/util/...` — both tests must pass before moving
-     on.
-   - Compare fixes: what guard did your AI add? Where exactly? Did you and
-     your neighbor land on the same fix from different starting guesses?
+4. **The failing-test prompt** (5 min) — `TestCreateBookReturns201` and
+   `TestDeleteBookReturns204` have been failing since your baseline run. One
+   prompt fixes both.
+   - Techniques in play (see *Providing Error Context*): error context —
+     verbatim, not paraphrased · Scope it · Constrain it (the tests are the
+     spec) · Define done. What `/effort` does this task deserve?
+   - Draft → `/prompt-coach 4` → revise → run →
+     `go test ./internal/handler/...` → debrief.
 
-4. **Fix: `TestCreateBookReturns201` and `TestDeleteBookReturns204`** (3 min)
-   - Before asking your AI anything, decide for yourself what status codes
-     these two endpoints *should* return, and why. Then check your reasoning
-     against your AI's.
-   - Apply the fixes. Run `go test ./internal/handler/...`.
-   - Compare: did you already know why REST wants 201 and 204, or did the AI
-     teach you something there?
+5. **The plan-mode prompt** (7 min) — `TestCreateReviewNonexistentBook`
+   expects `404`, gets `201` — and where the fix belongs is genuinely
+   debatable. Use plan mode.
+   - Techniques in play (see *Plan Mode* and *Prompting & Extended
+     Thinking*): plan mode (no code until you approve) · directed thinking —
+     name what the plan must reason through · Scope it · Define done. Demand
+     a recommendation with rationale, not an options menu.
+   - Draft the *planning* prompt → `/prompt-coach 5` → revise → run in plan
+     mode → **push back on at least one step**, then approve → implement →
+     `go test ./internal/handler/...` → debrief.
 
-5. **Fix: `TestCreateReviewNonexistentBook`** (4 min) — use plan mode for this
-   one.
-   - Without any AI help yet, sketch on paper (or in a scratch comment) what
-     you think needs to change. Then open plan mode and see how your sketch
-     compares to the plan it proposes.
-   - Review the plan, adjust it if you disagree with a step, then have it
-     implement.
-   - Run `go test ./internal/handler/...`.
-   - Compare: did your AI add the existence check in the handler or the
-     store? Did your plan put it in the same place?
+6. **Wrap** (1 min) — run `go test ./...`. **It will not be green — that's by
+   design.** `TestCreateReviewValidation` is still failing, and one bug in
+   this codebase has no test at all. Tell your pair which techniques prompts
+   for those two would need.
 
-6. **Fix: `TestCreateReviewValidation`** (3 min)
-   - Before asking, decide as a pair: should this validation live in the
-     handler, a middleware, or the store? Argue it out first, *then* ask your
-     AI where it would put it and why.
-   - Implement, run `go test ./internal/handler/...` — all 4 subtests must
-     pass.
-   - Compare: did the AI's placement match what you two agreed on?
+## Bonus (only if time remains)
 
-7. **Hunt the hidden bug** (2 min) — one bug has no failing test attached to
-   it. You decide how to look for it — ask for a general code review, ask it
-   to inspect a package you haven't touched yet, or go looking yourself first
-   and use your AI to confirm a suspicion.
-   - Compare: did you and your neighbor find the same bug via the same route,
-     or different routes?
+Uncoached — apply what the coach kept flagging:
 
-8. **Final check** (1 min) — run `go test ./...`. All tests should now pass. If
-   not, diagnose the remaining failure yourself before asking your AI to
-   confirm your diagnosis.
+- Fix `TestCreateReviewValidation` (all 4 subtests). Decide *before
+  prompting*: handler, middleware, or store?
+- Hunt the testless bug with a review prompt. Which specialist reviews
+  (*Role framing*), which package (*Scope it*), looking at what (*Direct
+  it*)?
+- Fix-until-green — but count your cycles. More than 2 means the prompt, not
+  the code, needs work.
 
 ## Pair Discussion (5 min)
 
-Compare with your partner: which bug was hardest to fix? Where did your
-hypothesis turn out wrong, and what did that teach you? Did plan mode change
-how you approached bug 5? Did the training-mode CLAUDE.md change how you
-prompted — did you use the escape hatch, and when? Choose **one take-away**
-to present to the group.
+Which single clause in one of your prompts bought the most? Which missing
+technique actually cost you — did the coach's prediction come true? Where did
+you overrule the coach, and were you right? Choose **one take-away** to
+present to the group.
 
 ## Group Share (5 min)
 
