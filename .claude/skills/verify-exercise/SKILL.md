@@ -48,6 +48,9 @@ Exercise-specific expectations live in `checks/<id>-<slug>.md` beside this file.
 2. **Ask for the prompt they used, verbatim.** You cannot run this skill without
    it. Ask in one line and wait. Don't reconstruct it from conversation history
    even if you could: retyping their own prompt is part of the exercise.
+   Exception: a check file may put something else under review — a context
+   file, a configuration — and say so at the top. Then ask for *that*,
+   verbatim, instead of a prompt.
 3. Locate the artifact named in the check file. If it doesn't exist, say so and
    stop — don't verify a different file instead.
 
@@ -56,6 +59,10 @@ Exercise-specific expectations live in `checks/<id>-<slug>.md` beside this file.
 Do this **before reading the artifact.** Work through the techniques the
 participants were taught. The check file says which are applicable to this task;
 respect it — marking an inapplicable technique as "missing" is a false finding.
+If the check file supplies its own rubric (later blocks grade context files
+against the four dimensions rather than prompting techniques), use that rubric
+in place of the table below — everything else in this phase still applies:
+predictions first, one expected defect per ❌, a stated grade.
 
 | Technique | Present when the prompt… |
 | --- | --- |
