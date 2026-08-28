@@ -7,7 +7,8 @@ import { defineConfig } from "vite";
 // browser sees the API at a same-origin /api path. No CORS, no backend change.
 //
 // Application code must not depend on Vite. No build step, no bundler
-// features, no imports from node_modules at runtime. See constitution.md.
+// features, no imports from node_modules at runtime.
+// See .specify/memory/constitution.md.
 export default defineConfig({
   server: {
     port: 5173,

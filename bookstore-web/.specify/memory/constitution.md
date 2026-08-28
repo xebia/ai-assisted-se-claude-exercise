@@ -1,12 +1,8 @@
 # BookStore Web Constitution
 
-The non-negotiable principles for the BookStore frontend. Spec Kit loads this
-before every `/speckit.*` command; it constrains the specification, the plan and
-the generated tasks.
-
-This file is **pre-written for the training**. You are not asked to author it —
-you are asked to read it, and then to notice where it shows up in the artifacts
-you generate.
+The non-negotiable principles for the BookStore frontend. `/speckit.plan` gates
+its output against this file, `/speckit.analyze` audits every artifact against
+it, and `/speckit.implement` is bound by it.
 
 ## Core Principles
 
@@ -26,14 +22,19 @@ reviewable when an agent team generates it.
 
 ### II. Contract, Not Implementation
 
-The frontend must run unchanged against **all four** backend implementations —
-`bookstore-go`, `bookstore-kt`, `bookstore-py` and `bookstore-ts`.
+The frontend must run unchanged against any BookStore backend implementation —
+`bookstore-go`, `bookstore-kt`, `bookstore-py` or `bookstore-ts`.
 
 Depend only on the HTTP contract: paths, methods, status codes, and JSON shapes.
 Never depend on a backend's internals, source layout, database schema or SQL.
 
 You may read a backend's source to *discover* the contract. You may not encode
 anything you find there beyond the contract itself.
+
+The contract is what a running backend does, not what a README or a test name
+says it should do. Where a behaviour is observed rather than guaranteed — a
+status code, a body shape, a paging convention — the spec records it as observed
+and the UI degrades safely if it differs.
 
 ### III. Independently Demoable Stories
 
@@ -56,26 +57,34 @@ No user story may create or modify a file another user story also creates or
 modifies. A task marked `[P]` that violates this is wrong, no matter what the
 generated plan says.
 
+*Why:* this is stricter than a single developer would need, deliberately. It is
+the price of letting independent agents write to one repository at the same time
+without a merge queue — file ownership replaces coordination.
+
 ### V. Every Error Path Is Specified (NON-NEGOTIABLE)
 
 Every API call has a specified behaviour for: success, empty result, not found,
 client error, server error, and network failure.
 
-Raw upstream error text is never rendered to a user. The BookStore API is known
-to leak internal database messages in at least one endpoint; the UI must not
-pass those through.
+Raw upstream error text is never rendered to a user. At least one endpoint has
+been observed passing a raw database message through in its `error` field; the
+UI must not forward it, and must not start forwarding it if the endpoint is
+later fixed. Sanitising at the boundary is the requirement, regardless of what
+any given backend currently emits.
 
-"The API returns a 404 there" is not an assumption you may make. Check what it
-actually returns.
+"The API returns a 404 there" is not an assumption you may make. Check what your
+running backend actually returns, for every path in every principle above.
 
 ### VI. Verifiable Acceptance Criteria
 
 Every user story states how you would confirm it works — concrete, observable
 steps against a running backend, not "it looks right".
 
-Automated tests are not written in the specification phase. Acceptance criteria
-are what a later implementation phase turns into tests, so they must be precise
-enough to be mechanically checkable.
+Automated tests are not written in the specification phase, and no task may
+require one before `tasks.md` is complete. Acceptance criteria are what a later
+implementation phase turns into tests, so they must be precise enough to be
+mechanically checkable. Generated test tasks belong to implementation, not to
+specification — this is a sequencing rule, not a position on testing.
 
 ## Technology Constraints
 
@@ -103,4 +112,4 @@ grounds for an exception.
 `/speckit.analyze` checks generated artifacts against these principles. Treat
 what it reports as findings to act on, not as advice to weigh.
 
-**Version**: 1.0.0 | **Ratified**: 2026-08-28 | **Last Amended**: 2026-08-28
+**Version**: 1.1.0 | **Ratified**: 2026-08-28 | **Last Amended**: 2026-08-28

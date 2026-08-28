@@ -93,14 +93,15 @@ uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
 cd ai-assisted-se-claude-exercise/bookstore-web
 npm install
 specify init --here --force --non-interactive --integration claude
-cp constitution.md .specify/memory/constitution.md   # must run AFTER init
+git checkout -- .specify/memory/constitution.md      # must run AFTER init
 specify check
 ```
 
 > [!IMPORTANT]
-> The `cp` must come **after** `specify init`. Init writes into a non-empty
-> directory and would otherwise overwrite the constitution with its own
-> template.
+> The `git checkout` must come **after** `specify init`. The constitution is
+> committed at `.specify/memory/constitution.md`, and `specify init --force`
+> overwrites it with its own template. Restoring it from git puts the real one
+> back — and `git status` will tell you if you forget.
 
 Please do this **before the training day**. `specify init` downloads a template
 bundle from GitHub, and thirty laptops doing that at once on conference wifi is
@@ -125,7 +126,8 @@ on http://localhost:5173.
 - `uv` is installed (`uv --version` works in your terminal)
 - Spec Kit is installed (`specify check` runs without problems)
 - `bookstore-web` is set up (`npm install` finished, `.specify/` exists,
-  `.specify/memory/constitution.md` starts with "# BookStore Web Constitution")
+  `.specify/memory/constitution.md` starts with "# BookStore Web Constitution"
+  and `git status` shows it unmodified)
 
 ## Questions?
 

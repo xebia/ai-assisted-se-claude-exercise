@@ -19,7 +19,11 @@ This project talks to whichever BookStore backend you started on port `8080`:
 | [bookstore-py](../bookstore-py/) | `python3 main.py` |
 | [bookstore-ts](../bookstore-ts/) | `bun run start` |
 
-All four expose the same HTTP contract, so one specification covers all of them.
+All four ship the same paths, methods and JSON shapes, so one specification
+covers all of them — but write that specification against the backend you can
+actually `curl`, not against this README. See the warning under
+[The API](#the-api).
+
 `vite.config.js` proxies `/api` to `http://localhost:8080`, which is what keeps
 the browser on a single origin — no CORS, and no change to any backend.
 
@@ -68,23 +72,28 @@ Shapes are not uniform, which matters when you write the spec:
 
 - **List endpoints return a bare JSON array** — `[ {...}, {...} ]`
 - **Detail endpoints return an envelope** — `{book, author}` and `{author, books}`
-- Delete returns `{status: "deleted"}`; failures return `{error: "..."}`
+- Failures return `{error: "..."}`
 
 > [!IMPORTANT]
-> Do not take this table as the specification. The BookStore API contains
-> **deliberate bugs** — some endpoints do not behave the way this summary
-> suggests. Discovering the real behaviour is part of Exercise 6. Check what the
-> API actually returns before you write a requirement about it.
+> **This is a sketch, not the specification** — least of all for status codes,
+> paging behaviour and error bodies. The BookStore API ships with deliberate
+> bugs, several endpoints do not behave the way a reasonable reader would
+> expect, and the backend in front of you has been worked on since it was
+> cloned. Your copy and your neighbour's may no longer agree.
+>
+> Finding out what your running backend actually does is part of the exercise —
+> and the exercise has you delegate that research rather than do it by hand.
+> Nothing here is a substitute for a response you have actually seen.
 
 ## Files
 
 | File | What it is |
 |---|---|
-| `constitution.md` | Pre-written project principles. Read this first. Copied into `.specify/memory/` during setup. |
+| `.specify/memory/constitution.md` | Pre-written project principles. **Read this first.** The one file under `.specify/` that is committed — Spec Kit reads it from here. |
 | `vite.config.js` | Dev server and `/api` proxy. Not application code. |
 | `index.html` | Deliberately empty shell. |
-| `specs/` | Created by Spec Kit in Exercise 6. **Commit this** — Exercise 7 needs it. |
-| `.specify/` | Spec Kit tooling. Generated during setup, not committed. |
+| `specs/` | Created by Spec Kit in Exercise 6, plus your own `api-research.md` alongside the spec. **Commit this** — Exercise 7 needs it. |
+| `.specify/` (the rest) | Spec Kit tooling. Generated during setup, not committed. |
 
 ## Setup
 
@@ -94,10 +103,12 @@ See the `preparation.md` in your chosen backend project. In short:
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
 npm install
 specify init --here --force --non-interactive --integration claude
-cp constitution.md .specify/memory/constitution.md   # must run AFTER init
+git checkout -- .specify/memory/constitution.md      # must run AFTER init
 specify check
 ```
 
-The `cp` comes after `init` deliberately: `specify init --force` writes into a
-non-empty directory and would otherwise overwrite the constitution with its own
-template.
+The `git checkout` comes after `init` deliberately. The constitution is
+committed at Spec Kit's own path, `.specify/memory/constitution.md`, and
+`specify init --force` overwrites it with its own template — so the last step
+puts the real one back. Everything else under `.specify/` is generated and
+ignored.
