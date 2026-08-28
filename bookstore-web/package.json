@@ -1,0 +1,14 @@
+{
+  "name": "bookstore-web",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Frontend for the BookStore API. Backend-agnostic: works against bookstore-go, -kt, -py or -ts.",
+  "scripts": {
+    "dev": "vite",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^8.2.2"
+  }
+}
