@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "jdbc-database": {
+      "command": "java",
+      "args": [
+        "-jar",
+        "<root-path>/ai-assisted-se-claude-exercise/mcp-jdbc/target/mcp-jdbc-1.0.0.jar"
+      ],
+      "env": {
+        "JDBC_URL": "jdbc:postgresql://localhost:5431/mydb",
+        "JDBC_USERNAME": "dbuser",
+        "JDBC_PASSWORD": "${JDBC_PASSWORD}"
+      }
+    }
+  }
+}
