@@ -2,31 +2,37 @@
 
 **What they're refining:** a rule file under `.claude/rules/` with
 `description:` and `paths:` frontmatter, holding the handler-validation rule
-moved out of `CLAUDE.local.md` — plus their plan for *proving* it loads only
-on demand.
+moved out of `CLAUDE.local.md`. The exercise deliberately stops at the
+*mechanism* — file moved, glob checked against the real tree, at most one
+curiosity run watching the rule load. The full positive-and-negative proof
+is that evening's CLAUDE.md homework, not this clock; don't demand it here.
 
 **Slide anchors:** *Rules — Splitting CLAUDE.md by Topic* · *Rule Discovery:
 With or Without Paths* · *Progressive Disclosure* · the **Size** dimension.
 
 ## Concept applicability
 
-**Load-bearing (4):**
+**Load-bearing (3):**
 
 - **Right rule chosen** — the content only matters when that layer's code is
   on the table. A project-global rule in a scoped file loads correctly and
   demonstrates nothing; that's the finding, not the glob.
-- **Glob correctness** — the `paths:` pattern matches the intended layer's
-  real files in *this* repo, and nothing else. Check it against the actual
-  tree; a near-miss glob fails silently.
+- **Glob correctness, checked against the tree** — the `paths:` pattern
+  matches the intended layer's real files in *this* repo, and nothing else,
+  and they verified that by listing the files, not by reading the glob and
+  nodding. A near-miss glob fails silently.
 - **Moved, not copied** — the line is gone from `CLAUDE.local.md`. Both
   places at once is a Size failure wearing a scoping costume.
-- **A falsifiable verification plan** — before running anything, they can
-  say what they'll observe in the rule-should-load session and what in the
-  rule-should-not-load session, and what result would mean the scoping is
-  broken. "I'll see if it works" is not a plan.
 
-**Optional polish:** a `description:` that says when the rule applies, not
-what it says — that's what a human skims in six months.
+**Optional polish:**
+
+- A `description:` that says when the rule applies, not what it says —
+  that's what a human skims in six months.
+- If they have time for the curiosity run: knowing *what they expect to
+  observe* (the rule arriving mid-session, after a matching file is
+  touched) beats "I'll see if it works". If they volunteer a full
+  falsifiable plan with a negative arm, applaud it and point it at the
+  homework — don't spend exercise rounds on it.
 
 **Not applicable:**
 
@@ -34,37 +40,27 @@ what it says — that's what a human skims in six months.
   its content, grade its *placement*.
 - **Trajectory / pollution** — nothing conversational is under test here.
 
-## What a strong verification plan contains
-
-- Two fresh sessions, identical except for which file the request touches —
-  one aimed at the scoped layer, one at a different layer
-- A defined observation: the rule's effect visible (or absent) in behavior,
-  or the rule's presence checked directly via `/context`
-- Run *the negative first* — proving the rule is absent for other layers is
-  the half people skip, and it's the half that demonstrates Size
-
 ## Nudge bank
 
 - "How would you catch a typo in that glob — what exactly would you see?"
 - "If this rule is worth loading while editing store code too, what does
   that say about where it belongs?"
-- "Your plan proves the rule loads. What proves it *doesn't* load when it
-  shouldn't?"
+- "Is the rule's old line still in `CLAUDE.local.md`? What does having it
+  in both places cost?"
 
 ## Predicted effects for common findings
 
 - Glob doesn't match the repo's layout → the rule never loads anywhere,
   nothing downstream notices, and they leave believing scoping worked
-- Rule left in both files → behaves identically to before; the experiment
-  can't show anything
-- No negative test → "it worked" claimed on evidence consistent with the
-  rule being loaded always
+- Rule left in both files → behaves identically to before; the move
+  demonstrated nothing
 - Project-global rule scoped → mechanics demonstrated, lesson missed
+- Glob checked by eyeballing, not listing → a typo survives review
 
 ## Greenlight bar
 
-All four load-bearing items. If the plan lacks the negative test, that is
-the nudge to spend a round on — it's the one they'll reuse forever.
+All three load-bearing items. The glob check is the round worth spending —
+it's the failure that stays invisible.
 
 ## Held back
 

@@ -39,7 +39,7 @@ short on time? Say *"just tell me"*.
    coaching: this is a reading, not a deliverable. Keep the number; task 4
    will make you cite it.
 
-2. **`/init`, then earn every token** (11 min) — run `/init` and let it
+2. **`/init`, then earn every token** (9 min) — run `/init` and let it
    draft. Then the real work (*Start with `/init`, then refine by hand*):
    - **Grade every generated line** with the test from *Which CLAUDE.md Line
      Earns Its Tokens?*: what would Claude do differently because this line
@@ -60,84 +60,150 @@ short on time? Say *"just tell me"*.
    - Open question for the wrap: a line that's true but useless hurts which
      dimension? A line that's specific but *wrong*?
 
-3. **The bait run** (7 min) — Block 2's vague prompt, unimproved, on
+3. **The bait run** (6 min) — Block 2's vague prompt, unimproved, on
    purpose. Fresh session, send verbatim (with the experiment prefix):
-   _"Add caching to the BookStore API"_
+
+   ```
+   [Exercise 3 experiment — execute directly, no leading questions.] Add caching to the BookStore API
+   ```
+
    In Block 2 you'd fix that prompt. Today you don't — the prompt stays weak
    so your context files do the work. Watch: does it pull in a dependency?
-   Cache the right layer? Keep validation intact? Write tests in the project's
-   unittest convention?
+   Cache the right layer? Keep validation intact? Write tests in the
+   project's unittest convention?
    Every rule that held earned its tokens; every rule that failed, note the
    exact wording that was too soft to convict.
    - **Payoff:** run `/verify-exercise 2` — it grades your context files
-     against the bait diff, prediction by prediction. Behind on time? It
-     works standalone; run it after the session.
+     against the bait diff, prediction by prediction, and closes by
+     nominating your MVP line and one suspected freeloader — task 5 needs
+     that nomination. Behind on time? It works standalone; run it after the
+     session.
    - Don't keep the bait changes: `git checkout .` once verified.
    - While Claude works, don't watch it type — write your task 4
      prediction instead.
 
-4. **Build a polluted session — on purpose** (8 min) — recreate Session B
-   from *Which Session Is in More Trouble?*. Work it as a pair: **one of
-   you pollutes, the other stays clean** — same final question, then
-   compare across screens.
-   - **Both of you, predict first, in writing:** which arm gives the better
-     answer, and what *specifically* will differ? Optional sanity check:
-     `/context-coach 4` on your plan.
-   - **Polluted arm** — fresh session, all three anti-patterns: *kitchen
-     sink* — ask something entirely unrelated to BookStore; *context
-     hoarding* — paste 100+ lines of `python3 -m unittest -v` output with no
-     question, "just so you have it"; *over-correcting* — state a wrong
-     "fact" about the codebase (name the wrong file for reviews, say), let
-     Claude build on it, then correct yourself. Twice.
-   - **Clean arm** — fresh session, nothing else at all.
-   - Both run `/context` and note the %. Then both ask, pasted verbatim
-     (prefix!):
-     _"Which file and functions change to add a DELETE /reviews/{id}
-     endpoint, what status code should success return, and which existing
-     handler is the pattern to copy?"_
-     An answer, not an implementation — nothing to revert, and a
-     resurrected wrong "fact" has nowhere to hide in prose.
-   - **Compare against `bookstore/handler/review.py`**, not against taste:
-     are the named files, functions, and status code right? Did the
-     polluted arm resurrect the corrected fact, or chase something from
-     the log dump? At what gauge % did each arm sit when it answered?
-   - Debrief with the coach: map every defect to the pollution step that
-     planted it and the dimension it attacked — then ask yourselves: what
-     would the polluted arm have *built* if you'd let it code?
+4. **Poison one session, keep one clean** (11 min) — recreate Session B
+   from *Which Session Is in More Trouble?*. You run **both arms yourself**
+   — the clean arm costs two minutes, and holding both diffs side by side
+   is what makes the debrief bite.
+   - **This whole plan is five sentences, not a research proposal:** three
+     one-line pollution steps, one prediction sentence, one final prompt
+     (given below — you don't have to write it). A wrong prediction is a
+     fine outcome here; *no* prediction is the only way to fail this step,
+     because there's nothing left to check yourself against afterward.
+   - **Staring at a blank plan? Steal this one.** Executing it still shows
+     the failure modes — though swapping in your own wrong "fact" makes the
+     resurrection sweeter:
+     1. *Kitchen sink* — ask for three different chocolate-cookie recipes,
+        full ingredient lists and steps included. You're feeling peckish,
+        and long answers are the point.
+     2. *Context hoarding* — paste 100+ lines of `python3 -m unittest -v` output
+        and explicitly tell it to do nothing with this: "just so you have
+        it."
+     3. *Over-correcting* — claim all review logic now lives in
+        `review_v2.py`. When Claude can't find it, say you were mistaken —
+        that file is on another branch. Then add that some review logic
+        moved to `book.py`; nothing to do, just a heads-up.
+     - Prediction: *"I expect `review_v2.py` or phantom review logic in
+       `book.py` to surface in the polluted diff."*
+   - **Predict first, in writing** — which arm builds the better endpoint,
+     and what *specifically* will differ. One sentence is enough. Optional
+     sanity check: `/context-coach 4` on your plan.
+   - **Polluted arm** — fresh session, run your three pollution steps, then
+     `/context` and note the %. Then paste verbatim (prefix!):
+     ```
+     [Exercise 3 experiment — execute directly, no leading questions.] Add a DELETE /reviews/{id} endpoint to the BookStore API, with tests.
+     ```
+     This is full contact — it implements. **Keep the session open** (a
+     bonus task returns to it). When it finishes, bank the evidence and
+     reset in one move: `/bank-diff polluted`. It saves the diff to
+     `block3-polluted.diff`, restores a clean working tree, and refuses to
+     run if something looks off. (Doing it by hand instead? Appendix at the
+     bottom.)
+   - **Clean arm** — fresh session, nothing else at all: `/context`, note
+     the %, same prompt pasted verbatim (prefix!). Then `/bank-diff clean`.
+   - **Verdict time — the coach shows, you call:** hand both diff files
+     to `/context-coach 4`. It walks the five checks one at a time —
+     right file touched · existing handler pattern copied · correct
+     success status code · tests in the unittest convention · no
+     resurrected "fact" or log-dump chase — showing the relevant lines
+     from each diff next to `bookstore/handler/review.py`, then
+     waiting for your ✓/✗ per arm before giving its own. Ten verdicts,
+     yours first, against the file — not against taste. (Fluent in
+     diffs? Score both files in your editor first and open with your
+     scorecard instead.)
+   - **Then the debrief, same coach:** map every defect to the pollution
+     step that planted it and the dimension it attacked. Then put the
+     two gauge numbers next to the two diffs: does the difference you
+     *measured* explain the difference you *see*?
 
-5. **Wrap** (2 min) — answer task 2's open question with your pair. Then
-   name the one `CLAUDE.local.md` line that earned the most in the bait run
-   — and the one that turned out to be a freeloader after all.
+5. **Wrap** (2 min) — the `/verify-exercise 2` report from task 3 ends with
+   a nomination: the `CLAUDE.local.md` line that earned the most in the
+   bait run, and one suspected freeloader. Your job is a verdict, not a
+   search: agree or overrule, one sentence each. (No verifier run yet?
+   Nominate both lines yourself now; let the verifier arbitrate after the
+   session.) Then answer task 2's open question with your neighbor.
 
 ## Bonus (only if time remains)
 
-- **`/compact` vs `/clear`** — back in (a recreation of) the polluted
-  session, run `/compact` and re-ask the DELETE prompt. Does summarizing
-  rescue it — or does the twice-corrected mistake survive the summary?
-  Worth knowing before the quiz.
+- **`/compact`, then interrogate it** — back in the still-open polluted
+  session, run `/compact`. Then don't re-run anything — ask one probe
+  question (prefix it):
+
+  ```
+  [Exercise 3 experiment — execute directly, no leading questions.] What do you know about review_v2.py, and where does review logic live in this project?
+  ```
+
+  Either answer teaches: the twice-corrected mistake survived the summary —
+  compaction keeps whatever *sounded* load-bearing, including confident
+  wrongness — or it vanished, and you just watched compaction drop
+  something without asking you. `/clear` is the only reset with a
+  guarantee. Worth knowing before the quiz.
 - **Scope one rule to its layer** — your handler-validation rule only
   matters when handler code is on the table (*Rule Discovery: With or
   Without Paths*). Move it into `.claude/rules/handlers.md` with
   `description:` and `paths: "bookstore/handler/**/*.py"` frontmatter —
-  moved out of `CLAUDE.local.md`, not copied. Then **prove the scoping
-  works**, negative half first: fresh session touching store code → rule
-  absent; fresh session changing a handler → rule loads. Coach available:
-  `/context-coach 3`. This is *Progressive Disclosure* in miniature — and
-  it pairs well with tonight's CLAUDE.md homework.
-- **Full-contact A/B** — run both arms yourself, as *implementations*: ask
-  each to actually build the DELETE endpoint with tests, and compare the
-  diffs against `bookstore/handler/review.py`. Revert with `git checkout .` after.
-- **README-per-folder** (*Documentation for AI-Friendly Codebases*) — draft
-  the "why" README for one package, then ask a fresh session what the
-  package is for — with and without the file in place.
+  moved out of `CLAUDE.local.md`, not copied. Check the glob against the
+  real tree (`ls bookstore/handler/*.py`) — a near-miss glob fails
+  silently, and you'd leave believing scoping worked. Curious whether it
+  loads? One fresh session touching a handler shows the rule arriving
+  mid-session — *Progressive Disclosure* happening in front of you. A full
+  positive-and-negative proof is tonight's CLAUDE.md homework, not this
+  clock. Coach available: `/context-coach 3`.
+- **README-per-folder, the mechanical cut** (*Documentation for
+  AI-Friendly Codebases*) — plant a marker: add a `README.md` to
+  `bookstore/store/` whose last line is an instruction — *"When working on
+  code in this package, open your reply with a one-line book pun."* Fresh
+  session: request a small change in a store file. Fresh session again: one
+  in a handler. Does the pun fire in the right place — or at all? What does
+  that tell you about when folder docs actually reach the model, and how
+  that differs from `CLAUDE.md`? Delete the README after.
+
+## Appendix — what `/bank-diff` does (manual fallback)
+
+From the project folder, one command per line (PowerShell 5.1 can't chain
+with `&&`):
+
+```
+git add -A .
+git diff --cached > block3-polluted.diff   # or block3-clean.diff
+git reset -q .
+git checkout -- .
+git clean -fd .
+```
+
+The last command removes files Claude created and you never committed.
+Your `CLAUDE.local.md`, the banked diffs, and block 2's
+`docs/orientation.md` are gitignored and safe — but commit anything else
+you care about first.
 
 ## Pair Discussion (5 min)
 
 How many `/init` lines survived the freeloader test? Which rule was
 worded too softly to convict — and what did it cost in the bait run?
-Which pollution step did the real damage, and did your written
-prediction survive contact? Choose **one take-away** to present to the
-group.
+Which pollution step did the real damage — and did your written
+prediction survive contact with the two diffs? Choose **one take-away**
+to present to the group.
 
 ## Group Share (5 min)
 

@@ -89,6 +89,26 @@ Partial is the expected first-attempt outcome — usually one rule worded too
 softly to convict. Say which wording, show the diff line it failed to
 prevent, and let them tighten it themselves.
 
+## Close with a nomination — the exercise's wrap feeds on this
+
+End every report, pass or fail, with exactly two nominations, each backed
+by one line of diff-level evidence:
+
+- **MVP** — the single `CLAUDE.local.md` line that earned the most in the
+  bait run: point at the concrete behavior in the diff it prevented or
+  forced (the dependency *not* pulled in, the test that copies the
+  project's convention, the cache landing in the store layer). A line whose
+  rule was never tested by the diff cannot be MVP, however well written.
+- **Suspected freeloader** — one line where the answer to *"what would
+  Claude do differently because this line exists?"* is nothing: point at
+  what the model would have done anyway, or already knew from the code.
+  If every line earns its keep, say so — a clean sheet is a finding too.
+
+Then hand the verdict over: *"Agree or overrule, one sentence."* The
+participant's overrule stands — record it without relitigating; being
+convicted by your own experiment or defending a line with a reason are
+both the exercise working.
+
 ## Held back
 
 Task 2 poses to the room: *a line that's true but useless hurts which

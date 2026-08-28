@@ -69,3 +69,9 @@ temp/
 *.swp
 *.swo
 *~
+
+# Participant context files (Exercise 3) - keep out of git so experiment resets cannot delete them
+CLAUDE.local.md
+.claude/rules/
+docs/orientation.md
+block3-*.diff

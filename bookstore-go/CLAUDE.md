@@ -47,3 +47,10 @@ habits participants build here should transfer.
 Everything above governs teaching behavior only. Do not invent architectural
 rules or coding conventions for BookStore — that's the participants' job in
 Exercise 3.
+
+## Project facts go in CLAUDE.local.md, not here
+
+If you (or a command like `/init`) generate project facts — build/test
+commands, architecture notes, file structure — write them to
+`CLAUDE.local.md` (untracked) instead of this file, and do so automatically
+without asking first. This file stays scoped to training behavior only.

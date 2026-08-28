@@ -1,8 +1,9 @@
-# Task 4 — Build a polluted session, on purpose
+# Task 4 — Poison one session, keep one clean
 
 **What they're refining:** their experiment plan — the pollution script, the
 written prediction, and the comparison criteria — coached *before* they run
-it. Afterwards, the debrief maps what happened back to the plan.
+it. Afterwards, the verdict walkthrough and debrief work from the two
+banked diff files (`block3-polluted.diff`, `block3-clean.diff`).
 
 **Slide anchors:** *Which Session Is in More Trouble?* · *Context Rot: The
 Attention Budget* · *Warning Signs of a Polluted Context* · *Anti-Patterns
@@ -20,17 +21,24 @@ in Context* · the **Trajectory** dimension.
   sink), one pasted dump with no question (context hoarding), one wrong
   "fact" stated and then corrected twice (over-correcting). Each step exists
   to attack a *named* dimension; a step they can't assign a dimension to is
-  decoration.
-- **A controlled comparison** — the arms are split across the pair: one
-  partner pollutes, the other stays clean. Identical final request in both
-  arms, pasted verbatim (retyping introduces a second variable), identical
+  decoration. The exercise sheet offers a worked plan to steal — a copied
+  plan is a valid plan (execution shows the failure modes either way), so
+  grade it on the same criteria; if they swapped in their own wrong "fact",
+  say why that's the better version.
+- **A controlled comparison** — the participant runs *both arms themselves*:
+  one polluted session, one clean. Identical final request in both arms,
+  pasted verbatim (retyping introduces a second variable), identical
   experiment prefix. The window is the only intended difference.
-- **Concrete comparison criteria** — the final request asks for a committed
-  answer, not an implementation: named file and functions, a status code, a
-  pattern handler to copy. Each is checkable against the existing handler
-  file. "Which answer feels better" cannot lose, so it cannot teach.
-- **Gauge reading in both arms** — `/context` percentage noted, so the
-  debrief can confront percentage with behavior.
+- **Concrete comparison criteria** — the final request is full contact: both
+  arms implement the endpoint, and the two banked diffs get ✓/✗ verdicts
+  per arm on five checks against the existing review handler: right file,
+  pattern copied, status code, test convention, no resurrection of the
+  corrected "fact". The verdicts are *theirs* — delivered in the
+  walkthrough below, or self-scored in their editor if they're diff-fluent.
+  "Which diff feels better" cannot lose, so it cannot teach.
+- **Gauge reading in both arms** — `/context` percentage noted before the
+  final prompt in each arm, so the debrief can confront percentage with
+  behavior.
 
 **Not applicable:**
 
@@ -47,7 +55,7 @@ in Context* · the **Trajectory** dimension.
   attack the same one, what's missing?"
 - "What result would prove your prediction *wrong*? If nothing could, it's
   not a prediction yet."
-- "Your criteria — could someone else apply them to both outputs and reach
+- "Your criteria — could someone else apply them to both diffs and reach
   your verdict without you in the room?"
 
 ## Predicted effects for common findings
@@ -55,22 +63,54 @@ in Context* · the **Trajectory** dimension.
 - Pollution is all on-topic questions about the codebase → both arms come
   out similar; the experiment "fails" — coherent context degrades far more
   gently than distractors do. *Held back — see below.*
+- Kitchen-sink step asks a one-line trivia question → barely any tokens,
+  barely any drift; the step exists but doesn't pull. Long unrelated
+  *output* is what fills the window — that's why the worked plan asks for
+  full recipes, not recipe names.
 - No written prediction → hindsight rewrites itself; the debrief grades
   nothing
 - Different wording between arms, retyped instead of pasted, or prefix on
   one arm only → two changed variables; no conclusion survives
+- Diffs not banked before the reset (`/bank-diff` skipped, raw `git
+  checkout` run instead) → the comparison runs on memory and vibes;
+  nothing convicts
 - Vibes-only criteria → both arms declared "fine"; nothing learned
+
+## The verdict walkthrough — you show, they call
+
+Most participants can't read raw unified diffs fluently, and diff literacy
+is not the lesson — judgment is. So when they hand over the two diff files,
+run the five checks **one at a time, evidence first, their verdict before
+yours**:
+
+1. Read both diff files and the existing review handler yourself, silently.
+2. For each check — right file · pattern copied · status code · test
+   convention · resurrected "fact"/log-dump chase — show the *minimal*
+   relevant excerpt from each diff (a few lines, labeled by arm) next to
+   the corresponding lines of the reference handler, plainly enough that
+   no diff-format knowledge is needed. Explain diff notation once, in one
+   line, the first time it matters.
+3. Ask for their ✓/✗ per arm. **Wait.** Never volunteer your verdict first,
+   and never batch multiple checks into one question.
+4. After their call: confirm, or overturn by pointing at the decisive line.
+   Their wrong call corrected by evidence teaches more than your right call
+   announced.
+
+If they open with a self-made scorecard instead, don't redo the walkthrough
+— spot-check it: confirm what the evidence supports, overturn what it
+doesn't, evidence on the table either way.
 
 ## During the debrief
 
-Map every observed defect to the pollution step that planted it and the
-dimension it attacked. Confront the gauge: what % was the polluted arm at?
-(Usually nowhere near full — that's the A/B slide's punchline landing in
-their own terminal.) If the polluted arm did *fine*, treat it exactly like a
-got-away-with-it in Block 2: name luck as luck, point at which pollution
-step was weakest, and offer the sharper re-run. If the pair ran the
-full-contact bonus (both arms as implementations), the same mapping applies
-to the diffs. If they ran `/compact` as the bonus suggests: did the
+After the ten verdicts stand, map every confirmed defect to the pollution
+step that planted it and the dimension it attacked. Then confront the
+gauge: put the two `/context` percentages next to the two diffs and ask
+whether the difference they *measured* explains the difference they *see*.
+(The percentages usually sit within a point or two of each other — that's
+the A/B slide's punchline landing in their own terminal.) If the polluted
+arm did *fine*, treat it exactly like a got-away-with-it in Block 2: name
+luck as luck, point at which pollution step was weakest, and offer the
+sharper re-run. If they ran the `/compact` bonus probe: did the
 twice-corrected mistake survive the summary?
 Lossy summarization keeps whatever looked load-bearing — including confident
 wrongness.
@@ -88,8 +128,10 @@ Two things the run must teach, not you:
   patterns better, and the polluted arm's defects trace to specific steps
   (the corrected fact resurfacing is the classic). Never predict this for
   them, and never confirm their prediction before the run.
-- **Pollution beats percentage** — that a 30%-full poisoned window loses to
-  a fuller coherent one. If their script is all on-topic questions, nudge
-  with the Session A/B question above; don't explain why. If asked directly
-  after the run, give it, with the hook: this is why the deck says judge the
+- **Pollution beats percentage** — that the gauge barely separates the two
+  arms while the diffs do: pollution is cheap in tokens and expensive in
+  trajectory, and a lightly-filled poisoned window loses to a fuller
+  coherent one. If their script is all on-topic questions, nudge with the
+  Session A/B question above; don't explain why. If asked directly after
+  the run, give it, with the hook: this is why the deck says judge the
   session by *behavior*, not the gauge.
