@@ -307,8 +307,7 @@ this report, that is the lesson — consistency is not correctness.
 git add specs/ && git commit -m "spec: bookstore-web frontend"
 ```
 
-Exercise 7 starts from this. A spec that lives only in a chat window is not a
-spec.
+A spec that lives only in a chat window is not a spec.
 
 ---
 
