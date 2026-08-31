@@ -1,8 +1,8 @@
 # BookStore Web Constitution
 
-The non-negotiable principles for the BookStore frontend. `/speckit.plan` gates
-its output against this file, `/speckit.analyze` audits every artifact against
-it, and `/speckit.implement` is bound by it.
+The non-negotiable principles for the BookStore frontend. `/speckit-plan` gates
+its output against this file, `/speckit-analyze` audits every artifact against
+it, and `/speckit-implement` is bound by it.
 
 ## Core Principles
 
@@ -109,7 +109,7 @@ This constitution supersedes conventions inherited from any other BookStore
 project. Plans and tasks that conflict with it are defects in the plan, not
 grounds for an exception.
 
-`/speckit.analyze` checks generated artifacts against these principles. Treat
+`/speckit-analyze` checks generated artifacts against these principles. Treat
 what it reports as findings to act on, not as advice to weigh.
 
 **Version**: 1.1.0 | **Ratified**: 2026-08-28 | **Last Amended**: 2026-08-28

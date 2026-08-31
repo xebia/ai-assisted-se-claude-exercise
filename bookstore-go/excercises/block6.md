@@ -76,7 +76,7 @@ in `bookstore-web`. Yours is pre-written — you are not authoring one today.
 It has six principles and fits on one page. Read them, then answer this:
 **which two things does it forbid outright?**
 
-### 2. `/speckit.specify` — capture intent (3 min)
+### 2. `/speckit-specify` — capture intent (3 min)
 
 Use this prompt **exactly as written**:
 
@@ -103,7 +103,7 @@ building this still have to make up?** Four worth checking:
 
 **Which of those four does the spec actually answer?**
 
-### 3. `/speckit.clarify` — interrogate the spec (6 min)
+### 3. `/speckit-clarify` — interrogate the spec (6 min)
 
 **This is the core of the exercise.** Spec Kit asks up to five targeted
 questions about what you left underspecified, and writes your answers back into
@@ -141,7 +141,7 @@ git add specs/
 ```
 
 Staging is enough — no commit needed. `git diff` compares your working tree
-against what you staged, so it will show exactly what `/speckit.clarify`
+against what you staged, so it will show exactly what `/speckit-clarify`
 touched. You read that diff in task 4, not now.
 
 **Then spend two minutes finding out what this API actually does.** You are
@@ -178,7 +178,7 @@ to drop it:
 go run . --seed
 ```
 
-Now run `/speckit.clarify`. It asks up to five questions, one at a time, and
+Now run `/speckit-clarify`. It asks up to five questions, one at a time, and
 waits for each answer. **Answer fast** — five questions, six minutes. You are
 making a first draft, not a perfect spec.
 
@@ -192,7 +192,7 @@ Two rules:
 Then stop. Do not read the spec yet — that is what you do in task 4, while a
 slow command runs.
 
-### 4. `/speckit.plan` — decide how, and review while it works (6 min)
+### 4. `/speckit-plan` — decide how, and review while it works (6 min)
 
 This is the slowest command in the flow, and it runs unattended for two to four
 minutes. That is not dead time — it is when you review what you just wrote.
@@ -209,7 +209,7 @@ specs/001-*/plan.md          the approach
            quickstart.md     how to verify
 ```
 
-Note the second file. `/speckit.plan` does its own research, unprompted — task 5
+Note the second file. `/speckit-plan` does its own research, unprompted — task 5
 comes back to that.
 
 #### While it runs: review `specs/001-*/spec.md`
@@ -222,7 +222,7 @@ cd ../bookstore-web && git diff specs/001-*/spec.md
 
 The `## Clarifications` log at the top tells you what you were *asked*. Only the
 diff shows **where the answers landed** — and that is the whole point, because
-`/speckit.clarify` rewrote Functional Requirements, User Stories, Data Model,
+`/speckit-clarify` rewrote Functional Requirements, User Stories, Data Model,
 Success Criteria and Edge Cases in place while you were answering.
 
 Four things to look for:
@@ -238,7 +238,7 @@ Four things to look for:
   rewrite a user story, add an edge case *and* change the data model. Did any of
   them land somewhere you would not have put them?
 - **Anything you now disagree with.** Write it down; do not fix it yet.
-  `/speckit.plan` is reading this file right now, and editing it mid-run gets
+  `/speckit-plan` is reading this file right now, and editing it mid-run gets
   you a plan built from two different specs.
 
 **Now compare with your neighbour.** Put their `spec.md` next to yours and find
@@ -248,7 +248,7 @@ written a spec?
 
 ### 5. Check the plan against reality (3 min)
 
-`/speckit.plan` wrote its own account of what this API does, in two places:
+`/speckit-plan` wrote its own account of what this API does, in two places:
 
 ```
 specs/001-*/research.md
@@ -271,7 +271,7 @@ you saw:
 **Did you find one?** Write it down. In a real project it goes back into the
 plan before anyone writes code.
 
-### 6. `/speckit.tasks` — break it down (4 min)
+### 6. `/speckit-tasks` — break it down (4 min)
 
 Open `specs/001-*/tasks.md`. This is the artifact Exercise 7 consumes, so read
 it properly.
@@ -289,7 +289,7 @@ they write the same file? Shared things — the API client, the stylesheet,
 `index.html` — belong to the foundational phase (constitution principle IV). If
 one lives inside a story, the `[P]` is a lie and two agents will collide.
 
-### 7. `/speckit.analyze` — validate (3 min)
+### 7. `/speckit-analyze` — validate (3 min)
 
 A read-only consistency check across `spec.md`, `plan.md` and `tasks.md`. It
 writes no files.
@@ -314,9 +314,9 @@ spec.
 
 ## Pair Discussion (2 min)
 
-- Which `/speckit.clarify` question did you not see coming?
+- Which `/speckit-clarify` question did you not see coming?
 - Which of your answers travelled further into the spec than you expected?
-- Did `/speckit.plan` get anything wrong about the API? Would `/speckit.analyze`
+- Did `/speckit-plan` get anything wrong about the API? Would `/speckit-analyze`
   ever have told you?
 - You started from the same prompt against the same API. Where do your two specs
   differ, and which of those differences would ever have surfaced if neither of
@@ -339,4 +339,4 @@ bookstore-web/specs/001-*/
   tasks.md           the work queue, with [P] markers
 ```
 
-No application code. That is the point — `/speckit.implement` is Exercise 7.
+No application code. That is the point — `/speckit-implement` is Exercise 7.
