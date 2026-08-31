@@ -1,8 +1,14 @@
 # Exercise 2 — Context files vs. the bait run
 
-**Artifact:** `CLAUDE.local.md`, the working-tree changes produced by the
-bait run, and — only if the participant did the bonus scoped-rule task —
-the path-scoped rule file under `.claude/rules/`.
+**Artifact:** `CLAUDE.local.md`, the banked bait diff (`block3-bait.diff`
+at the project root — the exercise banks and resets in one move, so expect
+a clean working tree, not live changes), and — only if the participant did
+the bonus scoped-rule task — the path-scoped rule file under
+`.claude/rules/`.
+
+**This check is homework by default.** The exercise sends participants
+here after the session, with their own MVP/freeloader nominations already
+written down in the wrap. Grade the same way regardless of when it runs.
 
 **Under review: the context files, not a prompt.** This is the Block 3
 exception to this skill's usual framing. The bait prompt is fixed and
@@ -51,11 +57,15 @@ dimensions sound*.
    failing is a Correctness finding regardless of anything else.
 2. If a rule file exists, list the files its glob matches against the
    actual tree (every handler file? anything outside the layer?).
-3. Only then open the bait diff: where did the cache land (store layer or
-   smeared across handlers?), was anything added to the dependency manifest,
-   do new tests exist and do they follow the project's convention (compare
-   against one existing test file, not memory), is cache invalidation wired
-   to update/delete, is handler validation still intact?
+3. Only then read `block3-bait.diff` (`git apply --stat` for the shape,
+   the file itself for the content — the changes are no longer in the
+   working tree): where did the cache land (store layer or smeared across
+   handlers?), was anything added to the dependency manifest, do new tests
+   exist and do they follow the project's convention (compare against one
+   existing test file, not memory), is cache invalidation wired to
+   update/delete, is handler validation still intact? No
+   `block3-bait.diff`? The bank step was skipped — say so; without the
+   diff only Correctness and Size can be graded.
 
 ## Known traps
 
@@ -89,7 +99,7 @@ Partial is the expected first-attempt outcome — usually one rule worded too
 softly to convict. Say which wording, show the diff line it failed to
 prevent, and let them tighten it themselves.
 
-## Close with a nomination — the exercise's wrap feeds on this
+## Close with a nomination — and arbitrate theirs
 
 End every report, pass or fail, with exactly two nominations, each backed
 by one line of diff-level evidence:
@@ -104,10 +114,11 @@ by one line of diff-level evidence:
   what the model would have done anyway, or already knew from the code.
   If every line earns its keep, say so — a clean sheet is a finding too.
 
-Then hand the verdict over: *"Agree or overrule, one sentence."* The
-participant's overrule stands — record it without relitigating; being
-convicted by your own experiment or defending a line with a reason are
-both the exercise working.
+The participant wrote their own nominations in the session's wrap. Ask for
+them, then arbitrate: name where you agree, and where you differ show the
+diff line that decides it. Their overrule stands — record it without
+relitigating; being convicted by your own experiment or defending a line
+with a reason are both the exercise working.
 
 ## Held back
 

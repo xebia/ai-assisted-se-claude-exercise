@@ -1,6 +1,6 @@
 # Exercise 3: The Context Is the Deliverable
 
-**Block**: 3 — Context Engineering **Duration**: 30 minutes
+**Block**: 3 — Context Engineering **Duration**: 40 minutes
 **Project**: Same BookStore API.
 
 **Goal**: Practice controlling *what reaches the model* — and proving the
@@ -39,7 +39,7 @@ short on time? Say *"just tell me"*.
    coaching: this is a reading, not a deliverable. Keep the number; task 4
    will make you cite it.
 
-2. **`/init`, then earn every token** (9 min) — run `/init` and let it
+2. **`/init`, then earn every token** (12 min) — run `/init` and let it
    draft. Then the real work (*Start with `/init`, then refine by hand*):
    - **Grade every generated line** with the test from *Which CLAUDE.md Line
      Earns Its Tokens?*: what would Claude do differently because this line
@@ -60,7 +60,7 @@ short on time? Say *"just tell me"*.
    - Open question for the wrap: a line that's true but useless hurts which
      dimension? A line that's specific but *wrong*?
 
-3. **The bait run** (6 min) — Block 2's vague prompt, unimproved, on
+3. **The bait run** (8 min) — Block 2's vague prompt, unimproved, on
    purpose. Fresh session, send verbatim (with the experiment prefix):
 
    ```
@@ -73,16 +73,17 @@ short on time? Say *"just tell me"*.
    project's unittest convention?
    Every rule that held earned its tokens; every rule that failed, note the
    exact wording that was too soft to convict.
-   - **Payoff:** run `/verify-exercise 2` — it grades your context files
-     against the bait diff, prediction by prediction, and closes by
-     nominating your MVP line and one suspected freeloader — task 5 needs
-     that nomination. Behind on time? It works standalone; run it after the
-     session.
-   - Don't keep the bait changes: `git checkout .` once verified.
+   - **Bank the evidence and reset:** `/bank-diff bait` — the diff lands
+     in `block3-bait.diff` and the tree comes back clean for task 4.
+   - **Payoff — tonight, not now:** `/verify-exercise 2` grades
+     `block3-bait.diff` against your context files, prediction by
+     prediction, and closes with its own MVP and freeloader nominations.
+     It works standalone, so it's homework by default — run it in the room
+     only if you're ahead of the clock. Task 5 works either way.
    - While Claude works, don't watch it type — write your task 4
      prediction instead.
 
-4. **Poison one session, keep one clean** (11 min) — recreate Session B
+4. **Poison one session, keep one clean** (14 min) — recreate Session B
    from *Which Session Is in More Trouble?*. You run **both arms yourself**
    — the clean arm costs two minutes, and holding both diffs side by side
    is what makes the debrief bite.
@@ -109,26 +110,33 @@ short on time? Say *"just tell me"*.
    - **Predict first, in writing** — which arm builds the better endpoint,
      and what *specifically* will differ. One sentence is enough. Optional
      sanity check: `/context-coach 4` on your plan.
-   - **Polluted arm** — fresh session, run your three pollution steps, then
-     `/context` and note the %. Then paste verbatim (prefix!):
+   - **Clean arm first — start it, then go to the next step:** fresh session,
+     nothing else at all: `/context`, note the %, then paste verbatim:
      ```
      [Exercise 3 experiment — execute directly, no leading questions.] Add a DELETE /reviews/{id} endpoint to the BookStore API, with tests.
      ```
-     This is full contact — it implements. **Keep the session open** (a
-     bonus task returns to it). When it finishes, bank the evidence and
-     reset in one move: `/bank-diff polluted`. It saves the diff to
-     `block3-polluted.diff`, restores a clean working tree, and refuses to
-     run if something looks off. (Doing it by hand instead? Appendix at the
-     bottom.)
-   - **Clean arm** — fresh session, nothing else at all: `/context`, note
-     the %, same prompt pasted verbatim (prefix!). Then `/bank-diff clean`.
+     This is full contact — it implements, and that takes a few minutes.
+     Don't watch it type.
+   - **Pollute session two while it works:** second terminal, fresh
+     session, run your three pollution steps there. They're chat-only —
+     recipes, pasted logs, and corrections touch no files, so the two arms
+     don't collide. If the wrong-fact dance tempts Claude to start editing,
+     say "nothing to do yet."
+   - **Swap:** when the clean arm finishes, `/bank-diff clean` — the diff
+     lands in `block3-clean.diff`, the tree comes back clean, and the
+     command refuses to run if something looks off (by hand instead?
+     Appendix at the bottom). Then back in the polluted session:
+     `/context`, note the %, same prompt pasted verbatim (prefix!). **Keep
+     this session open** (a bonus task returns to it), and finish with
+     `/bank-diff polluted`.
    - **Verdict time — the coach shows, you call:** hand both diff files
      to `/context-coach 4`. It walks the five checks one at a time —
      right file touched · existing handler pattern copied · correct
      success status code · tests in the unittest convention · no
      resurrected "fact" or log-dump chase — showing the relevant lines
      from each diff next to `bookstore/handler/review.py`, then
-     waiting for your ✓/✗ per arm before giving its own. Ten verdicts,
+     waiting for your pass-or-fail per arm before giving its own (typed
+     however you like — the coach keeps the tally). Ten verdicts,
      yours first, against the file — not against taste. (Fluent in
      diffs? Score both files in your editor first and open with your
      scorecard instead.)
@@ -137,12 +145,12 @@ short on time? Say *"just tell me"*.
      two gauge numbers next to the two diffs: does the difference you
      *measured* explain the difference you *see*?
 
-5. **Wrap** (2 min) — the `/verify-exercise 2` report from task 3 ends with
-   a nomination: the `CLAUDE.local.md` line that earned the most in the
-   bait run, and one suspected freeloader. Your job is a verdict, not a
-   search: agree or overrule, one sentence each. (No verifier run yet?
-   Nominate both lines yourself now; let the verifier arbitrate after the
-   session.) Then answer task 2's open question with your neighbor.
+5. **Wrap** (4 min) — nominate, in writing, from your own bait-run notes:
+   the `CLAUDE.local.md` line that earned the most, and one suspected
+   freeloader — one sentence of evidence each. Tonight's `/verify-exercise
+   2` run closes with its own nominations: see whose verdict survives, and
+   overrule it if yours is better argued. Then answer task 2's open
+   question with your neighbor.
 
 ## Bonus (only if time remains)
 
@@ -186,7 +194,7 @@ with `&&`):
 
 ```
 git add -A .
-git diff --cached > block3-polluted.diff   # or block3-clean.diff
+git diff --cached > block3-polluted.diff   # or block3-clean.diff / block3-bait.diff
 git reset -q .
 git checkout -- .
 git clean -fd .
@@ -197,14 +205,10 @@ Your `CLAUDE.local.md`, the banked diffs, and block 2's
 `docs/orientation.md` are gitignored and safe — but commit anything else
 you care about first.
 
-## Pair Discussion (5 min)
+## Plenary Harvest (5 min)
 
-How many `/init` lines survived the freeloader test? Which rule was
-worded too softly to convict — and what did it cost in the bait run?
-Which pollution step did the real damage — and did your written
-prediction survive contact with the two diffs? Choose **one take-away**
-to present to the group.
-
-## Group Share (5 min)
-
-Each participant presents **one take-away** from this exercise to the group.
+Trainer popcorns the room — have answers ready: how many `/init` lines
+survived the freeloader test? Which rule was worded too softly to convict —
+and what did it cost in the bait run? Which pollution step did the real
+damage — did your written prediction survive contact with the two diffs?
+Close with **one take-away** you'd give someone who skipped today.

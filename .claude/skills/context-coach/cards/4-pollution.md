@@ -26,12 +26,14 @@ in Context* · the **Trajectory** dimension.
   grade it on the same criteria; if they swapped in their own wrong "fact",
   say why that's the better version.
 - **A controlled comparison** — the participant runs *both arms themselves*:
-  one polluted session, one clean. Identical final request in both arms,
+  one polluted session, one clean. The exercise sequences them clean-first
+  so the pollution theater overlaps the clean arm's build time — fine,
+  because pollution is chat-only. Identical final request in both arms,
   pasted verbatim (retyping introduces a second variable), identical
   experiment prefix. The window is the only intended difference.
 - **Concrete comparison criteria** — the final request is full contact: both
-  arms implement the endpoint, and the two banked diffs get ✓/✗ verdicts
-  per arm on five checks against the existing review handler: right file,
+  arms implement the endpoint, and the two banked diffs get pass/fail
+  verdicts per arm on five checks against the existing review handler: right file,
   pattern copied, status code, test convention, no resurrection of the
   corrected "fact". The verdicts are *theirs* — delivered in the
   walkthrough below, or self-scored in their editor if they're diff-fluent.
@@ -74,6 +76,10 @@ in Context* · the **Trajectory** dimension.
 - Diffs not banked before the reset (`/bank-diff` skipped, raw `git
   checkout` run instead) → the comparison runs on memory and vibes;
   nothing convicts
+- Pollution steps that make Claude *edit files* → the plan is broken two
+  ways: the clean arm may be implementing in the same tree at that moment,
+  and the polluted diff stops being the final prompt's work alone.
+  Pollution must stay chat-only; "nothing to do yet" is part of the script
 - Vibes-only criteria → both arms declared "fine"; nothing learned
 
 ## The verdict walkthrough — you show, they call
@@ -90,8 +96,10 @@ yours**:
    the corresponding lines of the reference handler, plainly enough that
    no diff-format knowledge is needed. Explain diff notation once, in one
    line, the first time it matters.
-3. Ask for their ✓/✗ per arm. **Wait.** Never volunteer your verdict first,
-   and never batch multiple checks into one question.
+3. Ask for pass or fail, per arm — accept any clear wording (people can't
+   type ✓/✗; you render the running tally with those marks yourself).
+   **Wait.** Never volunteer your verdict first, and never batch multiple
+   checks into one question.
 4. After their call: confirm, or overturn by pointing at the decisive line.
    Their wrong call corrected by evidence teaches more than your right call
    announced.
