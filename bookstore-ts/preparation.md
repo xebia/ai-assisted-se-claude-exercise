@@ -70,6 +70,46 @@ bun install
 bun run start
 ```
 
+### 6. Spec Kit and Node (for Exercise 6)
+
+In Exercise 6 we use [Spec Kit](https://github.com/github/spec-kit), GitHub's
+spec-driven development toolkit, to specify a frontend for the BookStore API.
+
+**Node.js 20+** — https://nodejs.org/ (the frontend's dev server runs on it)
+
+**uv** — Spec Kit is a Python tool installed via `uv`:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh     # macOS / Linux
+# Windows (PowerShell):
+# powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/0.9.9/install.ps1 | iex"
+```
+
+Then install Spec Kit and set up the frontend project:
+
+```bash
+uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
+
+cd ai-assisted-se-claude-exercise/bookstore-web
+npm install
+specify init --here --force --non-interactive --integration claude
+git checkout -- .specify/memory/constitution.md      # must run AFTER init
+specify check
+```
+
+> [!IMPORTANT]
+> The `git checkout` must come **after** `specify init`. The constitution is
+> committed at `.specify/memory/constitution.md`, and `specify init --force`
+> overwrites it with its own template. Restoring it from git puts the real one
+> back — and `git status` will tell you if you forget.
+
+Please do this **before the training day**. `specify init` downloads a template
+bundle from GitHub, and thirty laptops doing that at once on conference wifi is
+not a good start to a session.
+
+Verify: `specify check` reports no problems, and `npm run dev` starts a server
+on http://localhost:5173.
+
 ## Quick checklist
 
 - VSCode is installed and opens without issues
@@ -81,6 +121,13 @@ bun run start
 - Git is installed (`git --version` works in your terminal)
 - You have cloned the bookstore project from GitHub and `bun install` finishes
   without errors
+
+- Node.js 20+ is installed (`node --version` works in your terminal)
+- `uv` is installed (`uv --version` works in your terminal)
+- Spec Kit is installed (`specify check` runs without problems)
+- `bookstore-web` is set up (`npm install` finished, `.specify/` exists,
+  `.specify/memory/constitution.md` starts with "# BookStore Web Constitution"
+  and `git status` shows it unmodified)
 
 ## Questions?
 
