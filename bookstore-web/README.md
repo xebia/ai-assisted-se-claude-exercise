@@ -29,7 +29,8 @@ the browser on a single origin — no CORS, and no change to any backend.
 
 ## Running it
 
-Two terminals.
+Two terminals — but only from **Exercise 7** onward. Exercise 6 specifies this
+frontend without running it, and needs the backend alone.
 
 **Terminal 1 — a backend:**
 
@@ -92,7 +93,7 @@ Shapes are not uniform, which matters when you write the spec:
 | `.specify/memory/constitution.md` | Pre-written project principles. **Read this first.** The one file under `.specify/` that is committed — Spec Kit reads it from here. |
 | `vite.config.js` | Dev server and `/api` proxy. Not application code. |
 | `index.html` | Deliberately empty shell. |
-| `specs/` | Created by Spec Kit in Exercise 6, plus your own `api-research.md` alongside the spec. **Commit this** — Exercise 7 needs it. |
+| `specs/` | Created by Spec Kit in Exercise 6. **Commit this** — Exercise 7 needs it. |
 | `.specify/` (the rest) | Spec Kit tooling. Generated during setup, not committed. |
 
 ## Setup

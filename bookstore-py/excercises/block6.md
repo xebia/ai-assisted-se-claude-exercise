@@ -28,33 +28,35 @@ Setup is in `preparation.md`. Verify it in one command:
 cd ../bookstore-web && specify check
 ```
 
-Then get both halves running.
+You need three terminals. **Not** the frontend dev server — there is no
+frontend yet, and that is the point: today you specify it, Exercise 7 builds it.
 
 **Terminal 1 — your backend**, from the `bookstore-py` project directory
-(any of the four backends works; the frontend is agnostic):
+(any of the four backends works; the spec you write is agnostic):
 
 ```bash
 python3 main.py
 ```
 
-**Terminal 2 — the frontend dev server:**
+Confirm it answers — this must return JSON, not a connection error:
 
 ```bash
-cd ../bookstore-web && npm run dev
+curl http://localhost:8080/api/books
 ```
 
-Confirm the proxy works — this must return JSON, not a connection error:
-
-```bash
-curl http://localhost:5173/api/books
-```
-
-**Terminal 3 — Claude Code, started from `bookstore-web` with your backend
+**Terminal 2 — Claude Code, started from `bookstore-web` with your backend
 readable:**
 
 ```bash
 cd ../bookstore-web && claude --add-dir ../bookstore-py
 ```
+
+**Terminal 3 — a plain shell**, anywhere in the repo. You need one for `curl`
+and `git` while Claude Code is busy in terminal 2.
+
+You will call the API on `http://localhost:8080` directly. The finished frontend
+will reach it at the same-origin path `/api` — `bookstore-web/vite.config.js`
+proxies that to port 8080 — so the paths in your spec are the ones you see here.
 
 ---
 
@@ -62,39 +64,19 @@ cd ../bookstore-web && claude --add-dir ../bookstore-py
 
 ### 1. Read the constitution (2 min)
 
+Spec Kit separates two kinds of rules. A **spec** describes one feature and is
+done when that feature ships. A **constitution** holds the rules that outlive
+every feature — stack, architecture, what counts as finished. Spec Kit re-reads
+it at each later step, so a plan or a task that breaks one of these is a defect
+to fix, not a trade-off to weigh.
+
 Open [`.specify/memory/constitution.md`](../../bookstore-web/.specify/memory/constitution.md)
-in `bookstore-web`. It is pre-written — you are not authoring one today, and it
-is already where Spec Kit looks for it.
+in `bookstore-web`. Yours is pre-written — you are not authoring one today.
 
-Read it and note **two things it forbids**.
+It has six principles and fits on one page. Read them, then answer this:
+**which two things does it forbid outright?**
 
-Where those constraints show up is worth knowing: `/speckit.plan` gates its
-output against this file and `/speckit.analyze` audits every artifact against
-it. `/speckit.specify` does **not** read it — so don't go hunting for the
-constitution's fingerprints in `spec.md` in the next task. It bites from task 5
-onward.
-
-**Principle II is the one that will bite you.** There are four interchangeable
-implementations of this API. That is what the principle protects: a requirement
-that is only true of the one you happen to be running is a defect, not a detail.
-
-The rule is not "don't read the source". It is *what you take from it*:
-
-- The source is good for finding out **what to ask** — which routes exist, which
-  query parameters are read, which fields come back.
-- The source is not where you learn **what happens**. Only a response tells you
-  that. A requirement saying "returns X" that nobody ever saw return X is a
-  guess wearing a citation.
-- Anything below the HTTP boundary — tables, columns, SQL, file layout,
-  framework behaviour — cannot appear in a requirement, however true it is. If
-  you have a way to query the database directly, that is not research for this
-  spec; it is the shortest route to a violation.
-
-The test for every requirement you write: **would this still hold if the backend
-were swapped for one of the other three tomorrow?** If not, it belongs in your
-research notes, not in the spec.
-
-### 2. `/speckit.specify` — capture intent (4 min)
+### 2. `/speckit.specify` — capture intent (3 min)
 
 Use this prompt **exactly as written**:
 
@@ -102,67 +84,122 @@ Use this prompt **exactly as written**:
 > author and its reviews, add a review to a book, and browse authors. The API is
 > already running behind `/api`.
 
-It writes `specs/001-*/spec.md`. Don't read it yet — the next task starts by
-handing it to someone else.
+It writes `specs/001-*/spec.md`. Open it and scroll to **Assumptions** at the
+bottom — that is where the spec parks what it invented. One entry reads roughly:
 
-The prompt was deliberately thin, and the spec inherits that. Nothing in it was
-informed by the API it is a UI for, because nothing has looked at the API yet.
+> Ratings use a simple numeric scale (e.g., 1 to 5); the exact scale is a UI
+> presentation detail to be finalized during implementation.
 
-### 3. Research what the spec can't answer (4 min)
+Nothing has called the API yet, so that scale is a guess — and it is the number
+your review form will send.
 
-The next task interrogates you about an API you have never called. Answering it
-from memory is how a spec ends up describing a REST API that does not exist.
+Now read the requirements with one question in mind: **what would someone
+building this still have to make up?** Four worth checking:
 
-You are not going to do this by hand. **Delegate it to a subagent** and give it
-a brief of your own writing. What the brief has to get across:
+- How does a visitor reach page 2 of a list longer than one screen?
+- Where does a new review appear once it is submitted — top or bottom?
+- What counts as a valid rating, and who rejects an invalid one?
+- What does the page show for a book id that does not exist?
 
-- The subagent's input is the `spec.md` you just generated. Its job is to find
-  every statement in there that cannot be settled without calling the live API —
-  and then settle it, by calling it.
-- **Evidence per finding**, not description: the request it made, the status it
-  got back, the body it got back. A finding without a response attached is an
-  opinion.
-- Verify, do not infer. Principle II from task 1 applies to your researcher too.
-- Output is a file, written next to the spec: `api-research.md`, in the same
-  `specs/001-*/` directory. Findings that live only in a transcript are gone by
-  the next task.
+**Which of those four does the spec actually answer?**
 
-**While it works, don't watch it type.** Read `spec.md` yourself and write down
-the gaps *you* would have asked about.
-
-Then, when it comes back — and this is the part that matters — **do not trust
-it**. Compare its gaps against yours, then pick two of its findings and check
-them against the running API yourself. A researcher reporting on a REST API will
-happily write down the API it has read a thousand times instead of the one
-running on `:8080`, and the only thing standing between that and your spec is
-you.
-
-### 4. `/speckit.clarify` — interrogate the spec (5 min)
+### 3. `/speckit.clarify` — interrogate the spec (6 min)
 
 **This is the core of the exercise.** Spec Kit asks up to five targeted
 questions about what you left underspecified, and writes your answers back into
 the spec.
 
-Answer **quickly — do not deliberate**, and answer from `api-research.md`. You
-can afford the speed because you did the research; that is the whole point of
-having done it.
+Unlike the other commands, this one creates **no new file**. Everything lands in
+the spec you already have:
 
-Two rules for the answers:
+```
+specs/001-*/spec.md                     modified in place, re-saved after every answer
+specs/001-*/checklists/requirements.md  re-validated — only if it exists; ours will not
+```
 
-- Where the research covers the question, answer with what was observed — not
-  with what a REST API conventionally does.
-- Where the research does not cover it, answer anyway and **mark that you
-  guessed**. Research is never complete. An honest guess that is labelled is a
-  defect someone can find later; an unlabelled one is a landmine.
+Two new headings appear, and by design only these two — placed near the **top**
+of the spec, just after its overview section, not appended at the end:
 
-Diff `spec.md` afterwards and see where your answers landed. If you and your
-neighbour turn the same prompt into two different specs, that is the correct
-outcome — and the reason the artifact gets committed.
+```markdown
+## Clarifications
 
-### 5. `/speckit.plan` — decide how (5 min)
+### Session YYYY-MM-DD
 
-Runs unattended. While it works, watch what it writes — it produces **five**
-files, not one:
+- Q: <the question it asked> → A: <the answer you gave>
+```
+
+That log is the cheap part. Each answer is *also* applied wherever it belongs —
+Functional Requirements, User Stories, Data Model, Success Criteria or Edge
+Cases — and where an answer contradicts something the spec already said, the old
+sentence is **replaced, not added to**. What you get back is not the file you
+had plus a section at the top.
+
+**First, snapshot the spec** so you can see all of that later:
+
+```bash
+git add specs/
+```
+
+Staging is enough — no commit needed. `git diff` compares your working tree
+against what you staged, so it will show exactly what `/speckit.clarify`
+touched. You read that diff in task 4, not now.
+
+**Then spend two minutes finding out what this API actually does.** You are
+about to be asked questions whose answers are not what a REST API
+conventionally does.
+
+Two of the four gaps from task 2, answered in 30 seconds:
+
+```bash
+# how do you get page 2?
+curl -s 'http://localhost:8080/api/books?page=0&size=3'
+curl -s 'http://localhost:8080/api/books?page=1&size=3'
+
+# a rating of 99 on an empty review — does this get rejected?
+curl -s -X POST http://localhost:8080/api/books/1/reviews \
+  -H 'Content-Type: application/json' -d '{"rating":99,"review_text":""}'
+```
+
+Two answers you now have that no amount of reasoning would have given you:
+
+- **Pages start at 1.** Page 0 returns page 1 again, so a UI counting from zero
+  shows the first page twice and never reaches the last.
+- **`201 Created`.** The server accepts a rating of 99 on an empty review. It
+  validates nothing — so every rule about a valid review is the UI's job.
+
+Both are UI decisions, and neither was in the spec. That is the point of these
+two minutes: **the clarify questions are about your UI, but some of them can
+only be answered by asking the API.**
+
+That POST stored a real review on book 1 — rating 99, empty text. Reseed
+to drop it:
+
+```bash
+python3 main.py --seed
+```
+
+Now run `/speckit.clarify`. It asks up to five questions, one at a time, and
+waits for each answer. **Answer fast** — five questions, six minutes. You are
+making a first draft, not a perfect spec.
+
+Two rules:
+
+- If you saw the answer in the curl output, use that.
+- If you did not, answer anyway — but **say in your answer that you are
+  guessing**. Your words go into the spec as written, so the label travels with
+  them. Task 4 comes back for these.
+
+Then stop. Do not read the spec yet — that is what you do in task 4, while a
+slow command runs.
+
+### 4. `/speckit.plan` — decide how, and review while it works (6 min)
+
+This is the slowest command in the flow, and it runs unattended for two to four
+minutes. That is not dead time — it is when you review what you just wrote.
+
+**Start it now**, then read on.
+
+It produces **five** files, not one:
 
 ```
 specs/001-*/plan.md          the approach
@@ -172,14 +209,67 @@ specs/001-*/plan.md          the approach
            quickstart.md     how to verify
 ```
 
-Note the second file. `/speckit.plan` just did its own research, and it landed
-in the same directory as yours. **Two researchers, one API: diff them.**
+Note the second file. `/speckit.plan` does its own research, unprompted — task 5
+comes back to that.
 
-Where they disagree, one of them is wrong, and you have the evidence to say
-which. Look at the paging convention, the status codes and the error bodies
-first; those are where a plan describes a conventional REST API instead of this
-one. Then check `contracts/` for anything asserted that neither researcher ever
-actually observed.
+#### While it runs: review `specs/001-*/spec.md`
+
+In terminal 3. Do not touch the session running the command:
+
+```bash
+cd ../bookstore-web && git diff specs/001-*/spec.md
+```
+
+The `## Clarifications` log at the top tells you what you were *asked*. Only the
+diff shows **where the answers landed** — and that is the whole point, because
+`/speckit.clarify` rewrote Functional Requirements, User Stories, Data Model,
+Success Criteria and Edge Cases in place while you were answering.
+
+Four things to look for:
+
+- **Your marked guesses.** Find each one in the diff. A guess that became a
+  Functional Requirement now looks exactly like an observed fact to everyone
+  downstream — including the agents in Exercise 7.
+- **Lines that disappeared.** Look for `-` lines outside the Clarifications
+  block. Where an answer contradicted something the spec already said, the old
+  sentence was *replaced*. Deletions are the edits you never see if you only
+  read the finished file.
+- **Answers that travelled further than you expected.** A single reply can
+  rewrite a user story, add an edge case *and* change the data model. Did any of
+  them land somewhere you would not have put them?
+- **Anything you now disagree with.** Write it down; do not fix it yet.
+  `/speckit.plan` is reading this file right now, and editing it mid-run gets
+  you a plan built from two different specs.
+
+**Now compare with your neighbour.** Put their `spec.md` next to yours and find
+**one requirement that differs**. You started from the same prompt, against the
+same API. Would either of you have noticed that difference if neither had
+written a spec?
+
+### 5. Check the plan against reality (3 min)
+
+`/speckit.plan` wrote its own account of what this API does, in two places:
+
+```
+specs/001-*/research.md
+specs/001-*/contracts/
+```
+
+Nobody called the API to write those. They were inferred — and Exercise 7 builds
+against them.
+
+You *did* call the API, in task 3. Open both files and check them against what
+you saw:
+
+- **Validation** — do they assume the API rejects a bad rating? You got a `201`
+  for rating 99 on empty text. This is the most likely error of the three,
+  because every REST API the model has ever read validates its input.
+- **Paging** — do they say pages start at 1? Anything starting at 0 is wrong.
+- **Inventions** — endpoints, fields or status codes that appear nowhere in your
+  curl output. A contract is where a plausible invention does the most damage.
+
+**Did you find one?** Write it down. In a real project it goes back into the
+plan before anyone writes code.
 
 ### 6. `/speckit.tasks` — break it down (4 min)
 
@@ -205,8 +295,11 @@ A read-only consistency check across `spec.md`, `plan.md` and `tasks.md`. It
 writes no files.
 
 Read the report and pick **one finding you agree with** and **one you do not**.
-Be ready to say why. The answers you marked as guesses in task 4 are a good
-place to start looking.
+Be ready to say why.
+
+Two places to look first: the answers you marked as guesses in task 3, and
+whatever you noted in task 5. If something you *know* to be wrong is absent from
+this report, that is the lesson — consistency is not correctness.
 
 ### 8. Commit
 
@@ -214,16 +307,17 @@ place to start looking.
 git add specs/ && git commit -m "spec: bookstore-web frontend"
 ```
 
-That is nine files plus your research note. Exercise 7 starts from this, and a
-spec is worth less without the evidence its requirements rest on.
+Exercise 7 starts from this. A spec that lives only in a chat window is not a
+spec.
 
 ---
 
 ## Pair Discussion (2 min)
 
 - Which `/speckit.clarify` question did you not see coming?
-- Did either researcher get anything wrong — your subagent, or `/speckit.plan`?
-  How would you have found out if you had not checked by hand?
+- Which of your answers travelled further into the spec than you expected?
+- Did `/speckit.plan` get anything wrong about the API? Would `/speckit.analyze`
+  ever have told you?
 - You started from the same prompt against the same API. Where do your two specs
   differ, and which of those differences would ever have surfaced if neither of
   you had written one?
@@ -236,10 +330,9 @@ spec is worth less without the evidence its requirements rest on.
 
 ```
 bookstore-web/specs/001-*/
-  api-research.md    what the API actually does, with evidence — yours
   spec.md            intent, clarified
   plan.md            approach
-  research.md        what the plan learned
+  research.md        what the plan learned about the API
   data-model.md      entities
   contracts/         API contract
   quickstart.md      verification
