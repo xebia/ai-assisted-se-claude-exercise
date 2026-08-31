@@ -1,250 +1,342 @@
-# Exercise 6: Connect & Extend
+# Exercise 6: Spec-Driven Development with Spec Kit
 
-**Block**: 6 — MCP Servers & External Tools **Duration**: 30 minutes
-**Project**: Same BookStore API.
+**Block**: 6 — Real Development Workflows **Duration**: 30 minutes
+**Project**: `bookstore-web` — a new frontend for the BookStore API you already
+know.
 
-**Goal**: Build a custom SQLite MCP server that exposes the bookstore database
-to Claude, wire it up, and create a security-auditor subagent. Then compare AI
-responses with and without each extension loaded.
+**Goal**: Run a real spec-driven flow end to end and produce every artifact up
+to a task breakdown. You will **not** write any application code. Exercise 7
+implements what you specify here, with a team of agents working in parallel.
+
+---
+
+## Why a frontend
+
+The BookStore API has no UI. That makes it genuinely unspecified: the HTTP
+contract is discoverable, but nothing tells you what happens on an empty list,
+what a failed request looks like, or which fields a book page shows. Those are
+decisions, and decisions are what a specification is for.
+
+It also breaks into pieces that different agents can build at the same time —
+which is the property Exercise 7 depends on.
+
+## Before you start
+
+Setup is in `preparation.md`. Verify it in one command:
+
+```bash
+cd ../bookstore-web && specify check
+```
+
+You need three terminals. **Not** the frontend dev server — there is no
+frontend yet, and that is the point: today you specify it, Exercise 7 builds it.
+
+**Terminal 1 — your backend**, from the `bookstore-ts` project directory
+(any of the four backends works; the spec you write is agnostic):
+
+```bash
+bun run start
+```
+
+Confirm it answers — this must return JSON, not a connection error:
+
+```bash
+curl http://localhost:8080/api/books
+```
+
+**Terminal 2 — Claude Code, started from `bookstore-web` with your backend
+readable:**
+
+```bash
+cd ../bookstore-web && claude --add-dir ../bookstore-ts
+```
+
+**Terminal 3 — a plain shell**, anywhere in the repo. You need one for `curl`
+and `git` while Claude Code is busy in terminal 2.
+
+You will call the API on `http://localhost:8080` directly. The finished frontend
+will reach it at the same-origin path `/api` — `bookstore-web/vite.config.js`
+proxies that to port 8080 — so the paths in your spec are the ones you see here.
 
 ---
 
 ## Tasks
 
-### 1. Build the SQLite MCP Server (8 min)
+### 1. Read the constitution (2 min)
 
-The bookstore uses a SQLite database (`store.db`). Without MCP, Claude has to
-guess column names. With MCP, it can query the schema and run real SQL. The
-server lives at `mcp-sqlite/main.go` (sibling of `bookstore-ts/`) and exposes
-two tools:
+Spec Kit separates two kinds of rules. A **spec** describes one feature and is
+done when that feature ships. A **constitution** holds the rules that outlive
+every feature — stack, architecture, what counts as finished. Spec Kit re-reads
+it at each later step, so a plan or a task that breaks one of these is a defect
+to fix, not a trade-off to weigh.
 
-- `get_table_definitions` — returns `CREATE TABLE` statements and column info
-- `execute_query` — executes a read-only `SELECT` query and returns JSON rows
+Open [`.specify/memory/constitution.md`](../../bookstore-web/.specify/memory/constitution.md)
+in `bookstore-web`. Yours is pre-written — you are not authoring one today.
 
-**Step 1** — Make sure the bookstore database exists. From the project root,
-start the bookstore server once (it seeds on first run):
+It has six principles and fits on one page. Read them, then answer this:
+**which two things does it forbid outright?**
 
-```bash
-cd bookstore-ts && bun install && bun run start &
-# wait ~2 seconds, then stop it — we just need store.db to exist
-kill %1
-cd ..
+### 2. `/speckit.specify` — capture intent (3 min)
+
+Use this prompt **exactly as written**:
+
+> A web UI for the BookStore API. Users can browse books, open a book to see its
+> author and its reviews, add a review to a book, and browse authors. The API is
+> already running behind `/api`.
+
+It writes `specs/001-*/spec.md`. Open it and scroll to **Assumptions** at the
+bottom — that is where the spec parks what it invented. One entry reads roughly:
+
+> Ratings use a simple numeric scale (e.g., 1 to 5); the exact scale is a UI
+> presentation detail to be finalized during implementation.
+
+Nothing has called the API yet, so that scale is a guess — and it is the number
+your review form will send.
+
+Now read the requirements with one question in mind: **what would someone
+building this still have to make up?** Four worth checking:
+
+- How does a visitor reach page 2 of a list longer than one screen?
+- Where does a new review appear once it is submitted — top or bottom?
+- What counts as a valid rating, and who rejects an invalid one?
+- What does the page show for a book id that does not exist?
+
+**Which of those four does the spec actually answer?**
+
+### 3. `/speckit.clarify` — interrogate the spec (6 min)
+
+**This is the core of the exercise.** Spec Kit asks up to five targeted
+questions about what you left underspecified, and writes your answers back into
+the spec.
+
+Unlike the other commands, this one creates **no new file**. Everything lands in
+the spec you already have:
+
+```
+specs/001-*/spec.md                     modified in place, re-saved after every answer
+specs/001-*/checklists/requirements.md  re-validated — only if it exists; ours will not
 ```
 
-Verify the file exists:
-
-```bash
-ls -lh bookstore-ts/store.db
-```
-
-**Step 2** — Compile the MCP server to a binary:
-
-```bash
-cd mcp-sqlite && go build -o ../mcp-sqlite-server . && cd ..
-```
-
-This produces `mcp-sqlite-server` in the project root. Confirm it compiled:
-
-```bash
-./mcp-sqlite-server --help
-```
-
-You should see the `-db` flag printed. If so, the server is working.
-
-**Step 3** — Register the server with Claude Code (project scope). Use the
-absolute path so Claude Code can find the binary regardless of working
-directory, and point it at the TS store:
-
-```bash
-claude mcp add \
-  --transport stdio \
-  --scope project \
-  sqlite-bookstore \
-  -- $(realpath mcp-sqlite-server) -db $(realpath bookstore-ts/store.db)
-```
-
-**Step 4** — Verify the server is registered:
-
-```bash
-claude mcp list
-```
-
-You should see `sqlite-bookstore` in the list. Inside an active Claude Code
-session, type `/mcp` to confirm it shows as connected and lists both tools:
-`get_table_definitions` and `execute_query`.
-
----
-
-### 2. Compare AI Responses: Without vs With MCP (5 min)
-
-This is the core learning exercise — observe how access to real data changes
-Claude's answers.
-
-**Round A — without MCP** (disable it temporarily):
-
-```bash
-claude mcp remove sqlite-bookstore
-```
-
-Open a fresh Claude Code session and ask:
-
-> "How many books are in the bookstore database? Which author has the most
-> books? Write a SQL query that returns all books with their author name and
-> average rating, sorted by rating descending."
-
-Write down Claude's response. Notice:
-
-- Does it hesitate or add caveats about not knowing the schema?
-- Are the column names correct (`author_id`, `review_text`, `rating`)?
-- Does it join the right tables?
-
-**Round B — with MCP** (re-add it):
-
-```bash
-claude mcp add \
-  --transport stdio \
-  --scope project \
-  sqlite-bookstore \
-  -- $(realpath mcp-sqlite-server) -db $(realpath bookstore-ts/store.db)
-```
-
-Open a **new** Claude Code session (so MCP connects on startup) and ask the
-**exact same question**.
-
-Observe the difference:
-
-- Claude now calls `get_table_definitions` first — watch for the tool call in
-  the output
-- It then calls `execute_query` with a real query
-- Column names are exact, joins are correct, results are real data
-
-Ask a follow-up that would be impossible without live data:
-
-> "Which book has the highest average rating? Show me its title, author, and the
-> top 3 review texts."
-
-Without MCP this is just a guess. With MCP it is a fact.
-
----
-
-### 3. Create the Security-Auditor Subagent (5 min)
-
-A subagent runs in its own isolated context window with its own tools and model.
-You will create one that specializes in OWASP security audits. It uses a cheaper
-model (Haiku) and only gets read access — it can never modify code.
-
-**Step 1** — Create the agents directory:
-
-```bash
-mkdir -p bookstore-ts/.claude/agents
-```
-
-**Step 2** — Create `bookstore-ts/.claude/agents/security-auditor.md`:
+Two new headings appear, and by design only these two — placed near the **top**
+of the spec, just after its overview section, not appended at the end:
 
 ```markdown
----
-name: security-auditor
-description: >
-  Audits TypeScript source code for OWASP Top 10 security vulnerabilities.
-  Invoke this agent whenever the user asks for a security review,
-  vulnerability check, or when new handlers or store functions are added.
-tools: Read, Grep, Glob
-model: claude-haiku-4-5-20251001
-effort: xhigh
-color: red
----
+## Clarifications
 
-You are a security engineer specializing in TypeScript / Node-style web
-applications and the OWASP Top 10. Your job is to find real vulnerabilities —
-not theoretical risks.
+### Session YYYY-MM-DD
 
-## Scope
-
-Audit only the files you are given. Do not modify any file.
-
-## Process
-
-1. Run `Glob` with `src/**/*.ts` to find all source files
-2. For each handler file in `src/handler/`, read it fully
-3. For each store file in `src/store/`, read it fully
-4. Check for the following vulnerabilities:
-
-**A01 — Broken Access Control**
-
-- Are there authorization checks on any endpoint?
-- Can an unauthenticated user call DELETE or POST endpoints?
-
-**A03 — Injection**
-
-- Are SQL queries built with template strings or concatenation instead of
-  parameter binding?
-- Are query parameters sanitized before use?
-
-**A05 — Security Misconfiguration**
-
-- Are error messages returned verbatim to HTTP clients?
-- Does the server expose stack traces or internal paths?
-
-**A07 — Identification and Authentication Failures**
-
-- Is there any authentication middleware at all?
-
-**A09 — Security Logging and Monitoring Failures**
-
-- Are failed requests or suspicious inputs logged?
-
-## Output format
-
-Write a report with this structure:
-
-### Security Audit Report
-
-**Files reviewed**: list every file you read
-
-For each finding:
-
-**[SEVERITY] OWASP Category — Short title**
-
-- File: `path/to/file.ts`, line N
-- Description: what the vulnerability is
-- Evidence: paste the relevant code snippet
-- Recommendation: one concrete fix
-
-Severity levels: CRITICAL, HIGH, MEDIUM, LOW, INFO
-
-End with a **Summary** table: | Severity | Count |
+- Q: <the question it asked> → A: <the answer you gave>
 ```
 
-**Step 3** — Test by asking Claude directly (without explicitly triggering the
-subagent):
+That log is the cheap part. Each answer is *also* applied wherever it belongs —
+Functional Requirements, User Stories, Data Model, Success Criteria or Edge
+Cases — and where an answer contradicts something the spec already said, the old
+sentence is **replaced, not added to**. What you get back is not the file you
+had plus a section at the top.
 
-> "Do a security audit of the bookstore API."
+**First, snapshot the spec** so you can see all of that later:
 
-Watch the tool calls in the output. Claude will delegate to `security-auditor`
-automatically because the description matches. The audit runs in a separate
-context — your main conversation stays clean.
+```bash
+git add specs/
+```
+
+Staging is enough — no commit needed. `git diff` compares your working tree
+against what you staged, so it will show exactly what `/speckit.clarify`
+touched. You read that diff in task 4, not now.
+
+**Then spend two minutes finding out what this API actually does.** You are
+about to be asked questions whose answers are not what a REST API
+conventionally does.
+
+Two of the four gaps from task 2, answered in 30 seconds:
+
+```bash
+# how do you get page 2?
+curl -s 'http://localhost:8080/api/books?page=0&size=3'
+curl -s 'http://localhost:8080/api/books?page=1&size=3'
+
+# a rating of 99 on an empty review — does this get rejected?
+curl -s -X POST http://localhost:8080/api/books/1/reviews \
+  -H 'Content-Type: application/json' -d '{"rating":99,"review_text":""}'
+```
+
+Two answers you now have that no amount of reasoning would have given you:
+
+- **Pages start at 1.** Page 0 returns page 1 again, so a UI counting from zero
+  shows the first page twice and never reaches the last.
+- **`201 Created`.** The server accepts a rating of 99 on an empty review. It
+  validates nothing — so every rule about a valid review is the UI's job.
+
+Both are UI decisions, and neither was in the spec. That is the point of these
+two minutes: **the clarify questions are about your UI, but some of them can
+only be answered by asking the API.**
+
+That POST stored a real review on book 1 — rating 99, empty text. Reseed
+to drop it:
+
+```bash
+bun run seed
+```
+
+Now run `/speckit.clarify`. It asks up to five questions, one at a time, and
+waits for each answer. **Answer fast** — five questions, six minutes. You are
+making a first draft, not a perfect spec.
+
+Two rules:
+
+- If you saw the answer in the curl output, use that.
+- If you did not, answer anyway — but **say in your answer that you are
+  guessing**. Your words go into the spec as written, so the label travels with
+  them. Task 4 comes back for these.
+
+Then stop. Do not read the spec yet — that is what you do in task 4, while a
+slow command runs.
+
+### 4. `/speckit.plan` — decide how, and review while it works (6 min)
+
+This is the slowest command in the flow, and it runs unattended for two to four
+minutes. That is not dead time — it is when you review what you just wrote.
+
+**Start it now**, then read on.
+
+It produces **five** files, not one:
+
+```
+specs/001-*/plan.md          the approach
+           research.md       what it learned about the API
+           data-model.md     the entities
+           contracts/        the API contract it extracted
+           quickstart.md     how to verify
+```
+
+Note the second file. `/speckit.plan` does its own research, unprompted — task 5
+comes back to that.
+
+#### While it runs: review `specs/001-*/spec.md`
+
+In terminal 3. Do not touch the session running the command:
+
+```bash
+cd ../bookstore-web && git diff specs/001-*/spec.md
+```
+
+The `## Clarifications` log at the top tells you what you were *asked*. Only the
+diff shows **where the answers landed** — and that is the whole point, because
+`/speckit.clarify` rewrote Functional Requirements, User Stories, Data Model,
+Success Criteria and Edge Cases in place while you were answering.
+
+Four things to look for:
+
+- **Your marked guesses.** Find each one in the diff. A guess that became a
+  Functional Requirement now looks exactly like an observed fact to everyone
+  downstream — including the agents in Exercise 7.
+- **Lines that disappeared.** Look for `-` lines outside the Clarifications
+  block. Where an answer contradicted something the spec already said, the old
+  sentence was *replaced*. Deletions are the edits you never see if you only
+  read the finished file.
+- **Answers that travelled further than you expected.** A single reply can
+  rewrite a user story, add an edge case *and* change the data model. Did any of
+  them land somewhere you would not have put them?
+- **Anything you now disagree with.** Write it down; do not fix it yet.
+  `/speckit.plan` is reading this file right now, and editing it mid-run gets
+  you a plan built from two different specs.
+
+**Now compare with your neighbour.** Put their `spec.md` next to yours and find
+**one requirement that differs**. You started from the same prompt, against the
+same API. Would either of you have noticed that difference if neither had
+written a spec?
+
+### 5. Check the plan against reality (3 min)
+
+`/speckit.plan` wrote its own account of what this API does, in two places:
+
+```
+specs/001-*/research.md
+specs/001-*/contracts/
+```
+
+Nobody called the API to write those. They were inferred — and Exercise 7 builds
+against them.
+
+You *did* call the API, in task 3. Open both files and check them against what
+you saw:
+
+- **Validation** — do they assume the API rejects a bad rating? You got a `201`
+  for rating 99 on empty text. This is the most likely error of the three,
+  because every REST API the model has ever read validates its input.
+- **Paging** — do they say pages start at 1? Anything starting at 0 is wrong.
+- **Inventions** — endpoints, fields or status codes that appear nowhere in your
+  curl output. A contract is where a plausible invention does the most damage.
+
+**Did you find one?** Write it down. In a real project it goes back into the
+plan before anyone writes code.
+
+### 6. `/speckit.tasks` — break it down (4 min)
+
+Open `specs/001-*/tasks.md`. This is the artifact Exercise 7 consumes, so read
+it properly.
+
+The task format is `[ID] [P?] [Story]`:
+
+- `[P]` — can run in parallel: different files, no dependencies
+- `[US1]`, `[US2]` — which user story the task belongs to
+
+Find the **Parallel Opportunities** and **Parallel Team Strategy** sections at
+the bottom. That is a staffing plan for agents.
+
+Now check one thing: pick two `[P]` tasks from **different** user stories. Do
+they write the same file? Shared things — the API client, the stylesheet,
+`index.html` — belong to the foundational phase (constitution principle IV). If
+one lives inside a story, the `[P]` is a lie and two agents will collide.
+
+### 7. `/speckit.analyze` — validate (3 min)
+
+A read-only consistency check across `spec.md`, `plan.md` and `tasks.md`. It
+writes no files.
+
+Read the report and pick **one finding you agree with** and **one you do not**.
+Be ready to say why.
+
+Two places to look first: the answers you marked as guesses in task 3, and
+whatever you noted in task 5. If something you *know* to be wrong is absent from
+this report, that is the lesson — consistency is not correctness.
+
+### 8. Commit
+
+```bash
+git add specs/ && git commit -m "spec: bookstore-web frontend"
+```
+
+Exercise 7 starts from this. A spec that lives only in a chat window is not a
+spec.
 
 ---
 
-## Pair Discussion (5 min)
+## Pair Discussion (2 min)
 
-Compare notes with your partner:
+- Which `/speckit.clarify` question did you not see coming?
+- Which of your answers travelled further into the spec than you expected?
+- Did `/speckit.plan` get anything wrong about the API? Would `/speckit.analyze`
+  ever have told you?
+- You started from the same prompt against the same API. Where do your two specs
+  differ, and which of those differences would ever have surfaced if neither of
+  you had written one?
+- Could four agents genuinely take four user stories from your `tasks.md` right
+  now? If not, what is in the way?
 
-1. **MCP schema awareness**: did Claude use `get_table_definitions` before every
-   query, or only on first use? What does that tell you about how Claude manages
-   tool calls?
-2. **Subagent delegation**: did Claude delegate automatically, or did you have
-   to trigger it explicitly? What would you change in the `description:` field
-   to make auto-delegation more reliable?
-3. **Real-world applications**: which MCP servers would save your team the most
-   time? (GitHub, JIRA, your production database?) What risks would you need to
-   mitigate before connecting a production database?
-4. **Cost vs capability**: the security auditor uses Haiku to save cost. What
-   tasks in your workflow could be delegated to a cheaper model without losing
-   quality?
+---
 
-Choose **one take-away** to present to the group.
+## What you should have
 
-## Group Share (5 min)
+```
+bookstore-web/specs/001-*/
+  spec.md            intent, clarified
+  plan.md            approach
+  research.md        what the plan learned about the API
+  data-model.md      entities
+  contracts/         API contract
+  quickstart.md      verification
+  tasks.md           the work queue, with [P] markers
+```
 
-Each participant presents **one take-away** from this exercise to the group.
+No application code. That is the point — `/speckit.implement` is Exercise 7.

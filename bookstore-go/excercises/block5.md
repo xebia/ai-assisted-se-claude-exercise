@@ -1,219 +1,246 @@
-# Exercise 5: Build Two Custom Skills
+# Exercise 5: Connect & Extend
 
-**Block**: 5 — Skills, Hooks & Automation **Duration**: 30 minutes **Project**:
-Same BookStore API.
+**Block**: 5 — MCP Servers & External Tools **Duration**: 30 minutes
+**Project**: Same BookStore API.
 
-**Goal**: Create two reusable skills — a manual `/commit` skill and an
-auto-triggered `/changelog` skill — and wire the changelog into a hook.
+**Goal**: Build a custom SQLite MCP server that exposes the bookstore database
+to Claude, wire it up, and create a security-auditor subagent. Then compare AI
+responses with and without each extension loaded.
+
+---
 
 ## Tasks
 
-1. **Create the `/commit` skill** (5 min) — create the file
-   `.claude/skills/commit/SKILL.md` with this content:
+### 1. Build the SQLite MCP Server (8 min)
 
-   ```markdown
-   ---
-   name: commit
-   description: Analyzes all git changes and creates intelligent commits.
-   disable-model-invocation: true
-   ---
+The bookstore uses a SQLite database (`store.db`). Without MCP, Claude has to
+guess column names. With MCP, it can query the schema and run real SQL. The
+server lives at `mcp-sqlite/main.go` (sibling of `bookstore-go/`) and exposes
+two tools:
 
-   You are a git commit expert. Analyze the changes and commit them intelligently.
+- `get_table_definitions` — returns `CREATE TABLE` statements and column info
+- `execute_query` — executes a read-only `SELECT` query and returns JSON rows
 
-   1. Review `git status` to see all changes
-   2. Review `git diff HEAD` for staged changes
-   3. Review `git diff` for unstaged changes
-   4. Group related changes into 1 to max 5 logical commits
-   5. Write each commit message in **imperative mood**, starting with a
-      present-tense verb. This matches the Common Changelog convention so changelog
-      entries can be generated directly from git history. Examples:
-      - "Add genre filter to book search handler"
-      - "Fix pagination in book listing endpoint"
-      - "Refactor review store for better error handling"
-      - "Bump Go version to 1.22"
-      - "Document review API query parameters" Do NOT use past tense ("Added",
-        "Fixed") or noun phrases ("Genre filter for search").
-   6. Run `git add <files>` to stage the next group
-   7. Run `git commit -m "Your message here"` (NO Co-Authored-By line)
-   8. Repeat until all changes are committed
-   9. Confirm: "All changes committed successfully"
+**Step 1** — Make sure the bookstore database exists. From the project root,
+start the bookstore server once (it seeds on first run):
 
-   **CRITICAL**: Do NOT run `git push` at the end.
+```bash
+cd bookstore-go && go run . &
+# wait ~2 seconds, then stop it — we just need store.db to exist
+kill %1
+cd ..
+```
 
-   ## Example
+Verify the file exists:
 
-   **Changes to commit:**
+```bash
+ls -lh bookstore-go/store.db
+```
 
-   - Modified: `internal/model/book.go` (added Genre field)
-   - Modified: `internal/handler/book.go` (added genre query parameter)
-   - Modified: `internal/store/book.go` (updated query with genre filter)
+**Step 2** — Compile the MCP server to a binary:
 
-   **Generated commit:** git commit -m "Add genre filter to book search endpoint"
+```bash
+cd mcp-sqlite && go build -o ../mcp-sqlite-server . && cd ..
+```
 
-   **Output:** Committed: "Add genre filter to book search endpoint" 3 files
-   changed, 18 insertions(+), 2 deletions(-)
-   ```
+This produces `mcp-sqlite-server` in the project root. Confirm it compiled:
 
-   Note the frontmatter: `disable-model-invocation: true` ensures this skill
-   only runs when you explicitly type `/commit` — Claude will never trigger it
-   on its own. Test: make a small change to a bookstore file, type `/commit` in
-   Claude Code, and verify the commit was created with a good message, no
-   co-author line and no push.
+```bash
+./mcp-sqlite-server --help
+```
 
-2. **Create the `/changelog` skill** (8 min) — this skill follows the
-   [Common Changelog](https://common-changelog.org/) format. Skills can include
-   supporting files that Claude loads when needed. Instead of summarizing the
-   spec in your skill, store the full specification as a reference file.
+You should see the `-db` flag printed. If so, the server is working.
 
-   First, save the Common Changelog spec as a markdown file. Go to
-   https://common-changelog.org/, select all content and copy it. Then use
-   [Clipboard to Markdown](https://euangoddard.github.io/clipboard2markdown/) to
-   convert the HTML to clean markdown. Alternatively, use
-   [SafeMarkdown](https://safemarkdown.com) to paste a URL and download the page
-   as markdown. Save the result to
-   `.claude/skills/changelog/common-changelog-spec.md`. Your skill directory
-   should look like this:
+**Step 3** — Register the server with Claude Code (project scope). Use the
+absolute path so Claude Code can find the binary regardless of working
+directory:
 
-   ```
-   .claude/skills/changelog/
-   ├── SKILL.md                      # Main instructions (required)
-   └── common-changelog-spec.md      # Full spec reference
-   ```
+```bash
+claude mcp add \
+  --transport stdio \
+  --scope project \
+  sqlite-bookstore \
+  -- $(realpath mcp-sqlite-server)
+```
 
-   Then create `.claude/skills/changelog/SKILL.md` with this content:
+**Step 4** — Verify the server is registered:
 
-   ```markdown
-   ---
-   name: changelog
-   description: Updates CHANGELOG.md following the Common Changelog format.
-   ---
+```bash
+claude mcp list
+```
 
-   You maintain a changelog following the Common Changelog specification.
+You should see `sqlite-bookstore` in the list. Inside an active Claude Code
+session, type `/mcp` to confirm it shows as connected and lists both tools:
+`get_table_definitions` and `execute_query`.
 
-   **This skill is triggered automatically after every commit.**
+---
 
-   For the full specification, see
-   [common-changelog-spec.md](common-changelog-spec.md). Read it before making any
-   changes to the changelog.
+### 2. Compare AI Responses: Without vs With MCP (5 min)
 
-   1. Read the current `CHANGELOG.md` (create it if it doesn't exist)
-   2. Read [common-changelog-spec.md](common-changelog-spec.md) for the formatting
-      rules
-   3. Run `git log --oneline -10` to see recent commits
-   4. Run `git tag --sort=-v:refname` to get existing version tags
-   5. Compare the latest commits against what's already in the changelog
-   6. For any NEW commits not yet in the changelog, add entries to the
-      **Unreleased** section at the top
-   7. If a tag points to a commit that has an "Unreleased" section, rename that
-      section to `## [TAG] - YYYY-MM-DD` using the tag name and the tag's date
-   8. Categorize each change under the correct group heading:
-      - `### Changed` — existing functionality altered
-      - `### Added` — new functionality
-      - `### Removed` — functionality taken away
-      - `### Fixed` — bug fixes
-   9. Format each entry as:
-      - Start with imperative verb (Add, Fix, Remove, Change, Refactor)
-      - Include commit reference as a link: ([`short-hash`](commit-url))
-      - Prefix breaking changes with **Breaking:**
-   10. Skip noise: dotfile changes, formatting-only changes, dev tooling
-   11. Write the updated `CHANGELOG.md`
+This is the core learning exercise — observe how access to real data changes
+Claude's answers.
 
-   ## Unreleased section
+**Round A — without MCP** (disable it temporarily):
 
-   If there is no release yet, use this format at the top of the changelog:
+```bash
+claude mcp remove sqlite-bookstore
+```
 
-   ## Unreleased
+Open a fresh Claude Code session and ask:
 
-   ### Added
+> "How many books are in the bookstore database? Which author has the most
+> books? Write a SQL query that returns all books with their author name and
+> average rating, sorted by rating descending."
 
-   - Add genre filter to book search endpoint
-     ([`a1b2c3d`](https://github.com/owner/repo/commit/a1b2c3d))
+Write down Claude's response. Notice:
 
-   When a release is made, rename "Unreleased" to the version and date.
+- Does it hesitate or add caveats about not knowing the schema?
+- Are the column names correct (`author_id`, `review_text`, `rating`)?
+- Does it join the right tables?
 
-   ## Example
+**Round B — with MCP** (re-add it):
 
-   **New commit:** `a1b2c3d Add genre filter to book search endpoint`
+```bash
+claude mcp add \
+  --transport stdio \
+  --scope project \
+  sqlite-bookstore \
+  -- $(realpath mcp-sqlite-server)
+```
 
-   **Entry added to CHANGELOG.md:**
+Open a **new** Claude Code session (so MCP connects on startup) and ask the
+**exact same question**.
 
-   ### Added
+Observe the difference:
 
-   - Add genre filter to book search endpoint
-     ([`a1b2c3d`](https://github.com/owner/repo/commit/a1b2c3d))
-   ```
+- Claude now calls `get_table_definitions` first — watch for the tool call in
+  the output
+- It then calls `execute_query` with a real query
+- Column names are exact, joins are correct, results are real data
 
-   Note: this skill does NOT have `disable-model-invocation: true`, so Claude
-   can trigger it automatically — which is what we want for the hook in the next
-   step. Key rules from Common Changelog:
-   - File is named `CHANGELOG.md` with a `# Changelog` heading
-   - Each release uses `## [VERSION] - YYYY-MM-DD`
-   - Change groups use `###` with one of: **Changed**, **Added**, **Removed**,
-     **Fixed** (in that order)
-   - Each entry starts with an imperative verb (Add, Fix, Remove, Change)
-   - Each entry must include a reference (commit or PR link) in parentheses
-   - Entries are sorted: breaking changes first (prefixed with **Breaking:**)
-   - Exclude noise: dotfile changes, dev-dependency updates, formatting-only
-     changes
+Ask a follow-up that would be impossible without live data:
 
-3. **Wire up auto-triggering** (4 min) — make the changelog skill run
-   automatically after every `git commit`. The hook matcher can only filter by
-   tool name (e.g. `Bash`), so you need a small script that checks whether the
-   actual command was a `git commit`. First, create
-   `.claude/hooks/run-changelog.sh`:
+> "Which book has the highest average rating? Show me its title, author, and the
+> top 3 review texts."
 
-   ```bash
-   #!/bin/bash
-   # Read the hook JSON from stdin
-   COMMAND=$(jq -r '.tool_input.command')
+Without MCP this is just a guess. With MCP it is a fact.
 
-   # Only trigger on git commit commands
-   if echo "$COMMAND" | grep -q '^git commit'; then
-     echo '{"additionalContext": "A git commit was just made. Run the /changelog skill to update CHANGELOG.md."}'
-   fi
-   ```
+---
 
-   Make it executable:
-   ```bash
-   chmod +x .claude/hooks/run-changelog.sh
-   ```
+### 3. Create the Security-Auditor Subagent (5 min)
 
-   Then add the hook to `.claude/settings.json`:
+A subagent runs in its own isolated context window with its own tools and model.
+You will create one that specializes in OWASP security audits. It uses a cheaper
+model (Haiku) and only gets read access — it can never modify code.
 
-   ```json
-   {
-     "hooks": {
-       "PostToolUse": [
-         {
-           "matcher": "Bash",
-           "hooks": [
-             {
-               "type": "command",
-               "command": ".claude/hooks/run-changelog.sh"
-             }
-           ]
-         }
-       ]
-     }
-   }
-   ```
+**Step 1** — Create the agents directory:
 
-   This fires on every Bash call, but the script exits silently unless the
-   command starts with `git commit`. Only then does it return
-   `additionalContext` telling Claude to run the changelog skill.
+```bash
+mkdir -p bookstore-go/.claude/agents
+```
 
-4. **Test the full flow** (3 min) — make a change to the bookstore project
-   (prompt to remove delete functionality), run `/commit`, then verify that
-   `CHANGELOG.md` was automatically created/updated. Check that it follows
-   Common Changelog format: has a `# Changelog` heading, an `## Unreleased`
-   section, entries use imperative verbs with commit links, and entries are
-   under the correct group (`Added`, `Fixed`, etc.).
+**Step 2** — Create `bookstore-go/.claude/agents/security-auditor.md`:
+
+```markdown
+---
+name: security-auditor
+description: >
+  Audits Go source code for OWASP Top 10 security vulnerabilities.
+  Invoke this agent whenever the user asks for a security review,
+  vulnerability check, or when new handlers or store functions are added.
+tools: Read, Grep, Glob
+model: claude-haiku-4-5-20251001
+effort: xhigh
+color: red
+---
+
+You are a security engineer specializing in Go web applications and the OWASP
+Top 10. Your job is to find real vulnerabilities — not theoretical risks.
+
+## Scope
+
+Audit only the files you are given. Do not modify any file.
+
+## Process
+
+1. Run `Glob` with `**/*.go` to find all Go source files
+2. For each handler file in `internal/handler/`, read it fully
+3. For each store file in `internal/store/`, read it fully
+4. Check for the following vulnerabilities:
+
+**A01 — Broken Access Control**
+
+- Are there authorization checks on any endpoint?
+- Can an unauthenticated user call DELETE or POST endpoints?
+
+**A03 — Injection**
+
+- Are SQL queries built with string concatenation or `fmt.Sprintf`?
+- Are query parameters sanitized before use?
+
+**A05 — Security Misconfiguration**
+
+- Are error messages returned verbatim to HTTP clients?
+- Does the server expose stack traces or internal paths?
+
+**A07 — Identification and Authentication Failures**
+
+- Is there any authentication middleware at all?
+
+**A09 — Security Logging and Monitoring Failures**
+
+- Are failed requests or suspicious inputs logged?
+
+## Output format
+
+Write a report with this structure:
+
+### Security Audit Report
+
+**Files reviewed**: list every file you read
+
+For each finding:
+
+**[SEVERITY] OWASP Category — Short title**
+
+- File: `path/to/file.go`, line N
+- Description: what the vulnerability is
+- Evidence: paste the relevant code snippet
+- Recommendation: one concrete fix
+
+Severity levels: CRITICAL, HIGH, MEDIUM, LOW, INFO
+
+End with a **Summary** table: | Severity | Count |
+```
+
+**Step 3** — Test by asking Claude directly (without explicitly triggering the
+subagent):
+
+> "Do a security audit of the bookstore API."
+
+Watch the tool calls in the output. Claude will delegate to `security-auditor`
+automatically because the description matches. The audit runs in a separate
+context — your main conversation stays clean.
+
+---
 
 ## Pair Discussion (5 min)
 
-Compare your `CHANGELOG.md` files side by side with your partner. Did the AI
-categorize changes the same way? How did you solve the hook triggering — does it
-fire too often? What other skills would benefit from auto-triggering via hooks?
+Compare notes with your partner:
+
+1. **MCP schema awareness**: did Claude use `get_table_definitions` before every
+   query, or only on first use? What does that tell you about how Claude manages
+   tool calls?
+2. **Subagent delegation**: did Claude delegate automatically, or did you have
+   to trigger it explicitly? What would you change in the `description:` field
+   to make auto-delegation more reliable?
+3. **Real-world applications**: which MCP servers would save your team the most
+   time? (GitHub, JIRA, your production database?) What risks would you need to
+   mitigate before connecting a production database?
+4. **Cost vs capability**: the security auditor uses Haiku to save cost. What
+   tasks in your workflow could be delegated to a cheaper model without losing
+   quality?
+
 Choose **one take-away** to present to the group.
 
 ## Group Share (5 min)
