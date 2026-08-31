@@ -61,3 +61,10 @@ CLAUDE.local.md
 .claude/rules/
 docs/orientation.md
 block3-*.diff
+
+# Participant skills, hooks and changelog (Exercise 4) - keep out of git so branch cleanup cannot delete them
+CHANGELOG.md
+.claude/skills/
+.claude/hooks/
+.claude/settings.json
+.claude/settings.local.json
