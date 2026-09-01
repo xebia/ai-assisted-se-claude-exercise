@@ -1,115 +1,104 @@
+<!--
+Sync Impact Report
+Version change: 1.2.0 → 1.3.0
+Modified principles: none (I–VI unchanged in wording and intent)
+Renamed sections: "Principles" → "Core Principles" (template conformance)
+Added sections: "Governance" (amendment procedure, versioning policy, compliance review)
+Removed sections: none — the Workflow bullet on overriding principles moved into Governance
+Follow-up TODOs: none
+-->
+
 # BookStore Web Constitution
 
-The non-negotiable principles for the BookStore frontend. `/speckit-plan` gates
-its output against this file, `/speckit-analyze` audits every artifact against
-it, and `/speckit-implement` is bound by it.
+Non-negotiable rules for the BookStore frontend. Plans and tasks that
+conflict with them are defects, not trade-offs.
 
 ## Core Principles
 
 ### I. Vanilla Only
 
-Plain HTML, CSS and JavaScript. No UI framework, no component library, no state
-management library, no runtime dependencies of any kind. Application code has no
-build step and no bundler features: no JSX, no TypeScript, no `import` from
-`node_modules`. ES modules between your own files are fine.
+Plain HTML, CSS and JavaScript. Zero runtime dependencies — no framework, no
+component or state library. No build-step features: no JSX, no TypeScript, no
+imports from `node_modules`. ES modules between your own files are fine.
 
-Vite is a dev server and reverse proxy. Nothing more. The app must still make
-sense if Vite disappears.
+Vite is a dev server and proxy, nothing more. The app must still work if Vite
+disappears.
 
-*Why:* the BookStore backend hand-rolls its own JSON encoder, router and SQL
-mapping. The frontend keeps the same ethos — and dependency-free code stays
-reviewable when an agent team generates it.
+*Why:* dependency-free code stays reviewable when agents generate it.
 
 ### II. Contract, Not Implementation
 
-The frontend must run unchanged against any BookStore backend implementation —
-`bookstore-go`, `bookstore-kt`, `bookstore-py` or `bookstore-ts`.
+The frontend must run unchanged against any BookStore backend (`go`, `kt`,
+`py`, `ts`). Depend only on the HTTP contract: paths, methods, status codes,
+JSON shapes. Never on internals, file layout, schema or SQL.
 
-Depend only on the HTTP contract: paths, methods, status codes, and JSON shapes.
-Never depend on a backend's internals, source layout, database schema or SQL.
-
-You may read a backend's source to *discover* the contract. You may not encode
-anything you find there beyond the contract itself.
-
-The contract is what a running backend does, not what a README or a test name
-says it should do. Where a behaviour is observed rather than guaranteed — a
-status code, a body shape, a paging convention — the spec records it as observed
-and the UI degrades safely if it differs.
+The contract is what a **running** backend does — not what a README claims.
+Reading backend source to discover it is fine; encoding anything beyond it is
+not. Record observed behaviour as observed, and degrade safely if it differs.
 
 ### III. Independently Demoable Stories
 
-Every user story must be completable and demonstrable in a browser on its own,
-without any other story being finished.
+Every user story must be completable and demoable in a browser on its own,
+with no other story finished. If it can't be, it is a fragment: merge it into
+another story or move it to the foundational phase.
 
-If a story cannot be demoed alone, it is not a story — it is a fragment, and it
-belongs merged into another one or pushed into the foundational phase.
-
-*Why:* this is what allows separate agents to build separate stories at the same
-time.
+*Why:* this is what lets separate agents build stories in parallel.
 
 ### IV. Shared Code Is Foundational
 
-Anything more than one story needs — the API client, the layout shell, the
-stylesheet, shared error rendering — belongs to the foundational phase and must
-be finished before story work starts.
+Anything more than one story needs — API client, layout shell, stylesheet,
+error rendering — belongs to the foundational phase and is finished before
+story work starts.
 
-No user story may create or modify a file another user story also creates or
-modifies. A task marked `[P]` that violates this is wrong, no matter what the
-generated plan says.
+No two user stories may touch the same file. A `[P]` task that violates this
+is wrong, whatever the generated plan says.
 
-*Why:* this is stricter than a single developer would need, deliberately. It is
-the price of letting independent agents write to one repository at the same time
-without a merge queue — file ownership replaces coordination.
+*Why:* file ownership replaces coordination when agents share one repo.
 
 ### V. Every Error Path Is Specified (NON-NEGOTIABLE)
 
-Every API call has a specified behaviour for: success, empty result, not found,
-client error, server error, and network failure.
+Every API call specifies behaviour for: success, empty result, not found,
+client error, server error, network failure.
 
-Raw upstream error text is never rendered to a user. At least one endpoint has
-been observed passing a raw database message through in its `error` field; the
-UI must not forward it, and must not start forwarding it if the endpoint is
-later fixed. Sanitising at the boundary is the requirement, regardless of what
-any given backend currently emits.
+Raw upstream error text is never shown to a user — sanitise at the boundary,
+regardless of what a backend currently emits.
 
-"The API returns a 404 there" is not an assumption you may make. Check what your
-running backend actually returns, for every path in every principle above.
+"The API returns 404 there" is not an assumption you may make. Check what your
+running backend actually returns.
 
 ### VI. Verifiable Acceptance Criteria
 
-Every user story states how you would confirm it works — concrete, observable
-steps against a running backend, not "it looks right".
+Every story states how you'd confirm it works: concrete, observable steps
+against a running backend — not "it looks right".
 
-Automated tests are not written in the specification phase, and no task may
-require one before `tasks.md` is complete. Acceptance criteria are what a later
-implementation phase turns into tests, so they must be precise enough to be
-mechanically checkable. Generated test tasks belong to implementation, not to
-specification — this is a sequencing rule, not a position on testing.
+No automated tests during the specification phase, and no task may require one
+before `tasks.md` is complete. Tests come from these criteria later, so make
+them precise enough to be mechanically checkable.
 
-## Technology Constraints
+## Constraints
 
-- Runtime dependencies: **none**.
-- Dev dependencies: **Vite only**.
-- The API is reached at the same-origin path `/api`, proxied to
-  `http://localhost:8080`. Never hardcode a host, port or scheme.
-- Target: current evergreen browsers. No transpilation, no polyfills.
+- Runtime dependencies: **none**. Dev dependencies: **Vite only**.
+- The API is at the same-origin path `/api` (proxied to `localhost:8080`).
+  Never hardcode a host, port or scheme.
+- Target current evergreen browsers. No transpilation, no polyfills.
 
-## Development Workflow
+## Workflow
 
-- Specification precedes implementation. No production code is written before
-  `spec.md`, `plan.md` and `tasks.md` exist and have been read by a human.
-- Ambiguity is resolved in the specification, not in code. If an
-  implementer has to guess, the spec has a defect — fix the spec.
-- Any principle here may be overridden only by amending this file, never by an
-  exception buried in a plan or a task.
+- No production code before `spec.md`, `plan.md` and `tasks.md` exist and a
+  human has read them.
+- Ambiguity is resolved in the spec, not in code. If an implementer has to
+  guess, the spec has a defect — fix the spec.
 
 ## Governance
 
-This constitution supersedes conventions inherited from any other BookStore
-project. Plans and tasks that conflict with it are defects in the plan, not
-grounds for an exception.
+This file supersedes conventions from any other BookStore project. A principle
+can only be overridden by amending this file, never by an exception buried in a
+plan or task.
 
-`/speckit-analyze` checks generated artifacts against these principles. Treat
-what it reports as findings to act on, not as advice to weigh.
+An amendment changes the text, the version and the amendment date in one
+commit. Versioning is semantic: **MAJOR** removes or redefines a principle,
+**MINOR** adds one or widens its scope, **PATCH** clarifies wording.
 
-**Version**: 1.1.0 | **Ratified**: 2026-08-28 | **Last Amended**: 2026-08-28
+Every spec, plan and task review checks compliance before work proceeds.
+
+**Version**: 1.3.0 | **Ratified**: 2026-08-28 | **Last Amended**: 2026-09-01

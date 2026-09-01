@@ -74,34 +74,32 @@ Open [`.specify/memory/constitution.md`](../../bookstore-web/.specify/memory/con
 in `bookstore-web`. Yours is pre-written — you are not authoring one today.
 
 It has six principles and fits on one page. Read them, then answer this:
-**which two things does it forbid outright?**
+**What does the constitution say about the API contract — and where does it
+say the contract comes from?**
+
+> **Tip**: Use Claude Code to find out!
 
 ### 2. `/speckit-specify` — capture intent (3 min)
 
 Use this prompt **exactly as written**:
 
-> A web UI for the BookStore API. Users can browse books, open a book to see its
-> author and its reviews, add a review to a book, and browse authors. The API is
-> already running behind `/api`.
+> A web UI for the BookStore API. Users can browse books and open a book to see
+> its details and its author. The API is already running behind `/api`.
 
 It writes `specs/001-*/spec.md`. Open it and scroll to **Assumptions** at the
-bottom — that is where the spec parks what it invented. One entry reads roughly:
+bottom — that is where the spec parks what it invented. Nothing has called the
+API yet, so every one of them is a guess — and they are the field names and
+numbers your UI gets built from.
 
-> Ratings use a simple numeric scale (e.g., 1 to 5); the exact scale is a UI
-> presentation detail to be finalized during implementation.
-
-Nothing has called the API yet, so that scale is a guess — and it is the number
-your review form will send.
-
-Now read the requirements with one question in mind: **what would someone
-building this still have to make up?** Four worth checking:
+Now read the **Requirements** section in the `spec.md` with one question in
+mind: **what would someone building this still have to make up?** Three worth
+checking:
 
 - How does a visitor reach page 2 of a list longer than one screen?
-- Where does a new review appear once it is submitted — top or bottom?
-- What counts as a valid rating, and who rejects an invalid one?
+- What does the list show when a page has no books on it?
 - What does the page show for a book id that does not exist?
 
-**Which of those four does the spec actually answer?**
+**Which of those three does the spec actually answer?**
 
 ### 3. `/speckit-clarify` — interrogate the spec (6 min)
 
@@ -144,50 +142,13 @@ Staging is enough — no commit needed. `git diff` compares your working tree
 against what you staged, so it will show exactly what `/speckit-clarify`
 touched. You read that diff in task 4, not now.
 
-**Then spend two minutes finding out what this API actually does.** You are
-about to be asked questions whose answers are not what a REST API
-conventionally does.
-
-Two of the four gaps from task 2, answered in 30 seconds:
-
-```bash
-# how do you get page 2?
-curl -s 'http://localhost:8080/api/books?page=0&size=3'
-curl -s 'http://localhost:8080/api/books?page=1&size=3'
-
-# a rating of 99 on an empty review — does this get rejected?
-curl -s -X POST http://localhost:8080/api/books/1/reviews \
-  -H 'Content-Type: application/json' -d '{"rating":99,"review_text":""}'
-```
-
-Two answers you now have that no amount of reasoning would have given you:
-
-- **Pages start at 1.** Page 0 returns page 1 again, so a UI counting from zero
-  shows the first page twice and never reaches the last.
-- **`201 Created`.** The server accepts a rating of 99 on an empty review. It
-  validates nothing — so every rule about a valid review is the UI's job.
-
-Both are UI decisions, and neither was in the spec. That is the point of these
-two minutes: **the clarify questions are about your UI, but some of them can
-only be answered by asking the API.**
-
-That POST stored a real review on book 1 — rating 99, empty text. Reseed
-to drop it:
-
-```bash
-bun run seed
-```
-
 Now run `/speckit-clarify`. It asks up to five questions, one at a time, and
 waits for each answer. **Answer fast** — five questions, six minutes. You are
 making a first draft, not a perfect spec.
 
-Two rules:
-
-- If you saw the answer in the curl output, use that.
-- If you did not, answer anyway — but **say in your answer that you are
-  guessing**. Your words go into the spec as written, so the label travels with
-  them. Task 4 comes back for these.
+One rule: **if you are guessing, say so in the answer.** Your words go into the
+spec as written, so the label travels with them. Tasks 4 and 5 come back for
+these.
 
 Then stop. Do not read the spec yet — that is what you do in task 4, while a
 slow command runs.
@@ -246,7 +207,7 @@ Four things to look for:
 same API. Would either of you have noticed that difference if neither had
 written a spec?
 
-### 5. Check the plan against reality (3 min)
+### 5. Check the plan against reality (4 min)
 
 `/speckit-plan` wrote its own account of what this API does, in two places:
 
@@ -258,12 +219,28 @@ specs/001-*/contracts/
 Nobody called the API to write those. They were inferred — and Exercise 7 builds
 against them.
 
-You *did* call the API, in task 3. Open both files and check them against what
-you saw:
+So call it yourself. In terminal 3, thirty seconds — this answers the first of
+the three gaps from task 2, plus one thing the spec never thought to ask:
 
-- **Validation** — do they assume the API rejects a bad rating? You got a `201`
-  for rating 99 on empty text. This is the most likely error of the three,
-  because every REST API the model has ever read validates its input.
+```bash
+# how do you get page 2?
+curl -s 'http://localhost:8080/api/books?page=0&size=3'
+curl -s 'http://localhost:8080/api/books?page=1&size=3'
+
+# what shape is one book?
+curl -s http://localhost:8080/api/books/1
+```
+
+**Pages start at 1** — page 0 returns page 1 again. And **a book is not a
+book**: `GET /api/books/1` returns `{"book": {…}, "author": {…}}`, a wrapper,
+while the list returns a bare array. Neither is guessable, and neither was in
+your spec.
+
+Now open both files and check them against what you just saw:
+
+- **Shape** — do they say `GET /api/books/{id}` returns a book? The most likely
+  error of the three, because every REST API the model has ever read returns
+  the resource itself.
 - **Paging** — do they say pages start at 1? Anything starting at 0 is wrong.
 - **Inventions** — endpoints, fields or status codes that appear nowhere in your
   curl output. A contract is where a plausible invention does the most damage.
@@ -320,7 +297,7 @@ A spec that lives only in a chat window is not a spec.
 - You started from the same prompt against the same API. Where do your two specs
   differ, and which of those differences would ever have surfaced if neither of
   you had written one?
-- Could four agents genuinely take four user stories from your `tasks.md` right
+- Could two agents genuinely take your two user stories from `tasks.md` right
   now? If not, what is in the way?
 
 ---
