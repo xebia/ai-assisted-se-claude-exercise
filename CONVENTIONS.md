@@ -8,7 +8,7 @@ versions and all eight blocks keep behaving as one course.
 Four projects — `bookstore-go`, `bookstore-kt`, `bookstore-py`,
 `bookstore-ts` — implement the same API with the same deliberate bugs.
 Participants pick one language for the whole course. Each project carries
-`excercises/block1.md … block8.md` (the folder-name typo is historic; keep
+`excercises/session1.md … session8.md` (the folder-name typo is historic; keep
 it), a `README.md` (build/run) and `preparation.md` (install checklist).
 Coaching skills live once, at the repo root, in `.claude/skills/`.
 
