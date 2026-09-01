@@ -6,9 +6,10 @@ a clean working tree, not live changes), and — only if the participant did
 the bonus scoped-rule task — the path-scoped rule file under
 `.claude/rules/`.
 
-**This check is homework by default.** The exercise sends participants
-here after the session, with their own MVP/freeloader nominations already
-written down in the wrap. Grade the same way regardless of when it runs.
+**This check runs in-session, at the end of the exercise.** Participants
+arrive with their own MVP/freeloader nominations already written down in
+the wrap; the report is read during or right after the plenary harvest.
+Grade the same way regardless of when it runs.
 
 **Under review: the context files, not a prompt.** This is the Block 3
 exception to this skill's usual framing. The bait prompt is fixed and

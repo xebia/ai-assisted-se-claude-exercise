@@ -48,7 +48,7 @@ can't explain.
    - Draft → `/prompt-coach 2` → revise → ship.
    - **Payoff:** run `/verify-exercise 1` — it grades the prompt you actually
      sent against the file it actually produced, claim by claim. Behind on
-     time? It works standalone; run it after the session.
+     time? It works standalone; pick it up in the next break.
 
 3. **The test-first prompt** (6 min) — `paginate()` in
    `bookstore/util/pagination.py` breaks on `page = 0` and negative pages,

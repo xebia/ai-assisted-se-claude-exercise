@@ -44,7 +44,7 @@ language slot. Anything else is drift — fix it.
   the run must teach) are marked per card — don't leak them into exercise
   docs or slides either.
 - `/verify-exercise <n>`: after-the-fact grading against a rubric in
-  `checks/<n>-….md`. Block 3's check is homework-by-default and grades the
+  `checks/<n>-….md`. Block 3's check runs in-session at the end of the exercise and grades the
   banked `block3-bait.diff`, then arbitrates the participant's own wrap
   nominations.
 - `/bank-diff <label>`: banks the working tree as `block3-<label>.diff`

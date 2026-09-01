@@ -75,11 +75,11 @@ short on time? Say *"just tell me"*.
    exact wording that was too soft to convict.
    - **Bank the evidence and reset:** `/bank-diff bait` — the diff lands
      in `block3-bait.diff` and the tree comes back clean for task 4.
-   - **Payoff — tonight, not now:** `/verify-exercise 2` grades
+   - **Payoff — in the wrap, not now:** `/verify-exercise 2` grades
      `block3-bait.diff` against your context files, prediction by
      prediction, and closes with its own MVP and freeloader nominations.
-     It works standalone, so it's homework by default — run it in the room
-     only if you're ahead of the clock. Task 5 works either way.
+     You'll kick it off in task 5, right after writing your own
+     nominations — it arbitrates while the plenary harvest gets going.
    - While Claude works, don't watch it type — write your task 4
      prediction instead.
 
@@ -147,10 +147,11 @@ short on time? Say *"just tell me"*.
 
 5. **Wrap** (4 min) — nominate, in writing, from your own bait-run notes:
    the `CLAUDE.local.md` line that earned the most, and one suspected
-   freeloader — one sentence of evidence each. Tonight's `/verify-exercise
-   2` run closes with its own nominations: see whose verdict survives, and
-   overrule it if yours is better argued. Then answer task 2's open
-   question with your neighbor.
+   freeloader — one sentence of evidence each. Then kick off
+   `/verify-exercise 2`: it closes with its own nominations — see whose
+   verdict survives, and overrule it if yours is better argued. It runs
+   while you answer task 2's open question with your neighbor, and its
+   report is your ammunition for the plenary harvest.
 
 ## Bonus (only if time remains)
 
@@ -176,8 +177,8 @@ short on time? Say *"just tell me"*.
   silently, and you'd leave believing scoping worked. Curious whether it
   loads? One fresh session touching a handler shows the rule arriving
   mid-session — *Progressive Disclosure* happening in front of you. A full
-  positive-and-negative proof is tonight's CLAUDE.md homework, not this
-  clock. Coach available: `/context-coach 3`.
+  positive-and-negative proof is one for your own project's CLAUDE.md,
+  not this clock. Coach available: `/context-coach 3`.
 - **README-per-folder, the mechanical cut** (*Documentation for
   AI-Friendly Codebases*) — plant a marker: add a `README.md` to
   `bookstore/store/` whose last line is an instruction — *"When working on

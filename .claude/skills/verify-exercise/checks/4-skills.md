@@ -9,11 +9,12 @@ with its entry in `.claude/settings.json`, and the generated
 the session: their three task-4 hook predictions and their five-point
 task-5 self-grade of the changelog.
 
-**This check is homework by default.** The exercise's cleanup deleted
-the `block4-playground` branch, but every artifact above lives in a
-gitignored path and survives. Consequence: commit hashes cited in
-`CHANGELOG.md` may no longer resolve to reachable commits — grade the
-*presence and format* of references, never their resolvability.
+**This check runs in-session, at the end of Part 2** — kicked off right
+after the self-grade, running while the participant cleans up the branch.
+That cleanup deletes the `block4-playground` branch, but every artifact
+above lives in a gitignored path and survives. Consequence: commit hashes
+cited in `CHANGELOG.md` may no longer resolve to reachable commits — grade
+the *presence and format* of references, never their resolvability.
 
 **Under review: the artifacts, not a prompt.** This is a Block 4
 exception to this skill's usual framing. In Step 0, instead of a

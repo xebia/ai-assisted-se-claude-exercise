@@ -13,8 +13,8 @@ output.
 ## How this exercise works
 
 There is no coach for this block. The checklists in the tasks below are the
-guardrail, and tonight's `/verify-exercise 4` gives the closing verdicts —
-after yours, as always.
+guardrail, and `/verify-exercise 4` gives the closing verdicts at the end
+of task 5 — after yours, as always.
 
 This exercise makes **real commits**, so everything happens on a throwaway
 branch; task 6 cleans it up and explains why your work survives the delete.
@@ -51,7 +51,7 @@ short on time? Say *"just tell me"*.
 
    Stick to the `SKILL.md` files. The `cards/` and `checks/` folders next to
    them hold graded answers for this course's exercises — opening them spoils
-   your own homework.
+   your own verifier run.
 
 2. **Create the /commit skill** (6 min) — create the file
    `.claude/skills/commit/SKILL.md` (in *your project folder* this time, next
@@ -170,7 +170,7 @@ short on time? Say *"just tell me"*.
      changes
 
    No coach checks this draft — the list above is the guardrail, and
-   tonight's `/verify-exercise 4` grades the result.
+   `/verify-exercise 4` grades the result at the end of task 5.
 
 4. **Wire the hook** (6 min) — a skill Claude *may* invoke still needs
    something to remind it at the right moment. That's a hook. You'll add a
@@ -242,7 +242,7 @@ short on time? Say *"just tell me"*.
    chain: commit → hook → changelog.
 
    When the dust settles, two verdicts, both **in writing**, both before
-   tonight's verifier gives its own:
+   the verifier gives its own:
 
    - **Predictions vs. reality** — take your three task-4 predictions and
      mark each confirmed or busted, citing the moment in the transcript that
@@ -253,9 +253,9 @@ short on time? Say *"just tell me"*.
      verb · every entry carries a commit reference.
 
    `/verify-exercise 4` re-grades all of it — both skills, the hook, the
-   changelog, and your two verdicts — with evidence. It works standalone from
-   the artifacts, so it's homework by default; run it in the room only if
-   you're ahead of the clock.
+   changelog, and your two verdicts — with evidence. Kick it off now: it
+   works standalone from the artifacts and keeps running while you clean
+   up in task 6 — read its report before the plenary harvest.
 
 6. **Cleanup + Plenary Harvest** (5 min) — cleanup first, one command per
    line (PowerShell 5.1 can't chain with `&&`):

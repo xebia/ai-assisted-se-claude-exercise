@@ -5,7 +5,8 @@
 moved out of `CLAUDE.local.md`. The exercise deliberately stops at the
 *mechanism* — file moved, glob checked against the real tree, at most one
 curiosity run watching the rule load. The full positive-and-negative proof
-is that evening's CLAUDE.md homework, not this clock; don't demand it here.
+is one for the CLAUDE.md they'll write for their own project, not this
+clock; don't demand it here.
 
 **Slide anchors:** *Rules — Splitting CLAUDE.md by Topic* · *Rule Discovery:
 With or Without Paths* · *Progressive Disclosure* · the **Size** dimension.
@@ -31,8 +32,8 @@ With or Without Paths* · *Progressive Disclosure* · the **Size** dimension.
 - If they have time for the curiosity run: knowing *what they expect to
   observe* (the rule arriving mid-session, after a matching file is
   touched) beats "I'll see if it works". If they volunteer a full
-  falsifiable plan with a negative arm, applaud it and point it at the
-  homework — don't spend exercise rounds on it.
+  falsifiable plan with a negative arm, applaud it and point it at their
+  own project's CLAUDE.md — don't spend exercise rounds on it.
 
 **Not applicable:**
 
