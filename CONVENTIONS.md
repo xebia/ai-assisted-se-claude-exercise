@@ -33,6 +33,14 @@ word-for-word identical:
 Verify a port with a structural diff: every differing line must contain a
 language slot. Anything else is drift — fix it.
 
+## Writing style
+
+All exercise text follows `writing-style.md` in this repo's root: B1 English
+for instructions, flavor skippable and idiom-free, the AI-tell ban list, a
+**Done when** line per task, and the final-pass checklist before shipping
+any doc. The copy in the course repo (`ai-assisted-se-claude`) is the
+source of truth — when it changes there, copy it here again.
+
 ## Skills: coach, verifier, bank-diff
 
 - `/prompt-coach` (block 2) and `/context-coach` (block 3): per-task cards

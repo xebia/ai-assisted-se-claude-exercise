@@ -1,0 +1,185 @@
+# Writing Style Guide — Course Materials
+
+For all exercises, slides, and handouts in this course. The audience is
+professional developers, many of them Dutch, with English between B1 and C1.
+Assume B1 for anything that matters.
+
+## The litmus test
+
+> Could a tired reader, at the end of a training day, with B1 English,
+> do the task correctly after reading each sentence once?
+
+If a sentence fails this test and it carries an instruction, rewrite it.
+If it fails and it's decoration, cut it or move it out of the way.
+
+## The two-tier rule
+
+Every piece of text is one of two tiers:
+
+**Tier 1 — load-bearing.** Steps, requirements, definitions, commands,
+success criteria. Rules: B1 English. Sentences under ~18 words. One idea per
+sentence. No idioms, no irony, no inversion. State the point plainly, first.
+
+**Tier 2 — flavor.** Asides, closers, encouragement, humor. Rules: B2
+maximum, and always *skippable* — a reader who skips all flavor loses zero
+instructions. Flavor never carries information. At most one flavor line per
+section.
+
+## Voice
+
+- Direct address: "you", "your prompt", "decide before you prompt".
+- Honest and a little dry — but warmth comes from directness and candor
+  ("Sometimes you'll be right"), **not from idioms**.
+- Technical jargon is fine when the audience shares it (sub-agent,
+  middleware, table test). English idioms are not jargon — they are the
+  actual language barrier. Avoid: "earned its keep", "off the hook",
+  "goldmine", "buys you nothing", "ship it" *unless defined first*.
+- Some AI-typical phrasing is acceptable — this is an AI course — but never
+  at the cost of a second read.
+
+## Structure rules
+
+- Define every term of art once, early, before first use.
+- Name a list before explaining its items. Never nest rationale inside a
+  list item; explain in separate sentences after the list.
+- Separate *what to do* (numbered steps, plain verbs) from *why it matters*
+  (a short note after).
+- Caveats get their own sentence. No em-dash chains, no nested
+  parentheticals in Tier 1 text.
+- One aphorism per section maximum, always as a closer, never as the
+  primary explanation.
+
+## Do / don't (from real material)
+
+**Don't** (original, ~C2, meaning by implication):
+> An unfixed bug whose prompt gap you can name beats a lucky fix you can't
+> explain.
+
+**Do** (plain first, aphorism as optional closer):
+> The goal is a better prompt, not a fixed bug. If a bug stays unfixed but
+> you can name what was missing from your prompt, you've learned more than
+> someone who got lucky.
+
+**Don't** (rationale nested inside a semicolon list):
+> Techniques in play: paste the exact error output — don't paraphrase it,
+> paraphrasing throws away the searchable details; Scope it; Constrain it
+> (the tests define what correct means); Define done.
+
+**Do** (bare list, then notes):
+> Techniques in play: error context, Scope it, Constrain it, Define done.
+>
+> Two notes. Paste the error output exactly as it appears — paraphrasing
+> strips out the searchable details. And the tests are your constraint:
+> correct means they pass.
+
+**Don't** (implication the reader must decode):
+> If you didn't ask for proof, the report won't contain any.
+
+**Do** (cause and effect spelled out):
+> The sub-agent only sees your prompt — nothing from your chat. So
+> everything it needs, including what proof to show, must be in the prompt
+> itself.
+
+## Settled decisions
+
+1. **Slide rhythm**: most slides keep the term → example → bold punchline
+   pattern for predictability. Roughly every 4–5 slides, one breaks it — it
+   ends with a question, a plain sentence, or no punchline at all.
+2. **Humor**: one dry aside per section is allowed, written in plain B1
+   English. Warmth comes from candor and direct address, never from idioms.
+3. **Aphorisms**: at most one per section, always as a closer, always after
+   the plain statement of the same point.
+4. **Final pass is mandatory.** Every new piece gets a dedicated last check
+   before delivery (see below). Rules alone are not enough — idioms are how
+   fluent writing naturally drifts.
+
+## AI-tell ban list
+
+Phrases and patterns readers recognize as machine-written. Participants
+flagged "that's where the learning lands" almost instantly — this list
+exists so those never ship. **It is maintained: when a reader flags a
+phrase, add it here.**
+
+Banned phrases, with plain replacements:
+
+| Tell | Write instead |
+| --- | --- |
+| "that's where the learning lands" | "that's where you learn the most" |
+| "let's dive in" / "deep dive" | "let's start" / "a closer look" |
+| "here's the thing" / "the magic happens" | delete; start with the point |
+| "unlocks" / "unleashes" / "supercharges" | "makes possible" / "speeds up" |
+| "leverage" (verb) / "empower" / "elevate" | "use" / "help" / "improve" |
+| "seamless" / "robust" / "powerful" / "rich" | name the concrete property |
+| "navigate the complexities" / "journey" | "deal with" / "process" |
+| "game-changer" / "takes it to the next level" | say what actually changes |
+| "this begs the question" | "this raises the question" |
+| "crucially" / "importantly" as openers | delete; the sentence should show it |
+| "doesn't survive first contact with X" | "breaks the first time it meets X" |
+| "full contact" / "battle-tested" | say concretely what happens or was tested |
+
+Banned patterns:
+
+- **Symmetrical antithesis on autopilot**: "X isn't about A — it's about
+  B", "There is no neutral". Allowed once per document; more is a watermark.
+- **Adjective triads**: "clear, concise, and actionable". Use two items, or
+  one concrete one.
+- **Ideas as physical objects**: points that "land", insights that
+  "surface", questions that get "unpacked". People remember things, notice
+  things, and explain things.
+- **Nominalization piles**: "invites a dense information dump", "defines
+  review lenses". Name the actor and the consequence: "you get pages you
+  will never read".
+- **The relentless moral**: every section ending with its own bolded lesson.
+  Some sections may simply end.
+- **Combat and sports metaphors**: "first contact", "in the trenches",
+  "moving the goalposts", "slam dunk". These are real native-speaker idioms
+  — which is exactly the problem: they read as borrowed cleverness, AI
+  over-uses them, and they are culturally opaque at B1/B2. Note the
+  criterion for this whole list: not "did AI invent it" but "did a reader
+  stumble".
+
+## Slide copy rules
+
+Proven on the Session 2 deck restyle (2026-09); apply with
+`slidev/CONVENTIONS.md`:
+
+- **Ration the epigrams.** Keep the few that earn their place (course-level
+  ideas like "megaphone for your habits"); end other slides plainly, with a
+  question, or not at all. The facilitator note can carry the punchline —
+  spoken lines land better than bold text. Target: ~5 per deck, not one
+  per slide.
+- **Verdicts state consequences, not categories.** "You get twenty opinions
+  and no priorities" — never "vague criteria and subjective critique".
+- **Quiz statements sound like a colleague's opinion**, not an exam item:
+  "they are only tests, after all" — not "because they do not affect
+  runtime behavior". Wrong claims should be fun to vote on.
+- **Facilitator notes are exempt from the flavor budget** but not from the
+  ban list — trainers read them aloud.
+
+## Exercise structure patterns
+
+Proven on Exercise 2; apply to every exercise document:
+
+- **Done when, per task.** Every task ends with a `**Done when**:` line
+  stating observable proof (a file exists, a named test passes, a decision
+  was made and told to someone). This also makes the document practice what
+  it teaches: Define done.
+- **Recap box for the core loop.** If tasks share a repeated workflow,
+  state it once in full, then add a one-line recap box the reader can jump
+  back to mid-exercise. Nobody should re-read prose to find step 3.
+- **Timing per phase, not just per task.** Split each task's minutes in the
+  heading (e.g. "9 min: draft 3 · coach & revise 3 · ship & check 3") so a
+  reader knows *when* they are behind, not just that time exists.
+
+## Final pass checklist
+
+Run this on every piece before delivering it:
+
+- [ ] Any idioms? ("off the hook", "earned its keep", "buys you nothing")
+      → replace with plain words.
+- [ ] Every Tier 1 sentence under ~18 words and parseable in one read?
+- [ ] Is every term of art defined before first use?
+- [ ] Is all flavor skippable — no instruction hiding inside a joke or
+      aphorism?
+- [ ] The litmus test: could a tired B1 reader do the task correctly after
+      reading each sentence once?

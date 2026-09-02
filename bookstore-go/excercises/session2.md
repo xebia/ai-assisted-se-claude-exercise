@@ -1,116 +1,193 @@
-# Exercise 2: The Prompt Is the Deliverable
+# Exercise 2: Writing Effective Prompts
 
-**Block**: 2 — Bug Fixing & Effective Prompting **Duration**: 30 minutes
-**Project**: Same BookStore API. The test suite has deliberate failures baked
-in.
+**Block**: 2 — Bug Fixing & Effective Prompting
+**Duration**: 30 minutes
+**Project**: The same BookStore API. Its test suite contains deliberate failures.
 
-**Goal**: Practice composing prompts with the Block 2 techniques —
-CONTEXT-TASK-FORMAT, Scope/Constrain/Direct/Define done, role framing,
-Examples, verbatim error context, `/effort`, plan mode. The bugs are your
-practice targets, not the goal: a green test run is how you *verify* a prompt
-worked. An unfixed bug whose prompt gap you can name beats a lucky fix you
-can't explain.
+## Goal
+
+You'll practice writing prompts using the techniques from this block:
+CONTEXT-TASK-OUTCOME, Scope/Constrain/Direct/Define done, role framing,
+examples, verbatim error context, `/effort`, and plan mode.
+
+One thing to be clear about before you start: the bugs are practice material,
+not the goal. A passing test only proves your prompt worked. If a bug stays
+unfixed but you can name what was missing from your prompt, you've learned
+more than someone who got lucky.
+
+## A few words we'll use
+
+- **Coach**: the `/prompt-coach` command. It reviews your draft and points
+  out gaps. It will never write the prompt for you — that's your job.
+- **Greenlight**: the coach thinks your prompt is ready to run.
+- **Ship**: the coach sends your prompt, word for word, to a sub-agent.
+- **Sub-agent**: a fresh Claude session that runs your prompt. It hasn't seen
+  your conversation. Whatever you wrote is all it gets.
+- **Green**: all tests pass.
 
 ## How every task works
 
-1. **Draft** your prompt for the task, in full. Don't send it as work yet.
-2. **Coach** — run `/prompt-coach <task number>` and paste your draft. Claude
-   grades it against this block's techniques, predicts what each gap will
-   cost, and nudges you with one question at a time. It will never write the
-   prompt for you.
-3. **Revise** until you get the greenlight — or overrule with *"run it
-   anyway"* and the coach will tell you what to watch.
-4. **Ship it** — the coach dispatches your exact prompt, verbatim, to a
-   fresh sub-agent that has seen none of your conversation. What you wrote is
-   all it gets: if your prompt leans on context from the chat, the sub-agent
-   won't have it — and if you didn't ask for proof, the report won't contain
-   any. (Task 5 is the exception: you run that one yourself, in plan mode —
-   reviewing the plan needs you in the loop.)
-5. **Debrief** — walk through the sub-agent's report with the coach. Did its
-   predictions come true? That comparison is where the learning lands.
+Same five steps every time:
 
-**Note**: `CLAUDE.md` keeps this project in training mode — Claude asks a
-leading question before handing you an answer, and investigates by searching
-rather than reading whole files. A greenlit prompt is exempt: it already
-passed review, and the coach ships it to a clean sub-agent where it runs
-straight. Stuck or short on time? Say *"just tell me"*.
+1. **Draft**. Write your complete prompt for the task. Don't run it yet.
+2. **Coach**. Run `/prompt-coach <task number>` and paste your draft. The
+   coach grades it against this block's techniques and predicts what each
+   gap will cost you. It asks one question at a time, so the feedback stays
+   easy to digest.
+3. **Revise**. Improve the prompt until you get the greenlight. Disagree
+   with the coach? Say *"run it anyway"* — it will let you, and tell you
+   what to watch for. Sometimes you'll be right.
+4. **Ship**. Your exact prompt goes to a fresh sub-agent. This is where it
+   gets interesting: the sub-agent knows nothing about your chat. If your
+   prompt depends on something you discussed earlier, that context is simply
+   gone. And if you didn't ask for proof, don't expect any in the report.
+   (Task 5 is the exception — you run that one yourself in plan mode,
+   because reviewing the plan requires your judgment.)
+5. **Debrief**. Read the sub-agent's report with the coach and check: did
+   its predictions come true? That comparison is where you learn the most.
+
+> **The loop, in short: Draft → Coach → Revise → Ship → Debrief.**
+> Every task below uses it. Come back here when you lose track.
+
+**About training mode**: `CLAUDE.md` keeps this project in training mode, so
+Claude asks you a leading question before handing you an answer, and searches
+rather than reading whole files. Greenlit prompts skip all that — they passed
+review, so they run directly. Stuck or short on time? Just say *"just tell
+me"*. That is allowed.
 
 ## Tasks
 
-1. **Baseline** (2 min) — run `go test ./...` and note every failing test.
-   Compare with your neighbor — you should both see the same failures. No
-   coaching for this one: it's exactly the kind of no-learning-goal request
-   the training mode leaves alone.
+### 1. Baseline (2 min)
 
-2. **The orientation prompt** (9 min) — you're onboarding onto this codebase.
-   One prompt must produce `docs/orientation.md` containing:
-   1. **Package tree** — one line per package on what it owns
-   2. **Request flow** — `main.go` → database and back, layer by layer, with
-      `file:line` per hop
-   - Techniques in play (see the *Prompt Analysis* slide — this is that
-     prompt, composed by you): CONTEXT-TASK-FORMAT · Role framing · Scope it
-     · Direct it · Define done · `@file` · Examples. One of those buys you
-     nothing here — which, and why? Tell the coach your answer.
-   - Draft → `/prompt-coach 2` → revise → ship.
-   - **Payoff:** run `/verify-exercise 1` — it grades the prompt you actually
-     sent against the file it actually produced, claim by claim. Behind on
-     time? It works standalone; pick it up in the next break.
+Run `go test ./...` and write down every failing test. Compare with your
+neighbor — you should both see the same failures.
 
-3. **The test-first prompt** (6 min) — `Paginate()` in
-   `internal/util/pagination.go` breaks on `page = 0` and negative pages, and
-   no test covers those cases. One prompt: failing tests first, then the fix,
-   then proof of both. This is Prompt A from the *Which Prompt is Better?*
-   slide — now it's yours to write.
-   - Techniques in play: Scope it · Direct it (test-first, explicitly) ·
-     Examples (there's a table test right next to the function) · Constrain
-     it · Define done. And: *you* decide what `page = 0` should do — don't
-     delegate the requirement.
-   - Draft → `/prompt-coach 3` → revise → ship → `go test ./internal/util/...`
-     → debrief.
+No coaching for this one. It's a simple request with no learning goal, which
+is exactly the kind of thing training mode leaves alone.
 
-4. **The failing-test prompt** (5 min) — `TestCreateBookReturns201` and
-   `TestDeleteBookReturns204` have been failing since your baseline run. One
-   prompt fixes both.
-   - Techniques in play (see *Providing Error Context*): error context —
-     verbatim, not paraphrased · Scope it · Constrain it (the tests are the
-     spec) · Define done. What `/effort` does this task deserve?
-   - Draft → `/prompt-coach 4` → revise → ship →
-     `go test ./internal/handler/...` → debrief.
+**Done when**: you have a written list of the failing tests, and it matches
+your neighbor's list.
 
-5. **The plan-mode prompt** (7 min) — `TestCreateReviewNonexistentBook`
-   expects `404`, gets `201` — and where the fix belongs is genuinely
-   debatable. Use plan mode.
-   - Techniques in play (see *Plan Mode* and *Prompting & Extended
-     Thinking*): plan mode (no code until you approve) · directed thinking —
-     name what the plan must reason through · Scope it · Define done. Demand
-     a recommendation with rationale, not an options menu.
-   - Draft the *planning* prompt → `/prompt-coach 5` → revise → run in plan
-     mode → **push back on at least one step**, then approve → implement →
-     `go test ./internal/handler/...` → debrief.
+### 2. The orientation prompt (9 min: draft 3 · coach & revise 3 · ship & check 3)
 
-6. **Wrap** (1 min) — run `go test ./...`. **It will not be green — that's by
-   design.** `TestCreateReviewValidation` is still failing, and one bug in
-   this codebase has no test at all. Tell your pair which techniques prompts
-   for those two would need.
+Imagine you're new to this codebase. Write one prompt that produces
+`docs/orientation.md` with:
+
+1. **Package tree** — one line per package on what it owns
+2. **Request flow** — from `main.go` to the database and back, layer by
+   layer, with a `file:line` reference for each step
+
+You've seen this prompt before — it's the one from the *Prompt Analysis*
+slide. Now you compose it yourself, using: CONTEXT-TASK-OUTCOME, role
+framing, Scope it, Direct it, Define done, `@file`, and examples.
+
+But watch out: one of those techniques adds nothing for this task. Find out
+which one, and why, and tell the coach.
+
+Draft → `/prompt-coach 2` → revise → ship.
+
+**Check your result**: run `/verify-exercise 1`. It compares the prompt you
+actually sent against the file it actually produced, claim by claim. Not
+enough time? The check works on its own — run it in the next break.
+
+**Done when**: `docs/orientation.md` exists, every step in the request flow
+has a `file:line` reference, and you told the coach which technique was
+useless here.
+
+### 3. The test-first prompt (6 min: draft 2 · coach & revise 2 · ship & test 2)
+
+`Paginate()` in `internal/util/pagination.go` breaks on `page = 0` and
+negative pages, and no test covers either case.
+
+Write one prompt that asks for failing tests first, then the fix, then proof
+of both. This is Prompt A from the *Which Prompt is Better?* slide — now
+it's yours to write.
+
+Techniques in play: Scope it, Direct it (say "tests first" explicitly),
+Examples (there's a table test sitting right next to the function),
+Constrain it, Define done.
+
+One decision belongs to you, not Claude: what *should* happen when
+`page = 0`? Decide before you prompt. Requirements are yours to make, not
+Claude's to guess.
+
+Draft → `/prompt-coach 3` → revise → ship → `go test ./internal/util/...` →
+debrief.
+
+**Done when**: the report shows the new tests failing *before* the fix and
+passing *after*, and `go test ./internal/util/...` is green on your machine.
+
+### 4. The failing-test prompt (5 min: draft 2 · coach & revise 1 · ship & test 2)
+
+`TestCreateBookReturns201` and `TestDeleteBookReturns204` have been failing
+since your baseline run. Write one prompt that fixes both.
+
+Techniques in play (see *Providing Error Context*): error context, Scope
+it, Constrain it, Define done.
+
+Two notes. Paste the error output exactly as it appears — paraphrasing
+strips out the searchable details. And the tests are your constraint:
+correct means they pass.
+
+And a small side question: what `/effort` level does this task actually
+deserve?
+
+Draft → `/prompt-coach 4` → revise → ship →
+`go test ./internal/handler/...` → debrief.
+
+**Done when**: both tests pass in `go test ./internal/handler/...`, and you
+can say why you picked your `/effort` level.
+
+### 5. The plan-mode prompt (7 min: draft 2 · coach & revise 2 · plan & challenge 2 · implement & test 1)
+
+`TestCreateReviewNonexistentBook` expects a `404` but gets a `201` — and
+where the fix belongs is genuinely debatable. That makes it a plan mode job.
+
+Techniques in play (see *Plan Mode* and *Prompting & Extended Thinking*):
+plan mode (no code until you approve), directed thinking (name the things
+the plan must reason through), Scope it, Define done.
+
+Ask for a recommendation with reasons. If you get a list of options instead,
+your prompt allowed Claude to avoid the decision.
+
+Draft the *planning* prompt → `/prompt-coach 5` → revise → run in plan mode
+→ **challenge at least one step of the plan** before you approve →
+implement → `go test ./internal/handler/...` → debrief.
+
+**Done when**: you challenged at least one plan step, and
+`TestCreateReviewNonexistentBook` passes.
+
+### 6. Wrap (1 min)
+
+Run `go test ./...`. It won't be green — and that's intentional.
+`TestCreateReviewValidation` still fails, and one bug in this codebase has
+no test at all. Tell your pair which techniques a prompt for each of those
+two would need.
+
+**Done when**: you named the techniques for both remaining bugs. Fixing them
+is the bonus, not the bar.
 
 ## Bonus (only if time remains)
 
-Uncoached — apply what the coach kept flagging:
+No coach this time — apply whatever it kept flagging in your prompts:
 
-- Fix `TestCreateReviewValidation` (all 4 subtests). Decide *before
-  prompting*: handler, middleware, or store?
-- Hunt the testless bug with a review prompt. Which specialist reviews
-  (*Role framing*), which package (*Scope it*), looking at what (*Direct
-  it*)?
-- Fix-until-green — but count your cycles. More than 2 means the prompt, not
-  the code, needs work.
+- Fix `TestCreateReviewValidation` (all 4 subtests). Decide *before you
+  prompt*: handler, middleware, or store?
+- Find the bug that has no test, using a review prompt. Which
+  specialist should review (*role framing*), which package (*Scope it*),
+  looking at what (*Direct it*)?
+- Keep fixing until everything is green — but count your rounds. More than
+  two means the prompt needs work, not the code.
 
 ## Pair Discussion (5 min)
 
-Which single clause in one of your prompts bought the most? Which missing
-technique actually cost you — did the coach's prediction come true? Where did
-you overrule the coach, and were you right? Choose **one take-away** to
-present to the group.
+Talk through with your pair:
+
+- Which single sentence in one of your prompts helped the most?
+- Which missing technique actually cost you — did the coach predict it?
+- Where did you overrule the coach, and were you right?
+
+Pick **one take-away** to present to the group.
 
 ## Group Share (5 min)
 
