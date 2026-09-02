@@ -187,7 +187,7 @@ compare. Do not run it for them.
 
 ## Adding a new exercise
 
-Copy `checks/TEMPLATE.md` to `checks/<id>-<slug>.md`. The dispatcher
+Copy `checks/template.md` to `checks/<id>-<slug>.md`. The dispatcher
 discovers check files by listing the directory, so this file never changes.
 Known traps and pass bars are quasi-output: write them in the register of
 *How you talk to the participant*.

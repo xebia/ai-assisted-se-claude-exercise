@@ -141,7 +141,7 @@ Banned patterns:
 ## Slide copy rules
 
 Proven on the Session 2 deck restyle (2026-09); apply with
-`slidev/CONVENTIONS.md`:
+`slidev/conventions.md`:
 
 - **Ration the epigrams.** Keep the few that earn their place (course-level
   ideas like "megaphone for your habits"); end other slides plainly, with a

@@ -18,7 +18,7 @@ spot the issues that humans (and test suites) miss.
 ## Pick your language
 
 The same BookStore API is implemented in four languages. Pick the one you are
-most comfortable with — the exercises (`excercises/session1.md` … `session8.md`) are
+most comfortable with — the exercises (`exercises/session1.md` … `session8.md`) are
 equivalent across all four.
 
 - [bookstore-go](bookstore-go/) — Go, standard library `net/http`

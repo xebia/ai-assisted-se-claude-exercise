@@ -32,7 +32,7 @@ Run these checks scoped to the current project directory (the participant's
 **every git command below must be scoped with `.` and run from the project
 folder**):
 
-1. **Right directory.** The cwd must contain `excercises/session3.md` (it is
+1. **Right directory.** The cwd must contain `exercises/session3.md` (it is
    the project root). If not: say where you are, say the command must run
    from the bookstore project folder, and stop.
 2. **Something to bank.** `git status --porcelain -- .` must be non-empty.
