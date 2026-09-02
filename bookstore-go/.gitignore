@@ -79,3 +79,9 @@ CHANGELOG.md
 .claude/hooks/
 .claude/settings.json
 .claude/settings.local.json
+
+# Participant subagent (Exercise 5)
+.claude/agents/
+
+# Seeded database (created by `go run .`, same pattern as the other three ports)
+store.db
