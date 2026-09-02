@@ -145,12 +145,14 @@ against what you staged, so it will show exactly what `/speckit-clarify`
 touched. You read that diff in task 4, not now.
 
 Now run `/speckit-clarify`. It asks up to five questions, one at a time, and
-waits for each answer. **Answer fast** — five questions, six minutes. You are
-making a first draft, not a perfect spec.
+waits for each answer.
 
 One rule: **if you are guessing, say so in the answer.** Your words go into the
 spec as written, so the label travels with them. Tasks 4 and 5 come back for
 these.
+
+**Answer fast** — five questions, six minutes. You are making a first draft, not
+a perfect spec.
 
 Then stop. Do not read the spec yet — that is what you do in task 4, while a
 slow command runs.
