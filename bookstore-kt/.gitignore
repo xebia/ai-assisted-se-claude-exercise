@@ -16,3 +16,6 @@ CHANGELOG.md
 .claude/hooks/
 .claude/settings.json
 .claude/settings.local.json
+
+# Participant subagent (Exercise 5)
+.claude/agents/

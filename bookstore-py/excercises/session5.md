@@ -7,11 +7,13 @@
 to Claude, wire it up, and create a security-auditor subagent. Then compare AI
 responses with and without each extension loaded.
 
+Stuck or short on time? Say *"just tell me"*. That is allowed.
+
 ---
 
 ## Tasks
 
-### 1. Build the SQLite MCP Server (8 min)
+### 1. Build the SQLite MCP Server (8 min: verify db 1 · compile 2 · register 3 · confirm 2)
 
 The bookstore uses a SQLite database (`store.db`). Without MCP, Claude has to
 guess column names. With MCP, it can query the schema and run real SQL. The
@@ -73,9 +75,12 @@ You should see `sqlite-bookstore` in the list. Inside an active Claude Code
 session, type `/mcp` to confirm it shows as connected and lists both tools:
 `get_table_definitions` and `execute_query`.
 
+**Done when**: `claude mcp list` shows `sqlite-bookstore`, and `/mcp` shows
+it connected with both tools listed.
+
 ---
 
-### 2. Compare AI Responses: Without vs With MCP (5 min)
+### 2. Compare AI Responses: Without vs With MCP (5 min: predict & round A 2 · round B 3)
 
 This is the core learning exercise — observe how access to real data changes
 Claude's answers.
@@ -85,6 +90,9 @@ Claude's answers.
 ```bash
 claude mcp remove sqlite-bookstore
 ```
+
+Before you ask anything, write down one prediction. Name the part you expect
+to be wrong or hedged: book count, top author, or SQL query.
 
 Open a fresh Claude Code session and ask:
 
@@ -125,9 +133,12 @@ Ask a follow-up that would be impossible without live data:
 
 Without MCP this is just a guess. With MCP it is a fact.
 
+**Done when**: you have written responses for both rounds, and a one-line
+verdict on whether your prediction held.
+
 ---
 
-### 3. Create the Security-Auditor Subagent (5 min)
+### 3. Create the Security-Auditor Subagent (5 min: create agent 3 · test 2)
 
 A subagent runs in its own isolated context window with its own tools and model.
 You will create one that specializes in OWASP security audits. It uses a cheaper
@@ -214,6 +225,10 @@ Severity levels: CRITICAL, HIGH, MEDIUM, LOW, INFO
 End with a **Summary** table: | Severity | Count |
 ```
 
+Optional, before you test it: run `/mcp-coach 3` on your `description`
+field. It grades your trigger the way the A-or-B slide judged the two
+examples. It also predicts one moment where it would misfire.
+
 **Step 3** — Test by asking Claude directly (without explicitly triggering the
 subagent):
 
@@ -223,27 +238,32 @@ Watch the tool calls in the output. Claude will delegate to `security-auditor`
 automatically because the description matches. The audit runs in a separate
 context — your main conversation stays clean.
 
----
+**Done when**: `bookstore-py/.claude/agents/security-auditor.md` exists, and
+you have a security-audit report produced by the subagent, not written by
+you.
 
-## Pair Discussion (5 min)
+## Plenary Harvest (10 min: write 5 · popcorn 5)
 
-Compare notes with your partner:
+Before the trainer popcorns the room, write down answers to these:
 
-1. **MCP schema awareness**: did Claude use `get_table_definitions` before every
-   query, or only on first use? What does that tell you about how Claude manages
-   tool calls?
-2. **Subagent delegation**: did Claude delegate automatically, or did you have
-   to trigger it explicitly? What would you change in the `description:` field
-   to make auto-delegation more reliable?
-3. **Real-world applications**: which MCP servers would save your team the most
-   time? (GitHub, JIRA, your production database?) What risks would you need to
-   mitigate before connecting a production database?
-4. **Cost vs capability**: the security auditor uses Haiku to save cost. What
-   tasks in your workflow could be delegated to a cheaper model without losing
-   quality?
+1. **MCP schema awareness**: did Claude call `get_table_definitions` before
+   every query, or only once? What does that tell you about how Claude
+   reuses tool results within a session?
+2. **Subagent delegation**: did Claude delegate automatically, or did you
+   have to trigger it explicitly? What would you change in the
+   `description:` field to make auto-delegation more reliable?
+3. **Real-world applications**: which MCP servers would save your team the
+   most time, and what would you need to check before connecting one?
+4. **Cost vs capability**: the security auditor uses Haiku to save cost.
+   Name one task in your own workflow that a cheaper model could handle.
+   Say why it would not lose quality.
 
-Choose **one take-away** to present to the group.
+Then start `/verify-exercise 5`. It checks your MCP registration and your
+subagent's file, trigger, and report. It grades by observable state, not by
+prose. Bring its report to the harvest if it finishes in time.
 
-## Group Share (5 min)
+**Done when**: you have a written answer for all four, and
+`/verify-exercise 5` is running.
 
-Each participant presents **one take-away** from this exercise to the group.
+Trainer popcorns the room — no pairs, no prep time beyond what you wrote
+above. Close with **one take-away** you'd give someone who skipped today.
