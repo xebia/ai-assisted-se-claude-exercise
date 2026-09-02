@@ -7,7 +7,7 @@ with `file:line` per hop.
 
 **Slide anchors:** *The CONTEXT-TASK-FORMAT Framework* · *Writing Effective
 Prompts* (Scope/Direct/Define done) · *Role Framing* · *Prompt Analysis* —
-this task is that slide's prompt, composed live instead of read.
+this task is that slide's prompt, written live instead of read.
 
 ## Technique applicability
 
@@ -15,64 +15,64 @@ this task is that slide's prompt, composed live instead of read.
 Define done.
 
 **Optional polish — mention, never count against them:** Role framing ·
-`@file` reference. Both improve the result; neither decides whether the
-artifact is checkable.
+`@file` reference. Both improve the result. Neither decides whether the
+artifact can be checked.
 
 **Not applicable:**
 
-- **Examples** — no pattern to point at in your first five minutes in an
-  unfamiliar codebase. *Held back — see below.*
-- **Constrain it** — read-only task; nothing to constrain.
+- **Examples** — there is no pattern to point at in your first five minutes
+  in an unfamiliar codebase. *Held back — see below.*
+- **Constrain it** — read-only task. There is nothing to constrain.
 - **Extended thinking / `/effort`** — this is reading, not reasoning. If the
-  draft asks for it, that's a finding: it buys tokens, not quality.
+  draft asks for it, that is a finding: it costs tokens and adds no quality.
 
 ## What a strong draft contains
 
-Nudge toward missing elements from this list; never paste it as a prompt.
+Nudge toward missing elements from this list. Never paste it as a prompt.
 
-- The stack and the entry point handed over, not left to be searched for
+- The stack and the entry point given, not left for Claude to search for
 - Both deliverables named, each with its output shape
-- `file:line` per hop demanded explicitly
+- `file:line` per hop asked for explicitly
 - **A method for the tree:** open at least one file per package before
-  describing it, rather than inferring from the package name. Highest-value
-  clause in the whole prompt and almost nobody writes it.
+  describing it. Do not guess from the package name. This is the most
+  valuable clause in the whole prompt, and almost nobody writes it.
 - **A method for the flow:** read the route registration first, then follow
-  one real route end to end
-- A done-condition amounting to *no claim I can't check by opening the file
+  one real route from start to end
+- A done-condition that means: *no claim I cannot check by opening the file
   you named*
 
 ## Nudge bank
 
-- "How would you tell a hop citation that's real from one the model made up to
-  satisfy your format?"
-- "Could the line about the `util` package be written without opening a single
-  file in it? What in your prompt prevents that?"
+- "Claude gives you a `file:line` for a hop. How do you know it is real, and
+  not invented to fill your format?"
+- "Could Claude write the line about the `util` package without opening any
+  file in it? What in your prompt stops that?"
 - "Your prompt says what to deliver. Where does it say how to *find* it?"
 
 ## Predicted defects for common gaps
 
-- No method for the tree → package one-liners guessed from package names
-- No `file:line` demand, or no done-condition → uncited hops, or fabricated
-  line numbers produced under format pressure
-- No CONTEXT/entry point → wasted turns searching, or the architecture the
-  model *expects* (a service layer, a repository abstraction) instead of the
-  one present
+- No method for the tree → Claude guesses each package's job from its name
+- No `file:line` demand, or no done-condition → hops without citations, or
+  invented line numbers written to satisfy your format
+- No CONTEXT / entry point → Claude spends turns searching, or describes the
+  architecture it *expects* (a service layer, a repository abstraction)
+  instead of the one that is there
 
 ## Greenlight bar
 
-All six load-bearing techniques present. Role framing and `@file` are worth a
-one-line mention if absent, not a round.
+All six load-bearing techniques present. Role framing and `@file` are worth
+one line if absent, not a round.
 
 ## After the run
 
 `/verify-exercise 1` grades the sent prompt against the produced artifact,
-claim by claim — that report is the debrief for this task, so keep yours to
-one line and hand over to it. Don't preempt its findings.
+claim by claim. That report is the debrief for this task. Keep yours to one
+line and hand over to it. Do not repeat its findings before it runs.
 
 ## Held back
 
-The exercise asks: *of the techniques listed, which buys you nothing here?*
-Intended answer: **Examples** — there's no pattern to point at yet, which is
+The exercise asks: *of the techniques listed, which one adds nothing here?*
+Intended answer: **Examples** — there is no pattern to point at yet, which is
 the premise of the task. **Don't volunteer it.** If asked directly, give it,
-and add the hook: Examples becomes available the moment this task is finished
-— the very next task can point at an existing test as its pattern.
+and add the hook: Examples becomes available the moment this task is
+finished. The very next task can point at an existing test as its pattern.

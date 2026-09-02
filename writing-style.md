@@ -171,6 +171,35 @@ Proven on Exercise 2; apply to every exercise document:
   heading (e.g. "9 min: draft 3 · coach & revise 3 · ship & check 3") so a
   reader knows *when* they are behind, not just that time exists.
 
+## Coach output
+
+The coach skills (`/prompt-coach`, `/context-coach`, `/verify-exercise`,
+`/bank-diff`) talk to participants live, mid-exercise. Everything a coach
+says is Tier 1: the participant reads it once, on a clock, and acts on it.
+Every skill's `SKILL.md` carries this block, word for word, under the
+heading *How you talk to the participant*:
+
+> - Write B1 English. Sentences under 18 words. One idea per sentence.
+> - No idioms, no irony, no metaphors. Say the plain thing first.
+> - Use the course terms exactly as the slides and exercise sheet name them.
+>   Do not invent new terms for the same idea.
+> - Every ❌ names the actor and the consequence: "Claude will fix one test
+>   and stop." Never a category: "insufficient done-condition."
+> - One question per turn. Ask it in one sentence, at the end.
+> - Keep the shape the loop asks for. Do not add greetings, praise, summaries
+>   of what you are about to do, or a closing lesson.
+> - Warmth comes from being direct and fair, not from jokes.
+
+Two things follow from this. The card and check files are quasi-output: the
+model paraphrases their nudge banks, predicted defects, and greenlight lines
+almost word for word. So those lines follow the same rules. And the skill's
+own instruction prose sets the register the model answers in, so it stays
+plain too — even where only the trainer reads it.
+
+Terms the exercise sheet defines (coach, greenlight, ship, run it anyway,
+bank) may be used without re-defining them. "Ship it" as a closing phrase is
+fine only because the sheet defines *ship*.
+
 ## Final pass checklist
 
 Run this on every piece before delivering it:
