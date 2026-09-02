@@ -4,8 +4,8 @@
 **Project**: Same BookStore API.
 
 **Goal**: Build a custom SQLite MCP server that exposes the bookstore database
-to Claude, wire it up, and create a security-auditor subagent. Then compare AI
-responses with and without each extension loaded.
+to Claude, and wire it up. Then create a security-auditor subagent, and
+compare AI responses with and without each extension loaded.
 
 Stuck or short on time? Say *"just tell me"*. That is allowed.
 
