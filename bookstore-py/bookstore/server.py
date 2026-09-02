@@ -29,14 +29,14 @@ def build_routes(db: sqlite3.Connection) -> list[Route]:
         return re.compile(f"^{regex}$")
 
     return [
-        ("GET", compile_pattern("/api/books"), bh.list_books),
-        ("GET", compile_pattern("/api/books/{id}"), bh.get_book),
-        ("POST", compile_pattern("/api/books"), bh.create_book),
-        ("DELETE", compile_pattern("/api/books/{id}"), bh.delete_book),
         ("GET", compile_pattern("/api/books/{id}/reviews"), rh.list_reviews),
-        ("POST", compile_pattern("/api/books/{id}/reviews"), rh.create_review),
         ("GET", compile_pattern("/api/authors"), ah.list_authors),
+        ("POST", compile_pattern("/api/books"), bh.create_book),
+        ("GET", compile_pattern("/api/books/{id}"), bh.get_book),
+        ("DELETE", compile_pattern("/api/books/{id}"), bh.delete_book),
         ("GET", compile_pattern("/api/authors/{id}"), ah.get_author),
+        ("POST", compile_pattern("/api/books/{id}/reviews"), rh.create_review),
+        ("GET", compile_pattern("/api/books"), bh.list_books),
     ]
 
 

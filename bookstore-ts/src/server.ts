@@ -16,20 +16,19 @@ export function buildRoutes(db: Database) {
   const rh = new ReviewHandler(reviews);
 
   return {
-    "/api/books": {
-      GET: bh.listBooks,
-      POST: bh.createBook,
-    },
-    "/api/books/:id": {
-      GET: bh.getBook,
-      DELETE: bh.deleteBook,
-    },
     "/api/books/:id/reviews": {
       GET: rh.listReviews,
-      POST: rh.createReview,
     },
     "/api/authors": {
       GET: ah.listAuthors,
+    },
+    "/api/books": {
+      POST: bh.createBook,
+      GET: bh.listBooks,
+    },
+    "/api/books/:id": {
+      DELETE: bh.deleteBook,
+      GET: bh.getBook,
     },
     "/api/authors/:id": {
       GET: ah.getAuthor,

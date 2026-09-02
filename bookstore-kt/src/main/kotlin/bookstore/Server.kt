@@ -50,14 +50,14 @@ fun buildRoutes(db: Connection): List<Route> {
     }
 
     return listOf(
-        route("GET", "/api/books", bh::listBooks),
-        route("GET", "/api/books/{id}", bh::getBook),
-        route("POST", "/api/books", bh::createBook),
-        route("DELETE", "/api/books/{id}", bh::deleteBook),
         route("GET", "/api/books/{id}/reviews", rh::listReviews),
-        route("POST", "/api/books/{id}/reviews", rh::createReview),
         route("GET", "/api/authors", ah::listAuthors),
+        route("POST", "/api/books", bh::createBook),
+        route("GET", "/api/books/{id}", bh::getBook),
+        route("DELETE", "/api/books/{id}", bh::deleteBook),
         route("GET", "/api/authors/{id}", ah::getAuthor),
+        route("POST", "/api/books/{id}/reviews", rh::createReview),
+        route("GET", "/api/books", bh::listBooks),
     )
 }
 
