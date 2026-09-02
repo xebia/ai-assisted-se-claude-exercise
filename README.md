@@ -32,7 +32,7 @@ Each project's `README.md` explains how to build and run it. Each project's
 ## Extras
 
 - [mcp-sqlite](mcp-sqlite/) — a small MCP server used in one of the later
-  exercise blocks.
+  exercise sessions.
 
 ## Before the training
 

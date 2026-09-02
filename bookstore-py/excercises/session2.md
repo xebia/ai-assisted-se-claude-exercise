@@ -1,12 +1,12 @@
 # Exercise 2: Writing Effective Prompts
 
-**Block**: 2 — Bug Fixing & Effective Prompting
+**Session**: 2 — Bug Fixing & Effective Prompting
 **Duration**: 30 minutes
 **Project**: The same BookStore API. Its test suite contains deliberate failures.
 
 ## Goal
 
-You'll practice writing prompts using the techniques from this block:
+You'll practice writing prompts using the techniques from this session:
 CONTEXT-TASK-OUTCOME, Scope/Constrain/Direct/Define done, role framing,
 examples, verbatim error context, `/effort`, and plan mode.
 
@@ -31,7 +31,7 @@ Same five steps every time:
 
 1. **Draft**. Write your complete prompt for the task. Don't run it yet.
 2. **Coach**. Run `/prompt-coach <task number>` and paste your draft. The
-   coach grades it against this block's techniques and predicts what each
+   coach grades it against this session's techniques and predicts what each
    gap will cost you. It asks one question at a time, so the feedback stays
    easy to digest.
 3. **Revise**. Improve the prompt until you get the greenlight. Disagree

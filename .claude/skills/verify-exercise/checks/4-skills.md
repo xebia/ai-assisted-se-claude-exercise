@@ -16,7 +16,7 @@ above lives in a gitignored path and survives. Consequence: commit hashes
 cited in `CHANGELOG.md` may no longer resolve to reachable commits. Grade
 the *presence and format* of references, never whether they resolve.
 
-**Under review: the artifacts, not a prompt.** This is a Block 4
+**Under review: the artifacts, not a prompt.** This is a Session 4
 exception to this skill's usual framing. In Step 0, instead of a
 prompt, ask for two things verbatim: the three written task-4
 predictions, and the written task-5 self-grade (five pass/fail calls).
@@ -33,7 +33,7 @@ run of the whole chain producing a Common Changelog–format
 `CHANGELOG.md`. They studied `bank-diff`'s SKILL.md as the worked
 example first.
 
-## Rubric — replaces the Block 2 technique table
+## Rubric — replaces the Session 2 technique table
 
 | Dimension | Passes when… |
 | --- | --- |

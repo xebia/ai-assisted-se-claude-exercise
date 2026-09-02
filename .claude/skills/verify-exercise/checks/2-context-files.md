@@ -11,7 +11,7 @@ arrive with their own MVP/freeloader nominations already written down in
 the wrap. The report is read during or right after the plenary harvest.
 Grade the same way regardless of when it runs.
 
-**Under review: the context files, not a prompt.** This is the Block 3
+**Under review: the context files, not a prompt.** This is the Session 3
 exception to this skill's usual framing. The bait prompt is fixed and
 deliberately vague — *"Add caching to the BookStore API"*, plus the
 exercise's experiment prefix. Its weakness is the experimental control:
@@ -28,7 +28,7 @@ path-scoped rule file is a bonus task: grade it when present, mark the
 Scoping dimension — n/a when absent, and never count its absence against
 them.
 
-## Rubric — replaces the Block 2 technique table
+## Rubric — replaces the Session 2 technique table
 
 | Dimension | The context files pass when… |
 | --- | --- |
@@ -52,7 +52,7 @@ dimensions sound*.
   layer-local guidance
 - `CLAUDE.md` itself untouched — `git status` / `git diff CLAUDE.md` is the
   cheapest check in this file. **Highest-value, least-often-checked:** a
-  modified `CLAUDE.md` silently damages every later block.
+  modified `CLAUDE.md` silently damages every later session.
 
 ## Establish ground truth
 

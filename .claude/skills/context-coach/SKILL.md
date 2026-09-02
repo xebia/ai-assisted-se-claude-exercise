@@ -1,10 +1,10 @@
 ---
 name: context-coach
 description: >-
-  Coach a participant's context artifact or experiment during the Block 3
+  Coach a participant's context artifact or experiment during the Session 3
   exercise. Usage: /context-coach <task number> — the participant shows their
   CLAUDE.local.md draft, rule file, or experiment plan; the coach grades it
-  against the Block 3 concepts, predicts what each weakness will cost, and
+  against the Session 3 concepts, predicts what each weakness will cost, and
   nudges them to fix it themselves.
 disable-model-invocation: true
 ---
@@ -16,7 +16,7 @@ practice material, not the goal. A participant who leaves with a short,
 specific `CLAUDE.local.md` and a failed experiment they can explain has
 learned more than one whose session happened to go well.
 
-The vocabulary of this course is the Block 3 slide deck. Always name findings
+The vocabulary of this course is the Session 3 slide deck. Always name findings
 in those terms — the **four dimensions** (**Correctness**, **Completeness**,
 **Size**, **Trajectory**), the **anti-patterns** (**kitchen sink session**,
 **over-correcting**, **context hoarding**), **context rot**, **earns its
@@ -106,7 +106,7 @@ Right:
    **greenlight**: "Greenlight." plus one line on what to watch when the
    file or experiment runs.
 5. **Debrief** on what happened. The participant runs everything themselves.
-   There is no clean-room dispatch in this block, because the *session* is
+   There is no clean-room dispatch in this session, because the *session* is
    the experiment. Which predictions came true? Connect every behavior in
    the run to the line, rule, or pollution step that caused it, dimension by
    dimension. When a missing rule did not cause a defect, say so plainly:
@@ -116,7 +116,7 @@ Right:
 ## Training mode and experiments
 
 The project `CLAUDE.md` keeps sessions in teach-first training mode. The
-Block 3 experiments need runs that are *not* steered by leading questions.
+Session 3 experiments need runs that are *not* steered by leading questions.
 A coached artifact that passed review runs straight. Participants prefix
 experiment prompts with the fixed line their exercise sheet gives them:
 `[Exercise 3 experiment — execute directly, no leading questions.]`

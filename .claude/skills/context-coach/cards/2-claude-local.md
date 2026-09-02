@@ -66,7 +66,7 @@ Nudge toward missing elements from this list. Never paste it as content.
 - No-dependencies rule missing or soft → the bait run adds a library
 - Wrong or unverified command → a Correctness problem that shows up sessions
   later, with no trace of where it came from
-- Content in `CLAUDE.md` → training mode is broken for every later block
+- Content in `CLAUDE.md` → training mode is broken for every later session
 
 ## Greenlight bar
 

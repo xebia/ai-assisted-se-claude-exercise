@@ -1,6 +1,6 @@
 # Exercise 5: Connect & Extend
 
-**Block**: 5 — MCP Servers & External Tools **Duration**: 30 minutes
+**Session**: 5 — MCP Servers & External Tools **Duration**: 30 minutes
 **Project**: Same BookStore API.
 
 **Goal**: Build a custom SQLite MCP server that exposes the bookstore database

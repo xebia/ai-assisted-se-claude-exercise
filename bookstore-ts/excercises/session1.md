@@ -1,6 +1,6 @@
 # Exercise 1: First Conversations
 
-**Block**: 1 — First Steps & Core Concepts **Duration**: 30 minutes **Project**:
+**Session**: 1 — First Steps & Core Concepts **Duration**: 30 minutes **Project**:
 "BookStore API" — a TypeScript REST API using only `Bun.serve` and
 `bun:sqlite`. Everyone clones the same repo.
 

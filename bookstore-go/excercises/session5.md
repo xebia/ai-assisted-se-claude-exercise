@@ -1,6 +1,6 @@
 # Exercise 5: Connect & Extend
 
-**Block**: 5 — MCP Servers & External Tools **Duration**: 30 minutes
+**Session**: 5 — MCP Servers & External Tools **Duration**: 30 minutes
 **Project**: Same BookStore API.
 
 **Goal**: Build a custom SQLite MCP server that exposes the bookstore database
@@ -53,14 +53,14 @@ You should see the `-db` flag printed. If so, the server is working.
 
 **Step 3** — Register the server with Claude Code (project scope). Use the
 absolute path so Claude Code can find the binary regardless of working
-directory:
+directory, and point it at the Go store:
 
 ```bash
 claude mcp add \
   --transport stdio \
   --scope project \
   sqlite-bookstore \
-  -- $(realpath mcp-sqlite-server)
+  -- $(realpath mcp-sqlite-server) -db $(realpath bookstore-go/store.db)
 ```
 
 **Step 4** — Verify the server is registered:
@@ -105,7 +105,7 @@ claude mcp add \
   --transport stdio \
   --scope project \
   sqlite-bookstore \
-  -- $(realpath mcp-sqlite-server)
+  -- $(realpath mcp-sqlite-server) -db $(realpath bookstore-go/store.db)
 ```
 
 Open a **new** Claude Code session (so MCP connects on startup) and ask the

@@ -13,7 +13,7 @@ is evidence about the prompt, not the thing being graded. A weak prompt that
 happened to produce a decent file still gets a weak grade. The participant
 needs to hear exactly that, because next time the luck runs out.
 
-The learning goal of this course block is prompting skill, not working code.
+The learning goal of this course session is prompting skill, not working code.
 Someone who ends with a flawed artifact and can say which clause caused each
 flaw has learned more than someone with a clean artifact they cannot explain.
 
@@ -84,7 +84,7 @@ Exercise-specific expectations live in `checks/<id>-<slug>.md` beside this file.
 Do this **before reading the artifact.** Work through the techniques the
 participants were taught. The check file says which are applicable to this
 task; respect it. Marking an inapplicable technique as "missing" is a false
-finding. If the check file supplies its own rubric (later blocks grade
+finding. If the check file supplies its own rubric (later sessions grade
 context files against the four dimensions rather than prompting techniques),
 use that rubric in place of the table below. Everything else in this phase
 still applies: predictions first, one expected defect per ❌, a stated grade.

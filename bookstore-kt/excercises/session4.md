@@ -1,11 +1,11 @@
 # Exercise 4: Build the Tooling That Coached You
 
-**Block**: 4 — Skills, Hooks & Automation **Duration**: 40 minutes
+**Session**: 4 — Skills, Hooks & Automation **Duration**: 40 minutes
 **Project**: Same BookStore API.
 
 ## Goal
 
-The coaches you've been talking to since Block 2 — `/prompt-coach`,
+The coaches you've been talking to since Session 2 — `/prompt-coach`,
 `/context-coach`, `/bank-diff` — are nothing but markdown files in this
 repo. Today you build the same kind of tooling yourself: a manual
 `/commit` skill (pasted, then understood), an auto-invoked `/changelog`
@@ -15,7 +15,7 @@ whole automation and grade its output.
 ## A few words we'll use
 
 - **Skill**: a markdown file with instructions Claude follows when the
-  skill runs. The coaches from Blocks 2 and 3 are skills.
+  skill runs. The coaches from Sessions 2 and 3 are skills.
 - **Frontmatter**: the block between `---` lines at the top of a skill
   file. It holds the skill's name and settings.
 - **Manual skill**: a skill that runs only when you type its name, like
@@ -28,7 +28,7 @@ whole automation and grade its output.
 
 ## How this exercise works
 
-There is no coach for this block. The checklists in the tasks below are
+There is no coach for this session. The checklists in the tasks below are
 the guardrail, and `/verify-exercise 4` gives the closing verdicts at the
 end of task 5 — after yours, as always.
 
@@ -45,7 +45,7 @@ or short on time? Say *"just tell me"*. That is allowed.
 
 ### 1. Setup & study the coach (5 min: branch 1 · study 4)
 
-First, protect the project. Blocks 5–8 reuse this codebase, and today you
+First, protect the project. Sessions 5–8 reuse this codebase, and today you
 commit for real:
 
 ```
@@ -319,7 +319,7 @@ git branch -D block4-playground
 The commits go; your work stays. `CHANGELOG.md`, `.claude/skills/`,
 `.claude/hooks/` and `.claude/settings.json` are gitignored, so the
 branch delete can't touch them. This is the same protection your
-`CLAUDE.local.md` has had since Block 3.
+`CLAUDE.local.md` has had since Session 3.
 
 Then the trainer popcorns the room — have answers ready: which of your
 three predictions turned out wrong, and what does that teach you about

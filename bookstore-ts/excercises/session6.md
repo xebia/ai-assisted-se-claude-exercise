@@ -1,6 +1,6 @@
 # Exercise 6: Spec-Driven Development with Spec Kit
 
-**Block**: 6 — Real Development Workflows **Duration**: 30 minutes
+**Session**: 6 — Real Development Workflows **Duration**: 30 minutes
 **Project**: `bookstore-web` — a new frontend for the BookStore API you already
 know.
 

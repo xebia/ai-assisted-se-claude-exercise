@@ -1,7 +1,7 @@
 # Conventions for the BookStore exercise repo
 
 Read this before editing an exercise or a skill, so all four language
-versions and all eight blocks keep behaving as one course.
+versions and all eight sessions keep behaving as one course.
 
 ## Repo layout
 
@@ -11,6 +11,15 @@ Participants pick one language for the whole course. Each project carries
 `excercises/session1.md … session8.md` (the folder-name typo is historic; keep
 it), a `README.md` (build/run) and `preparation.md` (install checklist).
 Coaching skills live once, at the repo root, in `.claude/skills/`.
+
+## Naming: sessions, not blocks
+
+The teaching units are **sessions** (Session 1–8), in exercise headers, prose,
+skills, and slides — decided with the wider trainer group, 2026-09. "Block"
+is reserved for the commercial packaging. Artifact identifiers that still
+carry the old word (`block3-*.diff`, `block4-playground`, the `.gitignore`
+entries) are kept until renamed in one coordinated pass, because they are
+wired into `/bank-diff`, the checks, and participant instructions.
 
 ## Editing exercises: Go first, then port
 
@@ -43,7 +52,7 @@ source of truth — when it changes there, copy it here again.
 
 ## Skills: coach, verifier, bank-diff
 
-- `/prompt-coach` (block 2) and `/context-coach` (block 3): per-task cards
+- `/prompt-coach` (session 2) and `/context-coach` (session 3): per-task cards
   in `cards/<n>-<slug>.md`, where `<n>` equals the task number in the
   exercise doc. Cards are language-agnostic — they name behaviors and
   layers, never one language's paths. Coach rules (see each SKILL.md):
@@ -52,7 +61,7 @@ source of truth — when it changes there, copy it here again.
   the run must teach) are marked per card — don't leak them into exercise
   docs or slides either.
 - `/verify-exercise <n>`: after-the-fact grading against a rubric in
-  `checks/<n>-….md`. Block 3's check runs in-session at the end of the exercise and grades the
+  `checks/<n>-….md`. Session 3's check runs in-session at the end of the exercise and grades the
   banked `block3-bait.diff`, then arbitrates the participant's own wrap
   nominations.
 - `/bank-diff <label>`: banks the working tree as `block3-<label>.diff`
@@ -64,7 +73,7 @@ source of truth — when it changes there, copy it here again.
   paths, with a README saying what goes where); a human moves them in and
   deletes the folder.
 
-## Exercise-design patterns (converged over blocks 2–3)
+## Exercise-design patterns (converged over sessions 2–3)
 
 - **Escape hatch**: every exercise doc tells stuck participants to say
   *"just tell me"* — training-mode CLAUDE.md honors it.
@@ -83,15 +92,15 @@ source of truth — when it changes there, copy it here again.
 - **Bank evidence before resets**: diffs are saved to files before any
   revert, and compared as artifacts, not from memory.
 - **Overlap waiting time**: sequence tasks so Claude's implementation runs
-  overlap with participant work (e.g. block 3 fires the clean arm, then
+  overlap with participant work (e.g. session 3 fires the clean arm, then
   pollutes a second session while it builds — chat-only steps can't
   collide with a tree-writing run).
-- **Timing**: budget ≈ expert dry-run × 1.3. Block 3 measured 30 min
+- **Timing**: budget ≈ expert dry-run × 1.3. Session 3 measured 30 min
   expert → 40 min box.
-- **Closing**: block 3 uses a single 5-min "Plenary Harvest" (popcorn, no
-  pair share) per the course-wide no-pairs rule. Other blocks still end
+- **Closing**: session 3 uses a single 5-min "Plenary Harvest" (popcorn, no
+  pair share) per the course-wide no-pairs rule. Other sessions still end
   with the older Pair Discussion + Group Share pair — align them when
-  their block gets a redesign pass.
+  their session gets a redesign pass.
 - **Slide sync**: the exercise doc's Duration is the source of truth; the
   deck's exercise-slide `PhaseBanner timing` must match it, and the slide's
   beats must match the doc's tasks.
@@ -109,5 +118,5 @@ participant-created files to the list when future exercises introduce them.
 Each project's `CLAUDE.md` holds course-wide training behavior (teach,
 don't answer; investigate like a large codebase) and **must never gain
 project facts** — participants write those themselves into
-`CLAUDE.local.md` in block 3. Exercises and skills must never instruct
+`CLAUDE.local.md` in session 3. Exercises and skills must never instruct
 anyone to edit `CLAUDE.md`.

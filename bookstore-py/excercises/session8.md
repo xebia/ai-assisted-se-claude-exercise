@@ -1,6 +1,6 @@
 # Exercise 8: Capstone — Your Real Project
 
-**Block**: 8 — Bringing It All Together **Duration**: 30 minutes
+**Session**: 8 — Bringing It All Together **Duration**: 30 minutes
 
 **Goal**: Apply everything you've learned to your own real-world project.
 

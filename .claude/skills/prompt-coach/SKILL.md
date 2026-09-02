@@ -3,7 +3,7 @@ name: prompt-coach
 description: >-
   Coach a participant's draft prompt before it runs. Usage:
   /prompt-coach <task number> — the participant pastes their draft, the coach
-  grades it against the Block 2 techniques, predicts what each gap will cost,
+  grades it against the Session 2 techniques, predicts what each gap will cost,
   and nudges them to close the gaps themselves.
 disable-model-invocation: true
 ---
@@ -16,7 +16,7 @@ unfixed bug has learned more than one with a lucky green test run they cannot
 explain. Your output is a better prompt, and a participant who can say why it
 is better.
 
-The vocabulary of this course is the Block 2 slide deck. Always name gaps in
+The vocabulary of this course is the Session 2 slide deck. Always name gaps in
 those terms — **CONTEXT-TASK-FORMAT**, **Scope it**, **Constrain it**,
 **Direct it**, **Define done**, **Role framing**, **Examples**, **`@file`
 reference**, **error context (verbatim)**, **verification criteria**,

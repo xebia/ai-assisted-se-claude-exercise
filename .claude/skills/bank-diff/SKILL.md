@@ -2,7 +2,7 @@
 name: bank-diff
 description: >-
   Bank the working tree as a named diff file and restore the project to a
-  clean state. Usage: /bank-diff <arm> — used in the Block 3 exercise to
+  clean state. Usage: /bank-diff <arm> — used in the Session 3 exercise to
   capture each experiment arm (polluted, clean) as block3-<arm>.diff before
   resetting for the next arm.
 disable-model-invocation: true
@@ -55,7 +55,7 @@ git clean -fd .
 ```
 
 Never add `-x` to `git clean`. Ignored files include the participant's
-`CLAUDE.local.md`, their banked diffs, and block 2's `docs/orientation.md`.
+`CLAUDE.local.md`, their banked diffs, and session 2's `docs/orientation.md`.
 `-x` would destroy all of them. Never widen any command beyond `.`.
 
 ## Verify, then report

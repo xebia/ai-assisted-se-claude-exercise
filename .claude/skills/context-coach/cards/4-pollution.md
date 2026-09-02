@@ -47,7 +47,7 @@ in Context* · the **Trajectory** dimension.
 - **Earns its tokens / freeloader test** — no context file under review.
 - **Prompt quality** — both arms get the same words on purpose. Improving
   the prompt here would break the control. If they polish it, that is a
-  Block 2 habit in the wrong block. Say so, kindly.
+  Session 2 habit in the wrong session. Say so, kindly.
 
 ## Nudge bank
 
@@ -116,7 +116,7 @@ put the two `/context` percentages next to the two diffs and ask whether
 the difference they *measured* explains the difference they *see*. (The
 percentages usually sit within a point or two of each other. That is the
 A/B slide's point, now in their own terminal.) If the polluted arm did
-*fine*, treat it exactly like a lucky run in Block 2: say it was luck, point
+*fine*, treat it exactly like a lucky run in Session 2: say it was luck, point
 at which pollution step was weakest, and offer the sharper re-run. If they
 ran the `/compact` bonus probe: did the twice-corrected mistake survive the
 summary? A summary keeps whatever looked important, including confident

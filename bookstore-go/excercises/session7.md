@@ -1,6 +1,6 @@
 # Exercise 7: Parallel Agents & Quality Gates
 
-**Block**: 7 — Agentic Workflows & Multi-Agent Patterns **Duration**: 30 minutes
+**Session**: 7 — Agentic Workflows & Multi-Agent Patterns **Duration**: 30 minutes
 **Project**: Same BookStore API.
 
 **Goal**: Use worktrees and background agents to build two independent bookstore

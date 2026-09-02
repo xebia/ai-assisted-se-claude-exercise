@@ -1,12 +1,12 @@
 # Exercise 3: The Context Is the Deliverable
 
-**Block**: 3 — Context Engineering **Duration**: 40 minutes
+**Session**: 3 — Context Engineering **Duration**: 40 minutes
 **Project**: Same BookStore API.
 
 ## Goal
 
 You'll practice controlling *what reaches the model*, and proving the
-effect. Block 2 was about the wording of your prompts. Today the wording
+effect. Session 2 was about the wording of your prompts. Today the wording
 stays fixed wherever possible, and the **context** does the work instead:
 a pruned `CLAUDE.local.md`, a bait run it must survive, and a
 deliberately poisoned session. Everything maps to the four dimensions —
@@ -16,7 +16,7 @@ deliberately poisoned session. Everything maps to the four dimensions —
 
 - **Coach**: the `/context-coach <task number>` command. Show it your
   draft context file, rule file, or experiment plan. It grades your draft
-  against this block's concepts and predicts what each weakness will cost.
+  against this session's concepts and predicts what each weakness will cost.
   It asks one question at a time, and it never writes a line for you.
 - **Experiment prefix**: a fixed line you paste at the start of every
   experiment prompt. It stops training mode from steering the run.
@@ -104,7 +104,7 @@ three rules, you ran the test command it claims, and `git status` shows
 
 ### 3. The bait run (8 min: send 1 · watch & note 5 · bank 2)
 
-This is Block 2's vague prompt, unimproved, on purpose. In Block 2 you
+This is Session 2's vague prompt, unimproved, on purpose. In Session 2 you
 would fix the prompt. Today you don't. The prompt stays weak so your
 context files do the work.
 
@@ -284,7 +284,7 @@ git clean -fd .
 ```
 
 The last command removes files Claude created and you never committed.
-Your `CLAUDE.local.md`, the banked diffs, and block 2's
+Your `CLAUDE.local.md`, the banked diffs, and session 2's
 `docs/orientation.md` are gitignored and safe — but commit anything else
 you care about first.
 
