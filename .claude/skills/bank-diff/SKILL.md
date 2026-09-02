@@ -3,7 +3,7 @@ name: bank-diff
 description: >-
   Bank the working tree as a named diff file and restore the project to a
   clean state. Usage: /bank-diff <arm> — used in the Session 3 exercise to
-  capture each experiment arm (polluted, clean) as block3-<arm>.diff before
+  capture each experiment arm (polluted, clean) as session3-<arm>.diff before
   resetting for the next arm.
 disable-model-invocation: true
 ---
@@ -39,7 +39,7 @@ folder**):
    If it is empty, there is no diff to bank. Most likely the reset already
    ran, or the implementation never happened. Say so and stop. Do not
    create an empty file.
-3. **No accidental overwrite.** If `block3-<arm>.diff` already exists,
+3. **No accidental overwrite.** If `session3-<arm>.diff` already exists,
    ask in one line whether to overwrite it, and wait. (A leftover from an
    earlier failed attempt is the common case. Overwriting is usually right,
    but it is their evidence, so they decide.)
@@ -48,7 +48,7 @@ folder**):
 
 ```
 git add -A .
-git diff --cached > block3-<arm>.diff
+git diff --cached > session3-<arm>.diff
 git reset -q .
 git checkout -- .
 git clean -fd .
@@ -64,7 +64,7 @@ After the reset, confirm `git status --porcelain -- .` is empty and the
 diff file is non-empty. Then report in at most four lines:
 
 - the file written and its diffstat (files changed, insertions/deletions —
-  `git apply --stat block3-<arm>.diff`)
+  `git apply --stat session3-<arm>.diff`)
 - confirmation the working tree is clean again
 - if this was the `polluted` arm: a reminder to note the `/context` % if
   they have not, and that the session should stay open for the bonus

@@ -123,16 +123,16 @@ Don't watch Claude type — use the wait to write your task 4 prediction
 instead (task 4 explains it).
 
 When the run finishes, bank the evidence and reset: `/bank-diff bait`.
-The diff is saved to `block3-bait.diff` and the tree comes back clean for
+The diff is saved to `session3-bait.diff` and the tree comes back clean for
 task 4.
 
 The payoff comes in the wrap, not now: `/verify-exercise 2` grades
-`block3-bait.diff` against your context files, prediction by prediction,
+`session3-bait.diff` against your context files, prediction by prediction,
 and closes with its own nominations — the line that earned the most, and
 a freeloader. You'll start it in task 5, right after writing your own
 nominations. It does its grading while the plenary harvest gets going.
 
-**Done when**: `block3-bait.diff` exists, the tree is clean, and you have
+**Done when**: `session3-bait.diff` exists, the tree is clean, and you have
 a held-or-failed note for each of your three rules.
 
 ### 4. Poison one session, keep one clean (14 min: plan & predict 3 · run both arms 7 · verdicts & debrief 4)
@@ -188,7 +188,7 @@ Now run it:
    say "nothing to do yet."
 
 3. **Swap.** When the clean arm finishes: `/bank-diff clean`. The diff
-   is saved to `block3-clean.diff`, the tree comes back clean, and the
+   is saved to `session3-clean.diff`, the tree comes back clean, and the
    command refuses to run if something looks off. (By hand instead? See
    the appendix at the bottom.) Then, back in the polluted session:
    `/context`, note the %, and paste the same prompt verbatim — prefix
@@ -212,7 +212,7 @@ Now run it:
    numbers next to the two diffs: does the difference you *measured*
    explain the difference you *see*?
 
-**Done when**: `block3-clean.diff` and `block3-polluted.diff` both exist,
+**Done when**: `session3-clean.diff` and `session3-polluted.diff` both exist,
 you gave all ten verdicts before the coach gave its own, and every defect
 you found is mapped to a pollution step.
 
@@ -273,7 +273,7 @@ with `&&`):
 
 ```
 git add -A .
-git diff --cached > block3-polluted.diff   # or block3-clean.diff / block3-bait.diff
+git diff --cached > session3-polluted.diff   # or session3-clean.diff / session3-bait.diff
 git reset -q .
 git checkout -- .
 git clean -fd .

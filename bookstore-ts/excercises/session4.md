@@ -49,7 +49,7 @@ First, protect the project. Sessions 5–8 reuse this codebase, and today you
 commit for real:
 
 ```
-git switch -c block4-playground
+git switch -c session4-playground
 ```
 
 Then study the kind of file you're about to write. Open
@@ -80,7 +80,7 @@ Stick to the `SKILL.md` files. The `cards/` and `checks/` folders next to
 them hold graded answers for this course's exercises — opening them
 spoils your own verifier run.
 
-**Done when**: `git status` says you are on `block4-playground`, and you
+**Done when**: `git status` says you are on `session4-playground`, and you
 wrote down 2–3 design moves.
 
 ### 2. Create the /commit skill (6 min)
@@ -313,7 +313,7 @@ Cleanup first, one command per line (PowerShell 5.1 can't chain with
 
 ```
 git switch -
-git branch -D block4-playground
+git branch -D session4-playground
 ```
 
 The commits go; your work stays. `CHANGELOG.md`, `.claude/skills/`,
@@ -329,7 +329,7 @@ would you tighten now? And one skill+hook automation you'd actually build
 at work. Close with **one take-away** you'd give someone who skipped
 today.
 
-**Done when**: you are back on your original branch, `block4-playground`
+**Done when**: you are back on your original branch, `session4-playground`
 is gone, and `CHANGELOG.md` still exists.
 
 ## Bonus (only if time remains)

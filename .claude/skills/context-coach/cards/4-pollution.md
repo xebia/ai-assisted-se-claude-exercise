@@ -3,7 +3,7 @@
 **What they're refining:** their experiment plan — the pollution script, the
 written prediction, and the comparison criteria — coached *before* they run
 it. Afterwards, the verdict walkthrough and debrief work from the two
-banked diff files (`block3-polluted.diff`, `block3-clean.diff`).
+banked diff files (`session3-polluted.diff`, `session3-clean.diff`).
 
 **Slide anchors:** *Which Session Is in More Trouble?* · *Context Rot: The
 Attention Budget* · *Warning Signs of a Polluted Context* · *Anti-Patterns

@@ -16,10 +16,8 @@ Coaching skills live once, at the repo root, in `.claude/skills/`.
 
 The teaching units are **sessions** (Session 1–8), in exercise headers, prose,
 skills, and slides — decided with the wider trainer group, 2026-09. "Block"
-is reserved for the commercial packaging. Artifact identifiers that still
-carry the old word (`block3-*.diff`, `block4-playground`, the `.gitignore`
-entries) are kept until renamed in one coordinated pass, because they are
-wired into `/bank-diff`, the checks, and participant instructions.
+is reserved for the commercial packaging. Artifact identifiers follow the same rule: `session3-*.diff`, the
+`session4-playground` branch, and the matching `.gitignore` entries.
 
 ## Editing exercises: Go first, then port
 
@@ -62,9 +60,9 @@ source of truth — when it changes there, copy it here again.
   docs or slides either.
 - `/verify-exercise <n>`: after-the-fact grading against a rubric in
   `checks/<n>-….md`. Session 3's check runs in-session at the end of the exercise and grades the
-  banked `block3-bait.diff`, then arbitrates the participant's own wrap
+  banked `session3-bait.diff`, then arbitrates the participant's own wrap
   nominations.
-- `/bank-diff <label>`: banks the working tree as `block3-<label>.diff`
+- `/bank-diff <label>`: banks the working tree as `session3-<label>.diff`
   and resets, with preconditions (right cwd, non-empty status, no silent
   overwrite; never `git clean -x`). Reuse it for any exercise that needs
   evidence to survive a reset.
@@ -108,7 +106,7 @@ source of truth — when it changes there, copy it here again.
 ## Participant artifacts stay out of git
 
 Every project's `.gitignore` ignores `CLAUDE.local.md`, `.claude/rules/`,
-`docs/orientation.md`, and `block3-*.diff` — so exercise resets
+`docs/orientation.md`, and `session3-*.diff` — so exercise resets
 (`/bank-diff`, `git clean`) can never delete a participant's deliverables.
 Keep these entries if a `.gitignore` is ever regenerated, and add new
 participant-created files to the list when future exercises introduce them.

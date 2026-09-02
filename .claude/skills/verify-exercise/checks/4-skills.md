@@ -11,7 +11,7 @@ task-5 self-grade of the changelog.
 
 **This check runs in-session, at the end of Part 2** — started right
 after the self-grade, running while the participant cleans up the branch.
-That cleanup deletes the `block4-playground` branch, but every artifact
+That cleanup deletes the `session4-playground` branch, but every artifact
 above lives in a gitignored path and survives. Consequence: commit hashes
 cited in `CHANGELOG.md` may no longer resolve to reachable commits. Grade
 the *presence and format* of references, never whether they resolve.

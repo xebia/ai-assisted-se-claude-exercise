@@ -1,6 +1,6 @@
 # Exercise 2 — Context files vs. the bait run
 
-**Artifact:** `CLAUDE.local.md`, the banked bait diff (`block3-bait.diff`
+**Artifact:** `CLAUDE.local.md`, the banked bait diff (`session3-bait.diff`
 at the project root — the exercise banks and resets in one move, so expect
 a clean working tree, not live changes), and — only if the participant did
 the bonus scoped-rule task — the path-scoped rule file under
@@ -60,14 +60,14 @@ dimensions sound*.
    fails, that is a Correctness finding regardless of anything else.
 2. If a rule file exists, list the files its glob matches against the
    actual tree (every handler file? anything outside the layer?).
-3. Only then read `block3-bait.diff` (`git apply --stat` for the shape,
+3. Only then read `session3-bait.diff` (`git apply --stat` for the shape,
    the file itself for the content — the changes are no longer in the
    working tree). Where did the cache land: store layer, or spread across
    handlers? Was anything added to the dependency manifest? Do new tests
    exist, and do they follow the project's convention (compare against one
    existing test file, not memory)? Is cache invalidation wired to
    update/delete? Is handler validation still intact? No
-   `block3-bait.diff`? The bank step was skipped. Say so. Without the diff
+   `session3-bait.diff`? The bank step was skipped. Say so. Without the diff
    only Correctness and Size can be graded.
 
 ## Known traps
