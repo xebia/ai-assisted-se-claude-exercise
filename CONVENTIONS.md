@@ -8,8 +8,7 @@ versions and all eight sessions keep behaving as one course.
 Four projects — `bookstore-go`, `bookstore-kt`, `bookstore-py`,
 `bookstore-ts` — implement the same API with the same deliberate bugs.
 Participants pick one language for the whole course. Each project carries
-`excercises/session1.md … session8.md` (the folder-name typo is historic; keep
-it), a `README.md` (build/run) and `preparation.md` (install checklist).
+`exercises/session1.md … session8.md`, a `README.md` (build/run) and `preparation.md` (install checklist).
 Coaching skills live once, at the repo root, in `.claude/skills/`.
 
 ## Naming: sessions, not blocks
@@ -18,6 +17,13 @@ The teaching units are **sessions** (Session 1–8), in exercise headers, prose,
 skills, and slides — decided with the wider trainer group, 2026-09. "Block"
 is reserved for the commercial packaging. Artifact identifiers follow the same rule: `session3-*.diff`, the
 `session4-playground` branch, and the matching `.gitignore` entries.
+
+## File names
+
+Lowercase kebab-case for every file and folder (`conventions.md`,
+`session3.md`, `2-context-files.md`). The only exceptions are names that tools
+look up by convention: `README.md`, `CLAUDE.md`, `CLAUDE.local.md`, `SKILL.md`.
+Language-specific source files follow their language's convention.
 
 ## Editing exercises: Go first, then port
 
