@@ -10,10 +10,10 @@
 You'll have your first conversations with Claude in the IDE: explain code,
 find a bug, change code, say no to a change, write a test, refactor.
 
-After each task you look behind the answer. Which files did Claude open?
-Which tools did it use? How many steps did it take before it answered? That
-is the second goal of this exercise: seeing how Claude works, not only what
-it says.
+After each task you check how Claude got to its answer. Which files did
+Claude open? Which tools did it use? How many steps did it take before it
+answered? That is the second goal of this exercise: seeing how Claude works,
+not only what it says.
 
 ## A few words we'll use
 
@@ -44,7 +44,7 @@ Same four steps every time:
 2. **Read**. Read the answer before you do anything else. Does it match
    what you know?
 3. **Trace**. Run `/trace`. Did the task take more than one turn? Then run
-   `/trace all` instead. Read the trail from top to bottom.
+   `/trace all` instead. Read the table from top to bottom.
 4. **Note**. Write down the number the task asks for. You need these
    numbers in the harvest at the end.
 
@@ -61,7 +61,7 @@ on time? Just say *"just tell me"*. That is allowed.
 ### 1. Explain, with and without a selection (6 min: selected 2 · `/clear` and ask again 3 · compare 1)
 
 This task compares two runs, so both prompts start with the experiment
-prefix. Both, or the comparison is invalid:
+prefix. Use it on both, or the two runs are not comparable:
 
 > `[Exercise 1 experiment — execute directly, no leading questions.]`
 
