@@ -43,7 +43,7 @@ or short on time? Say *"just tell me"*. That is allowed.
 
 ## Tasks
 
-### 1. Setup & study the coach (5 min: branch 1 · study 4)
+### 1. Setup & study the coach (4 min: branch 1 · study 3)
 
 First, protect the project. Sessions 5–8 reuse this codebase, and this session you
 commit for real:
@@ -83,7 +83,7 @@ spoils your own verifier run.
 **Done when**: `git status` says you are on `session4-playground`, and you
 wrote down 2–3 design moves.
 
-### 2. Create the /commit skill (6 min)
+### 2. Create the /commit skill (5 min)
 
 Create the file `.claude/skills/commit/SKILL.md` — in *your project
 folder* this time, next to the code it commits — with this content:
@@ -148,7 +148,7 @@ Claude Code, and check the result.
 **Done when**: the commit exists, its message is in imperative mood, it
 has no co-author line, and nothing was pushed.
 
-### 3. Design the /changelog skill (12 min: fetch spec 3 · write 7 · tune description 2)
+### 3. Design the /changelog skill (10 min: fetch spec 2 · write 6 · tune description 2)
 
 The second skill follows the
 [Common Changelog](https://common-changelog.org/) format — and this one
@@ -267,6 +267,10 @@ Then add the hook to `.claude/settings.json`:
 
 (On mac/linux, make that `python3`.)
 
+Note what the script actually works with. It reads
+`tool_input.command`. That is the command line Claude ran, as plain text.
+The script never sees what the command did.
+
 **Before you run anything: predict first, in writing.** Three one-line
 predictions:
 
@@ -277,15 +281,95 @@ predictions:
 A wrong prediction is a fine outcome. A missing one is the only failure —
 without it, task 5 has nothing to check you against.
 
+Task 5 answers all three. Prediction 1 surprises nearly everyone, so
+commit to an answer now and expect to be corrected.
+
 **Done when**: the script and the settings entry both exist, and your
 three predictions are written down.
 
-### 5. Test the flow, verdict-first (6 min: change & run 3 · verdicts 2 · start verifier 1)
+### 5. Test the flow, then repair it (10 min: change & run 3 · see it 2 · repair & re-run 3 · verdicts 1 · start verifier 1)
 
 Make a real change: prompt Claude to remove the delete functionality from
 the BookStore API. A removal, deliberately — your changelog design has to
 prove it can file something outside the easy `Added` group. Then run
 `/commit` and watch the chain: commit → hook → changelog.
+
+> **Stop here. Read this before you debug anything.**
+>
+> The chain did not finish. `CHANGELOG.md` was not created, and Claude
+> never mentioned your changelog skill. **This is the expected result.**
+> Your hook is not broken, your skill is not broken, and you did not make
+> a mistake. The script in task 4 was written to fail on this exact step.
+>
+> Almost everyone gets prediction 1 wrong, including people who have used
+> hooks for months. Getting it wrong is the point of the task.
+
+**See it for yourself.** Run these two lines. They feed a fake command to
+your hook script, the same way Claude Code does. The quoting works in
+PowerShell and in bash. On mac/linux, use `python3`.
+
+```
+echo '{"tool_input":{"command":"git commit -m x"}}' | python .claude/hooks/run-changelog.py
+echo '{"tool_input":{"command":"git add . && git commit -m x"}}' | python .claude/hooks/run-changelog.py
+```
+
+The first line prints JSON. The second line prints nothing.
+
+**Why.** The `/commit` skill never runs `git commit` on its own. It joins
+two commands into one line, like this:
+
+```
+git add internal/handler/book.go && git commit -m "Remove the delete endpoint"
+```
+
+Your hook receives that whole line as one string. The string starts with
+`git add`, not with `git commit`, so `command.startswith("git commit")` is
+`False` and the script prints nothing.
+
+Say the rule in your own words before you fix it. A hook sees the **text**
+of a command. It does not see what the command does.
+
+**Now repair the script.** It must also match a `git commit` that comes
+after `&&` or `;`. One way to do that:
+
+```python
+import json
+import re
+import sys
+
+data = json.load(sys.stdin)
+command = data.get("tool_input", {}).get("command", "")
+
+parts = re.split(r"&&|\|\||;", command)
+if any(part.strip().startswith("git commit") for part in parts):
+    print(json.dumps({
+        "hookSpecificOutput": {
+            "hookEventName": "PostToolUse",
+            "additionalContext": (
+                "A git commit was just made. Invoke the changelog skill now, "
+                "in this same turn. Do not ask the user for permission first."
+            )
+        }
+    }))
+```
+
+Two things changed. The script now splits the command into parts and
+checks each part. And the message now tells Claude to act. "Run the
+/changelog skill" reads like advice, so Claude may only suggest it and
+wait for you. "Invoke it now, do not ask" leaves less room.
+
+Run the two test lines again. Both should print JSON now.
+
+The hook may also fire on the test line itself. That line contains the
+text `&& git commit`, so the script matches it. It is harmless here, and
+it is the same rule again: a hook sees text, not effect.
+
+Then make a second small change, run `/commit`, and watch. This time `CHANGELOG.md`
+should update without you asking for it.
+
+If it still does not update, check the message text first, not the
+matching. A hook that fires but only suggests looks exactly like a hook
+that never fired.
 
 When the chain finishes, write down two verdicts. Both come before the
 verifier gives its own:
@@ -303,8 +387,8 @@ changelog, and your two verdicts — with evidence. Start it now: it works
 standalone from the artifacts and keeps running while you clean up in
 task 6. Read its report before the plenary harvest.
 
-**Done when**: both verdicts are written down and `/verify-exercise 4`
-is running.
+**Done when**: the repaired hook fires on `/commit`, both verdicts are
+written down, and `/verify-exercise 4` is running.
 
 ### 6. Cleanup + Plenary Harvest (5 min)
 
@@ -322,8 +406,8 @@ branch delete can't touch them. This is the same protection your
 `CLAUDE.local.md` has had since Session 3.
 
 Then the trainer popcorns the room — have answers ready: which of your
-three predictions turned out wrong, and what does that teach you about
-when hooks see commands? The best design move you stole from `bank-diff`?
+three predictions turned out wrong, what a hook can and cannot see, and
+what you changed to make the chain finish. The best design move you stole from `bank-diff`?
 Which wording in your `description` do you trust to auto-fire — and which
 would you tighten now? And one skill+hook automation you'd actually build
 at work. Close with **one take-away** you'd give someone who skipped this session.

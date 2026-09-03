@@ -4,7 +4,8 @@
 gitignored paths — `.claude/skills/commit/SKILL.md`,
 `.claude/skills/changelog/SKILL.md` (plus its
 `common-changelog-spec.md` sibling), `.claude/hooks/run-changelog.py`
-with its entry in `.claude/settings.json`, and the generated
+(in its repaired, compound-command form) with its entry in
+`.claude/settings.json`, and the generated
 `CHANGELOG.md` — plus two things the participant wrote by hand during
 the session: their three task-4 hook predictions and their five-point
 task-5 self-grade of the changelog.
@@ -39,7 +40,7 @@ example first.
 | --- | --- |
 | **/commit skill** | frontmatter has `name`, `description`, and `disable-model-invocation: true`; the body carries an "execute directly — no leading questions" line near the top; imperative-mood commit-message rules with examples; explicit no-`git push` and no-co-author rules |
 | **/changelog skill** | frontmatter has **no** `disable-model-invocation` (auto-invocability is the point); the `description` works as a trigger (see below); the body requires reading `common-changelog-spec.md` before editing, and that file exists with real spec content; the must-do behaviors are all present |
-| **Hook wiring** | `settings.json` has a `PostToolUse` entry with matcher `Bash`; the command runs a Python script (no bash/`jq`/`chmod` dependencies — participants are on Windows); the script reads JSON from stdin, tests `tool_input.command` for `git commit`, and prints the nested `{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": ...}}` shape |
+| **Hook wiring** | `settings.json` has a `PostToolUse` entry with matcher `Bash`; the command runs a Python script (no bash/`jq`/`chmod` dependencies — participants are on Windows); the script reads JSON from stdin, tests `tool_input.command` for `git commit`, and prints the nested `{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": ...}}` shape; **after the task-5 repair** it also matches a `git commit` that follows `&&` or `;`, and its `additionalContext` tells Claude to invoke the skill now rather than suggesting it |
 | **Changelog output** | `# Changelog` heading · `## Unreleased` section · groups in Changed/Added/Removed/Fixed order · imperative-verb entries · a commit reference on every entry |
 
 Grade each ✅ / ❌ / ⚠️ with the usual discipline: predictions before
@@ -66,6 +67,12 @@ luck, and the hook is covering for it.
   noise
 - A hook script that runs on Windows and mac/linux alike, and stays
   silent on non-commit commands
+- The task-5 repair applied: the script splits the command on `&&` and
+  `;` before matching, so `/commit`'s `git add ... && git commit ...`
+  fires it. An unrepaired `startswith("git commit")` is a ❌ here — the
+  participant either skipped the repair or never saw the chain break.
+  A repaired matcher with a still-advisory `additionalContext` ("Run the
+  /changelog skill") is a ⚠️: it fires, but Claude may only suggest.
 - Exactly the honored JSON shape — nested `hookSpecificOutput` with
   `hookEventName` — not a top-level `additionalContext`, not a bare
   string. **Highest-value, least-often-checked:** a hook can "work" in
