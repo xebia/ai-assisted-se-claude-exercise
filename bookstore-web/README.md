@@ -94,6 +94,8 @@ Shapes are not uniform, which matters when you write the spec:
 | `vite.config.js` | Dev server and `/api` proxy. Not application code. |
 | `index.html` | Deliberately empty shell. |
 | `specs/` | Created by Spec Kit in Exercise 6. **Commit this** — Exercise 7 needs it. |
+| `specs-reference/` | A finished spec in the same layout, for anyone who did not complete Exercise 6. Exercise 7 says when to copy it. |
+| `.claude/settings.json` | Turns on agent teams (experimental) for this project. Committed; everything else under `.claude/` is generated. |
 | `.specify/` (the rest) | Spec Kit tooling. Generated during setup, not committed. |
 
 ## Setup
@@ -106,6 +108,7 @@ npm install
 specify init --here --force --non-interactive --integration claude
 git checkout -- .specify/memory/constitution.md      # must run AFTER init
 specify check
+git status --short .claude/settings.json             # must print nothing
 ```
 
 The `git checkout` comes after `init` deliberately. The constitution is

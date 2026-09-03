@@ -95,6 +95,22 @@ git checkout -- .specify/memory/constitution.md      # must run AFTER init
 specify check
 ```
 
+Exercise 7 uses **agent teams**, an experimental Claude Code feature that is
+off by default. The file `bookstore-web/.claude/settings.json` is committed
+and turns it on for that project only. It needs Claude Code **2.1.178 or
+newer**. Check both:
+
+```bash
+claude --version
+git status --short .claude/settings.json      # must print nothing
+```
+
+If `specify init` changed or removed the file, restore it:
+
+```bash
+git checkout -- .claude/settings.json
+```
+
 > [!IMPORTANT]
 > The `git checkout` must come **after** `specify init`. The constitution is
 > committed at `.specify/memory/constitution.md`, and `specify init --force`
@@ -126,6 +142,8 @@ on http://localhost:5173.
 - `bookstore-web` is set up (`npm install` finished, `.specify/` exists,
   `.specify/memory/constitution.md` starts with "# BookStore Web Constitution"
   and `git status` shows it unmodified)
+- Claude Code is 2.1.178 or newer, and `bookstore-web/.claude/settings.json`
+  is present and unmodified (`git status` shows nothing for it)
 
 ## Questions?
 
