@@ -6,7 +6,7 @@
 ## Goal
 
 You'll practice controlling *what reaches the model*, and proving the
-effect. Session 2 was about the wording of your prompts. Today the wording
+effect. Session 2 was about the wording of your prompts. This session the wording
 stays fixed wherever possible, and the **context** does the work instead:
 a pruned `CLAUDE.local.md`, a bait run it must survive, and a
 deliberately poisoned session. Everything maps to the four dimensions —
@@ -48,7 +48,7 @@ Both arms of a comparison get the prefix, or the comparison is invalid.
 > prompt → run → bank the diff → compare.**
 > Tasks 3 and 4 both use it. Come back here when you lose track.
 
-**Note**: `CLAUDE.md` keeps this project in training mode. Today it is
+**Note**: `CLAUDE.md` keeps this project in training mode. This session it is
 also **load-bearing course infrastructure: never edit it**. Your project
 facts go in `CLAUDE.local.md` instead — task 2 explains why that works.
 Stuck or short on time? Say *"just tell me"*. That is allowed.
@@ -105,7 +105,7 @@ three rules, you ran the test command it claims, and `git status` shows
 ### 3. The bait run (8 min: send 1 · watch & note 5 · bank 2)
 
 This is Session 2's vague prompt, unimproved, on purpose. In Session 2 you
-would fix the prompt. Today you don't. The prompt stays weak so your
+would fix the prompt. This session you don't. The prompt stays weak so your
 context files do the work.
 
 Open a fresh session and send this verbatim:
@@ -258,7 +258,7 @@ its report to the plenary harvest.
   Curious whether it loads? Open one fresh session and touch a handler:
   you'll see the rule arrive mid-session — *Progressive Disclosure*
   happening in front of you. A full proof, with a positive and a negative
-  case, is one for your own project's CLAUDE.md — not for today's time.
+  case, is one for your own project's CLAUDE.md — not for this session's time.
   Coach available: `/context-coach 3`.
 - **README-per-folder, the mechanical cut** (*Documentation for
   AI-Friendly Codebases*) — plant a marker: add a `README.md` to
@@ -294,4 +294,4 @@ Trainer popcorns the room — have answers ready: how many `/init` lines
 survived the freeloader test? Which rule was worded too vaguely to stop
 the mistake — and what did it cost in the bait run? Which pollution step
 did the real damage — did your written prediction hold up against the two
-diffs? Close with **one take-away** you'd give someone who skipped today.
+diffs? Close with **one take-away** you'd give someone who skipped this session.

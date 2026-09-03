@@ -7,7 +7,7 @@
 
 The coaches you've been talking to since Session 2 — `/prompt-coach`,
 `/context-coach`, `/bank-diff` — are nothing but markdown files in this
-repo. Today you build the same kind of tooling yourself: a manual
+repo. This session you build the same kind of tooling yourself: a manual
 `/commit` skill (pasted, then understood), an auto-invoked `/changelog`
 skill (designed by you), and a hook that connects them. Then you run the
 whole automation and grade its output.
@@ -45,7 +45,7 @@ or short on time? Say *"just tell me"*. That is allowed.
 
 ### 1. Setup & study the coach (5 min: branch 1 · study 4)
 
-First, protect the project. Sessions 5–8 reuse this codebase, and today you
+First, protect the project. Sessions 5–8 reuse this codebase, and this session you
 commit for real:
 
 ```
@@ -326,8 +326,7 @@ three predictions turned out wrong, and what does that teach you about
 when hooks see commands? The best design move you stole from `bank-diff`?
 Which wording in your `description` do you trust to auto-fire — and which
 would you tighten now? And one skill+hook automation you'd actually build
-at work. Close with **one take-away** you'd give someone who skipped
-today.
+at work. Close with **one take-away** you'd give someone who skipped this session.
 
 **Done when**: you are back on your original branch, `session4-playground`
 is gone, and `CHANGELOG.md` still exists.

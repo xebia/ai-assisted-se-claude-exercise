@@ -6,7 +6,7 @@
 
 ## Goal
 
-In Exercise 6 you produced a spec, a plan and a task list, and no code. Today
+In Exercise 6 you produced a spec, a plan and a task list, and no code. This session
 an agent team builds it. You build the shared foundation in one session, then
 draft a coached prompt that hands the user stories to a team, one teammate per
 story. While they work you watch them. Then you check the result against the

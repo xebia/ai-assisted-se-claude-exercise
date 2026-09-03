@@ -60,13 +60,15 @@ me"*. That is allowed.
 ### 1. Baseline (2 min)
 
 Run `./mvnw test` (or `./gradlew test`) and write down every failing test.
-Compare with your neighbor — you should both see the same failures.
+
+Are the `createReviewValidation` cases on your list? Then you skipped task 3 of
+Session 1. Ask Claude to add the validation now (2 min), then continue.
 
 No coaching for this one. It's a simple request with no learning goal, which
 is exactly the kind of thing training mode leaves alone.
 
-**Done when**: you have a written list of the failing tests, and it matches
-your neighbor's list.
+**Done when**: you have a written list of the failing tests, and
+the `createReviewValidation` cases are not on it.
 
 ### 2. The orientation prompt (9 min: draft 3 · coach & revise 3 · ship & check 3)
 
@@ -161,25 +163,12 @@ implement → `./mvnw test` (or `./gradlew test`) → debrief.
 
 ### 6. Wrap (1 min)
 
-Run `./mvnw test` (or `./gradlew test`). It won't be green — and that's
-intentional. The `createReviewValidation` cases still fail, and one bug in
-this codebase has no test at all. Tell your pair which techniques a prompt
-for each of those two would need.
+Run `./mvnw test` (or `./gradlew test`). It should be green now. Sessions 3 to 8 build on this
+codebase, so a red test costs you later. Still red? Write down which
+test, and which technique the prompt for it was missing.
 
-**Done when**: you named the techniques for both remaining bugs. Fixing them
-is the bonus, not the bar.
-
-## Bonus (only if time remains)
-
-No coach this time — apply whatever it kept flagging in your prompts:
-
-- Fix the `createReviewValidation` cases (all 4). Decide *before you
-  prompt*: handler, middleware, or store?
-- Find the bug that has no test, using a review prompt. Which
-  specialist should review (*role framing*), which package (*Scope it*),
-  looking at what (*Direct it*)?
-- Keep fixing until everything is green — but count your rounds. More than
-  two means the prompt needs work, not the code.
+**Done when**: the test run is green, or you wrote down the failing test
+and the missing technique.
 
 ## Pair Discussion (5 min)
 

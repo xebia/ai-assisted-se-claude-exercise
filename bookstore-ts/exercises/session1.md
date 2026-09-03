@@ -19,6 +19,8 @@ it says.
 
 - **Turn**: one message from you, plus everything Claude does until it
   answers.
+- **Cycle**: one call to the model inside a turn. One turn can contain
+  many cycles.
 - **Tool call**: one action Claude takes inside a turn. It searches the
   project, reads a file, edits a file, or runs a command. You see each one
   as a short line while Claude works.
@@ -29,6 +31,9 @@ it says.
   turn: what Claude looked at, why, and what it found. It ends with totals
   per tool and one question for you. `/trace all` does the same for every
   turn since the last `/clear`, one table per turn.
+- **Experiment prefix**: a fixed line you paste at the start of a prompt.
+  It stops training mode from steering the run. Task 1 uses it, on both
+  prompts.
 
 ## How every task works
 
@@ -55,9 +60,15 @@ on time? Just say *"just tell me"*. That is allowed.
 
 ### 1. Explain, with and without a selection (6 min: selected 2 · `/clear` and ask again 3 · compare 1)
 
+This task compares two runs, so both prompts start with the experiment
+prefix. Both, or the comparison is invalid:
+
+> `[Exercise 1 experiment — execute directly, no leading questions.]`
+
 Open `src/store/book.ts` and select the whole `search()` function. Ask:
 
 ```
+[Exercise 1 experiment — execute directly, no leading questions.]
 Explain what this function does step by step
 ```
 
@@ -70,6 +81,7 @@ when it cannot see your selection?
 Run `/clear`. Do not select anything. Ask:
 
 ```
+[Exercise 1 experiment — execute directly, no leading questions.]
 Explain step by step what search() in the book store does
 ```
 
@@ -111,7 +123,8 @@ Run `/clear` again, then ask:
 Add input validation to createReview: rating must be 1-5, review_text must be between 10 and 500 characters
 ```
 
-Look at where Claude put the checks. Inside the handler? In a separate
+Training mode may ask a leading question here too. Answer it, then look
+at where Claude put the checks. Inside the handler? In a separate
 function? In a schema library? Now say no:
 
 ```
@@ -192,9 +205,9 @@ found.
 
 ## Plenary Harvest (5 min)
 
-Trainer popcorns the room — have your numbers ready: how many tool calls
-with the selection, and how many without? Which file did Claude open first
-for the bug, and did your prediction hold? Did Claude run your test on its
-own, or did you have to? How many files for the status-code question, and
-how many issues came out? Close with **one take-away** you'd give someone
-who skipped today.
+The trainer calls on people at random. Have your numbers ready: how many
+tool calls with the selection, and how many without? Which file did Claude
+open first for the bug, and did your prediction hold? Did Claude run your
+test on its own, or did you have to? How many files for the status-code
+question, and how many issues came out? Close with **one take-away** you'd
+give someone who skipped this session.

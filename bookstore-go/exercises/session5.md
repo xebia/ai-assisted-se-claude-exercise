@@ -265,4 +265,4 @@ prose. Bring its report to the harvest if it finishes in time.
 `/verify-exercise 5` is running.
 
 Trainer popcorns the room — no pairs, no prep time beyond what you wrote
-above. Close with **one take-away** you'd give someone who skipped today.
+above. Close with **one take-away** you'd give someone who skipped this session.

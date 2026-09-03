@@ -29,7 +29,7 @@ cd ../bookstore-web && specify check
 ```
 
 You need three terminals. **Not** the frontend dev server — there is no
-frontend yet, and that is the point: today you specify it, Exercise 7 builds it.
+frontend yet, and that is the point: this session you specify it, Exercise 7 builds it.
 
 **Terminal 1 — your backend**, from the `bookstore-go` project directory
 (any of the four backends works; the spec you write is agnostic):
@@ -71,7 +71,7 @@ it at each later step, so a plan or a task that breaks one of these is a defect
 to fix, not a trade-off to weigh.
 
 Open [`.specify/memory/constitution.md`](../../bookstore-web/.specify/memory/constitution.md)
-in `bookstore-web`. Yours is pre-written — you are not authoring one today.
+in `bookstore-web`. Yours is pre-written — you are not authoring one this session.
 
 It has six principles and fits on one page. Read them, then answer this:
 **What does the constitution say about the API contract — and where does it
