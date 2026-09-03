@@ -17,6 +17,7 @@ export function buildRoutes(db: Database) {
 
   return {
     "/api/books/:id/reviews": {
+      POST: rh.createReview,
       GET: rh.listReviews,
     },
     "/api/authors": {

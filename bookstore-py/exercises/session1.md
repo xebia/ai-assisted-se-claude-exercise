@@ -27,8 +27,8 @@ it says.
   it.
 - **Trace**: the `/trace` command. It lists every tool call of the last
   turn: what Claude looked at, why, and what it found. It ends with totals
-  per tool and one question for you. `/trace all` covers every turn since
-  the last `/clear`.
+  per tool and one question for you. `/trace all` does the same for every
+  turn since the last `/clear`, one table per turn.
 
 ## How every task works
 
@@ -38,7 +38,8 @@ Same four steps every time:
    says so.
 2. **Read**. Read the answer before you do anything else. Does it match
    what you know?
-3. **Trace**. Run `/trace`. Read the trail from top to bottom.
+3. **Trace**. Run `/trace`. Did the task take more than one turn? Then run
+   `/trace all` instead. Read the trail from top to bottom.
 4. **Note**. Write down the number the task asks for. You need these
    numbers in the harvest at the end.
 
@@ -84,6 +85,8 @@ prediction.
 
 ### 2. Find a bug (4 min: predict 1 · ask 2 · trace 1)
 
+Run `/clear`, so the trace at the end shows this task only.
+
 Open `bookstore/handler/review.py` and select `create_review()`. Before you
 ask, write one sentence: which other file will Claude open to answer?
 
@@ -94,14 +97,16 @@ Is there a bug in this function?
 ```
 
 Training mode applies here. Answer the leading question, then read the
-answer. Run `/trace`. Did Claude open the file you predicted?
+answer. That took more than one turn, and `/trace` shows only the last
+one. Run `/trace all`. Did Claude open the file you predicted? In which
+turn?
 
 **Done when**: Claude named a bug, and you can say in one sentence what
 `create_review()` fails to check.
 
 ### 3. Add validation, then say no (6 min: ask 3 · redirect 2 · trace 1)
 
-Ask:
+Run `/clear` again, then ask:
 
 ```
 Add input validation to create_review: rating must be 1-5, review_text must be between 10 and 500 characters
@@ -117,9 +122,9 @@ No, extract the validation into a separate validate_review() function instead
 Saying no is normal. Claude does not mind, and you decide what goes into
 your code.
 
-Run `/trace`. Two things to look for: which tool changed the file, and what
-Claude ran to check its own change. If it ran nothing, note that. Nobody
-asked it to.
+More than one turn again, so run `/trace all`. Three things to look for:
+which tool changed the file, in which turn, and what Claude ran to check
+its own change. If it ran nothing, note that. Nobody asked it to.
 
 **Done when**: `validate_review()` exists in `bookstore/handler/review.py`,
 `create_review()` calls it, and `python3 -c "import bookstore.server"`
@@ -180,11 +185,10 @@ found.
 
 ## Bonus (only if time remains)
 
-- Run `/trace all` and count the tool calls of the whole conversation
-  since task 6. Then run `/context`. How much of the context window did
-  one question cost?
-- Ask Claude the task 6 question again, in the same conversation. Run
-  `/trace`. Fewer tool calls this time? Say why in one sentence.
+- Ask Claude the task 6 question again, in the same conversation. Then
+  run `/trace all`. You see two turns. Fewer tool calls the second time?
+  Say why in one sentence.
+- Run `/context`. How much of the context window did two questions cost?
 
 ## Plenary Harvest (5 min)
 

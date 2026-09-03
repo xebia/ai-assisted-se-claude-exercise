@@ -57,9 +57,8 @@ participant selected in the editor before asking).
 `$ARGUMENTS` is empty or one word:
 
 - empty: trace the last turn only.
-- `all`: trace every turn since the context was last cleared. Older turns
-  get one line each (message in eight words, then the tool-call count). The
-  last turn gets the full table.
+- `all`: trace every turn since the context was last cleared. Every turn
+  gets its own full table, oldest first. The totals cover all traced turns.
 
 ## The report
 
