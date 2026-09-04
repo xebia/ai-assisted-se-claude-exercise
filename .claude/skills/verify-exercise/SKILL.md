@@ -93,7 +93,7 @@ still applies: predictions first, one expected defect per ❌, a stated grade.
 | --- | --- |
 | **CONTEXT** | states the stack, the domain, or where to start |
 | **TASK** | names an outcome, not a topic |
-| **FORMAT** | specifies the shape of the output |
+| **OUTCOME** | specifies the shape of the output |
 | **Scope it** | names a file, package, endpoint, or flow |
 | **Constrain it** | sets a boundary on what may change or be added |
 | **Direct it** | prescribes a *method*, not just a goal |
@@ -130,7 +130,7 @@ file describes, then sort each factual claim in the artifact:
 Rules that keep this honest:
 
 - **An uncited claim is ⚠️, never ✅**, even if you know it is right. The
-  missing citation *is* the finding, and it maps directly to FORMAT or
+  missing citation *is* the finding, and it maps directly to OUTCOME or
   Define done.
 - **Line drift is not an error.** Within a few lines, count ✅ and say
   nothing. Right file but far-off line or wrong function is ❌, usually an

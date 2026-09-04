@@ -5,13 +5,14 @@ two sections — a package tree (one line per package on what it owns) and the
 request flow from the entry point to the database and back, layer by layer,
 with `file:line` per hop.
 
-**Slide anchors:** *The CONTEXT-TASK-FORMAT Framework* · *Writing Effective
-Prompts* (Scope/Direct/Define done) · *Role Framing* · *Prompt Analysis* —
-this task is that slide's prompt, written live instead of read.
+**Slide anchors:** *The CONTEXT-TASK-OUTCOME Framework* · *Writing Effective
+Prompts* (Scope/Direct/Define done) · *Role Framing* · *Let's do a Prompt
+Analysis* — that slide's prompt has the same shape as this task, on a
+different subject. Do not tell them to copy it.
 
 ## Technique applicability
 
-**Load-bearing (6):** CONTEXT · TASK · FORMAT · Scope it · Direct it ·
+**Load-bearing (6):** CONTEXT · TASK · OUTCOME · Scope it · Direct it ·
 Define done.
 
 **Optional polish — mention, never count against them:** Role framing ·

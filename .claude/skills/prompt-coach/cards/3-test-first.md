@@ -6,9 +6,10 @@ written first, shown failing on today's code, then the fix, then both runs
 shown. The edge cases are currently untested and broken. There is no failing
 output to paste. That is exactly why the prompt must demand tests first.
 
-**Slide anchors:** *Which Prompt is Better?* — this task is Prompt A, written
-by the participant instead of read off the slide · *The Power of Examples* ·
-*Providing Verification Criteria* · *Use-Case: Working with Tests*.
+**Slide anchors:** *Which Prompt is More Effective?* — the stronger prompt on
+that slide has the same three parts this task needs, on a different bug ·
+*The Power of Examples* · *Providing Verification Criteria for the Outcome* ·
+*Working with Tests*.
 
 ## Technique applicability
 
@@ -67,9 +68,9 @@ criteria beyond the test run.
 
 ## Greenlight bar
 
-All five load-bearing present. This prompt should end up close to the
-slide's Prompt A. If it does, say so in the greenlight. That recognition is
-the reward.
+All five load-bearing present. This prompt should end up as strong as the
+stronger prompt on the slide. If it does, say so when you tell them it is
+ready.
 
 ## Held back
 

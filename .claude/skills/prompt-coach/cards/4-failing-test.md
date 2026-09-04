@@ -4,10 +4,10 @@
 code tests — create-book should return `201`, delete-book should return `204`
 — using the real failing output they already have from the baseline run.
 
-**Slide anchors:** *Providing Error Context* (the ★-table: verbatim, more
-context = better diagnosis) · *Use-Case: Bug Fixing Workflow* (expected vs
-actual, root cause not suppression) · *Prompting & Extended Thinking* (this
-is the `low`-effort row).
+**Slide anchors:** *Providing Error Context* (the exact error beats a
+description of it) · *Use AI for: Fixing Bugs* (expected vs actual, root
+cause not suppression) · *Prompting & Extended Thinking* (this is the
+`low`-effort row).
 
 ## Technique applicability
 
@@ -42,8 +42,8 @@ fix into something learned · a CONTEXT one-liner.
   you, compared to the exact paste?"
 - "If Claude decides the *tests* are wrong, what in your prompt stops it from
   editing them until they pass?"
-- "What effort level did you pick for this? What would `high` give you
-  here?"
+- "Which effort level did you write down for this task? What would `high`
+  buy you here that `low` does not?"
 
 ## Predicted defects for common gaps
 
@@ -54,6 +54,13 @@ fix into something learned · a CONTEXT one-liner.
 - No scope → Claude goes through the router or response helper first, before
   it finds the handler
 - No done-condition → Claude fixes one of the two codes and reports success
+
+## Effort level — decision, not command
+
+The sheet asks them to *write down* an effort level and one reason. It does
+not ask them to run `/effort`. The prompt goes to a fresh sub-agent, which
+does not take over their setting. Coach the reasoning; never tell them to
+run the command.
 
 ## Greenlight bar
 

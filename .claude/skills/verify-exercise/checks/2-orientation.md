@@ -5,18 +5,27 @@
 **What the participant was asked to produce** (they were given the
 deliverable, not a prompt — composing the prompt is the exercise):
 
-1. **Package tree** — one line per package on what it owns
-2. **Request flow** — the path a request takes from the entry point to the
-   database and back, layer by layer, with `file:line` per hop
+1. **Package tree** — one line per package, saying what that package is
+   responsible for
+2. **Request flow** — the path of one request, from the entry point to the
+   database and back. One line per step, each with a `file:line` reference
 
-They were told which techniques were worth using, and asked which one adds
-nothing here. See *Held back*, below.
+They were given seven techniques and asked which one adds nothing here. See
+*Held back*, below.
+
+## Say the sheet's words
+
+This file uses trainer shorthand. The participant has never seen it.
+Translate before you speak: *load-bearing* → "a technique this task needs";
+*n/a* → "not needed here"; *the artifact* → `docs/orientation.md`;
+*verbatim* → "word for word"; *CONTEXT-TASK-FORMAT* → CONTEXT-TASK-OUTCOME.
+Say *pass* and *fail*, never ✓/✗.
 
 ## Technique applicability
 
 Grade the prompt against these only.
 
-**Load-bearing (6) — the grade is out of these:** CONTEXT · TASK · FORMAT ·
+**Load-bearing (6) — the grade is out of these:** CONTEXT · TASK · OUTCOME ·
 Scope it · Direct it · Define done.
 
 **Optional polish — mention but don't count against them:** Role framing ·
@@ -47,6 +56,9 @@ becomes copy-paste material and the exercise collapses.
   one real route from start to end
 - A completion condition that means *no claim I cannot check by opening the
   file you named*
+
+The sheet also tells them the `docs/` folder does not exist yet. A prompt
+that never lets Claude create it is a scope gap, not a formatting one.
 
 ## Establish ground truth
 

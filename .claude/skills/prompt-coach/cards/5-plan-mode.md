@@ -6,10 +6,10 @@ This one is open to debate: where the existence check belongs is an
 architectural choice. That is why it runs through plan mode with a directed
 reasoning budget, and why the plan gets reviewed before any code is written.
 
-**Slide anchors:** *Plan Mode: Think Before Coding* ("a bad line in a plan
-becomes 100+ bad lines of code") · *Prompting & Extended Thinking* (`/effort`
-= how much, prompt = what about) · *Thinking Effort in Practice* (this is the
-Task B pattern: name the risks).
+**Slide anchors:** *Plan Mode: Explore Before Editing* ("a wrong assumption
+in the plan gets multiplied in the code") · *Prompting & Extended Thinking*
+(`/effort` = how much, prompt = what about) · *Thinking Effort in Practice*
+(this is the Task B pattern: name the risks).
 
 ## Technique applicability
 
@@ -72,8 +72,15 @@ helps; it is one paste, not the core this time).
 All four load-bearing present. **This task is the exception to clean-room
 dispatch:** do not launch a sub-agent. The participant runs the prompt
 themselves, in plan mode, so they can review the plan and approve or reject
-it. Say in the greenlight: their next job is to *push back on at least one
-step of the plan* before approving. Reading a plan is not reviewing it.
+it. Do not tell them to type *ship it*. Say the prompt is ready, and tell
+them to copy it into their notes, run `/clear`, and send it in a fresh
+session in plan mode. Add this: their next job is to
+*push back on at least one step of the plan* before approving. Reading a
+plan is not reviewing it.
+
+Training mode is on in their own session; nothing lifts it here. Claude may
+ask one leading question before it plans. That is expected, and the sheet
+tells them to answer it in one line. Never coach a way around it.
 
 ## Held back
 
