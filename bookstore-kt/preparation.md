@@ -6,22 +6,19 @@ preparation steps before the session.
 
 ## What to prepare
 
-### 1. Visual Studio Code
+### 1. An editor or IDE
 
-Make sure you have [Visual Studio Code](https://code.visualstudio.com/)
-installed and working on your computer. We will use it throughout the training
-as our primary editor.
+Use the editor or IDE you like best, as long as it can open and browse
+Kotlin code. During the training the editor is only used to read code and
+review changes. All AI work happens in Claude Code in the terminal.
 
-### 2. Kotlin plugin for VSCode
+If you have no preference, [Visual Studio Code](https://code.visualstudio.com/)
+is a safe choice. The instructions below use VSCode where a step depends on the
+editor.
 
-Install a **Kotlin extension** for Visual Studio Code:
+### 2. Kotlin
 
-- Open VSCode and go to the Extensions panel (`Ctrl+Shift+X` / `Cmd+Shift+X`)
-- Search for **"Kotlin"** (the *Kotlin Language* extension by mathiasfrohlich
-  is a good lightweight option)
-- Click **Install**
-
-Also make sure the **Kotlin compiler** (`kotlinc` 1.9+) and a **JDK** (Java
+Make sure the **Kotlin compiler** (`kotlinc` 1.9+) and a **JDK** (Java
 21+) are installed on your machine:
 
 - Kotlin: https://kotlinlang.org/docs/command-line.html
@@ -34,6 +31,15 @@ kotlinc -version
 java -version
 ```
 
+Your IDE also needs to understand Kotlin. IntelliJ IDEA supports it out of the
+box, including the free Community Edition. In VSCode, install a **Kotlin
+extension**:
+
+- Open the Extensions panel (`Ctrl+Shift+X` / `Cmd+Shift+X`)
+- Search for **"Kotlin"** (the *Kotlin Language* extension by mathiasfrohlich
+  is a good lightweight option)
+- Click **Install**
+
 ### 3. Claude Code subscription and plugins
 
 We will be using **Claude Code** as our AI coding assistant during the training.
@@ -45,10 +51,11 @@ Please set up your account and tools before the session:
 - Install the **Claude Code CLI** by following the instructions at
   [claude.ai/code](https://claude.ai/code)
 - Verify it works by running `claude` in your terminal
-- Install the **Claude for Visual Studio Code** extension in VSCode:
-  - Open the Extensions panel (`Ctrl+Shift+X` / `Cmd+Shift+X`)
-  - Search for **"Claude Code"** by Anthropic
-  - Click **Install**
+- Optional: Claude Code has editor integrations for VSCode and for JetBrains
+  IDEs. They are convenient but not required — the terminal is enough for
+  every exercise. In VSCode, open the Extensions panel
+  (`Ctrl+Shift+X` / `Cmd+Shift+X`), search for **"Claude Code"** by Anthropic,
+  and click **Install**.
 
 ### 4. Git
 
@@ -136,14 +143,13 @@ on http://localhost:5173.
 
 ## Quick checklist
 
-- VSCode is installed and opens without issues
-- A Kotlin extension is installed in VSCode
+- Your editor or IDE is installed and can open Kotlin files
 - Kotlin compiler is installed (`kotlinc -version` works in your terminal)
 - JDK 21+ is installed (`java -version` shows 21 or higher)
 - You have an active Claude Pro subscription ($20/month)
 - Claude Code CLI is installed and working (`claude --version` works in your
   terminal)
-- The Claude Code extension is installed in VSCode
+- Optional: the Claude Code editor integration is installed
 - Git is installed (`git --version` works in your terminal)
 - You have cloned the bookstore project from GitHub and `./gradlew run` (or `./mvnw package -DskipTests`) finishes
   without errors

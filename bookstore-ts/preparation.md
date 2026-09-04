@@ -6,17 +6,21 @@ preparation steps before the session.
 
 ## What to prepare
 
-### 1. Visual Studio Code
+### 1. An editor or IDE
 
-Make sure you have [Visual Studio Code](https://code.visualstudio.com/)
-installed and working on your computer. We will use it throughout the training
-as our primary editor.
+Use the editor or IDE you like best, as long as it can open and browse
+TypeScript code. During the training the editor is only used to read code and
+review changes. All AI work happens in Claude Code in the terminal.
+
+If you have no preference, [Visual Studio Code](https://code.visualstudio.com/)
+is a safe choice. The instructions below use VSCode where a step depends on the
+editor.
 
 ### 2. Bun runtime
 
-The TypeScript BookStore project runs on the **Bun** runtime (Bun ships its own
-TypeScript support, so no separate TypeScript install or VSCode language plugin
-is required — VSCode handles `.ts` files out of the box).
+The TypeScript BookStore project runs on the **Bun** runtime. Bun ships its own
+TypeScript support, so you do not need a separate TypeScript install. Most
+IDEs, VSCode included, handle `.ts` files without extra plugins.
 
 Install Bun by following the instructions at: https://bun.sh/
 
@@ -37,10 +41,11 @@ Please set up your account and tools before the session:
 - Install the **Claude Code CLI** by following the instructions at
   [claude.ai/code](https://claude.ai/code)
 - Verify it works by running `claude` in your terminal
-- Install the **Claude for Visual Studio Code** extension in VSCode:
-  - Open the Extensions panel (`Ctrl+Shift+X` / `Cmd+Shift+X`)
-  - Search for **"Claude Code"** by Anthropic
-  - Click **Install**
+- Optional: Claude Code has editor integrations for VSCode and for JetBrains
+  IDEs. They are convenient but not required — the terminal is enough for
+  every exercise. In VSCode, open the Extensions panel
+  (`Ctrl+Shift+X` / `Cmd+Shift+X`), search for **"Claude Code"** by Anthropic,
+  and click **Install**.
 
 ### 4. Git
 
@@ -128,12 +133,12 @@ on http://localhost:5173.
 
 ## Quick checklist
 
-- VSCode is installed and opens without issues
+- Your editor or IDE is installed and can open TypeScript files
 - Bun is installed (`bun --version` works in your terminal)
 - You have an active Claude Pro subscription ($20/month)
 - Claude Code CLI is installed and working (`claude --version` works in your
   terminal)
-- The Claude Code extension is installed in VSCode
+- Optional: the Claude Code editor integration is installed
 - Git is installed (`git --version` works in your terminal)
 - You have cloned the bookstore project from GitHub and `bun install` finishes
   without errors
