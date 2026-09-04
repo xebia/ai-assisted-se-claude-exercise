@@ -235,7 +235,8 @@ curl -s 'http://localhost:8080/api/books?page=1&size=3'
 curl -s http://localhost:8080/api/books/1
 ```
 
-**Pages start at 1** — page 0 returns page 1 again. And **a book is not a
+**Page 0 does what you decided in Session 2**: page 1 again, or an error.
+Either way, pages start at 1. And **a book is not a
 book**: `GET /api/books/1` returns `{"book": {…}, "author": {…}}`, a wrapper,
 while the list returns a bare array. Neither is guessable, and neither was in
 your spec.
@@ -245,7 +246,8 @@ Now open both files and check them against what you just saw:
 - **Shape** — do they say `GET /api/books/{id}` returns a book? The most likely
   error of the three, because every REST API the model has ever read returns
   the resource itself.
-- **Paging** — do they say pages start at 1? Anything starting at 0 is wrong.
+- **Paging** — do they say pages start at 1, and what page 0 does? Anything
+  starting at 0 is wrong.
 - **Inventions** — endpoints, fields or status codes that appear nowhere in your
   curl output. A contract is where a plausible invention does the most damage.
 

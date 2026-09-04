@@ -59,10 +59,11 @@ Run these yourself. Do not take the participant's notes on trust.
   the list shows "db error". Constitution V. Usually the page module reads
   `outcome.error` that the client was supposed to drop — check whether the
   foundation client leaks it or the story re-fetches on its own.
-- **Page 0.** A page module that starts counting at 0 sends `page=0`, which
-  the API treats as page 1, so Next shows page 1 twice. This is a spec
-  defect from Exercise 6 that became code. Mention it as a finding either
-  way — it is the point of the harvest question about marked guesses.
+- **Page 0.** A page module that starts counting at 0 sends `page=0`. What
+  happens next depends on the participant's Session 2 fix: the API treats
+  it as page 1, so Next shows page 1 twice, or it returns an error the UI
+  shows. Both are a spec defect from Exercise 6 that became code. Mention
+  it as a finding either way — it is the point of the closing-round question about marked guesses.
 - **Subagents, not a team.** The participant reports no agent panel. Not a
   code defect, but a prompt one: map it to Team, not subagents.
 

@@ -46,7 +46,7 @@ Same four steps every time:
 3. **Trace**. Run `/trace`. Did the task take more than one turn? Then run
    `/trace all` instead. Read the table from top to bottom.
 4. **Note**. Write down the number the task asks for. You need these
-   numbers in the harvest at the end.
+   numbers in the closing round at the end.
 
 > **The loop, in short: Ask → Read → `/trace` → Note.**
 > Every task below uses it. Come back here when you lose track.
@@ -201,7 +201,7 @@ found.
   Say why in one sentence.
 - Run `/context`. How much of the context window did two questions cost?
 
-## Plenary Harvest (5 min)
+## Closing round (5 min)
 
 The trainer calls on people at random. Have your numbers ready: how many
 tool calls with the selection, and how many without? Which file did Claude

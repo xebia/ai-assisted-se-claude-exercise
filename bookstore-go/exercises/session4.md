@@ -385,12 +385,12 @@ verifier gives its own:
 `/verify-exercise 4` re-grades all of it — both skills, the hook, the
 changelog, and your two verdicts — with evidence. Start it now: it works
 standalone from the artifacts and keeps running while you clean up in
-task 6. Read its report before the plenary harvest.
+task 6. Read its report before the closing round.
 
 **Done when**: the repaired hook fires on `/commit`, both verdicts are
 written down, and `/verify-exercise 4` is running.
 
-### 6. Cleanup + Plenary Harvest (5 min)
+### 6. Cleanup + Closing round (5 min)
 
 Cleanup first, one command per line (PowerShell 5.1 can't chain with
 `&&`):

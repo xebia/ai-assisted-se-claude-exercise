@@ -243,7 +243,7 @@ context — your main conversation stays clean.
 you have a security-audit report produced by the subagent, not written by
 you.
 
-## Plenary Harvest (10 min: write 5 · popcorn 5)
+## Closing round (10 min: write 5 · popcorn 5)
 
 Before the trainer popcorns the room, write down answers to these:
 
@@ -261,7 +261,7 @@ Before the trainer popcorns the room, write down answers to these:
 
 Then start `/verify-exercise 5`. It checks your MCP registration and your
 subagent's file, trigger, and report. It grades by observable state, not by
-prose. Bring its report to the harvest if it finishes in time.
+prose. Bring its report to the closing round if it finishes in time.
 
 **Done when**: you have a written answer for all four, and
 `/verify-exercise 5` is running.

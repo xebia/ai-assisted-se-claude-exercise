@@ -100,7 +100,7 @@ page, a Slack message).
 **Done when**: the skill or hook/MCP config exists as a file in your
 project, and you've written the two-sentence explanation for your team.
 
-## Plenary Harvest (10 min)
+## Closing round (10 min)
 
 Popcorn round, whole room, no pairs: 4–5 participants each share one
 take-away.

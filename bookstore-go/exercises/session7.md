@@ -207,7 +207,7 @@ Any hit is a constitution violation, principle II.
 Write down what you found. Then start `/verify-exercise 7` and paste your
 team prompt when it asks. It grades the prompt first, then checks the tree
 for the same three things, plus the error paths from principle V. Bring its
-report to the plenary harvest.
+report to the closing round.
 
 Commit:
 
@@ -220,7 +220,7 @@ git add -A && git commit -m "feat: bookstore-web, built by agent team"
 
 ---
 
-## Plenary Harvest (5 min)
+## Closing round (5 min)
 
 Trainer popcorns the room — have answers ready:
 

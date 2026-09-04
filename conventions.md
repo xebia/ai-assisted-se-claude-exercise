@@ -101,7 +101,7 @@ source of truth — when it changes there, copy it here again.
   collide with a tree-writing run).
 - **Timing**: budget ≈ expert dry-run × 1.3. Session 3 measured 30 min
   expert → 40 min box.
-- **Closing**: session 3 uses a single 5-min "Plenary Harvest" (popcorn, no
+- **Closing**: session 3 uses a single 5-min "Closing round" (popcorn, no
   pair share) per the course-wide no-pairs rule. Other sessions still end
   with the older Pair Discussion + Group Share pair — align them when
   their session gets a redesign pass.

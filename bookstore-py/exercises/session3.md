@@ -130,7 +130,7 @@ The payoff comes in the wrap, not now: `/verify-exercise 2` grades
 `session3-bait.diff` against your context files, prediction by prediction,
 and closes with its own nominations — the line that earned the most, and
 a freeloader. You'll start it in task 5, right after writing your own
-nominations. It does its grading while the plenary harvest gets going.
+nominations. It does its grading while the closing round starts.
 
 **Done when**: `session3-bait.diff` exists, the tree is clean, and you have
 a held-or-failed note for each of your three rules.
@@ -225,7 +225,7 @@ evidence each.
 Then start `/verify-exercise 2`. It closes with its own nominations — see
 whose verdict survives, and overrule it if yours is better argued. It
 runs while you answer task 2's open question with your neighbor. Bring
-its report to the plenary harvest.
+its report to the closing round.
 
 **Done when**: both nominations are written down, with evidence, and
 `/verify-exercise 2` is running.
@@ -284,7 +284,7 @@ Your `CLAUDE.local.md`, the banked diffs, and session 2's
 `docs/orientation.md` are gitignored and safe — but commit anything else
 you care about first.
 
-## Plenary Harvest (5 min)
+## Closing round (5 min)
 
 Trainer popcorns the room — have answers ready: how many `/init` lines
 survived the freeloader test? Which rule was worded too vaguely to stop

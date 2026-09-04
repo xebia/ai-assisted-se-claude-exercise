@@ -116,6 +116,7 @@ Banned phrases, with plain replacements:
 | "crucially" / "importantly" as openers | delete; the sentence should show it |
 | "doesn't survive first contact with X" | "breaks the first time it meets X" |
 | "full contact" / "battle-tested" | say concretely what happens or was tested |
+| "harvest" (in participant text) | "closing round" for the end-of-exercise section; "collect answers" for the action. Trainer vocabulary — fine in speaker notes and AGENTS.md |
 
 Banned patterns:
 

@@ -8,7 +8,7 @@ the bonus scoped-rule task — the path-scoped rule file under
 
 **This check runs in-session, at the end of the exercise.** Participants
 arrive with their own MVP/freeloader nominations already written down in
-the wrap. The report is read during or right after the plenary harvest.
+the wrap. The report is read during or right after the closing round.
 Grade the same way regardless of when it runs.
 
 **Under review: the context files, not a prompt.** This is the Session 3
