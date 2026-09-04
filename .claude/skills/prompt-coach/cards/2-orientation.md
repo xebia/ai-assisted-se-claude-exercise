@@ -65,7 +65,7 @@ one line if absent, not a round.
 
 ## After the run
 
-`/verify-exercise 1` grades the sent prompt against the produced artifact,
+`/verify-exercise 2` grades the sent prompt against the produced artifact,
 claim by claim. That report is the debrief for this task. Keep yours to one
 line and hand over to it. Do not repeat its findings before it runs.
 

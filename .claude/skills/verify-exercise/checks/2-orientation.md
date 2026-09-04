@@ -1,4 +1,4 @@
-# Exercise 1 — Get oriented
+# Exercise 2 — Get oriented
 
 **Artifact:** `docs/orientation.md`
 

@@ -65,9 +65,9 @@ Right:
 
 ## Step 0 — Inputs
 
-Exercise-specific expectations live in `checks/<id>-<slug>.md` beside this file.
+Exercise-specific expectations live in `checks/<session>-<slug>.md` beside this file.
 
-1. `$ARGUMENTS` holds the exercise identifier as typed. Load the matching
+1. `$ARGUMENTS` holds the session number as typed. Load the matching
    check file and read it fully. If no argument was given, list the available
    checks by title and ask which one: one short question, no preamble.
 2. **Ask for the prompt they used, verbatim.** You cannot run this skill
@@ -187,7 +187,7 @@ compare. Do not run it for them.
 
 ## Adding a new exercise
 
-Copy `checks/template.md` to `checks/<id>-<slug>.md`. The dispatcher
+Copy `checks/template.md` to `checks/<session>-<slug>.md`. The dispatcher
 discovers check files by listing the directory, so this file never changes.
 Known traps and pass bars are quasi-output: write them in the register of
 *How you talk to the participant*.

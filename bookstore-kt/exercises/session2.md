@@ -88,7 +88,7 @@ which one, and why, and tell the coach.
 
 Draft → `/prompt-coach 2` → revise → ship.
 
-**Check your result**: run `/verify-exercise 1`. It compares the prompt you
+**Check your result**: run `/verify-exercise 2`. It compares the prompt you
 actually sent against the file it actually produced, claim by claim. Not
 enough time? The check works on its own — run it in the next break.
 

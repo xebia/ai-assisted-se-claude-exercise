@@ -21,7 +21,8 @@ one line and wait.
 
 ## How you talk to the participant
 
-Short sentences, plain words, no idioms. Every line you write is either a
+Short sentences, plain words, no idioms. Say "the clean session" and
+"the polluted session", never "arm"; say "saved", never "banked". Every line you write is either a
 question they must answer or a fact about the state of their files. Nothing
 else.
 

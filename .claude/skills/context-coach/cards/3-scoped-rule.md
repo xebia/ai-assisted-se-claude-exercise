@@ -9,7 +9,7 @@ is for the CLAUDE.md they will write for their own project, not for this
 clock. Do not demand it here.
 
 **Slide anchors:** *Rules — Splitting CLAUDE.md by Topic* · *Rule Discovery:
-With or Without Paths* · *Progressive Disclosure* · the **Size** dimension.
+With or Without Paths* · *Progressive Disclosure* · the **Relevance** dimension.
 
 ## Concept applicability
 
@@ -23,7 +23,7 @@ With or Without Paths* · *Progressive Disclosure* · the **Size** dimension.
   They verified that by listing the files, not by reading the glob and
   agreeing with it. A glob that almost matches fails silently.
 - **Moved, not copied** — the line is gone from `CLAUDE.local.md`. The same
-  rule in both places is a Size failure that looks like scoping.
+  rule in both places is a Relevance failure that looks like scoping.
 
 **Optional polish:**
 

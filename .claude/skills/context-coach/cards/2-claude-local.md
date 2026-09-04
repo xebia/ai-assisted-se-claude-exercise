@@ -1,11 +1,11 @@
-# Task 2 — `/init`, then earn every token
+# Task 2 — Write `CLAUDE.local.md`
 
 **What they're refining:** the file `/init` generated, pruned line by line and
 extended with human-only decisions, saved as `CLAUDE.local.md`. The
 training-mode `CLAUDE.md` stays untouched.
 
 **Slide anchors:** *`/init` — Bootstrap Your CLAUDE.md* · *Start with `/init`,
-then refine by hand* · *What Goes in CLAUDE.md* · *Which CLAUDE.md Line Earns
+then refine by hand* · *What Goes in CLAUDE.md* · *Which CLAUDE.md Line Is Worth
 Its Tokens?* · *Writing Effective CLAUDE.md* · *The CLAUDE.md Hierarchy*.
 
 ## Concept applicability
@@ -44,7 +44,7 @@ Nudge toward missing elements from this list. Never paste it as content.
 - The three decisions as specific prohibitions. "Never add a dependency
   without asking" is better than "keep dependencies minimal".
 - **Under ~15 lines.** The strongest sign of understanding is what got
-  deleted. A participant proud of a 40-line file has missed the Size slide.
+  deleted. A participant proud of a 40-line file has missed the Relevance slide.
 - No file-by-file inventory, no restated language conventions, no "write
   clean code" lines left
 
@@ -60,7 +60,7 @@ Nudge toward missing elements from this list. Never paste it as content.
 ## Predicted effects for common findings
 
 - Freeloader lines kept → Claude behaves the same. The lines cost tokens in
-  *every* future session. That is Size, paid forever.
+  *every* future session. That is Relevance, paid forever.
 - Vague test rule → the bait run produces tests, but not in the project's
   convention
 - No-dependencies rule missing or soft → the bait run adds a library
@@ -76,14 +76,14 @@ line if absent, not a round.
 
 ## After the run
 
-Task 3's bait run is this file's real test, and `/verify-exercise 2` grades
+Task 3's bait run is this file's real test, and `/verify-exercise 3` grades
 the file against that evidence. Keep your debrief to one line and hand over
 to it. Do not repeat its findings before it runs.
 
 ## Held back
 
 The exercise poses to the room: *a line that is true but useless hurts which
-dimension? A line that is specific but wrong?* Intended answers: **Size** for
+dimension? A line that is specific but wrong?* Intended answers: **Relevance** for
 the freeloader; **Correctness** for the wrong line. The wrong one is worse,
 because it does damage silently while looking trustworthy. **Don't volunteer
 this.** If asked directly, give it, with the hook: that difference is why
