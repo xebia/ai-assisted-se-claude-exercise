@@ -12,6 +12,47 @@ Assume B1 for anything that matters.
 If a sentence fails this test and it carries an instruction, rewrite it.
 If it fails and it's decoration, cut it or move it out of the way.
 
+## The reader
+
+Write every exercise for this person, and no one more experienced:
+
+- They heard the session's concepts ten minutes ago, for the first time.
+  Session 3 example: they have just learned that `CLAUDE.md` exists.
+- They know only the words the slides used. Nothing from the trainer's
+  design notes, nothing from earlier drafts, nothing from this repo.
+- Their English is B1. They read each sentence once.
+- They do not know what folder they are in, what a "fresh session" is, or
+  where a file should go, unless the sheet says so.
+
+Added 2026-09-04 after lead-trainer feedback on the session 3 sheet
+(Urs Peter): the sheet was written for someone who already knew the
+design. Concretely, it failed on all four points above.
+
+## Vocabulary rules
+
+- **No invented words.** Every term in a sheet comes from the slides of
+  that session, or it is replaced by a plain phrase. "Arm", "bank", "bait
+  run", "freeloader" are examples of words that failed: none is on a slide,
+  three are English idioms. Write "the clean session", "save the diff",
+  "the weak prompt", "a line that is not worth its tokens".
+- **A glossary is a warning sign.** If a sheet needs a word list before
+  the tasks, the tasks use words they should not. Command names
+  (`/bank-diff`, `/context-coach`) are the exception: explain each command
+  once, in one sentence, where it is first used.
+- **Explain the setup before the tasks.** One section, plain words: what
+  the project's `CLAUDE.md` does (training mode), what that changes in
+  Claude's answers, how to switch it off when needed, and why the file
+  must not be edited. A participant who has not read this section cannot
+  understand the exercise.
+- **Say where.** Every sheet names the folder to open a terminal in, and
+  defines "fresh session" once. Every task that creates or edits a file
+  names the file before the steps, not after.
+- **Slide references carry the point.** Do not write "use the test from
+  *Which CLAUDE.md Line Is Worth Its Tokens?*". Write the test itself, in
+  one sentence, and add the slide title after it in parentheses.
+- **Worked example first.** When a task asks for several rules, prompts or
+  steps, give the first one fully written. Then ask for the rest.
+
 ## The two-tier rule
 
 Every piece of text is one of two tiers:
@@ -168,9 +209,46 @@ Proven on Exercise 2; apply to every exercise document:
 - **Recap box for the core loop.** If tasks share a repeated workflow,
   state it once in full, then add a one-line recap box the reader can jump
   back to mid-exercise. Nobody should re-read prose to find step 3.
-- **Timing per phase, not just per task.** Split each task's minutes in the
-  heading (e.g. "9 min: draft 3 · coach & revise 3 · ship & check 3") so a
-  reader knows *when* they are behind, not just that time exists.
+- **Timing: total in the heading, phases on the steps.** The heading
+  carries one number: "(12 min)". If a task has phases, put the minutes on
+  the step itself: "3. Run the coach (3 min)". Never in the heading —
+  "9 min: draft 3 · coach & revise 3 · ship & check 3" was flagged as noise
+  by a lead trainer (2026-09-04) and is now banned.
+- **Tasks are numbered steps.** Each task is: the file or result it
+  produces, then numbered steps with plain verbs and the exact command,
+  then at most one short note on why, then **Done when**. Rationale never
+  sits inside a step.
+
+### Reference example
+
+A lead trainer rewrote task 1 of session 3 by hand (2026-09-04). It is the
+register every task must hit. Before:
+
+> Open a fresh session and run `/context` before typing anything. Note what
+> is already spent before your first message: system prompt, tools,
+> `CLAUDE.md`. Compare with your neighbor.
+> No coaching for this one. It's a reading, not a deliverable.
+> Write the number down. Task 4 will make you cite it.
+
+After:
+
+> Open a fresh Claude session and run the `/context` command before typing
+> anything.
+>
+> Note how many tokens are already spent before you type your first
+> message, due to the context Claude loads by default, such as the system
+> prompt, tools, and `CLAUDE.md`. To which category does `CLAUDE.md`
+> belong? Compare the outcome with your neighbor.
+>
+> In this exercise you don't need the coaching command (`/context-coach`);
+> gaining insight into the context window is the goal.
+>
+> Write down the token count of your clean session. You will re-use this
+> number in task 4.
+
+What changed: the command is named in full, the why is in the sentence,
+"no coaching" says which command is meant, and every reference ("task 4")
+says what for.
 
 ## Coach output
 
@@ -213,3 +291,11 @@ Run this on every piece before delivering it:
       aphorism?
 - [ ] The litmus test: could a tired B1 reader do the task correctly after
       reading each sentence once?
+- [ ] Every non-command term appears on a slide of this session? (No
+      invented words, no glossary needed.)
+- [ ] Does the sheet say which folder, what a fresh session is, and which
+      file each task produces — before the steps?
+- [ ] Headings carry one number only?
+- [ ] The reader test: someone who has only seen the slides reads the
+      sheet once and lists every question they still have. Each question
+      is a defect. Zero questions before delivery.
