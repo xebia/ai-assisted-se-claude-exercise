@@ -10,7 +10,7 @@ effect. Session 2 was about the wording of your prompts. This session the wordin
 stays fixed wherever possible, and the **context** does the work instead:
 a pruned `CLAUDE.local.md`, a bait run it must survive, and a
 deliberately poisoned session. Everything maps to the four dimensions —
-**Correctness, Completeness, Size, Trajectory**.
+**Correctness, Completeness, Relevance, Trajectory**.
 
 ## A few words we'll use
 
