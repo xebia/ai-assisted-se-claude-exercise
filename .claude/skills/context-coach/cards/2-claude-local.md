@@ -43,8 +43,18 @@ Nudge toward missing elements from this list. Never paste it as content.
 - The layering rule with the real package/module names of this repo
 - The three decisions as specific prohibitions. "Never add a dependency
   without asking" is better than "keep dependencies minimal".
-- **Under ~15 lines.** The strongest sign of understanding is what got
-  deleted. A participant proud of a 40-line file has missed the Relevance slide.
+- **Every line survives the question "what does Claude do differently
+  because of it?"** There is no line-count target; the sheet says so. The
+  strongest sign of understanding is what got deleted and why. A
+  participant proud of a 40-line file has missed the Relevance slide; a
+  participant who cut to 8 lines and cannot say why each one stays has
+  missed it too.
+- **Folder structure by reference, not by paste.** If `docs/orientation.md`
+  exists (session 2), the file should import it with `@docs/orientation.md`
+  instead of restating the folders. That is the Hierarchy slide's `@import`
+  arrow. Ask what `/context` showed after the import: the file now costs
+  tokens every session, and they should be able to say whether that price
+  is right.
 - No file-by-file inventory, no restated language conventions, no "write
   clean code" lines left
 

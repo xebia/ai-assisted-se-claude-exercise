@@ -54,7 +54,7 @@ for instructions, flavor skippable and idiom-free, the AI-tell ban list, a
 any doc. The copy in the course repo (`ai-assisted-se-claude`) is the
 source of truth — when it changes there, copy it here again.
 
-## Skills: coach, verifier, bank-diff
+## Skills: coach, verifier, save-changes, pollute
 
 - `/prompt-coach` (session 2) and `/context-coach` (session 3): per-task cards
   in `cards/<n>-<slug>.md`, where `<n>` equals the task number in the
@@ -66,12 +66,21 @@ source of truth — when it changes there, copy it here again.
   docs or slides either.
 - `/verify-exercise <n>`: after-the-fact grading against a rubric in
   `checks/<n>-….md`. Session 3's check runs in-session at the end of the exercise and grades the
-  banked `session3-bait.diff`, then arbitrates the participant's own wrap
+  saved `session3-rules.diff`, then arbitrates the participant's own wrap
   nominations.
-- `/bank-diff <label>`: banks the working tree as `session3-<label>.diff`
+- `/save-changes <name>`: saves the working tree as `session3-<name>.diff`
   and resets, with preconditions (right cwd, non-empty status, no silent
-  overwrite; never `git clean -x`). Reuse it for any exercise that needs
-  evidence to survive a reset.
+  overwrite; never `git clean -x`). Windows-safe: writes the diff with
+  `git diff --output=` (PowerShell 5.1's `>` produces UTF-16, which
+  `git apply` rejects) and runs one git command per call (no `&&`). Reuse
+  it for any exercise that needs evidence to survive a reset. Renamed from
+  `/bank-diff` 2026-09-07 ("bank" failed the vocabulary rule).
+- `/pollute`: session 3, task 4. Runs the fixed pollution script in the
+  current session (three long cookie recipes, the full verbose test log
+  pasted back), then prints the three over-correcting messages for the
+  participant to send by hand. Chat-only: it never edits files. Exists so
+  participants write only a prediction, not a plan, and so the polluted
+  session is built the same way on every machine.
 - **Writing to `.claude/` fails from the desktop bridge.** Stage updated
   skill files in `_move-to-dot-claude-skills/` (mirroring the target
   paths, with a README saying what goes where); a human moves them in and
@@ -95,10 +104,19 @@ source of truth — when it changes there, copy it here again.
   aren't on keyboards; the coach renders the tally itself.
 - **Bank evidence before resets**: diffs are saved to files before any
   revert, and compared as artifacts, not from memory.
-- **Overlap waiting time**: sequence tasks so Claude's implementation runs
-  overlap with participant work (e.g. session 3 fires the clean arm, then
-  pollutes a second session while it builds — chat-only steps can't
-  collide with a tree-writing run).
+- **Overlap waiting time — but never two sessions editing at once**: when
+  a build takes several minutes, sequence tasks so the wait overlaps with
+  participant work. When a build is short (session 3's endpoint: ~1.5
+  min), run sessions one after the other instead; a second terminal that
+  might edit the same tree is a bigger risk than a short wait (senior-
+  trainer feedback, 2026-09-07).
+- **Fresh session means restart**: exercise sheets define "fresh session"
+  as closing Claude and starting it again, never as `/clear`. `/clear`
+  does not reliably reload a changed `CLAUDE.local.md`.
+- **Commit before the first reset**: any exercise that resets the tree
+  tells participants to commit earlier sessions' work first (session 2's
+  closing and session 3's "Before you start" both do). Otherwise the reset
+  removes uncommitted fixes that later sessions build on.
 - **Timing**: budget ≈ expert dry-run × 1.3. Session 3 measured 30 min
   expert → 40 min box.
 - **Closing**: session 3 uses a single 5-min "Closing round" (popcorn, no
@@ -113,7 +131,7 @@ source of truth — when it changes there, copy it here again.
 
 Every project's `.gitignore` ignores `CLAUDE.local.md`, `.claude/rules/`,
 `docs/orientation.md`, and `session3-*.diff` — so exercise resets
-(`/bank-diff`, `git clean`) can never delete a participant's deliverables.
+(`/save-changes`, `git clean`) can never delete a participant's deliverables.
 Keep these entries if a `.gitignore` is ever regenerated, and add new
 participant-created files to the list when future exercises introduce them.
 

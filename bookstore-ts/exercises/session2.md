@@ -287,8 +287,17 @@ this code, so a failing test costs you time in a later session.
 Still a failing test? Write in your notes which test it is, and which
 technique your prompt for it was missing.
 
+Then commit your work. Session 3 resets the project several times, and a
+reset removes every change that is not committed. Run these two commands,
+one per line:
+
+```
+git add -A .
+git commit -m "session 2"
+```
+
 **Done when**: all tests pass, or you wrote down the failing test and the
-missing technique.
+missing technique. `git status` shows no changes in this folder.
 
 ## Bonus (only if time remains)
 

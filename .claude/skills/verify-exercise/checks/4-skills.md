@@ -53,7 +53,7 @@ self-designed `/changelog` skill (auto-invocable, description-driven,
 backed by a fetched spec file), a cross-platform PostToolUse hook that
 nudges Claude toward `/changelog` after any `git commit`, and one real
 run of the whole chain producing a Common Changelog–format
-`CHANGELOG.md`. They read `bank-diff`'s SKILL.md first, as an example
+`CHANGELOG.md`. They read `save-changes`'s SKILL.md first, as an example
 of a well-written skill.
 
 **Do not assume they saw the chain break.** The sheet no longer promises

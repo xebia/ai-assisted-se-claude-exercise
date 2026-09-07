@@ -1,7 +1,7 @@
 # Exercise 3 — Context files vs. the weak-prompt run
 
-**Artifact:** `CLAUDE.local.md`, the banked bait diff (`session3-bait.diff`
-at the project root — the exercise banks and resets in one move, so expect
+**Artifact:** `CLAUDE.local.md`, the saved bait diff (`session3-rules.diff`
+at the project root — the exercise saves and resets in one move, so expect
 a clean working tree, not live changes), and — only if the participant did
 the bonus scoped-rule task — the path-scoped rule file under
 `.claude/rules/`.
@@ -53,8 +53,12 @@ dimensions sound*.
 - The layering rule using this repo's real package/module names
 - Three prohibitions specific enough that the bait diff can show a
   violation
-- Under ~15 lines in `CLAUDE.local.md`; the scoped rule carries only
-  layer-local guidance
+- No line that fails the freeloader test. There is no line-count target:
+  the sheet says a line stays because they can say what it changes. An
+  `@docs/orientation.md` import in place of a pasted folder structure is a
+  plus (it is the Hierarchy slide's `@import` arrow, done); a pasted
+  structure next to an existing `docs/orientation.md` is a Relevance
+  finding. The scoped rule carries only layer-local guidance
 - `CLAUDE.md` itself untouched — `git status` / `git diff CLAUDE.md` is the
   cheapest check in this file. **Highest-value, least-often-checked:** a
   modified `CLAUDE.md` silently damages every later session.
@@ -65,14 +69,14 @@ dimensions sound*.
    fails, that is a Correctness finding regardless of anything else.
 2. If a rule file exists, list the files its glob matches against the
    actual tree (every handler file? anything outside the layer?).
-3. Only then read `session3-bait.diff` (`git apply --stat` for the shape,
+3. Only then read `session3-rules.diff` (`git apply --stat` for the shape,
    the file itself for the content — the changes are no longer in the
    working tree). Where did the cache land: store layer, or spread across
    handlers? Was anything added to the dependency manifest? Do new tests
    exist, and do they follow the project's convention (compare against one
    existing test file, not memory)? Is cache invalidation wired to
    update/delete? Is handler validation still intact? No
-   `session3-bait.diff`? The bank step was skipped. Say so. Without the diff
+   `session3-rules.diff`? The save step was skipped. Say so. Without the diff
    only Correctness and Relevance can be graded.
 
 ## Known traps

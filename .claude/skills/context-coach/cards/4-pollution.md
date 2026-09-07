@@ -1,9 +1,11 @@
 # Task 4 — Poison one session, keep one clean
 
-**What they're refining:** their experiment plan — the pollution script, the
-written prediction, and the comparison criteria — coached *before* they run
-it. Afterwards, the verdict walkthrough and debrief work from the two
-banked diff files (`session3-polluted.diff`, `session3-clean.diff`).
+**What they're refining:** their written prediction, coached *before* they
+run the experiment. The pollution script itself is fixed: the `/pollute`
+course command runs the kitchen-sink and context-hoarding steps, then
+prints the three over-correcting messages for the participant to send by
+hand. Afterwards, the verdict walkthrough and debrief work from the two
+saved diff files (`session3-polluted.diff`, `session3-clean.diff`).
 
 **Slide anchors:** *Which Session Is in More Trouble?* · *Context Rot: The
 Attention Budget* · *Warning Signs of a Polluted Context* · *Anti-Patterns
@@ -11,26 +13,24 @@ in Context* · the **Trajectory** dimension.
 
 ## Concept applicability
 
-**Load-bearing (5):**
+**Load-bearing (4):**
 
 - **Prediction first, in writing** — which arm produces the better endpoint,
   and *what specifically* will differ. "The clean one will be better" is a
   guess. "The polluted one will get the routing style wrong / bring back
   the corrected fact" is a prediction that can be wrong.
-- **All three anti-patterns represented** — one unrelated task (kitchen
-  sink), one pasted dump with no question (context hoarding), one wrong
-  "fact" stated and then corrected twice (over-correcting). Each step
-  exists to attack a *named* dimension. A step they cannot assign to a
-  dimension is decoration. The exercise sheet offers a worked plan to copy.
-  A copied plan is a valid plan (running it shows the failure modes either
-  way), so grade it on the same criteria. If they swapped in their own
-  wrong "fact", say why that is the better version.
-- **A controlled comparison** — the participant runs *both arms themselves*:
-  one polluted session, one clean. The exercise orders them clean-first, so
-  the pollution steps overlap with the clean arm's build time. That is fine,
-  because pollution is chat-only. Identical final request in both arms,
-  pasted verbatim (retyping adds a second variable), identical experiment
-  prefix. The window is the only intended difference.
+- **Each pollution step has a named target** — `/pollute` runs three
+  anti-patterns: one unrelated task with long output (kitchen sink), one
+  pasted dump with no question (context hoarding), one wrong "fact" stated
+  and then corrected twice (over-correcting; the participant sends these
+  three messages). The sheet lists the steps. Ask which dimension each
+  step attacks. A step they cannot assign to a dimension, they have not
+  understood yet; that is the one to nudge on.
+- **A controlled comparison** — the participant runs *both arms themselves*,
+  one after the other: the clean session first, saved and reset, then the
+  polluted session. Never two sessions editing at once. Identical final
+  request in both arms, pasted verbatim (retyping adds a second variable),
+  identical experiment prefix. The window is the only intended difference.
 - **Concrete comparison criteria** — both arms implement the endpoint, and
   the two banked diffs get pass/fail verdicts per arm on five checks against
   the existing review handler: right file, pattern copied, status code, test
@@ -62,24 +62,24 @@ in Context* · the **Trajectory** dimension.
 
 ## Predicted effects for common findings
 
-- Pollution is all on-topic questions about the codebase → both arms come
-  out similar, and the experiment "fails". Related context degrades much
-  more slowly than unrelated content. *Held back — see below.*
-- Kitchen-sink step asks a one-line trivia question → almost no tokens,
-  almost no drift. The step exists but does almost nothing. Long unrelated
-  *output* is what fills the window. That is why the worked plan asks for
-  full recipes, not recipe names.
+- `/pollute` was skipped, or run after the final prompt → the polluted
+  session is not polluted. Both arms come out similar and the experiment
+  "fails". Ask for the order of what they ran.
+- The three over-correcting messages were skipped, or sent as one message
+  → no wrong fact was ever stated and then corrected. The Trajectory step
+  is missing. The classic defect (the corrected fact coming back) cannot
+  appear.
 - No written prediction → memory rewrites itself after the fact. The
   debrief grades nothing.
 - Different wording between arms, retyped instead of pasted, or prefix on
   one arm only → two changed variables. No conclusion is valid.
-- Diffs not banked before the reset (`/bank-diff` skipped, raw `git
+- Diffs not saved before the reset (`/save-changes` skipped, raw `git
   checkout` run instead) → the comparison runs on memory and feelings.
   Nothing can be proven.
-- Pollution steps that make Claude *edit files* → the plan is broken two
-  ways. The clean arm may be implementing in the same tree at that moment,
-  and the polluted diff is no longer the final prompt's work alone.
-  Pollution must stay chat-only. "Nothing to do yet" is part of the script.
+- Claude *edited files* during the pollution (after the wrong fact) → the
+  polluted diff is no longer the final prompt's work alone. Pollution must
+  stay chat-only. "Nothing to do yet" is the answer when Claude wants to
+  start.
 - Criteria based on feeling → both arms declared "fine". Nothing learned.
 
 ## The verdict walkthrough — you show, they call
@@ -124,8 +124,8 @@ wrong facts.
 
 ## Greenlight bar
 
-All five load-bearing items in the plan. Spend rounds on the prediction and
-the criteria. The script itself is usually fine.
+A prediction that can be wrong, and a dimension named for each of the
+three steps. Spend the rounds on the prediction. The script is fixed.
 
 ## Held back
 
@@ -137,8 +137,7 @@ Two things the run must teach, not you:
   them, and never confirm their prediction before the run.
 - **Pollution beats percentage** — the gauge barely separates the two arms
   while the diffs do. Pollution is cheap in tokens and expensive in
-  trajectory. A half-full poisoned window loses to a fuller related one. If
-  their script is all on-topic questions, nudge with the Session A/B
-  question above. Do not explain why. If asked directly after the run, give
+  trajectory. A half-full poisoned window loses to a fuller related one.
+  Do not explain why before the run. If asked directly after the run, give
   it, with the hook: this is why the deck says judge the session by
   *behavior*, not by the gauge.

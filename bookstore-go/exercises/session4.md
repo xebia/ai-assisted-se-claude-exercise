@@ -7,7 +7,7 @@
 ## Goal
 
 The commands you have used since session 2 — `/prompt-coach`,
-`/context-coach`, `/bank-diff` — are markdown files in this repo. In this
+`/context-coach`, `/save-changes` — are markdown files in this repo. In this
 exercise you write the same kind of file yourself.
 
 You will do three things:
@@ -74,7 +74,7 @@ explains why.
 
 **Two course commands.**
 
-- `/bank-diff <name>` is the command from session 3. You do not run it
+- `/save-changes <name>` is the command from session 3. You do not run it
   here. In task 1 you open its file and read it as an example of a
   well-written skill.
 - `/verify-exercise 4` grades your work at the end. It first asks you to
@@ -103,7 +103,7 @@ This task produces a new git branch and 2–3 notes about one skill file.
    ```
 
 2. **Read one skill file** (2 min). Open
-   `../.claude/skills/bank-diff/SKILL.md`. That is the course `.claude/`
+   `../.claude/skills/save-changes/SKILL.md`. That is the course `.claude/`
    folder, not the one in `bookstore-go`. You have used this command since
    session 3. Now read it as the author of the next one. Write down 2–3
    things in it that you want to copy. Things to look for:
@@ -532,7 +532,7 @@ The trainer asks the room. Have these answers ready:
 - Which of your three predictions turned out wrong?
 - What can a hook see, and what can it not see?
 - What did you change to make the chain finish?
-- Which thing did you copy from the `bank-diff` file?
+- Which thing did you copy from the `save-changes` file?
 - Which words in your `description` do you trust to make Claude start the
   skill on its own? Which words would you make sharper now?
 - One thing you would tell someone who skipped this session.

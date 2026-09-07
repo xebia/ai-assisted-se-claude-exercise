@@ -19,7 +19,7 @@ You will do three things:
    Compare the code.
 
 The four dimensions from the slides (*The Four Dimensions of Context*)
-come back in every task.
+come back in every task: Correctness, Completeness, Relevance, Trajectory.
 
 ## Before you start: how this project is set up
 
@@ -28,11 +28,29 @@ Read this section first. The tasks do not work without it. Titles in
 
 **Where to work.** Open a terminal in the `bookstore-go` folder. That is
 the folder that contains `go.mod`. Run every command in this exercise from
-that folder. Start Claude with `claude`.
+that folder. Start Claude with `claude`. Commands like `git status` or
+the test command: type them in a second terminal, or ask Claude to run
+them. Simple commands like these do not start training mode.
 
-**Fresh session.** Some tasks say "open a fresh session". That means: run
-`/clear` in Claude, or close Claude and start it again. A fresh session
-remembers nothing from your earlier conversation.
+**Commit your session 2 work first.** This exercise resets the project
+several times. A reset removes every change that is not committed. Your
+session 2 fixes are not committed yet. Run these two commands, one per
+line:
+
+```
+git add -A .
+git commit -m "session 2"
+```
+
+If git says "nothing to commit", that is fine. Continue.
+
+**Fresh session.** Some tasks say "open a fresh session". That means: close
+Claude and start it again with `claude`. To close Claude, type `/exit`. A
+second terminal in the same folder with its own `claude` is also a fresh
+session. Do not use `/clear` for this. `/clear` empties the conversation,
+but it does not always reload a changed `CLAUDE.local.md`. A fresh session
+remembers nothing from your earlier conversation and reads all context
+files again.
 
 **Training mode.** This project has a `CLAUDE.md` file. Claude reads it at
 the start of every session. In this course, the file tells Claude to teach
@@ -64,22 +82,26 @@ project go in a second file: `CLAUDE.local.md`. Claude reads both files and
 combines them (*The CLAUDE.md Hierarchy*). Task 2 creates that file. It is
 already in `.gitignore`, so it stays on your machine.
 
-**Three course commands.** This project comes with three commands that
+**Four course commands.** This project comes with four commands that
 are not part of Claude Code itself. They are installed in the exercise
 project.
 
 - `/context-coach <number>`: reviews your draft (a file, a rule, or a
-  plan). It says what is weak and which mistake that will cause. It asks
-  one question at a time. It never writes the file for you. Usage: run
-  the command with the number printed in the task, then paste your draft
-  as your next message. Use only the numbers this sheet prints.
-- `/bank-diff <name>`: saves all your uncommitted changes to a file named
-  `session3-<name>.diff`, then removes the changes from the project. Your
-  changes are safe in the file, and the project is clean for the next
+  prediction). It says what is weak and which mistake that will cause. It
+  asks one question at a time. It never writes the file for you. Usage:
+  run the command with the number printed in the task, then paste your
+  draft as your next message. Use only the numbers this sheet prints.
+- `/save-changes <name>`: saves all your uncommitted changes to a file
+  named `session3-<name>.diff`, then removes the changes from the project.
+  Your changes are safe in the file, and the project is clean for the next
   task. Your `CLAUDE.local.md` is not touched. If the command stops, it
   says why. Fix that, or use the manual steps in the appendix.
+- `/pollute`: fills the current session with context that hurts later
+  work. Task 4 uses it. It talks and runs the tests; it changes no files.
 - `/verify-exercise 3`: grades your work at the end. Its report appears in
   the chat.
+
+`/context`, `/init`, `/compact` and `/exit` are part of Claude Code itself.
 
 **Stuck, or out of time?** Say *"just tell me"*. Claude then answers
 directly. That is allowed.
@@ -99,7 +121,7 @@ You don't need the coaching command (`/context-coach`) in this task.
 Looking at the context window is the goal.
 
 Write down the token count and the percentage of your clean session.
-You will re-use these numbers in task 4.
+You will re-use these numbers in task 2.
 
 **Done when**: you wrote down the token count and the percentage, and
 compared them with your neighbor's.
@@ -107,8 +129,8 @@ compared them with your neighbor's.
 ### 2. Write `CLAUDE.local.md` (12 min)
 
 You create the file `CLAUDE.local.md` in the project folder. The `/init`
-command writes a first version. You then make it shorter and better
-(*Start with `/init`, then refine by hand*).
+command writes a first version. You then make it shorter and better, by
+hand, in your editor (slide: *Start with `/init`, then refine by hand*).
 
 1. **Run `/init`** (2 min). Claude writes a file with project facts:
    commands, folder structure, conventions. Normally `/init` writes
@@ -117,16 +139,33 @@ command writes a first version. You then make it shorter and better
    `CLAUDE.md` is listed as modified, run `git diff CLAUDE.md`, copy the
    added lines into `CLAUDE.local.md` by hand, then put `CLAUDE.md` back
    with `git checkout -- CLAUDE.md`.
-2. **Delete every line that changes nothing** (3 min). For each line, ask:
-   what would Claude do differently because this line exists? If you have
-   no answer, delete the line (*Which CLAUDE.md Line Is Worth Its
-   Tokens?*). Example of a line to delete: *"Write clean code."* Claude
-   does that anyway. Two lines to keep: the exact test command, and the
-   line that describes the layers (handlers call the store, the store
-   talks to the database). If `/init` wrote no layer line, add one. Task
-   3 tests it. Expect to delete most lines. Under 15 lines of text, rules
-   included, is a good result.
-3. **Add three team rules** (4 min). These are decisions your team made.
+2. **Delete every line that changes nothing** (4 min). For each line, ask
+   one question: what would Claude do differently because this line
+   exists? If you have no answer, delete the line. That is the test from
+   the slide *Which CLAUDE.md Line Is Worth Its Tokens?*. Example of a
+   line to delete: *"Write clean code."* Claude does that anyway. Two
+   lines to keep: the exact test command, and the line that describes the
+   layers (handlers call the store, the store talks to the database).
+   Claude cannot see that rule in any single file. If `/init` wrote no
+   layer line, add one. Task 3 tests it. There is no target length. A
+   line stays because you can say what it changes, not because the file
+   is short.
+
+   Then look at what `/init` wrote about the folders and the request
+   flow. If you have `docs/orientation.md` from session 2, that file
+   already says this, and better. Delete those lines and put this line at
+   the top of `CLAUDE.local.md` instead:
+
+   ```
+   @docs/orientation.md
+   ```
+
+   Claude now loads `docs/orientation.md` at the start of every session
+   (slide: *The CLAUDE.md Hierarchy*, the `@import` arrow). Open a fresh
+   session and run `/context`. Compare with your number from task 1. The
+   difference is what the import costs, every session. If you have no
+   `docs/orientation.md`, keep the folder lines from `/init`.
+3. **Add three team rules** (3 min). These are decisions your team made.
    Claude cannot know a decision from reading the code. Write each rule
    at the end of the file, one or two sentences. The first one is written
    out for you. Write rules 2 and 3 in the same style:
@@ -146,14 +185,15 @@ A rule must be checkable. Someone who reads a diff must be able to say:
 "this breaks the rule". *"Keep dependencies minimal"* is not checkable.
 *"Never add a new library to this project"* is.
 
-Think about this question now; you discuss it in task 5. A line is true
-but changes nothing. Which of the four dimensions does it hurt? Another
-line is specific but wrong. Which dimension does that one hurt?
+Think about these two questions now. You discuss them in task 5. The four
+dimensions are Correctness, Completeness, Relevance and Trajectory.
+
+- A line is true but changes nothing. Which dimension does it hurt?
+- A line is specific but wrong. Which dimension does that one hurt?
 
 **Done when**: `CLAUDE.local.md` contains the lines you kept, a layer
 line, and the three rules. The test command from the file runs without
-errors. `git status`
-does not list `CLAUDE.md`.
+errors. `git status` does not list `CLAUDE.md`.
 
 ### 3. Test your file with a weak prompt (8 min)
 
@@ -161,20 +201,23 @@ The prompt below is the vague prompt from session 2, unchanged. In session
 2 you would improve it. Now you don't. The prompt stays weak. Your
 `CLAUDE.local.md` must stop the mistakes.
 
-1. **Send the prompt** (1 min). Open a fresh session and paste this
-   exactly:
+1. **Send the prompt** (1 min). Open a fresh session. Fresh means: close
+   Claude and start it again, so it reads your new `CLAUDE.local.md`. Then
+   paste this exactly:
 
    ```
    [Exercise 3 experiment — execute directly, no leading questions.] Add caching to the BookStore API
    ```
 
-2. **Work while Claude works** (5 min). Don't wait for Claude. Write
-   your prediction for task 4 first (task 4 says what to predict). When
-   Claude is done, check four things. Each check belongs to one line in
-   your file:
+2. **Watch while Claude works, then check** (5 min). Claude needs one to
+   two minutes. Watch the tool calls. Which files does Claude open before
+   it writes code? Does it look at an existing test? Does it run your test
+   command? When Claude is done, check four things. Each check belongs to
+   one line in your file:
    - Did it add a library? (rule 3)
    - Is the cache in the store layer, not in the handlers? (your layer
-     line)
+     line: only the store talks to the database, so a cache of database
+     results belongs there)
    - Do handlers still validate input? (rule 1)
    - Did it write table-driven tests? (rule 2)
 
@@ -182,77 +225,98 @@ The prompt below is the vague prompt from session 2, unchanged. In session
    *failed* (Claude broke it). For a failed line, also write down which
    words were too weak.
 3. **Save the changes and clean the project** (2 min). Run
-   `/bank-diff bait`. The file `session3-bait.diff` now holds the changes,
-   and the project is clean for task 4. ("bait" is only the file name.)
+   `/save-changes rules`. The file `session3-rules.diff` now holds the
+   changes, and the project is clean for task 4.
 
-In task 5, `/verify-exercise 3` grades `session3-bait.diff` against your
+In task 5, `/verify-exercise 3` grades `session3-rules.diff` against your
 `CLAUDE.local.md`.
 
-**Done when**: `session3-bait.diff` exists, `git status` shows no changes,
+**Done when**: `session3-rules.diff` exists, `git status` shows no changes,
 and you have *held* or *failed* written down for each of the four lines.
 
 ### 4. Clean session versus polluted session (14 min)
 
 You recreate Session B from the slide *Which Session Is in More Trouble?*.
 Two sessions get the same prompt. One is fresh. One is first filled with
-things that hurt later work: long answers, pasted logs, a wrong fact. The
+things that hurt later work: long answers, a pasted log, a wrong fact. The
 slides call this a *polluted context*. Then you compare the code from both
 sessions.
 
-**Step 1: write your plan** (3 min). A plan is four lines: three pollution
-steps and one prediction. You may copy this plan:
+You run the sessions one after the other: first the clean one, then the
+polluted one. Never let two sessions edit the project at the same time.
 
-1. *Kitchen sink*: ask for three chocolate-cookie recipes with full
+**Part 1: write your prediction** (2 min). Both sessions get the same
+prompt: add a DELETE endpoint for reviews, with tests. The exact prompt is
+in part 2. The pollution has three steps, from the slide *Anti-Patterns in
+Context*. The `/pollute` command does steps 1 and 2 for you. Step 3 is
+yours:
+
+1. *Kitchen sink*: Claude writes three chocolate-cookie recipes with full
    ingredient lists and steps. Long answers are the goal.
-2. *Context hoarding*: paste 100 or more lines of `go test ./... -v`
-   output and say: "just so you have it, do nothing with it".
-3. *Over-correcting*, in three messages. Message 1: all review logic now
-   lives in `review_v2.go`. Claude will not find that file. Message 2:
-   you were wrong, that file is on another branch. Message 3: some review
-   logic moved to `book.go`, nothing to do.
+2. *Context hoarding*: Claude runs `go test ./... -v` and pastes the whole
+   output into the chat, "just so you have it".
+3. *Over-correcting*: you send three short messages. Message 1: all
+   review logic now lives in `review_v2.go`. Claude will not find that
+   file. Message 2: you were wrong, that file is on another branch.
+   Message 3: some review logic moved to `book.go`, nothing to do. The
+   command prints these messages for you to copy.
 
-Prediction, one sentence: which session builds the better endpoint, and
+Now write one sentence: which session builds the better endpoint, and
 what exactly will differ. Example: *"I expect `review_v2.go` or review
 logic in `book.go` to appear in the polluted diff."* A wrong prediction is
 fine. No prediction is the only failure, because then you have nothing to
 check later.
 
-Optional: run `/context-coach 4` on your plan.
+Optional: run `/context-coach 4` on your prediction.
 
-**Step 2: run both sessions** (7 min).
+**Part 2: run the clean session** (3 min).
 
-1. **Clean session first.** Open a fresh session. Run `/context` and note
-   the percentage. Then paste this exactly:
+1. Open a fresh session. Run `/context` and note the percentage.
+2. Paste this exactly:
 
    ```
    [Exercise 3 experiment — execute directly, no leading questions.] Add a DELETE /reviews/{id} endpoint to the BookStore API, with tests.
    ```
 
-   This takes a few minutes. Don't wait for it. Go to the next step.
-2. **Pollute the second session while the first one works.** Open a
-   second terminal in the same folder and start `claude`. Run your three
-   pollution steps there. These steps only talk. They change no files, so
-   the two sessions do not conflict. This session is in training mode, so
-   Claude may ask you a question. Answer it shortly; that is also
-   context. If Claude wants to start editing after the wrong fact, say:
-   "nothing to do yet".
-3. **Save the clean result.** When the clean session is done, run
-   `/bank-diff clean` in that session. This saves `session3-clean.diff`
-   and cleans the project.
-4. **Run the polluted session.** In the polluted session, run `/context`
-   and note the percentage. Paste the same prompt, exactly, with the
-   experiment tag. When it is done, run `/bank-diff polluted`. Keep this
-   session open; the bonus returns to it.
+3. Wait for Claude to finish. This takes one to two minutes. Watch which
+   files it opens.
+4. Run `/save-changes clean`. This saves `session3-clean.diff` and cleans
+   the project.
 
-**Step 3: judge the two diffs** (4 min). Run `/context-coach 4` and name
-both diff files in your message. The coach checks five things, one at a
-time: the right file changed · the existing handler pattern copied · the
-correct success status code (the same one the existing book DELETE
-returns) · table-driven tests · nothing from the wrong fact or the
-pasted log. For each check, the coach shows the lines from both diffs, together
-with the current `internal/handler/review.go`. You answer *pass* or
-*fail* for each session first. Then the coach gives its own answer. Five
-checks, two sessions: ten answers from you.
+**Part 3: run the polluted session** (5 min).
+
+1. Open a fresh session. Run `/pollute`. Claude writes the recipes and
+   pastes the test output. This takes about a minute. Scroll through it:
+   this is what Session B looks like from the inside.
+2. Send the three messages that `/pollute` printed, one at a time. Wait
+   for Claude's reply after each one. If Claude wants to start editing,
+   answer with one more message: "nothing to do yet".
+3. Run `/context` and note the percentage.
+4. Paste the same prompt as in part 2, exactly, with the experiment tag.
+   Wait for Claude to finish.
+5. Run `/save-changes polluted`. Keep this session open; the bonus
+   returns to it.
+
+**Part 4: judge the two diffs** (4 min).
+
+1. Keep the polluted session open. Open a fresh session in a second
+   terminal.
+2. In the new session, run `/context-coach 4`. In your next message, name
+   both diff files. (Coach number 4 is the same as in part 1. It coaches
+   the prediction and the diffs.)
+3. The coach walks through five checks, one at a time:
+   - Did the change land in the right file?
+   - Does the new handler copy the pattern of the existing handlers?
+   - Does it return the same success status code as the existing book
+     DELETE?
+   - Are the tests table-driven?
+   - Is there nothing from the wrong fact or the pasted log?
+4. For each check, the coach shows the lines from both diffs next to the
+   current `internal/handler/review.go`. You answer *pass* or *fail* for
+   the clean session and for the polluted session. Then the coach gives
+   its own answer.
+
+Five checks, two sessions: ten answers from you.
 
 Then discuss the result with the same coach. For each mistake: which
 pollution step caused it, and which dimension did it hurt? Also tell the
@@ -270,11 +334,11 @@ the line that helped the most, and one line you kept but now doubt (would
 Claude do anything differently without it?). Add one sentence of evidence
 for each.
 
-Then start `/verify-exercise 3`. It grades `session3-bait.diff` against
+Then start `/verify-exercise 3` in the session from part 4. It grades `session3-rules.diff` against
 your `CLAUDE.local.md` and ends with its own two choices: the most
 helpful line, and a line that changes nothing. While it runs, discuss the
-question from task 2 with your neighbor. Bring its report to the closing
-round.
+two questions from task 2 with your neighbor. Bring its report to the
+closing round.
 
 **Done when**: both lines are written down with evidence, and
 `/verify-exercise 3` is running.
@@ -291,8 +355,8 @@ tag:
 
 Both answers teach you something. If the wrong fact survived: `/compact`
 keeps what sounded important, including confident mistakes. If it is
-gone: `/compact` dropped something without asking you. Only `/clear` gives
-you a guaranteed reset.
+gone: `/compact` dropped something without asking you. Only a fresh
+session gives you a guaranteed reset.
 
 **Move one rule to its own layer.** Your handler-validation rule only
 matters when Claude works on handler code (*Rule Discovery: With or Without
@@ -315,23 +379,25 @@ the right place, or at all? What does
 that tell you about when folder docs reach Claude, and how that differs
 from `CLAUDE.md`? Delete the README afterwards.
 
-## Appendix: `/bank-diff` by hand
+## Appendix: `/save-changes` by hand
 
-Run these from the project folder, one command per line (PowerShell 5.1
-cannot join commands with `&&`):
+Run these from the project folder, one command per line. Do not join them
+with `&&`, and do not use `>` to write the file: on Windows PowerShell that
+produces a file git cannot read.
 
 ```
 git add -A .
-git diff --cached > session3-polluted.diff   # or session3-clean.diff / session3-bait.diff
+git diff --cached --output=session3-polluted.diff
 git reset -q .
 git checkout -- .
 git clean -fd .
 ```
 
-The last command deletes files Claude created that you never committed.
-Your `CLAUDE.local.md`, the saved diffs, and session 2's
-`docs/orientation.md` (if you made it) are ignored by git and stay safe. Commit anything
-else you care about first.
+Replace `polluted` with `clean` or `rules` as needed. The last command
+deletes files Claude created that you never committed. Your
+`CLAUDE.local.md`, the saved diffs, and session 2's `docs/orientation.md`
+(if you made it) are ignored by git and stay safe. Commit anything else
+you care about first.
 
 ## Closing round (5 min)
 

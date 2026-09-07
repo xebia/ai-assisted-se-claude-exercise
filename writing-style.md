@@ -37,7 +37,7 @@ design. Concretely, it failed on all four points above.
   "the weak prompt", "a line that is not worth its tokens".
 - **A glossary is a warning sign.** If a sheet needs a word list before
   the tasks, the tasks use words they should not. Command names
-  (`/bank-diff`, `/context-coach`) are the exception: explain each command
+  (`/save-changes`, `/context-coach`) are the exception: explain each command
   once, in one sentence, where it is first used.
 - **Explain the setup before the tasks.** One section, plain words: what
   the project's `CLAUDE.md` does (training mode), what that changes in
@@ -253,7 +253,7 @@ says what for.
 ## Coach output
 
 The coach skills (`/prompt-coach`, `/context-coach`, `/verify-exercise`,
-`/bank-diff`) talk to participants live, mid-exercise. Everything a coach
+`/save-changes`, `/pollute`) talk to participants live, mid-exercise. Everything a coach
 says is Tier 1: the participant reads it once, on a clock, and acts on it.
 Every skill's `SKILL.md` carries this block, word for word, under the
 heading *How you talk to the participant*:
