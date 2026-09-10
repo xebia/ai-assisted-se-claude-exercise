@@ -53,6 +53,18 @@ the Kotlin project has no Gradle wrapper, use `mvn test`.
 If none of the marker files is in the current folder, say the command must
 run from the bookstore project folder, and stop.
 
+## Step 0 — this session must be fresh
+
+Look at the conversation above this command. If there is anything in it —
+an earlier prompt, a tool call, a diff, a reply — this session is not
+fresh, and pollution on top of real work spoils the comparison. Then print
+exactly this and stop:
+
+> This session is not fresh. Type `/exit`, start `claude` again, then run
+> `/pollute`.
+
+Only a session where `/pollute` is the first message continues.
+
 ## Step 1 — kitchen sink (long unrelated output)
 
 Write three chocolate-cookie recipes. Each recipe has a name, a full

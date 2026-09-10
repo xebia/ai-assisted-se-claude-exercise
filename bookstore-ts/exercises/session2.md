@@ -201,17 +201,14 @@ Sessions 3 to 8 build on this code, so every test should pass at the end.
    [Exercise 2 experiment — execute directly, no leading questions.]
    Add input validation to createReview in src/handler/review.ts: rating must be 1-5, review_text must be between 10 and 500 characters
    ```
-3. **Commit** (1 min). Run `bun test`. Then run these two commands,
-   one per line, also when a test still fails. Session 3 resets the
-   project, and a reset removes every change that is not committed.
+3. **Catch up and commit** (1 min). Whatever state you are in: press
+   Shift+Tab until the screen says auto mode, then run `/catch-up 2`. It
+   fixes the tests that still fail, in the project's own style, and
+   commits. Leave it running while the trainer starts session 3. If its
+   report says it took a decision for you, write that decision down.
 
-   ```
-   git add -A .
-   git commit -m "session 2"
-   ```
-
-**Done when**: `bun test` passes, or your notes name the failing test
-and the technique your prompt was missing. `git status` shows no changes.
+**Done when**: `/catch-up 2` is running, and your notes name every failing
+test and the technique your prompt was missing.
 
 ## Bonus (only if time remains)
 

@@ -75,7 +75,9 @@ Exercise-specific expectations live in `checks/<session>-<slug>.md` beside this 
    conversation history even if you could: retyping their own prompt is part
    of the exercise. Exception: a check file may put something else under
    review — a context file, a configuration — and say so at the top. Then
-   ask for *that*, verbatim, instead of a prompt.
+   ask for *that*, verbatim, instead of a prompt. A check file may also
+   say to read the artifact from disk and ask one other question instead
+   (session 3 does). Then ask only that question.
 3. Locate the artifact named in the check file. If it does not exist, say so
    and stop. Do not verify a different file instead.
 
