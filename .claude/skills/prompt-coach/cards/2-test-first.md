@@ -1,4 +1,4 @@
-# Task 3 — The test-first prompt
+# Task 2 — The test-first prompt
 
 **What they're drafting:** one prompt that gets the pagination helper's
 `page = 0` and negative-`page` behavior tested and fixed: failing tests
@@ -13,13 +13,21 @@ that slide has the same three parts this task needs, on a different bug ·
 
 ## Technique applicability
 
-**Load-bearing (5):** Scope it (the pagination helper and its test file, by
-name or `@file`) · Direct it (the *method*: write the failing tests first,
-watch them fail, then fix) · Define done (new tests pass **and** the existing
-table test still passes, via the project's test command) · Examples (point at
-the existing table-driven test as the pattern for the new cases) ·
-Constrain it (fix the function, do not change the expectations to match the
-bug; no new dependencies).
+**Must (2):**
+
+- **Direct it** — the *method*, as a sequence: write the failing tests
+  first, show them failing, then fix, then show both runs. "Tests first" in
+  those words is enough for ✅.
+- **Define done** — two parts: what `page = 0` *must do* (the participant
+  decides: clamp to page 1, or an error), and which test run must pass
+  afterwards, including the existing test. A prompt that leaves the page-0
+  behavior to Claude has delegated the requirement, not just the typing.
+  That is ❌, whatever else is there.
+
+**Should (3):** Scope it (the pagination helper and its test file, by name
+or `@file`) · Examples (the existing table test as the pattern for the new
+cases) · Constrain it (fix the function, do not change the expectations to
+match the bug; no new dependencies).
 
 **Optional polish:** CONTEXT one-liner (stack, no ORM) · verification
 criteria beyond the test run.
@@ -41,11 +49,26 @@ criteria beyond the test run.
 - Test-first as an explicit sequence: failing tests → shown failing → fix →
   both runs shown
 - The existing table test named as the pattern to extend
-- What the correct behavior *is*. The participant decides (clamp to page 1
-  is the usual answer), and the prompt states it. A prompt that leaves
-  "what should happen at page 0" to Claude has delegated the requirement,
-  not just the typing.
+- What the correct behavior *is*, decided by the participant and stated
 - Done as a command outcome: the specific test run that must pass
+
+## Example bank
+
+One clause per technique, on a different project: an Order API for a web
+shop with a `discount(total, code)` helper that breaks on an empty code.
+Quote the one you are nudging, word for word, and say it is from another
+project. Never turn one into a clause for this project.
+
+- **Scope it:** "Only `DiscountCalculator.java` and its test file."
+- **Direct it:** "Tests first. Write the two failing tests, run them, show
+  me they fail. Only then change the code, and run them again."
+- **Examples:** "Add the new cases to the existing parameterized test
+  `discountCases`, in the same style. Do not write a new test class."
+- **Constrain it:** "Change the calculator, never the expected values in
+  the tests. No new libraries."
+- **Define done:** "An empty code means no discount, total unchanged. Done
+  when `mvn test -Dtest=DiscountCalculatorTest` passes, including the
+  existing cases."
 
 ## Nudge bank
 
@@ -66,11 +89,10 @@ criteria beyond the test run.
   clamp?). You discover the requirement in review.
 - No done-condition → Claude handles one edge case and forgets the other
 
-## Greenlight bar
+## Ready when
 
-All five load-bearing present. This prompt should end up as strong as the
-stronger prompt on the slide. If it does, say so when you tell them it is
-ready.
+Both musts ✅ or 🟡. If the draft is as strong as the stronger prompt on
+the slide, say so when you tell them it is ready.
 
 ## Held back
 

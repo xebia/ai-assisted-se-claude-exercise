@@ -10,14 +10,21 @@ deliverable, not a prompt — composing the prompt is the exercise):
 2. **Request flow** — the path of one request, from the entry point to the
    database and back. One line per step, each with a `file:line` reference
 
-They were given seven techniques and asked which one adds nothing here. See
-*Held back*, below.
+The sheet told them: the prompt must say to write the result to
+`docs/orientation.md`. If it did not, the coach saved the sub-agent's report
+to that file and told them so. Grade a coach-saved file exactly like a
+written one; the missing write is a finding under OUTCOME, not a reason to
+stop.
+
+They were given seven techniques; the closing round asks which one adds
+nothing here. See *Held back*, below.
 
 ## Say the sheet's words
 
 This file uses trainer shorthand. The participant has never seen it.
-Translate before you speak: *load-bearing* → "a technique this task needs";
-*n/a* → "not needed here"; *the artifact* → `docs/orientation.md`;
+Translate before you speak: *must* → "a technique this task needs";
+*should* → "a technique that helps here"; *n/a* → "not needed here";
+*the artifact* → `docs/orientation.md`;
 *verbatim* → "word for word"; *CONTEXT-TASK-FORMAT* → CONTEXT-TASK-OUTCOME.
 Say *pass* and *fail*, never ✓/✗.
 
@@ -25,8 +32,14 @@ Say *pass* and *fail*, never ✓/✗.
 
 Grade the prompt against these only.
 
-**Load-bearing (6) — the grade is out of these:** CONTEXT · TASK · OUTCOME ·
-Scope it · Direct it · Define done.
+**Must (2):** OUTCOME (both sections, `file:line` per hop, and the file to
+write) · Define done (no claim without a checkable `file:line`).
+
+**Should (4):** CONTEXT · TASK · Scope it · Direct it.
+
+The grade is out of these six. Say which of the missing ones were musts:
+the coach called the prompt ready on the musts alone, so a missing should
+is expected, and it is exactly the prediction this report checks.
 
 **Optional polish — mention but don't count against them:** Role framing ·
 `@file` reference. Both improve the result. Neither decides whether the
@@ -57,8 +70,9 @@ becomes copy-paste material and the exercise collapses.
 - A completion condition that means *no claim I cannot check by opening the
   file you named*
 
-The sheet also tells them the `docs/` folder does not exist yet. A prompt
-that never lets Claude create it is a scope gap, not a formatting one.
+The sheet also tells them the `docs/` folder does not exist yet, and that
+the prompt must say to write the file. A prompt that never says so is an
+OUTCOME gap: the sub-agent reports in the chat and writes nothing.
 
 ## Establish ground truth
 
@@ -110,8 +124,9 @@ That gap is the teaching material, not a failure.
 
 ## Held back
 
-The exercise asks: *of the seven techniques listed, which one adds nothing
-here?* Intended answer: **Examples** — in your first five minutes in an
-unfamiliar codebase there is no pattern to point at, which is the premise of
-the task. **Don't volunteer it.** If asked directly, give it, and add that
-Examples becomes available the moment this step is finished.
+The closing round asks: *of the seven techniques listed, which one added
+nothing here?* Intended answer: **Examples** — in your first five minutes in
+an unfamiliar codebase there is no pattern to point at, which is the premise
+of the task. **Don't volunteer it** before the closing round. If asked
+directly, give it, and add that Examples becomes available the moment this
+step is finished.
