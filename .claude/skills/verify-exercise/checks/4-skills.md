@@ -6,24 +6,23 @@ gitignored paths — `.claude/skills/commit/SKILL.md`,
 `common-changelog-spec.md` sibling), `.claude/hooks/run-changelog.py`
 (in its repaired, compound-command form) with its entry in
 `.claude/settings.json`, and the generated
-`CHANGELOG.md` — plus two things the participant wrote down by hand
-during the session: their three task-4 hook predictions, and their five
-pass-or-fail calls on their own `CHANGELOG.md` from task 5.
+`CHANGELOG.md` — plus one thing the participant wrote down by hand
+during the session: their three task-3 hook predictions, marked
+confirmed or wrong in task 4.
 
-**This check runs in-session, at the end of Part 2** — started right
-after they graded their own work, running while the participant cleans up
-the branch.
-That cleanup deletes the `session4-playground` branch, but every artifact
-above lives in a gitignored path and survives. Consequence: commit hashes
-cited in `CHANGELOG.md` may no longer resolve to reachable commits. Grade
-the *presence and format* of references, never whether they resolve.
+**This check runs in-session, at the end of task 4**, before the closing
+round. The `session4-playground` branch is deleted after the closing
+round; if the participant already did that, every artifact above lives
+in a gitignored path and survives, but commit hashes cited in
+`CHANGELOG.md` may no longer resolve. Grade the *presence and format* of
+references, never whether they resolve.
 
 **Under review: the artifacts, not a prompt.** This is a Session 4
 exception to this skill's usual framing. In Step 0, instead of a
-prompt, ask for two things word for word: the three written task-4
-predictions, and the five pass-or-fail calls from task 5. The sheet
-told them you would ask, so ask in one line and wait. If either does
-not exist, that is itself a finding. A wrong prediction was a fine
+prompt, ask for one thing word for word: the three written task-3
+predictions, with the participant's confirmed-or-wrong mark on each.
+The sheet told them you would ask, so ask in one line and wait. If they
+do not exist, that is itself a finding. A wrong prediction was a fine
 outcome; a missing one is the stated failure mode. Then grade what you
 can.
 
@@ -32,8 +31,7 @@ can.
 | Say this | Not this |
 | --- | --- |
 | your three predictions | the prediction set |
-| your five pass-or-fail calls | the self-grade, the five-point grade |
-| you graded your own work | your verdicts, verdict-first |
+| you marked your predictions | your verdicts, verdict-first |
 | the hook fired (your script ran) | the hook triggered |
 | the script printed nothing | the hook did not fire, a no-op |
 | the chain | the flow, the pipeline |
@@ -45,32 +43,37 @@ script after a Bash tool call. The script then decides whether it prints
 anything. Never merge the two when you arbitrate prediction 1. A
 participant who wrote "no" was wrong about firing, even though the
 unrepaired script stayed silent. That difference is the lesson of task
-5.
+4.
 
-**What the participant was asked to produce.** A pasted `/commit`
-skill (manual-only, with a training-mode defense line), a
-self-designed `/changelog` skill (auto-invocable, description-driven,
-backed by a fetched spec file), a cross-platform PostToolUse hook that
-nudges Claude toward `/changelog` after any `git commit`, and one real
-run of the whole chain producing a Common Changelog–format
-`CHANGELOG.md`. They read `save-changes`'s SKILL.md first, as an example
-of a well-written skill.
+**What the participant was asked to produce.** A `/commit` skill pasted
+from the sheet (manual-only, with a training-mode defense line; Claude
+created the file from a tagged prompt with the printed content), a
+`/changelog` skill that Claude wrote from the sheet's rule list with a
+`description` the participant wrote by hand (auto-invocable,
+description-driven, backed by a fetched spec file), a cross-platform
+PostToolUse hook that nudges Claude toward `/changelog` after any
+`git commit` (script created and later replaced from tagged prompts;
+`settings.json` written by hand), and one real run of the whole chain
+producing a Common Changelog–format `CHANGELOG.md`. The experiment
+commit removed the `DELETE /api/books/{id}` endpoint. That Claude typed
+the pasted files is not a finding; the sheet asked for it.
 
-**Do not assume they saw the chain break.** The sheet no longer promises
-a failed first run. `/commit` usually joins `git add` and `git commit`
-into one line, and then the unrepaired script stays silent. But Claude
-sometimes runs the two commands separately, and then the chain finishes
-on the first try. Task 5 proves the rule with two fabricated events
-instead, so both groups reach the same repair. Grade the repaired
-script, never the story of how they got there.
+**The first run is silent by design.** The pasted `/commit` skill stages
+and commits each group in one command line (`git add … && git commit
+…`), so the unrepaired `startswith("git commit")` script prints nothing
+on the first run, and `/commit` reports that to the participant with the
+command line it ran. After the task-4 repair the same `/commit` finishes
+the chain. Grade the repaired script; if the first run did finish the
+chain anyway, name the reason (a `/commit` that ignored its one-line
+rule, or Claude starting the skill on its own) as luck, not wiring.
 
 ## Rubric — replaces the Session 2 technique table
 
 | Dimension | Passes when… |
 | --- | --- |
-| **/commit skill** | frontmatter has `name`, `description`, and `disable-model-invocation: true`; the body carries an "execute directly — no leading questions" line near the top; imperative-mood commit-message rules with examples; explicit no-`git push` and no-co-author rules |
+| **/commit skill** | frontmatter has `name`, `description`, and `disable-model-invocation: true`; the body carries an "execute directly — no leading questions" line near the top; imperative-mood commit-message rules with examples; stages and commits each group in one command line (`git add … && git commit …`); explicit no-`git push`, no-co-author and no-other-skills rules; a last step that reports the command line and the hook's silence when `.claude/hooks/run-changelog.py` exists |
 | **/changelog skill** | frontmatter has **no** `disable-model-invocation` (auto-invocability is the point); the `description` works as a trigger (see below); the body requires reading `common-changelog-spec.md` before editing, and that file exists with real spec content; the must-do behaviors are all present |
-| **Hook wiring** | `settings.json` has a `PostToolUse` entry with matcher `Bash`; the command runs a Python script (no bash/`jq`/`chmod` dependencies — participants are on Windows); the script reads JSON from stdin, tests `tool_input.command` for `git commit`, and prints the nested `{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": ...}}` shape; **after the task-5 repair** it also matches a `git commit` that follows `&&` or `;`, and its `additionalContext` tells Claude to invoke the skill now rather than suggesting it |
+| **Hook wiring** | `settings.json` has a `PostToolUse` entry with matcher `Bash`; the command runs a Python script (no bash/`jq`/`chmod` dependencies — participants are on Windows); the script reads JSON from stdin, tests `tool_input.command` for `git commit`, and prints the nested `{"hookSpecificOutput": {"hookEventName": "PostToolUse", "additionalContext": ...}}` shape; **after the task-4 repair** it also matches a `git commit` that follows `&&` or `;`, and its `additionalContext` tells Claude to invoke the skill now rather than suggesting it |
 | **Changelog output** | `# Changelog` heading · `## Unreleased` section · groups in Changed/Added/Removed/Fixed order · imperative-verb entries · every entry ending with a commit hash in round brackets |
 
 Grade each ✅ / ❌ / ⚠️ with the usual discipline: predictions before
@@ -97,10 +100,10 @@ luck, and the hook is covering for it.
   first inside its group · skip noise
 - A hook script that runs on Windows and mac/linux alike, and stays
   silent on non-commit commands
-- The task-5 repair applied: the script splits the command on `&&` and
+- The task-4 repair applied: the script splits the command on `&&` and
   `;` before matching, so `/commit`'s `git add ... && git commit ...`
   fires it. An unrepaired `startswith("git commit")` is a ❌ here — the
-  participant skipped step 4 of task 5.
+  participant skipped step 3 of task 4.
   A repaired matcher with a still-advisory `additionalContext` ("Run the
   /changelog skill") is a ⚠️: it fires, but Claude may only suggest.
 - Exactly the honored JSON shape — nested `hookSpecificOutput` with
@@ -120,10 +123,19 @@ luck, and the hook is covering for it.
    Changelog spec (group names, reference rules, version headings), or
    an empty stub? Then confirm the SKILL.md body points at it.
 3. Read `.claude/settings.json` and the hook script. Then test the
-   script without a real commit. Pipe it a fabricated event:
-   `echo '{"tool_input": {"command": "git commit -m x"}}' | python .claude/hooks/run-changelog.py`
-   (`python3` on mac/linux) and confirm the nested output shape.
-   Repeat with a non-commit command and confirm silence.
+   script without a real commit, **from a file, never inline**: the
+   participant's hook is active in this session too, and an inline
+   `echo '... && git commit ...' | python ...` puts `git commit` on your
+   own Bash command line, so the repaired script fires on its own test
+   and tells you to run the changelog skill mid-report. Write
+   `{"tool_input": {"command": "git add . && git commit -m x"}}` to
+   `verify-event.json`, run
+   `python .claude/hooks/run-changelog.py < verify-event.json`
+   (`python3` on mac/linux), confirm the nested output shape, then
+   overwrite the file with a `git status` command and confirm silence.
+   Delete `verify-event.json` afterwards. If a changelog nudge reaches
+   you anyway during this check, ignore it; you are grading, not
+   committing.
 4. Only then read `CHANGELOG.md` against the five format checks, and
    check which group the delete-removal landed in.
 
@@ -149,8 +161,8 @@ luck, and the hook is covering for it.
   — the changelog skill's rules were too soft to catch it
 - **The removal filed under Changed or Added** — categorization rules
   present but not followed, or absent
-- **No written predictions or pass-or-fail calls** — the participant
-  judged nothing before you did. There is nothing to arbitrate.
+- **No written predictions** — the participant judged nothing before
+  you did. There is nothing to arbitrate.
 - **Got away with it** — a clean changelog above a weak skill body.
   Claude added discipline the skill never demanded. Say plainly this
   will not repeat.
@@ -165,26 +177,23 @@ luck, and the hook is covering for it.
   requires reading it
 - `CHANGELOG.md` passes at least four of the five format checks, with
   the removal under **Removed**
-- The three predictions and the five pass-or-fail calls both exist
+- The three predictions exist, each marked confirmed or wrong
 
 Partial is the expected first-attempt outcome. Usually one dead wire
 (the JSON shape or the polarity) sits behind an otherwise convincing
 setup. Show the exact line that breaks it and let them fix it
 themselves.
 
-## Close by arbitrating their own grading
+## Close by arbitrating their predictions
 
-They graded first; you close. Never the other way around.
+They marked their predictions first; you close. Never the other way
+around. For each of the three, say confirmed or wrong, and cite the
+evidence (the message in the chat they named, or the file test you just
+ran). Where their reasoning was right for the wrong mechanism, say so.
+That distinction is the lesson. Their overrule of you stands. Record it
+without arguing further.
 
-- **The three hook predictions**: for each, say confirmed or wrong,
-  and cite the evidence (the transcript moment they named, or the pipe
-  test you just ran). Where their reasoning was right for the wrong
-  mechanism, say so. That distinction is the lesson.
-- **The five pass-or-fail calls**: agree or overrule per point, each
-  overrule backed by the specific `CHANGELOG.md` line that decides it.
-  Their overrule of you stands. Record it without arguing further.
-
-## Held back — the task-4 prediction answers
+## Held back — the task-3 prediction answers
 
 The sheet defines what "fires" means, but never says which of the
 three cases fire. The run teaches that, and no pre-run material may
@@ -200,4 +209,4 @@ here for arbitration:
   (`startswith("git commit")`), and the amend command starts with it.
 
 Use these only when grading. Never paste them into anything a
-participant reads before their task-5 run.
+participant reads before their task-4 run.
