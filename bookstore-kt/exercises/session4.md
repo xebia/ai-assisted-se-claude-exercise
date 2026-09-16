@@ -170,8 +170,8 @@ This task produces `.claude/skills/changelog/SKILL.md` and, next to it,
    `(I write this)`. Claude
    reads only this line when it decides whether to start a skill on its
    own (*Which Description Gets This Skill Invoked at the Right Moment?*).
-   For comparison, the start of a course skill's description. It says
-   *when* it applies, not only what it does:
+   For comparison, here's the start of a course skill's description. It
+   says *when* it applies, not only what it does:
 
    > Coach a participant's context artifact or experiment during the
    > Session 3 exercise. Usage: /context-coach <task number> — the
@@ -316,7 +316,7 @@ script.
    ```
 
    Two changes: the script cuts the line into parts and checks each part,
-   and the message says *invoke it now, do not ask*. The old one read like
+   and the message says *invoke it now; do not ask*. The old one read like
    advice, and Claude may answer advice with a suggestion and wait.
 
 4. **Run the chain again** (2 min). Add one more comment line by hand and
