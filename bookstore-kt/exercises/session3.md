@@ -68,8 +68,11 @@ Each task explains its command where it is used.
 
 ### 1. Write `CLAUDE.local.md` (10 min)
 
-You produce the file `CLAUDE.local.md` in the project folder (*Start
-with `/init`, then refine by hand*).
+You're going to build `CLAUDE.local.md`: the file Claude reads
+automatically at the start of every session in this project. `/init`
+writes you a first draft. You then go through it by hand, cut the lines
+that don't earn their place, and add the rules a new teammate would need
+but can't read off the code (*Start with `/init`, then refine by hand*).
 
 1. **Run `/init`** (2 min). In this project it writes `CLAUDE.local.md`,
    not `CLAUDE.md`. Check with `git status`. If `CLAUDE.md` is listed:
@@ -79,18 +82,20 @@ with `/init`, then refine by hand*).
    ask: what would Claude do differently because this line exists? No
    answer: delete it (*Which CLAUDE.md Line Is Worth Its Tokens?*).
    Delete a line like *"Write clean code"*. Keep the exact test command.
-   Keep the line that describes the layers. If there is none, add this
-   one: *"Handlers call the store. Only the store talks to the
-   database."*
+   Keep the line that says only the store touches the database. If there
+   is none, add this one: *"Every handler (`BookHandler`, `AuthorHandler`, `ReviewHandler`)
+   calls the store. Only the store talks to the database."*
 3. **Add three team rules** (3 min). A rule is a decision your team made;
-   Claude cannot read it from the code. Write each rule at the end of the
-   file, in one or two sentences. Rule 1 is written for you. Write rules 2
-   and 3 in the same style, in your own words:
+   Claude cannot read it from the code. Write each rule at the end of
+   `CLAUDE.local.md`, in one or two sentences. (The `.claude/rules` folder
+   comes later, in the "Back at work" section.) Rule 1 is written for
+   you. Write rules 2 and 3 in the same style, in your own words:
    - Rule 1: *"Handlers validate the request before they call the store.
      A handler never passes unchecked input to a store function."*
    - Rule 2: every new endpoint comes with tests, in the same style as the
-     existing tests. Open a test in `src/test/kotlin/bookstore/handler/` first to see the
-     style (the custom `@Test` runner).
+     existing tests. Open a test in `src/test/kotlin/bookstore/handler/`
+     first to see the style: plain JUnit 5, `@Test` methods with
+     `kotlin.test` assertions.
    - Rule 3: no new external dependencies beyond sqlite-jdbc.
 
    A rule must be checkable: someone who reads a diff can say "this
@@ -103,35 +108,41 @@ with `/init`, then refine by hand*).
    the whole file as your next message. The coach names the weakest line
    and asks one question. Fix that one thing, then go on.
 
-**Done when**: the file has the lines you kept, a layer line and three
+**Done when**: the file has the lines you kept, a database line and three
 rules. Its test command runs. `git status` does not list `CLAUDE.md`.
 
 ### 2. Clean session versus polluted session (20 min)
 
-Two sessions get the same prompt. One is fresh. The other is first
-filled with long answers, a pasted log and a wrong fact. That is Session
-B from the slide *Which Session Is in More Trouble?*. Then you compare
-the code. Both sessions read your `CLAUDE.local.md`, so the clean run
-also tests your rules.
+In this exercise, you send the same prompt to two sessions and compare
+what they build. One session is fresh. The other you pollute first, with
+long answers, a pasted log, and a wrong fact. That's Session B from the
+slide *Which Session Is in More Trouble?*. Both sessions still read your
+`CLAUDE.local.md`, so the fresh session also tells you whether your rules
+hold up.
 
-Three sessions, one after the other, each one fresh. Only one session
-edits the project at a time. The grader and the compare session only
-read.
+There are four sessions, run in this order. First, Clean, in the first
+terminal: it edits the project, so let it finish and save before you
+touch anything else. Then Grader, in the second terminal: start it and
+leave it running. It only reads. Then Polluted, back in the first
+terminal: it edits the project too, which is why Clean goes first. Last,
+Compare, in the second terminal, once Grader's report is done.
 
 | Session | Terminal | What you type, in this order | At the end |
 | --- | --- | --- | --- |
-| Clean | first | `/context`, the prompt, `/save-changes clean` | `/exit`, then start the grader in the second terminal |
+| Clean | first | `/context`, the prompt, `/save-changes clean` | `/exit`, then start Grader in the second terminal |
+| Grader | second | `/verify-exercise 3`, then your guess | leave it running, go back to the first terminal |
 | Polluted | first | `/pollute`, the three messages it prints, `/context`, the prompt, `/save-changes polluted` | stays open |
-| Compare | second | `/context-coach 2`, then the two diff file names | you give six answers |
+| Compare | second | `/exit`, then `/context-coach 2`, then the two diff file names | you give six answers |
 
 1. **Write a prediction and a guess** (2 min). The prompt for both
    sessions is: add a DELETE endpoint for reviews, with tests. Write one
    sentence: which session builds the better endpoint, and what will
    differ. Example: *"I expect `ReviewHandlerV2.kt` or review logic in
    `BookHandler.kt` in the polluted diff."* A wrong prediction is fine. No
-   prediction is the only failure. Then one guess: four lines of your
-   file are under test, the layer line and rules 1, 2 and 3. Which one
-   will Claude break in the clean session? Write it down.
+   prediction is the only failure. Then make one guess. Four lines from
+   your file get tested this round: the database line, rule 1, rule 2,
+   and rule 3. Which one will Claude break in the clean session? Write it
+   down.
 2. **Clean session** (4 min). In the first terminal, type `/exit` and
    start `claude` again. Run `/context` and note the percentage of the
    context window in use. Paste this exactly:
@@ -205,7 +216,8 @@ evidence. Bring them to the closing round.
 ## Bonus (only if time remains)
 
 **Test your rules with a weak prompt.** A DELETE endpoint rarely tempts
-Claude to add a library or to put logic in the wrong layer. Caching does.
+Claude to add a library or to put the cache logic in the handler instead
+of the store. Caching does.
 Open a fresh session in the first terminal and paste this exactly. It is
 the vague prompt from session 2, unchanged:
 
@@ -231,7 +243,7 @@ without asking you. Only a fresh session is a guaranteed reset.
 
 ## Back at work: try this on your own project
 
-**Move one rule to its own layer.** The handler-validation rule only
+**Move one rule to its own file.** The handler-validation rule only
 matters when Claude edits handler code (*Rule Discovery: With or Without
 Paths*). Move it to `.claude/rules/handlers.md` (create the folder) and
 remove it from `CLAUDE.local.md`. The file starts with these lines, then
