@@ -4,27 +4,29 @@
 **Project**: Same BookStore API.
 
 **Goal**: Build a custom SQLite MCP server that exposes the bookstore database
-to Claude, and wire it up. Then create a security-auditor subagent, and
-compare AI responses with and without each extension loaded.
+to Claude. Then create a security-auditor subagent, and compare AI responses
+with and without each extension loaded.
 
-Stuck or short on time? Say *"just tell me"*. That is allowed.
+Stuck on a question, or short on time? Say *"just tell me"* to Claude
+and it will skip ahead to a direct answer.
 
 ---
 
 ## Tasks
 
-### 1. Build the SQLite MCP Server (8 min: verify db 1 · compile 2 · register 3 · confirm 2)
+### 1. Build the SQLite MCP Server (8 min)
 
-The bookstore uses a SQLite database (`store.db`). Without MCP, Claude has to
-guess column names. With MCP, it can query the schema and run real SQL. The
-server lives at `mcp-sqlite/main.go` (sibling of `bookstore-py/`) and exposes
-two tools:
+The bookstore uses a SQLite database (`store.db`). Without an MCP, Claude
+doesn't know anything about the database and has to guess column names.
+With MCP, it can access information about the database and knows to query
+the schema and run real SQL. The server lives at `mcp-sqlite/main.go` and
+exposes two tools:
 
 - `get_table_definitions` — returns `CREATE TABLE` statements and column info
 - `execute_query` — executes a read-only `SELECT` query and returns JSON rows
 
 **Step 1** — Make sure the bookstore database exists. From the project root,
-start the bookstore server once (it seeds on first run):
+start the bookstore server once (it seeds the database on the first run):
 
 ```bash
 cd bookstore-py && python3 main.py &
@@ -33,13 +35,15 @@ kill %1
 cd ..
 ```
 
-Verify the file exists:
+Verify the store.db file exists:
 
 ```bash
 ls -lh bookstore-py/store.db
 ```
 
-**Step 2** — Compile the MCP server to a binary:
+**Step 2** — Compile the MCP server to a binary. Claude Code launches the
+server as a subprocess and talks to it over stdin/stdout, so it needs an
+executable:
 
 ```bash
 cd mcp-sqlite && go build -o ../mcp-sqlite-server . && cd ..
@@ -55,7 +59,7 @@ You should see the `-db` flag printed. If so, the server is working.
 
 **Step 3** — Register the server with Claude Code (project scope). Use the
 absolute path so Claude Code can find the binary regardless of working
-directory, and point it at the Python store:
+directory, and point it at `bookstore-py/store.db`:
 
 ```bash
 claude mcp add \
@@ -80,10 +84,7 @@ it connected with both tools listed.
 
 ---
 
-### 2. Compare AI Responses: Without vs With MCP (5 min: predict & round A 2 · round B 3)
-
-This is the core learning exercise — observe how access to real data changes
-Claude's answers.
+### 2. Compare AI Responses: Without vs With MCP (5 min)
 
 **Round A — without MCP** (disable it temporarily):
 
@@ -91,14 +92,17 @@ Claude's answers.
 claude mcp remove sqlite-bookstore
 ```
 
-Before you ask anything, write down one prediction. Name the part you expect
-to be wrong or hedged: book count, top author, or SQL query.
-
-Open a fresh Claude Code session and ask:
+Open a fresh Claude Code session. You are about to ask it this:
 
 > "How many books are in the bookstore database? Which author has the most
 > books? Write a SQL query that returns all books with their author name and
 > average rating, sorted by rating descending."
+
+Before you send it, bet on which of the three answers will come out wrong:
+the book count, the top author, or the SQL query. Claude has no database
+access yet, so at least one of them is likely to be wrong.
+
+Now ask it.
 
 Write down Claude's response. Notice:
 
@@ -133,16 +137,15 @@ Ask a follow-up that would be impossible without live data:
 
 Without MCP this is just a guess. With MCP it is a fact.
 
-**Done when**: you have written responses for both rounds, and a one-line
-verdict on whether your prediction held.
+**Done when**: you have written responses for both rounds.
 
 ---
 
-### 3. Create the Security-Auditor Subagent (5 min: create agent 3 · test 2)
+### 3. Create the Security-Auditor Subagent (5 min)
 
 A subagent runs in its own isolated context window with its own tools and model.
 You will create one that specializes in OWASP security audits. It uses a cheaper
-model (Haiku) and only gets read access — it can never modify code.
+model (Haiku) and only gets read access, so it can never modify code.
 
 **Step 1** — Create the agents directory:
 
@@ -150,7 +153,8 @@ model (Haiku) and only gets read access — it can never modify code.
 mkdir -p bookstore-py/.claude/agents
 ```
 
-**Step 2** — Create `bookstore-py/.claude/agents/security-auditor.md`:
+**Step 2** — Create `bookstore-py/.claude/agents/security-auditor.md` with
+this content:
 
 ```markdown
 ---
@@ -225,12 +229,8 @@ Severity levels: CRITICAL, HIGH, MEDIUM, LOW, INFO
 End with a **Summary** table: | Severity | Count |
 ```
 
-Optional, before you test it: run `/mcp-coach 3` on your `description`
-field. It grades your trigger the way the A-or-B slide judged the two
-examples. It also predicts one moment where it would misfire.
-
-**Step 3** — Test by asking Claude directly (without explicitly triggering the
-subagent):
+**Step 3** — Test whether the subagent auto-triggers. Ask Claude directly,
+without naming `security-auditor`:
 
 > "Do a security audit of the bookstore API."
 
@@ -239,12 +239,13 @@ automatically because the description matches. The audit runs in a separate
 context — your main conversation stays clean.
 
 **Done when**: `bookstore-py/.claude/agents/security-auditor.md` exists, and
-you have a security-audit report produced by the subagent, not written by
-you.
+you have a security-audit report produced by the subagent.
 
-## Closing round (10 min: write 5 · popcorn 5)
+---
 
-Before the trainer popcorns the room, write down answers to these:
+## Closing round (10 min)
+
+Write down the answers to these. The trainer may ask students to answer out loud.
 
 1. **MCP schema awareness**: did Claude call `get_table_definitions` before
    every query, or only once? What does that tell you about how Claude
@@ -264,6 +265,3 @@ prose. Bring its report to the closing round if it finishes in time.
 
 **Done when**: you have a written answer for all four, and
 `/verify-exercise 5` is running.
-
-Trainer popcorns the room — no pairs, no prep time beyond what you wrote
-above. Close with **one take-away** you'd give someone who skipped this session.
