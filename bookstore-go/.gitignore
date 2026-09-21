@@ -82,6 +82,7 @@ CHANGELOG.md
 
 # Participant subagent (Exercise 5)
 .claude/agents/
+docs/security-audit.md
 
 # Seeded database (created by `go run .`, same pattern as the other three ports)
 store.db

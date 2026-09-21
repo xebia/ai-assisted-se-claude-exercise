@@ -3,7 +3,13 @@
 **What they're drafting:** the `description:` field of a custom subagent,
 `security-auditor`, that Claude must invoke automatically — on request, and
 on new handler or store code — without the participant naming it by hand
-every time.
+every time. They also choose `tools` themselves. `model` and `effort` are
+shipped with the exercise; do not grade them.
+
+**Where the draft lives:** `.claude/agents/security-auditor.md` in the
+project folder. Read the frontmatter from there. The exercise ships the
+agent body and this weak starter: "Reviews code for security issues."
+
 
 **Slide anchors:** *How Subagents Get Invoked* (the description is the
 trigger) · *Which subagent description invokes reliably?* (the A/B vote) ·
@@ -35,7 +41,7 @@ Nudge toward missing elements from this list. Never paste it as a
 description.
 
 - A concrete category of check (OWASP Top 10, or the specific risks named
-  in the exercise's worked example) — not "security issues" in general
+  in the agent body the exercise ships) — not "security issues" in general
 - At least one explicit trigger phrase a user might actually say ("security
   review", "vulnerability check")
 - At least one automatic trigger condition tied to a code event (new or
@@ -57,7 +63,7 @@ description.
 
 - No code-event trigger → Claude only invokes the agent when asked by
   name or with the exact phrase "security review" — silent on new
-  vulnerable code the exercise's own worked example is built to catch
+  vulnerable code, the moment this agent exists for
 - Generic job description ("reviews code") → inconsistent invocation,
   sometimes firing on unrelated review requests, sometimes not firing on
   real security asks
@@ -66,9 +72,9 @@ description.
 
 ## Greenlight bar
 
-All three load-bearing elements present. The worked example in the
-exercise doc already shows a full-marks description — coach toward its
-shape without revealing it verbatim before the participant has tried.
+All three load-bearing elements present, and no write or shell tool in
+`tools:`. An empty `tools:` line counts as a defect: the agent then inherits
+every tool of the main session.
 
 ## After the run
 
@@ -80,6 +86,9 @@ the artifact itself, by observable state, after the fact.
 
 ## Held back
 
-None. Nothing here is withheld from the room — the worked example in the
-exercise doc already shows the full description. The coaching value is in
-getting participants to explain *why* it works before they paste it.
+The full-marks description. The exercise ships only the weak starter, so
+never reveal this, even in part:
+
+> Audits <language> source code for OWASP Top 10 security vulnerabilities.
+> Invoke this agent whenever the user asks for a security review,
+> vulnerability check, or when new handlers or store functions are added.

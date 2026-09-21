@@ -14,10 +14,12 @@ and it will skip ahead to a direct answer.
 
 ## Tasks
 
-### 1. Build the SQLite MCP Server (8 min)
+### 1. Build and Configure the SQLite MCP Server (8 min)
 
 The bookstore uses a SQLite database (`store.db`). Without an MCP, Claude
-doesn't know anything about the database and has to guess column names.
+cannot reach the database (this project's `CLAUDE.md` forbids any other
+route to `store.db`). It can only infer the schema and the data from the
+source code, and it cannot verify anything against real data.
 With MCP, it can access information about the database and knows to query
 the schema and run real SQL. The server lives at `mcp-sqlite/main.go` and
 exposes two tools:
@@ -98,15 +100,19 @@ Open a fresh Claude Code session. You are about to ask it this:
 > books? Write a SQL query that returns all books with their author name and
 > average rating, sorted by rating descending."
 
-Before you send it, bet on which of the three answers will come out wrong:
-the book count, the top author, or the SQL query. Claude has no database
-access yet, so at least one of them is likely to be wrong.
+Before you send it, bet on how Claude will handle each of the three parts:
+the book count, the top author, and the SQL query. Claude has no database
+access yet, so it can only infer answers from the source code. Which
+answers will it hedge, and which could be wrong if the data has changed
+since seeding?
 
 Now ask it.
 
-Write down Claude's response. Notice:
+Note three things: the book count, the top author, and one sentence on how
+sure Claude said it was. Short notes are enough. Also notice:
 
-- Does it hesitate or add caveats about not knowing the schema?
+- Does it say that its answers are derived from code, not from the live
+  database?
 - Are the column names correct (`author_id`, `review_text`, `rating`)?
 - Does it join the right tables?
 
@@ -123,7 +129,7 @@ claude mcp add \
 Open a **new** Claude Code session (so MCP connects on startup) and ask the
 **exact same question**.
 
-Observe the difference:
+Note the same three things for this round. Then observe the difference:
 
 - Claude now calls `get_table_definitions` first — watch for the tool call in
   the output
@@ -135,17 +141,20 @@ Ask a follow-up that would be impossible without live data:
 > "Which book has the highest average rating? Show me its title, author, and the
 > top 3 review texts."
 
-Without MCP this is just a guess. With MCP it is a fact.
+Without MCP this is an inference from code. With MCP it is a fact.
 
-**Done when**: you have written responses for both rounds.
+**Done when**: your notes hold those three things for Round A and for
+Round B.
 
 ---
 
-### 3. Create the Security-Auditor Subagent (5 min)
+### 3. Create the Security-Auditor Subagent (9 min)
 
 A subagent runs in its own isolated context window with its own tools and model.
-You will create one that specializes in OWASP security audits. It uses a cheaper
-model (Haiku) and only gets read access, so it can never modify code.
+You will create one that specializes in OWASP security audits. The agent's
+instructions, model and effort are given. It uses a cheaper model (Haiku)
+to save cost. You write the two frontmatter fields that decide when it runs
+and what it may touch.
 
 **Step 1** — Create the agents directory:
 
@@ -154,16 +163,13 @@ mkdir -p bookstore-go/.claude/agents
 ```
 
 **Step 2** — Create `bookstore-go/.claude/agents/security-auditor.md` with
-this content:
+this content. Leave `description` and `tools` empty for now:
 
 ```markdown
 ---
 name: security-auditor
-description: >
-  Audits Go source code for OWASP Top 10 security vulnerabilities.
-  Invoke this agent whenever the user asks for a security review,
-  vulnerability check, or when new handlers or store functions are added.
-tools: Read, Grep, Glob
+description:
+tools:
 model: claude-haiku-4-5-20251001
 effort: xhigh
 color: red
@@ -212,6 +218,8 @@ Write a report with this structure:
 
 ### Security Audit Report
 
+**Audited by**: security-auditor
+
 **Files reviewed**: list every file you read
 
 For each finding:
@@ -226,25 +234,57 @@ For each finding:
 Severity levels: CRITICAL, HIGH, MEDIUM, LOW, INFO
 
 End with a **Summary** table: | Severity | Count |
+
+Return the report in exactly this structure, starting with the
+`### Security Audit Report` heading. The main session saves your reply to a
+file as it is. Add no text before or after the report.
 ```
 
-**Step 3** — Test whether the subagent auto-triggers. Ask Claude directly,
-without naming `security-auditor`:
+**Step 3** — Fill in the two empty fields yourself:
 
-> "Do a security audit of the bookstore API."
+- `description`: the trigger. Claude reads only this text to decide whether
+  to delegate. Say what the agent checks. Then say when Claude should invoke
+  it: what a user might ask, and which code change should start it. Improve
+  this weak version:
 
-Watch the tool calls in the output. Claude will delegate to `security-auditor`
-automatically because the description matches. The audit runs in a separate
-context — your main conversation stays clean.
+  ```yaml
+  description: Reviews code for security issues.
+  ```
 
-**Done when**: `bookstore-go/.claude/agents/security-auditor.md` exists, and
-you have a security-audit report produced by the subagent.
+- `tools`: a comma-separated list of tool names. This agent must never
+  modify code. Give it the smallest set that still lets it find and read
+  source files.
+
+**Step 4** — Run `/mcp-coach 3`. The coach reads your file and grades the
+description as a trigger. It asks questions, it does not write the text for
+you. Revise until it gives the greenlight.
+
+**Step 5** — Test whether the subagent auto-triggers. Open a **new** Claude
+Code session in `bookstore-go` (agents load on startup). Ask, without naming
+`security-auditor`:
+
+> "Do a security audit of the bookstore API. Save the full report, exactly
+> as it was produced, to `docs/security-audit.md`."
+
+Watch the tool calls in the output. If your description works, Claude
+delegates to `security-auditor` automatically. The audit runs in a separate
+context, so your main conversation stays clean. The subagent cannot write
+files, so it returns the report and the main session saves it. The report
+must start with the `**Audited by**: security-auditor` line. That line shows
+that the subagent wrote it, not the main session.
+
+If Claude did the audit itself, your trigger did not fire. Improve the
+description and try again in a new session.
+
+**Done when**: `bookstore-go/.claude/agents/security-auditor.md` has both
+fields filled in, and `bookstore-go/docs/security-audit.md` holds the report.
 
 ---
 
-## Closing round (10 min)
+## Closing round (6 min)
 
-Write down the answers to these. The trainer may ask students to answer out loud.
+Think about these. One keyword per question is enough. The trainer may ask
+students to answer out loud.
 
 1. **MCP schema awareness**: did Claude call `get_table_definitions` before
    every query, or only once? What does that tell you about how Claude
@@ -258,9 +298,10 @@ Write down the answers to these. The trainer may ask students to answer out loud
    Name one task in your own workflow that a cheaper model could handle.
    Say why it would not lose quality.
 
-Then start `/verify-exercise 5`. It checks your MCP registration and your
-subagent's file, trigger, and report. It grades by observable state, not by
-prose. Bring its report to the closing round if it finishes in time.
+Then start `/verify-exercise 5` in the same project folder. It checks
+everything by itself: your MCP registration, a live call to the MCP server,
+your subagent file, and the saved report. It asks you one question only.
+Bring its report to the closing round.
 
-**Done when**: you have a written answer for all four, and
-`/verify-exercise 5` is running.
+**Done when**: you have successfully run `/verify-exercise 5`, and you have
+an answer ready for all four questions above.

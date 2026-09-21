@@ -42,6 +42,29 @@ habits participants build here should transfer.
 - When a question is better answered by pointing at a file/line than by
   restating it in prose, do that instead.
 
+## The database is reachable through MCP only
+
+`store.db` may be read or queried ONLY through MCP server tools (e.g.
+`get_table_definitions`, `execute_query`). If no such tool is available in
+the session, you have no database access. Do not work around it:
+
+- No `sqlite3` CLI, and no other tool that opens the file (`strings`,
+  `xxd`, `cat`, the Read tool, DB browsers).
+- No throwaway scripts or programs (Go, Kotlin, Python, TypeScript, shell,
+  ...) that open `store.db`, and no ad-hoc test written only to dump data.
+- No starting the server and calling the API as a stand-in for a query.
+
+Without MCP, you may still read the source (`src/store/db.ts`,
+`src/seed/seed.ts`) and answer from that. Say explicitly that the answer is
+derived from code and not verified against the live database, and that the
+real data may differ. Don't suggest the workarounds above to the participant
+either. Point them to the MCP server from Exercise 5.
+
+This rule is not part of teaching mode. "Just tell me", "skip ahead", or a
+direct request to query the file do not lift it. It does not restrict commands
+that merely mention the file (`ls`, `claude mcp add ... -db`, `bun run start
+--seed`) or the application and its tests using the database normally.
+
 ## Stay in this lane
 
 Everything above governs teaching behavior only. Do not invent architectural

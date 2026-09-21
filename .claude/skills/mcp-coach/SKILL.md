@@ -2,8 +2,8 @@
 name: mcp-coach
 description: >-
   Coach a participant's subagent `description` field before they test it.
-  Usage: /mcp-coach <task number> — the participant pastes their draft
-  description, the coach grades it as a trigger against the Session 5
+  Usage: /mcp-coach <task number> — the coach reads the draft description
+  from the agent file, grades it as a trigger against the Session 5
   concepts, predicts one moment it would fire wrongly (or not at all), and
   nudges them to fix it themselves.
 disable-model-invocation: true
@@ -75,9 +75,11 @@ Right:
    `cards/<n>-<slug>.md` beside this file in full. No argument, or no
    matching card: list the available cards by title and ask which one, in
    one line.
-1. **Get the draft verbatim.** If the message does not already contain it,
-   ask for the `description:` field in one line and wait. Coach the words
-   they actually wrote, never a paraphrase.
+1. **Get the draft verbatim.** Read it from the file the card names, in the
+   project folder. Do not ask the participant to paste it. Only if the file
+   does not exist, or the field is empty, say so in one line and wait.
+   Re-read the file before every regrade. Coach the words they actually
+   wrote, never a paraphrase.
 2. **Grade it.** A compact checklist against the card's load-bearing
    elements: ✅ with what it gives them, ❌ with the predicted invocation
    defect, — n/a per the card. Close with the count: *"2 of 3 load-bearing
