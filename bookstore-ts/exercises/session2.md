@@ -91,8 +91,7 @@ The prompt on the slide *Let's do a Prompt Analysis* has the same four
 parts: the technology, where to start, what to deliver, and proof for
 every statement.
 
-In the coffee break after this exercise, run `/verify-exercise 2` in any
-Claude session. It asks for the prompt from your notes and checks the
+After this exercise, run `/verify-exercise 2` in any Claude session. It asks for the prompt from your notes and checks the
 file against it, one line at a time.
 
 **Done when**: `docs/orientation.md` exists, and every step in the request
