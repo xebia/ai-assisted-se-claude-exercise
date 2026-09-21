@@ -2,5 +2,4 @@
 **/.DS_Store
 
 # Exercise 5: MCP server binary and project-scope registration, built at the repo root
-/mcp-sqlite-server
 /.mcp.json
