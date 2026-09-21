@@ -1,7 +1,7 @@
 # Exercise 1: First Conversations
 
 **Session**: 1 — First Steps & Core Concepts
-**Duration**: 35 minutes
+**Duration**: 30 minutes
 **Project**: "BookStore API" — a Kotlin REST API using only the JDK HTTP
 server and JDBC (no frameworks). Everyone clones the same repo.
 
@@ -58,7 +58,7 @@ on time? Just say *"just tell me"*. That is allowed.
 
 ## Tasks
 
-### 1. Explain, with and without a selection (6 min: selected 2 · `/clear` and ask again 3 · compare 1)
+### 1. Explain, with and without a selection (5 min: selected 2 · `/clear` and ask again 2 · compare 1)
 
 This task compares two runs, so both prompts start with the experiment
 prefix. Use it on both, or the two runs are not comparable:
@@ -117,7 +117,7 @@ turn?
 **Done when**: Claude named a bug, and you can say in one sentence what
 `createReview()` fails to check.
 
-### 3. Add validation, then say no (6 min: ask 3 · redirect 2 · trace 1)
+### 3. Add validation, then say no (5 min: ask 2 · redirect 2 · trace 1)
 
 Run `/clear` again, then ask:
 
@@ -144,7 +144,7 @@ its own change. If it ran nothing, note that. Nobody asked it to.
 `src/main/kotlin/bookstore/handler/ReviewHandler.kt`, `createReview()`
 calls it, and `./gradlew build` reports no errors.
 
-### 4. Write a test (5 min: ask 3 · run 1 · trace 1)
+### 4. Write a test (4 min: ask 2 · run 1 · trace 1)
 
 Ask:
 
@@ -161,7 +161,7 @@ calls came before its first edit?
 **Done when**: `./gradlew runTests` shows five passing tests in
 `ValidateReviewTest`.
 
-### 5. Refactor (5 min: ask 3 · check 1 · trace 1)
+### 5. Refactor (4 min: ask 2 · check 1 · trace 1)
 
 Open `src/main/kotlin/bookstore/Server.kt`. The route list is flat and in
 no particular order. Ask:
@@ -203,7 +203,7 @@ found.
   Say why in one sentence.
 - Run `/context`. How much of the context window did two questions cost?
 
-## Closing round (5 min)
+## Closing round (4 min)
 
 The trainer calls on people at random. Have your numbers ready: how many
 tool calls with the selection, and how many without? Which file did Claude

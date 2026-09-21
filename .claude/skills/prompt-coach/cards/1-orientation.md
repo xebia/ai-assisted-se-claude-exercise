@@ -104,7 +104,7 @@ framing and `@file` are worth one line if absent, not a round.
 ## After the run
 
 Run the deliverable guard. `/verify-exercise 2` grades the sent prompt
-against the produced file, claim by claim, in the break. Keep your debrief
+against the produced file, claim by claim. Keep your debrief
 to one line per prediction and hand over to it.
 
 ## Held back
