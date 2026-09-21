@@ -18,8 +18,8 @@ contract is discoverable, but nothing tells you what happens on an empty list,
 what a failed request looks like, or which fields a book page shows. Those are
 decisions, and decisions are what a specification is for.
 
-It also breaks into pieces that different agents can build at the same time —
-which is the property a later exercise depends on.
+It also breaks into pieces that different agents can build at the same time.
+That is the property a later exercise depends on.
 
 ## Before you start
 
@@ -29,9 +29,9 @@ Setup is in `preparation.md`. Verify it in one command:
 cd ../bookstore-web && specify check
 ```
 
-You need three terminals. **Not** the frontend dev server — there is no
-frontend yet, and that is the point: this session you specify it, a later exercise
-builds it.
+You need three terminals. **Not** the frontend dev server. There is no
+frontend yet, and that is the point: this session you specify it. A later
+exercise builds it.
 
 **Terminal 1 — your backend**, from the `bookstore-kt` project directory
 (any of the four backends works; the spec you write is agnostic):
@@ -40,14 +40,14 @@ builds it.
 ./gradlew run
 ```
 
-Confirm it answers — this must return JSON, not a connection error:
+Confirm it answers. This must return JSON, not a connection error:
 
 ```bash
 curl http://localhost:8080/api/books
 ```
 
-**Terminal 2 — Claude Code, started from `bookstore-web` with your backend
-readable:**
+**Terminal 2 — Claude Code, started from `bookstore-web` with read access
+to your backend:**
 
 ```bash
 cd ../bookstore-web && claude --add-dir ../bookstore-kt
@@ -57,8 +57,8 @@ cd ../bookstore-web && claude --add-dir ../bookstore-kt
 and `git` while Claude Code is busy in terminal 2.
 
 You will call the API on `http://localhost:8080` directly. The finished frontend
-will reach it at the same-origin path `/api` — `bookstore-web/vite.config.js`
-proxies that to port 8080 — so the paths in your spec are the ones you see here.
+will reach it at the same-origin path `/api`. `bookstore-web/vite.config.js`
+proxies that to port 8080, so the paths in your spec are the ones you see here.
 
 ---
 
@@ -68,15 +68,15 @@ proxies that to port 8080 — so the paths in your spec are the ones you see her
 
 Spec Kit separates two kinds of rules. A **spec** describes one feature and is
 done when that feature ships. A **constitution** holds the rules that outlive
-every feature — stack, architecture, what counts as finished. Spec Kit re-reads
+every feature: stack, architecture, what counts as finished. Spec Kit re-reads
 it at each later step, so a plan or a task that breaks one of these is a defect
 to fix, not a trade-off to weigh.
 
 Open [`.specify/memory/constitution.md`](../../bookstore-web/.specify/memory/constitution.md)
-in `bookstore-web`. Yours is pre-written — you are not authoring one this session.
+in `bookstore-web`. Yours is pre-written. You are not authoring one this session.
 
 It has six principles and fits on one page. Read them, then answer this:
-**What does the constitution say about the API contract — and where does it
+**What does the constitution say about the API contract, and where does it
 say the contract comes from?**
 
 > **Tip**: Use Claude Code to find out!
@@ -89,8 +89,8 @@ Use this prompt **exactly as written**:
 > its details and its author. The API is already running behind `/api`.
 
 It writes `specs/001-*/spec.md`. Open it and scroll to **Assumptions** at the
-bottom — that is where the spec parks what it invented. Nothing has called the
-API yet, so every one of them is a guess — and they are the field names and
+bottom. That is where the spec parks what it invented. Nothing has called the
+API yet, so every one of them is a guess, and they are the field names and
 numbers your UI gets built from.
 
 Now read the **Requirements** section in the `spec.md` with one question in
@@ -117,8 +117,9 @@ specs/001-*/spec.md                     modified in place, re-saved after every 
 specs/001-*/checklists/requirements.md  re-validated — only if it exists; ours will not
 ```
 
-Two new headings appear, and by design only these two — placed near the **top**
-of the spec, just after its overview section, not appended at the end:
+Two new headings appear, and by design only these two. They are placed near
+the **top** of the spec, just after its overview section, not appended at
+the end:
 
 ```markdown
 ## Clarifications
@@ -128,11 +129,11 @@ of the spec, just after its overview section, not appended at the end:
 - Q: <the question it asked> → A: <the answer you gave>
 ```
 
-That log is the cheap part. Each answer is *also* applied wherever it belongs —
-Functional Requirements, User Stories, Data Model, Success Criteria or Edge
-Cases — and where an answer contradicts something the spec already said, the old
-sentence is **replaced, not added to**. What you get back is not the file you
-had plus a section at the top.
+That log is the cheap part. Each answer is *also* applied wherever it
+belongs: Functional Requirements, User Stories, Data Model, Success Criteria,
+or Edge Cases. Where an answer contradicts something the spec already said,
+the old sentence is **replaced, not added to**. What you get back is not the
+file you had plus a section at the top.
 
 **First, snapshot the spec** so you can see all of that later:
 
@@ -140,7 +141,7 @@ had plus a section at the top.
 git add specs/
 ```
 
-Staging is enough — no commit needed. `git diff` compares your working tree
+Staging is enough. No commit needed. `git diff` compares your working tree
 against what you staged, so it will show exactly what `/speckit-clarify`
 touched. You read that diff in task 4, not now.
 
@@ -151,16 +152,16 @@ One rule: **if you are guessing, say so in the answer.** Your words go into the
 spec as written, so the label travels with them. Tasks 4 and 5 come back for
 these.
 
-**Answer fast** — five questions, six minutes. You are making a first draft, not
-a perfect spec.
+**Answer fast.** Five questions, six minutes. You are making a first draft,
+not a perfect spec.
 
-Then stop. Do not read the spec yet — that is what you do in task 4, while a
+Then stop. Do not read the spec yet. That is what you do in task 4, while a
 slow command runs.
 
 ### 4. `/speckit-plan` — decide how, and review while it works (6 min)
 
 This is the slowest command in the flow, and it runs unattended for two to four
-minutes. That is not dead time — it is when you review what you just wrote.
+minutes. That is not dead time. It is when you review what you just wrote.
 
 **Start it now**, then read on.
 
@@ -174,8 +175,8 @@ specs/001-*/plan.md          the approach
            quickstart.md     how to verify
 ```
 
-Note the second file. `/speckit-plan` does its own research, unprompted — task 5
-comes back to that.
+Note the second file. `/speckit-plan` does its own research, unprompted.
+Task 5 comes back to that.
 
 #### While it runs: review `specs/001-*/spec.md`
 
@@ -186,7 +187,7 @@ cd ../bookstore-web && git diff specs/001-*/spec.md
 ```
 
 The `## Clarifications` log at the top tells you what you were *asked*. Only the
-diff shows **where the answers landed** — and that is the whole point, because
+diff shows **where the answers landed**, and that is the whole point, because
 `/speckit-clarify` rewrote Functional Requirements, User Stories, Data Model,
 Success Criteria and Edge Cases in place while you were answering.
 
@@ -194,7 +195,7 @@ Four things to look for:
 
 - **Your marked guesses.** Find each one in the diff. A guess that became a
   Functional Requirement now looks exactly like an observed fact to everyone
-  downstream — including the agents in a later exercise.
+  downstream, including the agents in a later exercise.
 - **Lines that disappeared.** Look for `-` lines outside the Clarifications
   block. Where an answer contradicted something the spec already said, the old
   sentence was *replaced*. Deletions are the edits you never see if you only
@@ -220,10 +221,10 @@ specs/001-*/research.md
 specs/001-*/contracts/
 ```
 
-Nobody called the API to write those. They were inferred — and a later exercise
+Nobody called the API to write those. They were inferred, and a later exercise
 builds against them.
 
-So call it yourself. In terminal 3, thirty seconds — this answers the first of
+So call it yourself. In terminal 3, thirty seconds. This answers the first of
 the three gaps from task 2, plus one thing the spec never thought to ask:
 
 ```bash
@@ -268,9 +269,10 @@ Find the **Parallel Opportunities** and **Parallel Team Strategy** sections at
 the bottom. That is a staffing plan for agents.
 
 Now check one thing: pick two `[P]` tasks from **different** user stories. Do
-they write the same file? Shared things — the API client, the stylesheet,
-`index.html` — belong to the foundational phase (constitution principle IV). If
-one lives inside a story, the `[P]` is a lie and two agents will collide.
+they write the same file? Shared things, such as the API client, the
+stylesheet, or `index.html`, belong to the foundational phase (constitution
+principle IV). If one lives inside a story, the `[P]` is a lie and two
+agents will collide.
 
 ### 7. `/speckit-analyze` — validate (3 min)
 
@@ -282,7 +284,7 @@ Be ready to say why.
 
 Two places to look first: the answers you marked as guesses in task 3, and
 whatever you noted in task 5. If something you *know* to be wrong is absent from
-this report, that is the lesson — consistency is not correctness.
+this report, that is the lesson. Consistency is not correctness.
 
 ### 8. Commit
 
@@ -322,5 +324,5 @@ bookstore-web/specs/001-*/
   tasks.md           the work queue, with [P] markers
 ```
 
-No application code. That is the point — `/speckit-implement` comes in a later
+No application code. That is the point. `/speckit-implement` comes in a later
 exercise.
