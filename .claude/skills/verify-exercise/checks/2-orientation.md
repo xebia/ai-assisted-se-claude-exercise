@@ -1,0 +1,132 @@
+# Exercise 2 — Get oriented
+
+**Artifact:** `docs/orientation.md`
+
+**What the participant was asked to produce** (they were given the
+deliverable, not a prompt — composing the prompt is the exercise):
+
+1. **Package tree** — one line per package, saying what that package is
+   responsible for
+2. **Request flow** — the path of one request, from the entry point to the
+   database and back. One line per step, each with a `file:line` reference
+
+The sheet told them: the prompt must say to write the result to
+`docs/orientation.md`. If it did not, the coach saved the sub-agent's report
+to that file and told them so. Grade a coach-saved file exactly like a
+written one; the missing write is a finding under OUTCOME, not a reason to
+stop.
+
+They were given seven techniques; the closing round asks which one adds
+nothing here. See *Held back*, below.
+
+## Say the sheet's words
+
+This file uses trainer shorthand. The participant has never seen it.
+Translate before you speak: *must* → "a technique this task needs";
+*should* → "a technique that helps here"; *n/a* → "not needed here";
+*the artifact* → `docs/orientation.md`;
+*verbatim* → "word for word"; *CONTEXT-TASK-FORMAT* → CONTEXT-TASK-OUTCOME.
+Say *pass* and *fail*, never ✓/✗.
+
+## Technique applicability
+
+Grade the prompt against these only.
+
+**Must (2):** OUTCOME (both sections, `file:line` per hop, and the file to
+write) · Define done (no claim without a checkable `file:line`).
+
+**Should (4):** CONTEXT · TASK · Scope it · Direct it.
+
+The grade is out of these six. Say which of the missing ones were musts:
+the coach called the prompt ready on the musts alone, so a missing should
+is expected, and it is exactly the prediction this report checks.
+
+**Optional polish — mention but don't count against them:** Role framing ·
+`@file` reference. Both improve the result. Neither decides whether the
+artifact can be checked.
+
+**Not applicable:**
+
+- **Examples** — no pattern to point at yet, in your first five minutes in
+  an unfamiliar codebase. (Held back — see below.)
+- **Constrain it** — read-only task. Nothing to constrain.
+- **Extended thinking** — this is reading, not reasoning. If the prompt
+  *asks* for extended thinking, that is a finding: it cost tokens and added
+  no quality.
+
+## What a full-marks prompt contains
+
+Name missing elements from this list. **Never paste this as a prompt.** It
+becomes copy-paste material and the exercise collapses.
+
+- The stack and the entry point, given rather than searched for
+- Two named deliverables, with the output shape of each
+- `file:line` per hop asked for explicitly
+- **A method for the tree:** open at least one file per package before
+  describing it. Do not guess from the package name. This is the most
+  valuable clause in the whole prompt, and almost nobody writes it.
+- **A method for the flow:** read the route registration first, then follow
+  one real route from start to end
+- A completion condition that means *no claim I cannot check by opening the
+  file you named*
+
+The sheet also tells them the `docs/` folder does not exist yet, and that
+the prompt must say to write the file. A prompt that never says so is an
+OUTCOME gap: the sub-agent reports in the chat and writes nothing.
+
+## Establish ground truth
+
+Do this **after** grading the prompt and **before** trusting the artifact.
+
+1. Find the entry point (`Main.kt`, `main.go`, `Application.kt` — detect it,
+   do not assume) and read the route registration.
+2. Follow **one** registered route all the way to the database call, noting
+   each file and function.
+3. List the actual top-level packages and open at least one file in each
+   before forming a view on what it owns.
+
+Note where the real layering is *irregular*. That is where the artifact is
+most likely to be confidently wrong.
+
+## Known traps
+
+Check each explicitly, whether or not the artifact raises it:
+
+- **Invented layers.** A service or business layer that does not exist; a
+  repository abstraction over what is really direct SQL. Claude fills in the
+  architecture it expects rather than the one present.
+- **Responsibility guessed from the package name.** `util`, `seed`, `model`,
+  `config` get plausible one-liners without anyone opening them. Test: could
+  this line have been written *without* reading the package? Then ⚠️, even
+  if it is right.
+- **Invented line numbers.** Asking for `file:line` pushes Claude to produce
+  a number whether or not it looked. Resolve every one.
+- **Files that do not exist**, or the right filename in the wrong package.
+- **A skipped hop.** Routing → handler → store is the story. Check whether
+  middleware, validation, response helpers or the pagination helper are
+  silently left out or attributed to the wrong place.
+- **Endpoints that break the pattern.** If a route bypasses the usual
+  layering, an artifact presenting one uniform flow is incomplete. Report
+  under *Missed*.
+- **The "and back".** The response path is part of the ask. Serialisation
+  and error mapping are usually the thinnest part.
+
+## Pass bar
+
+- Both sections present.
+- Every layer in the flow carries a citation that resolves.
+- Package responsibilities say more than the names imply.
+- No invented files or layers.
+
+*Partial* is the normal and useful outcome. Most first attempts produce a
+good tree and a flow with one or two uncited hops. Report it as partial.
+That gap is the teaching material, not a failure.
+
+## Held back
+
+The closing round asks: *of the seven techniques listed, which one added
+nothing here?* Intended answer: **Examples** — in your first five minutes in
+an unfamiliar codebase there is no pattern to point at, which is the premise
+of the task. **Don't volunteer it** before the closing round. If asked
+directly, give it, and add that Examples becomes available the moment this
+step is finished.
