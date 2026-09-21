@@ -1,0 +1,88 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage.txt
+coverage.html
+
+# Go workspace file
+go.work
+go.work.sum
+
+# Dependency directories
+vendor/
+
+# Go build cache
+/.cache
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# IDE - IntelliJ / GoLand
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# OS Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.swp
+*.swo
+*~
+
+# Build outputs
+/bin/
+/dist/
+/build/
+
+# Participant context files (Exercise 3) - keep out of git so experiment resets cannot delete them
+CLAUDE.local.md
+.claude/rules/
+docs/orientation.md
+session3-*.diff
+
+# Participant skills, hooks and changelog (Exercise 4) - keep out of git so branch cleanup cannot delete them
+CHANGELOG.md
+.claude/skills/
+.claude/hooks/
+.claude/settings.json
+.claude/settings.local.json
+
+# Participant subagent (Exercise 5)
+.claude/agents/
+docs/security-audit.md
+
+# Seeded database (created by `go run .`, same pattern as the other three ports)
+store.db
