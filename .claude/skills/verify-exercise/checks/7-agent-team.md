@@ -29,9 +29,15 @@ predicted defect.
 
 Run these yourself. Do not take the participant's notes on trust.
 
+0. Take the file lists from the participant's own `tasks.md`, not from
+   the reference spec. Foundation files are the files Phase 1 and 2
+   create. Story files are the files each story phase writes. Task 1 had
+   the lead move shared work into Phase 2, so layouts differ: `src/views/`
+   or other names are fine. The reference spec's list (`index.html`,
+   `styles.css`, `src/main.js`, `src/api.js`, `src/ui.js`, one file per
+   story under `src/pages/`) applies only when they used that spec.
 1. `git diff --stat foundation` (from `bookstore-web`). List every changed
-   file. Sort each into: story file (under `src/pages/`), foundation file
-   (`index.html`, `styles.css`, `src/main.js`, `src/api.js`, `src/ui.js`),
+   file. Sort each into: story file (and which story), foundation file,
    or other.
 2. `git log --format=%s foundation..HEAD` — did teammates commit? Not
    required, but a commit by the lead touching a story file is the "lead
@@ -39,13 +45,13 @@ Run these yourself. Do not take the participant's notes on trust.
 3. Open `specs/001-*/tasks.md`. Count story tasks ticked vs total.
 4. `grep -rn "8080\|localhost" src/ index.html` — must print nothing
    (constitution II).
-5. Read `src/pages/*.js` and `src/api.js`, and trace what each page renders
+5. Read the story files and the API client, and trace what each page renders
    for: empty array, 404, non-JSON, fetch failure (constitution V). Every
    one of the four must render a fixed sentence, not backend text. Do not
    fetch the pages with curl: the dev server returns the empty shell, the
    pages are rendered by JavaScript in the browser. Say "read the page
    modules" in the report, never "fetched the page".
-6. Read `src/pages/*.js` for `import` lines. Any import from
+6. Read the story files for `import` lines. Any import from
    `node_modules` or a CDN is a constitution I violation.
 
 ## Known traps

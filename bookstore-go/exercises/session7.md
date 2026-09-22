@@ -44,7 +44,9 @@ committed at the end of Exercise 6. Check:
 cd ../bookstore-web && ls specs/
 ```
 
-No folder, or an unfinished one? Use the reference spec instead. It was
+Use your own spec when `specs/001-*/tasks.md` exists and has user-story
+phases. Task 1 repairs small problems in it. No folder, no `tasks.md`, or
+more than three user stories? Use the reference spec instead. It was
 written for this exercise and has the same format:
 
 ```bash
@@ -86,18 +88,26 @@ the stylesheet (*How the Exercise Works*). The constitution says no story
 may start before the foundation is done. So this part is not parallel
 work. One session, the lead, does it.
 
-1. Open `specs/001-*/tasks.md` and find **Phase 1** and **Phase 2**. Write
-   down the files those phases create, in terminal 3 or on paper. Keep the
-   list. Task 2 needs it.
+1. Open `specs/001-*/tasks.md` and find **Phase 1** and **Phase 2**. Then
+   look at your collision note from Exercise 6, task 5. Did a story task
+   write a shared file, such as the router? You do not fix it by hand. The
+   prompt below makes the lead fix it first. That is the constitution's
+   rule: a defect in the plan is fixed in the plan, not in code.
 2. Send the lead this prompt. Copy it as written:
 
-   > Implement Phase 1 and Phase 2 of `specs/001-*/tasks.md`, and nothing
-   > from any user story. Follow `.specify/memory/constitution.md`. Tick each
-   > task off in `tasks.md` when it is done. When you finish, list the files
-   > you created.
+   > Read `specs/001-*/tasks.md` and `.specify/memory/constitution.md`.
+   > First fix the task list. If a user-story task writes a file that more
+   > than one story needs (page shell, stylesheet, API client, router), or
+   > two stories write the same file, move that work into Phase 2. Give
+   > each story its own page file, created as a stub in Phase 2, so no
+   > story edits the router. Tell me what you moved. Then implement Phase 1
+   > and Phase 2, and nothing from any user story. Tick each task off in
+   > `tasks.md` when it is done. When you finish, list the files you
+   > created, and for each story the one file it owns.
 
    The run takes two to four minutes. **Do not wait. Start task 2 now.**
    Drafting a prompt changes no files, so it cannot disturb this run.
+   When the lead reports back, write down its file list. Task 2 needs it.
 3. When the lead reports back, start the frontend in terminal 3:
 
    ```bash
