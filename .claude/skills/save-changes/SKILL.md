@@ -53,13 +53,13 @@ chosen so they behave the same everywhere:
 ## Preconditions — check all three before touching anything
 
 Run these checks scoped to the current project directory (the participant's
-`bookstore-*` folder — all four projects share one git repository, so
-**every git command below must be scoped with `.` and run from the project
-folder**):
+`bookstore` folder, the root of their clone — `web/` and `bookstore-plugin/`
+live inside it, so **every git command below must be scoped with `.` and run
+from the project folder**):
 
 1. **Right directory.** The cwd must contain `exercises/session3.pdf` (it is
    the project root). If not: say where you are, say the command must run
-   from the bookstore project folder, and stop.
+   from the `bookstore` folder, and stop.
 2. **Something to save.** `git status --porcelain -- .` must be non-empty.
    If it is empty, there is nothing to save. Most likely the reset already
    ran, or the implementation never happened. Say so and stop. Do not
