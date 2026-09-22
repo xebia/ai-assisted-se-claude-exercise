@@ -12,7 +12,7 @@ as they wrote them. If a list is missing, that is a finding: say so and
 grade what you can from the files.
 
 **Artifact:** `specs/001-*/research.md`, `specs/001-*/contracts/*`,
-`specs/001-*/tasks.md`, all in `bookstore-web`.
+`specs/001-*/tasks.md`, all in `web`.
 
 **What the participant was asked to produce.** A committed `specs/001-*/`
 folder with spec, plan, research, data model, contract, quickstart and task
@@ -43,7 +43,7 @@ found and which they missed, in one line each.
 
 ## Establish ground truth
 
-Run these yourself, from `bookstore-web`, with the backend on port 8080. Do
+Run these yourself, from `web`, with the backend on port 8080. Do
 not trust the participant's notes or the plan's files without checking.
 
 1. `curl -s "http://localhost:8080/api/books?page=1&size=3"` — note the
