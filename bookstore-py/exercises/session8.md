@@ -1,33 +1,51 @@
-# Exercise 8: Capstone — Your Real Project
+# Exercise 8: Your Own Project, and Your Roadmap
 
-**Session**: 8 — Bringing It All Together
-**Duration**: 30 minutes
-**Project**: Your own project, not BookStore. Bring one you actually work on.
+**Session**: 8, Bringing It All Together
+**Duration**: 35 minutes, plus a 5-minute closing round
+**Project**: Your own project, not BookStore. Bring one you work on.
 
 ## Goal
 
-Apply this course's workflow to a task from your own codebase. The point is
-not to finish a big feature. The point is to run Research → Plan →
-Implement → Verify end to end, on a task small enough to actually finish in
-this slot, and to leave with one reusable piece of setup (a skill, a hook,
-or an MCP connection) for your team.
+You apply the workflow of this course to one small task in your own
+codebase: research, plan, implement, verify. Then you write a five-line
+roadmap for your team. Line five is the first thing you do back at work.
 
-Pick a task you can describe in one sentence and that a single AI turn per
-phase can carry: a small bug, a short doc update, one helper function. Not a
-multi-file feature. A task that takes you all 30 minutes to describe is the
-wrong task for this slot.
+The point is not to finish a big feature. Pick a task you can describe in
+one sentence and that one Claude turn per phase can carry: a small bug, a
+short doc update, one helper function. A task that takes you the whole
+slot to describe is the wrong task for this slot.
 
-No coach and no `/verify-exercise` this time: your project is yours alone,
-so there is no shared answer to grade against. Use **Done when** to check
-yourself.
+## Before you start
+
+Titles in *italics* are slide titles from this session, unless a session
+number follows them.
+
+**Where to work.** Open a terminal in the root folder of your own project,
+the folder that holds its build file or `.git` folder. Start Claude with
+`claude`. Keep this one session for the whole exercise.
+
+**No training mode here.** Your project has no course `CLAUDE.md`, so
+Claude answers directly. You do not need *just tell me* in this exercise.
+
+**No coach and no check.** Your project is yours alone, so there is no
+shared answer to grade against. Use the **Done when** line of each task to
+check yourself.
+
+**Your notes.** Keep a text file open next to Claude, outside your project.
+Task 3 asks you to write in it.
 
 ## Tasks
 
-### 1. Setup (5 min: open project & write CLAUDE.md 3 · pick a task 2)
+### 1. Write `CLAUDE.md` and pick a task (5 min)
 
-Open a real project of yours. Create a `CLAUDE.md` at its root, or update
-the one it already has, with your project's own conventions — build/test
-commands, layout, one or two rules you actually enforce in review.
+You produce the file `CLAUDE.md` in the root folder of your project. If
+the file already exists, you update it.
+
+1. **Write the file** (3 min). Put in your project's own facts: the build
+   and test commands, the folder layout, and one or two rules you repeat
+   in code review. Copy the example below and replace every line.
+2. **Pick your task** (2 min). Say its goal in one sentence. Use the sizing
+   rule from the Goal section above.
 
 Worked example, if you want a starting shape to copy:
 
@@ -38,74 +56,90 @@ Worked example, if you want a starting shape to copy:
 `npm test` runs the suite. `npm run build` must pass before any commit.
 
 ## Layout
-`src/api/` — HTTP handlers. `src/db/` — queries, no business logic.
-`src/domain/` — the rules. Domain code must not import from `src/api/`.
+`src/api/` holds the HTTP handlers. `src/db/` holds the queries, no business logic.
+`src/domain/` holds the rules. Domain code must not import from `src/api/`.
 
 ## Conventions
 - New endpoints get a handler test and an integration test.
 - No new dependencies without a one-line reason in the PR description.
 ```
 
-Then pick your task for this exercise (see the sizing rule above).
+This file is a guide: Claude reads it before its first move
+(*Everything You Built Is a Harness*).
 
-**Done when**: `CLAUDE.md` exists (or is updated) at your project's root, and
+**Done when**: `CLAUDE.md` exists in the root folder of your project, and
 you can say your task's goal in one sentence.
 
-### 2. Apply the full workflow (17 min: research 3 · plan 4 · implement 6 · verify 2, plus 2 min buffer)
+### 2. Apply the full workflow (25 min)
 
-Run the four phases on your task:
+You produce one finished change in your project, with a passing check.
 
-1. **Research**: ask Claude to explain the relevant code before changing
-   anything.
-2. **Plan**: ask for a plan — approach, affected files, risks, how you'll
-   verify it — before any code is written.
-3. **Implement**: ask Claude to write the code for one plan step at a time.
-   Review each diff before you approve the next step.
-4. **Verify**: run the tests or checks that prove the task is done. If none
-   exist yet, write one.
+Run the four phases on your task, one Claude turn per phase:
 
-This is the same loop from the *Plan Mode* and *Avoiding Vibe Coding* slides
-in earlier sessions — now on a codebase Claude has never seen before.
+1. **Research** (4 min). Ask Claude to explain the code your task touches.
+   Do not let it change anything yet. Read the answer and correct one
+   thing if it is wrong.
+2. **Plan** (6 min). Press Shift+Tab until the screen says plan mode. Ask
+   for a plan: the approach, the files it will touch, the risks, and how
+   you will verify the result. Read the plan. Question one step before
+   you approve it.
+3. **Implement** (10 min). Ask Claude to carry out one plan step at a
+   time. Read each diff before you approve the next step.
+4. **Verify** (5 min). Run the tests or checks that prove the task is
+   done. If no test covers it yet, ask for one first and watch it fail,
+   then pass.
+
+This is the same loop as in Session 6 (*The Research → Plan → Implement
+Method*, Session 6), now on a codebase Claude has never seen before.
+
+**The trainer calls task 3 at minute 30. Move to task 3 then, even if this
+task is not finished.**
 
 **Done when**: the change is made, your verification step passed, and you
-can point to the plan step that turned out to be wrong (if any — a plan
-surviving unchanged is rare, and fine too).
+can point to the plan step that turned out wrong, if there was one.
 
-### 3. Optimize your setup (8 min: choose one 1 · build it 5 · document 2)
+### 3. Your five-line roadmap (5 min)
 
-Pick **one**, not all three:
+You produce five lines in your notes. Each line answers one question about
+your team's harness. A harness is everything around the model: guides
+steer the agent before it acts, sensors observe after it acts
+(*Everything You Built Is a Harness*).
 
-- A project-specific **skill** for a task you repeat often.
-- **One** hook or MCP connection that would help your daily work.
+Write these five lines, in this order:
 
-Worked examples, if you want a starting shape to copy:
+1. **Guide**: one file, skill or spec your team needs before the agent starts.
+2. **Sensor**: one hook, gate or review step that catches a failure after it acts.
+3. **Share**: how the guide and the sensor reach every teammate
+   (*Beyond This Course: Sensors, Packaging, Proof*).
+4. **Metric**: one number you will measure, and never felt speed
+   (*What Decides Which Number You Get*).
+5. **First step**: the first thing you do back at work. It must fit in
+   one morning.
 
-```md
-<!-- .claude/skills/add-endpoint/SKILL.md -->
-# add-endpoint
-Use this when adding a new HTTP endpoint to this project.
-Steps: 1) add the handler in src/api/, 2) add a route, 3) add a handler
-test and an integration test, 4) update docs/api.md.
+Worked example, if you want a starting shape to copy:
+
+```
+1. Guide: an AGENTS.md in the payments repo, with the build command, the folder layout and the two rules we always repeat in review.
+2. Sensor: a PostToolUse hook that runs the linter after every edit.
+3. Share: a plugin in our team marketplace, installed at project scope.
+4. Metric: rework, counted as PRs that need a second round of changes, compared over one quarter.
+5. First step: write AGENTS.md for one repo and make CLAUDE.md import it, before lunch on my first day back.
 ```
 
-```json
-// a pre-commit hook, in .claude/settings.json
-{ "hooks": { "PreToolUse": [{ "matcher": "Bash", "command": "npm run lint" }] } }
-```
+The slide *A Real Roadmap: One Team's Harness Plan* shows the same five
+questions, answered by a whole team. Yours is smaller. That is the point.
 
-Build it. Then write two sentences — what it does, and why your team would
-want it — somewhere your team will actually read them (a README, a wiki
-page, a Slack message).
+**Done when**: your notes hold five lines, and line five fits in one
+morning.
 
-**Done when**: the skill or hook/MCP config exists as a file in your
-project, and you've written the two-sentence explanation for your team.
+## Closing round (5 min)
 
-## Closing round (10 min)
+Popcorn round, whole room, no pairs. The trainer asks 4 to 5 people to
+read line five of their roadmap aloud.
 
-Popcorn round, whole room, no pairs: 4–5 participants each share one
-take-away.
+Have these answers ready as well:
 
-Good prompts to answer, if you need one: which task took longer than you
-expected, and what would you set up differently next time? Or: what did
-your `CLAUDE.md` teach you about your own project that you hadn't written
-down before?
+- Which task took longer than you expected, and what would you set up
+  differently next time?
+- What did writing `CLAUDE.md` teach you about your own project that you
+  had not written down before?

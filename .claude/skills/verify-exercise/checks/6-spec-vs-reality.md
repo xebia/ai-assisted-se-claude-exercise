@@ -1,6 +1,6 @@
 # Exercise 6 — Spec vs. reality
 
-**Under review: the plan's account of the API, not a prompt.** This is a
+**Under review: what the plan says about the API, not a prompt.** This is a
 Session 6 exception to this skill's usual framing, like sessions 4 and 5.
 The participant wrote no prompt of their own: `/speckit-specify` ran a
 fixed sentence, and `/speckit-plan` did its own research. What they
@@ -26,8 +26,8 @@ to establish ground truth. Call the running API.
 
 ## Rubric — replaces the Session 2 technique table
 
-Grade the plan's files against these five. ✅ with what it got right, ❌ with
-the predicted consequence in code.
+Grade the plan's files against these five. ✅ names what the plan got right.
+❌ names what the code will do wrong because of it.
 
 | Check | Passes when… |
 | --- | --- |
@@ -44,7 +44,7 @@ found and which they missed, in one line each.
 ## Establish ground truth
 
 Run these yourself, from `bookstore-web`, with the backend on port 8080. Do
-not take the participant's notes or the plan's files on trust.
+not trust the participant's notes or the plan's files without checking.
 
 1. `curl -s "http://localhost:8080/api/books?page=1&size=3"` — note the
    shape of the list (bare array or wrapper), the field names, and the page
@@ -68,8 +68,8 @@ If the backend is not running, say so and stop. Do not grade from memory.
 
 ## Known traps
 
-- **Bare book on the detail endpoint.** The most likely defect. Every REST
-  API the model has read returns the resource itself, so the contract says
+- **Bare book on the detail endpoint.** The most likely defect. Most REST
+  APIs return the resource itself, so the contract says
   `GET /api/books/{id}` returns a book. The real backend returns a wrapper.
   In Exercise 7 the detail page will render `undefined` for every field.
   Map it to Detail shape.
@@ -88,9 +88,9 @@ If the backend is not running, say so and stop. Do not grade from memory.
   one loses its work without an error. Map it to Foundation ownership.
 - **Two stories, one file.** A route table or a page shell that both story
   phases edit. Same consequence. Map it to `[P]` collisions.
-- **Participant list matches the files, not the API.** Their differences
-  list repeats the plan's claims as facts. Say plainly: the list was
-  written from the files, not from the curl output.
+- **Participant list matches the files, not the API.** Their list of
+  differences repeats the plan's claims as facts. Say plainly: you wrote
+  the list from the files, not from the curl output.
 
 ## Pass bar
 
@@ -99,12 +99,12 @@ If the backend is not running, say so and stop. Do not grade from memory.
 - No inventions ✅, or every invention on the participant's list.
 - `[P]` collisions and Foundation ownership both ✅, or the participant's
   verdict says *collision: yes* with the right file.
-- Partial is the normal first-attempt outcome. Most plans get the detail
-  shape wrong. Name the check that failed; do not round up.
+- A partial pass is the normal first result. Most plans get the detail
+  shape wrong. Name the check that failed. Do not raise the grade.
 
-The learning goal is the habit, not a clean plan: a plan that is wrong in
-two places, found by the participant before anyone wrote code, is a full
-pass of the habit. Say that in one line when it applies.
+The learning goal is the habit, not a clean plan. A plan that is wrong in
+two places, where the participant found both before anyone wrote code, is
+a full pass of the habit. Say that in one line when it applies.
 
 ## Held back
 

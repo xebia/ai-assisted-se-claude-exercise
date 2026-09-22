@@ -67,8 +67,8 @@ Nudge toward missing elements from this list. Never paste it as a prompt.
 - No "wait" instruction → the lead spawns two teammates and then starts
   User Story 1 itself, so two sessions edit the same page file
 - Foundation not named as finished → a teammate adds a helper to the
-  shared API client; the other teammate adds a different one; the last
-  write wins and one story breaks
+  shared API client; the other teammate adds a different one; the second
+  save overwrites the first, and one story breaks
 - No done condition → a teammate ticks its tasks after writing the code
   and never opens the browser; the story renders "Not built yet" or throws
 - "Agents" instead of "agent team" or "teammates" → Claude uses subagents;

@@ -7,23 +7,10 @@
 ## Goal
 
 You run a spec-driven flow from a one-sentence idea to a reviewed task list.
-Spec Kit writes the files. You read them, answer its questions, and check
-what it claims against the running API. You will **not** write any
-application code. Exercise 7 builds what you specify here, with a team of
+Spec Kit writes the files: a spec, a plan and a task list. You read them,
+answer its questions, and check what they claim against the running API.
+You will **not** write any application code. Exercise 7 builds what you specify here, with a team of
 agents working in parallel.
-
-## A few words we'll use
-
-- **Spec**: the file `spec.md`. It says *what* the frontend does and *why*.
-  Not how.
-- **Constitution**: the file `.specify/memory/constitution.md`. Rules that
-  every spec, plan and task must follow. It is written for you.
-- **Plan**: the file `plan.md` and four files next to it. It says *how* the
-  frontend gets built.
-- **Task list**: the file `tasks.md`. Small steps in order. A step marked
-  `[P]` may run at the same time as other `[P]` steps.
-- **Check**: the `/verify-exercise 6` command. It compares what the plan
-  says about the API with what your backend really does.
 
 ## Why a frontend
 
@@ -35,6 +22,8 @@ A frontend also splits into parts that different agents can build at the
 same time. Exercise 7 depends on that.
 
 ## Before you start
+
+Titles in *italics* are slide titles from this session.
 
 **Where to work.** You need three terminals.
 
@@ -92,7 +81,8 @@ here.
 
 ### 1. Create the spec and find what it leaves open (7 min)
 
-You create `specs/001-*/spec.md`.
+You create `specs/001-*/spec.md`. The spec says *what* the frontend does
+and *why*. Not how.
 
 1. **Start the spec** (1 min). In terminal 2, run `/speckit-specify` with
    this text, exactly as written:
@@ -102,8 +92,9 @@ You create `specs/001-*/spec.md`.
 
    The command takes one to two minutes. Do not wait for it.
 2. **Read the constitution while it runs** (3 min). Open
-   `.specify/memory/constitution.md`. It has six principles on one page.
-   Answer two questions in one written sentence. What does the constitution
+   `.specify/memory/constitution.md`. The constitution holds the rules that
+   every spec, plan and task must follow. It is written for you. It has six
+   principles on one page. Answer two questions in one written sentence. What does the constitution
    say about the API contract? Where does it say the contract comes from?
 3. **Find the gaps** (3 min). When the command is done, open
    `specs/001-*/spec.md`. Scroll to **Assumptions** at the end. This is
@@ -145,8 +136,8 @@ You change `specs/001-*/spec.md` in place. No new file.
 3. **Stop** (1 min). Do not read the spec yet. You read it in task 3, while
    a slow command runs.
 
-The command changes more than a log. Every answer is also written into
-the section where it belongs: Functional Requirements, User Stories, Data
+The command does more than list your answers. Every answer is also written
+into the section where it belongs: Functional Requirements, User Stories, Data
 Model, Success Criteria or Edge Cases. Where an answer contradicts an old
 sentence, the old sentence is replaced.
 
@@ -156,7 +147,8 @@ contains the word "guess".
 ### 3. Create the plan, and review the spec while it runs (7 min)
 
 You create five files under `specs/001-*/`: `plan.md`, `research.md`,
-`data-model.md`, `contracts/` and `quickstart.md`.
+`data-model.md`, `contracts/` and `quickstart.md`. Together they are the
+plan. The plan says *how* the frontend gets built.
 
 1. **Start the plan** (1 min). In terminal 2, run `/speckit-plan`. It runs
    two to four minutes without you. Do not wait. Do not edit the spec while
@@ -219,15 +211,16 @@ So check them.
      curl output. A wrong line in a contract does the most damage, because
      code gets built on it.
 
-   Write down every difference. An empty list is a valid result. The check
-   in task 6 grades this list against your backend.
+   Write down every difference. An empty list is a valid result. In task 6,
+   `/verify-exercise 6` compares this list with your backend.
 
 **Done when**: both predictions were written before the first curl, and you
 have a list of differences (possibly empty).
 
 ### 5. Create the task list and check the `[P]` marks (5 min)
 
-You create `specs/001-*/tasks.md`.
+You create `specs/001-*/tasks.md`. The task list holds small steps, in
+order, for building the frontend.
 
 1. **Start the task list** (1 min). In terminal 2, run `/speckit-tasks`. It
    takes one to two minutes. While it runs, look at your task 4 list: which
@@ -260,10 +253,11 @@ You create `specs/001-*/tasks.md`.
    ```
 
    Exercise 7 starts from this commit.
-2. **Start the check** (1 min). In terminal 2, run `/verify-exercise 6`. It
-   asks you for two file names: `research.md` and the contract file. Give
-   them. It calls your backend, compares, and reports. Read the report
-   during the closing round.
+2. **Start the check** (1 min). In terminal 2, run `/verify-exercise 6`.
+   This is a course command. It compares what the plan says about the API
+   with what your backend really does. It asks you for two file names:
+   `research.md` and the contract file. Give them. It calls your backend,
+   compares, and reports. Read the report during the closing round.
 
 **Done when**: `git log` shows the commit, and `/verify-exercise 6` is
 running.
@@ -274,7 +268,7 @@ running.
 reports where they contradict each other. It writes no files. Pick one
 finding you agree with and one you do not. Then compare the report with
 your task 4 list. Is a difference you *know* is real missing from the
-report? Then you have seen the limit of this command: the three files can
+report? Then you have seen the limit of this command. The three files can
 agree with each other and still be wrong about the API.
 
 ## Closing round (5 min)
