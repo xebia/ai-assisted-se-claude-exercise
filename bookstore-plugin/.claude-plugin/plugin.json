@@ -1,0 +1,8 @@
+{
+  "name": "bookstore-plugin",
+  "description": "Everything the room built in sessions 4 and 5, as one installable unit: the /commit and /changelog skills, the changelog hook, the security-auditor subagent and the SQLite MCP server.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Xebia Academy"
+  }
+}

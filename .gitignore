@@ -86,3 +86,6 @@ docs/security-audit.md
 
 # Seeded database (created by `go run .`, same pattern as the other three ports)
 store.db
+
+# Participant MCP registration (Exercise 5) - written by `claude mcp add --scope project`
+.mcp.json

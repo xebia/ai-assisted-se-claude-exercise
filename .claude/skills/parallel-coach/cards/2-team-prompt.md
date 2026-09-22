@@ -5,8 +5,16 @@ it reads `specs/001-*/tasks.md`, spawns one teammate per user story, and
 collects the results. The foundation (Phase 1 and 2) is already built and
 committed.
 
-**Slide anchors:** *Agent Teams: Multi-Agent Coordination* · *Checkpoint:
-Who Starts the Team?* · *When to Use Which Pattern* (agent team row).
+**Slide anchors:** *Agent Teams: Multi-Agent Coordination* · *Who Starts
+the Team?* (checkpoint) · *Pick Your Pattern* (agent team row) · *How the
+Exercise Works*.
+
+**The sheet's worked example** shows three of the five checks on purpose:
+the task list as source of work, an agent team with named teammates, and a
+done condition per teammate. File ownership and the lead waiting are the
+two the participant must find. Do not point at the example as incomplete
+until they ask why the coach wants more than it shows; then say that the
+example is a shape, not a full prompt.
 
 ## Technique applicability
 
@@ -47,8 +55,8 @@ Nudge toward missing elements from this list. Never paste it as a prompt.
   lead do while the teammates work?"
 - "Which files may a teammate edit? Your prompt says which story it owns.
   Does `tasks.md` say which files that is?"
-- "A teammate loads the constitution and the project. It does not see this
-  chat. How does it know that `api.js` is finished?"
+- "A teammate starts with an empty context. It does not see this chat. How
+  does it know that `api.js` is finished?"
 - "When does a teammate stop? Your prompt says 'implement User Story 1'.
   What would it check before it says done?"
 - "You wrote 'spawn agents'. Claude may read that as subagents, which
@@ -59,25 +67,27 @@ Nudge toward missing elements from this list. Never paste it as a prompt.
 - No "wait" instruction → the lead spawns two teammates and then starts
   User Story 1 itself, so two sessions edit the same page file
 - Foundation not named as finished → a teammate adds a helper to the
-  shared API client; the other teammate adds a different one; the last
-  write wins and one story breaks
+  shared API client; the other teammate adds a different one; the second
+  save overwrites the first, and one story breaks
 - No done condition → a teammate ticks its tasks after writing the code
   and never opens the browser; the story renders "Not built yet" or throws
 - "Agents" instead of "agent team" or "teammates" → Claude uses subagents;
-  the agent panel stays empty and there is no shared task list to watch
+  the Ctrl+T task list stays empty and there is nothing to watch
 - Teammates not named → the participant cannot address one later ("tell
   the list teammate to…") and has to describe it instead
 
-## Greenlight bar
+## Ready bar
 
 All five load-bearing checks present, in the participant's own words.
 
 ## What to watch
 
-First: the agent panel below the prompt input. Rows appear within a
-minute. No rows means subagents, not a team — the participant should say
-"use an agent team, not subagents". Second: the lead's own edits. Any
-edit under `src/pages/` by the lead is the "wait" defect happening live.
+First: press Ctrl+T. A real team shows tasks claimed by named teammates
+within a minute. An empty list means subagents, not a team; the agent
+panel below the prompt input shows subagents too, so the panel alone
+proves nothing. The participant should say "use an agent team, not
+subagents". Second: the lead's own edits. Any edit under `src/pages/` by
+the lead is the "wait" defect happening live.
 
 ## After the run
 
@@ -85,7 +95,8 @@ Evidence for the debrief: `git diff --stat foundation` in terminal 3, the
 tick marks in `tasks.md`, and what the browser shows for each story. If
 every changed file belongs to exactly one story, connect that to the
 ownership clause. If a foundation file changed, ask which teammate did it
-and what the prompt said about that file.
+and what the prompt said about that file. Ask for their written prediction
+from task 3 and compare it with what happened.
 
 ## Held back
 
@@ -94,9 +105,11 @@ and what the prompt said about that file.
 that if it reads that sentence and is told it applies. The only thing that
 protects the foundation is the participant's prompt. Nudge toward the
 ownership clause with the questions above. If a participant asks "does the
-task list stop them?", say no, and add why: teammates load the project and
-the constitution, not the participant's intent.
+task list stop them?", say no, and add why: teammates load the project
+settings, not the participant's intent, and not the constitution unless
+the prompt names it.
 
 Also held back until asked: a lead that is not told to wait will usually
-start a story itself. The exercise sheet says this in task 3; the coach
-lets the participant find the clause without quoting the sheet.
+start a story itself. The exercise sheet gives the remedy in task 3, after
+the team has started; the coach lets the participant find the clause
+before that without quoting the sheet.

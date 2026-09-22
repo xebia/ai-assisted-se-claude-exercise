@@ -1,6 +1,0 @@
-#!/bin/sh
-# Starts the prebuilt SQLite MCP server that matches this machine.
-os=$(uname -s | tr '[:upper:]' '[:lower:]'); arch=$(uname -m); ext=""
-case "$os" in mingw*|msys*|cygwin*) os=windows; ext=.exe ;; esac
-case "$arch" in x86_64) arch=amd64 ;; aarch64) arch=arm64 ;; esac
-exec "$(dirname "$0")/mcp-sqlite/bin/mcp-sqlite-server-$os-$arch$ext" "$@"

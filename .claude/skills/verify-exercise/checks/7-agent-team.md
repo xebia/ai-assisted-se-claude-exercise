@@ -1,4 +1,4 @@
-# Exercise 7 — Agent team built the spec
+# Exercise 7 — Agent team built the frontend
 
 **Artifact:** the `bookstore-web` working tree after the team finished, plus
 `specs/001-*/tasks.md`. The commit tagged `foundation` marks where the
@@ -39,10 +39,12 @@ Run these yourself. Do not take the participant's notes on trust.
 3. Open `specs/001-*/tasks.md`. Count story tasks ticked vs total.
 4. `grep -rn "8080\|localhost" src/ index.html` — must print nothing
    (constitution II).
-5. With a backend on :8080 and `npm run dev` running, fetch the pages the
-   quickstart names, or read the page modules and trace what they render
+5. Read `src/pages/*.js` and `src/api.js`, and trace what each page renders
    for: empty array, 404, non-JSON, fetch failure (constitution V). Every
-   one of the four must render a fixed sentence, not backend text.
+   one of the four must render a fixed sentence, not backend text. Do not
+   fetch the pages with curl: the dev server returns the empty shell, the
+   pages are rendered by JavaScript in the browser. Say "read the page
+   modules" in the report, never "fetched the page".
 6. Read `src/pages/*.js` for `import` lines. Any import from
    `node_modules` or a CDN is a constitution I violation.
 
@@ -64,8 +66,10 @@ Run these yourself. Do not take the participant's notes on trust.
   it as page 1, so Next shows page 1 twice, or it returns an error the UI
   shows. Both are a spec defect from Exercise 6 that became code. Mention
   it as a finding either way — it is the point of the closing-round question about marked guesses.
-- **Subagents, not a team.** The participant reports no agent panel. Not a
-  code defect, but a prompt one: map it to Team, not subagents.
+- **Subagents, not a team.** The participant reports an empty Ctrl+T task
+  list. Not a code defect, but a prompt one: map it to Team, not
+  subagents. Rows in the agent panel are not evidence either way: subagents
+  show there too.
 
 ## Pass bar
 
