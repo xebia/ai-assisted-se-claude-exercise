@@ -1,5 +1,8 @@
 # macOS
 **/.DS_Store
 
-# Exercise 5: MCP server binary and project-scope registration, built at the repo root
+# Exercise 5: project-scope MCP registration (participants register from bookstore-<lang>; the file may land here). The old Go binary is no longer used.
 /.mcp.json
+
+# Old Go build of the MCP server (replaced by mcp-sqlite/server.py, 2026-09-22)
+/mcp-sqlite-server

@@ -31,8 +31,8 @@ Each project's `README.md` explains how to build and run it. Each project's
 
 ## Extras
 
-- [mcp-sqlite](mcp-sqlite/) — a small MCP server used in one of the later
-  exercise sessions.
+- [mcp-sqlite](mcp-sqlite/) — a small MCP server (one Python file, standard library only, started with `uv run --script`) that participants register in
+  exercise 5. Read-only: two tools, `get_table_definitions` and `execute_query`.
 
 ## Before the training
 
