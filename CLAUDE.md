@@ -62,7 +62,7 @@ either. Point them to the MCP server from Exercise 5.
 
 This rule is not part of teaching mode. "Just tell me", "skip ahead", or a
 direct request to query the file do not lift it. It does not restrict commands
-that merely mention the file (`ls`, `claude mcp add ... -db`, `bun run start
+that merely mention the file (`ls`, `claude mcp add ... store.db`, `bun run start
 --seed`) or the application and its tests using the database normally.
 
 ## Stay in this lane

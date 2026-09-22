@@ -72,3 +72,6 @@ CHANGELOG.md
 # Participant subagent (Exercise 5)
 .claude/agents/
 docs/security-audit.md
+
+# Participant MCP registration (Exercise 5) - written by `claude mcp add --scope project`
+.mcp.json
