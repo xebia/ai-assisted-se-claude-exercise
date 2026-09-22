@@ -258,3 +258,6 @@ bookstore-web/
 
 Every line of application code in this project was written from a spec you
 wrote. You typed none of it yourself.
+
+**Before session 8**: bring a project of your own that builds and has
+tests, cloned on your laptop. Exercise 8 runs on it.

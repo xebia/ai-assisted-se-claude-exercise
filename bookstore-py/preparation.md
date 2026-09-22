@@ -136,6 +136,13 @@ not a good start to a session.
 Verify: `specify check` reports no problems, and `npm run dev` starts a server
 on http://localhost:5173.
 
+### 7. A project of your own (for Exercise 8)
+
+In Exercise 8 you apply the full workflow of the course to one small task
+in a project of your own. Bring one that builds and has tests, cloned on
+your laptop, and that you are allowed to use in a training. No project
+you can bring? The exercise has a BookStore fallback.
+
 ## Quick checklist
 
 - Your editor or IDE is installed and can open Python files
@@ -155,6 +162,8 @@ on http://localhost:5173.
   and `git status` shows it unmodified)
 - Claude Code is 2.1.178 or newer, and `bookstore-web/.claude/settings.json`
   is present and unmodified (`git status` shows nothing for it)
+- A project of your own is cloned on your laptop, and it builds and has
+  tests (for Exercise 8)
 
 ## Questions?
 

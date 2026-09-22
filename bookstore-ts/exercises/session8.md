@@ -2,7 +2,8 @@
 
 **Session**: 8, Bringing It All Together
 **Duration**: 35 minutes, plus a 5-minute closing round
-**Project**: Your own project, not BookStore. Bring one you work on.
+**Project**: Your own project, not BookStore. Bring one that builds and
+has tests. No project with you? BookStore is the fallback, see below.
 
 ## Goal
 
@@ -11,20 +12,33 @@ codebase: research, plan, implement, verify. Then you write a five-line
 roadmap for your team. Line five is the first thing you do back at work.
 
 The point is not to finish a big feature. Pick a task you can describe in
-one sentence and that one Claude turn per phase can carry: a small bug, a
-short doc update, one helper function. A task that takes you the whole
-slot to describe is the wrong task for this slot.
+one sentence. Pick one that fits in twenty minutes: a small bug, a short
+doc update, one helper function. A task that takes you the whole slot to
+describe is the wrong task for this slot.
 
 ## Before you start
 
 Titles in *italics* are slide titles from this session, unless a session
 number follows them.
 
-**Where to work.** Open a terminal in the root folder of your own project,
-the folder that holds its build file or `.git` folder. Start Claude with
-`claude`. Keep this one session for the whole exercise.
+**Where to work.** Open a terminal in the root folder of your own project.
+That is the folder that holds its build file or `.git` folder. Start
+Claude with `claude`. Keep this one session for the whole exercise.
 
-**No training mode here.** Your project has no course `CLAUDE.md`, so
+**Save your work first.** Claude edits real files in this exercise. Run
+`git status`. If it shows changes, commit them or run `git stash` before
+task 1.
+
+**No project with you?** Use BookStore. Open a terminal in the
+`bookstore-ts` folder, the one that contains `package.json`. Your task for task
+2 is then: the book search loads the author of every book with a separate
+query. Change `search()` in `src/store/book.ts` so that one search
+runs one query. In task 1, update `CLAUDE.local.md`, the file you wrote in
+session 3. Never edit the course `CLAUDE.md`. Training mode is on in
+BookStore, so Claude may ask you one question before it acts. Answer it in
+one line, or say *just tell me*.
+
+**No training mode here.** Your own project has no course `CLAUDE.md`, so
 Claude answers directly. You do not need *just tell me* in this exercise.
 
 **No coach and no check.** Your project is yours alone, so there is no
@@ -32,7 +46,7 @@ shared answer to grade against. Use the **Done when** line of each task to
 check yourself.
 
 **Your notes.** Keep a text file open next to Claude, outside your project.
-Task 3 asks you to write in it.
+Tasks 2 and 3 ask you to write in it.
 
 ## Tasks
 
@@ -74,15 +88,16 @@ you can say your task's goal in one sentence.
 
 You produce one finished change in your project, with a passing check.
 
-Run the four phases on your task, one Claude turn per phase:
+Run the four phases on your task, one phase at a time:
 
 1. **Research** (4 min). Ask Claude to explain the code your task touches.
    Do not let it change anything yet. Read the answer and correct one
    thing if it is wrong.
-2. **Plan** (6 min). Press Shift+Tab until the screen says plan mode. Ask
-   for a plan: the approach, the files it will touch, the risks, and how
-   you will verify the result. Read the plan. Question one step before
-   you approve it.
+2. **Plan** (6 min). Write one line in your notes first: which file will
+   the plan change first? Then press Shift+Tab until the screen says plan
+   mode (Alt+M on some Windows terminals). Ask for a plan: the approach,
+   the files it will touch, the risks, and how you will verify the
+   result. Read the plan. Question one step before you approve it.
 3. **Implement** (10 min). Ask Claude to carry out one plan step at a
    time. Read each diff before you approve the next step.
 4. **Verify** (5 min). Run the tests or checks that prove the task is
@@ -90,18 +105,19 @@ Run the four phases on your task, one Claude turn per phase:
    then pass.
 
 This is the same loop as in Session 6 (*The Research → Plan → Implement
-Method*, Session 6), now on a codebase Claude has never seen before.
+Method*, Session 6), with verification as its own step. This time it runs
+on your own code.
 
 **The trainer calls task 3 at minute 30. Move to task 3 then, even if this
 task is not finished.**
 
 **Done when**: the change is made, your verification step passed, and you
-can point to the plan step that turned out wrong, if there was one.
+can name the plan step that was wrong, if any.
 
 ### 3. Your five-line roadmap (5 min)
 
 You produce five lines in your notes. Each line answers one question about
-your team's harness. A harness is everything around the model: guides
+your team's harness. A harness is everything around the model. Guides
 steer the agent before it acts, sensors observe after it acts
 (*Everything You Built Is a Harness*).
 
