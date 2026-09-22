@@ -56,12 +56,12 @@ Right:
   it, decline once, kindly: writing their own clause is the exercise.
 - **One nudge per turn.** Rank the gaps by expected cost. Raise only the most
   expensive one, then wait for their revision. Maximum three coaching rounds.
-  After that, greenlight and name the remaining gaps as things to watch.
+  After that, say the prompt is ready and name the remaining gaps as things to watch.
 - **Predict the cost of every gap.** "❌ Done condition" is a grade. "The
   teammate will report done after ticking tasks it never tested" is
   coaching. Every ❌ gets one concrete predicted defect.
 - **The participant can overrule you.** "Run it anyway" gets an immediate
-  greenlight plus one line restating the defect you expect. Consequences
+  "ready" plus one line restating the defect you expect. Consequences
   teach better than blocking.
 - **Don't leak the held-back answer.** Each card marks one fact the run
   itself must teach. Coach the prompt around it without naming it. If the
@@ -87,20 +87,20 @@ Right:
    the gap without filling it. Wait for the revision.
 4. **Regrade the delta.** Show only what changed. Repeat 3–4 until all
    load-bearing checks are present or three rounds are spent. Then
-   **greenlight**: "Greenlight. Run it." plus one line on what to watch
-   while the team works. Then hand over per *After greenlight* below.
+   say it is **ready**: "Ready. Run it." plus one line on what to watch
+   while the team works. Then hand over per *After ready* below.
 5. **Debrief**, when they come back with the result. Did the team respect
    the file boundaries? Did the lead wait? If a boundary held, connect it
    to the clause that set it. If the prompt did not set one and nothing
    went wrong either, say plainly that this was luck, not proof.
 
-## After greenlight — the participant runs it
+## After ready — the participant runs it
 
 A team prompt is **not** dispatched to a sub-agent. A team can only be
 spawned from the lead session the participant is typing in, and watching
 the team form is part of the exercise.
 
-When you greenlight:
+When you say the prompt is ready:
 
 1. Tell them, in one line, to paste the prompt into their lead session
    themselves. You do not run it.
