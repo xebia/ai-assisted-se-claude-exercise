@@ -3,7 +3,7 @@
 **Session**: 8, Bringing It All Together
 **Duration**: 35 minutes, plus a 5-minute closing round
 **Project**: Your own project, not BookStore. Bring one that builds and
-has tests. No project with you? BookStore is the fallback, see below.
+has tests. If you have no project with you, use BookStore (see below).
 
 ## Goal
 
@@ -30,13 +30,13 @@ Claude with `claude`. Keep this one session for the whole exercise.
 task 1.
 
 **No project with you?** Use BookStore. Open a terminal in the
-`bookstore-py` folder, the one that contains `main.py`. Your task for task
-2 is then: the book search loads the author of every book with a separate
-query. Change `search()` in `bookstore/store/book.py` so that one search
-runs one query. In task 1, update `CLAUDE.local.md`, the file you wrote in
-session 3. Never edit the course `CLAUDE.md`. Training mode is on in
-BookStore, so Claude may ask you one question before it acts. Answer it in
-one line, or say *just tell me*.
+`bookstore-py` folder, the one that contains `main.py`. Then this is your
+task for task 2: the book search loads the author of every book with a
+separate query. Change `search()` in `bookstore/store/book.py` so that one
+search runs one query. In task 1, update `CLAUDE.local.md`, the file you
+wrote in session 3. Never edit the course `CLAUDE.md`. Training mode is on
+in BookStore, so Claude may ask you one question before it acts. Answer it
+in one line, or say *just tell me*.
 
 **No training mode here.** Your own project has no course `CLAUDE.md`, so
 Claude answers directly. You do not need *just tell me* in this exercise.
@@ -53,7 +53,8 @@ Tasks 2 and 3 ask you to write in it.
 ### 1. Write `CLAUDE.md` and pick a task (5 min)
 
 You produce the file `CLAUDE.md` in the root folder of your project. If
-the file already exists, you update it.
+the file already exists, you update it. If you work in BookStore, update
+`CLAUDE.local.md` instead.
 
 1. **Write the file** (3 min). Put in your project's own facts: the build
    and test commands, the folder layout, and one or two rules you repeat
@@ -78,7 +79,7 @@ Worked example, if you want a starting shape to copy:
 - No new dependencies without a one-line reason in the PR description.
 ```
 
-This file is a guide: Claude reads it before its first move
+This file is a guide: Claude reads it before it starts work
 (*Everything You Built Is a Harness*).
 
 **Done when**: `CLAUDE.md` exists in the root folder of your project, and
@@ -95,17 +96,17 @@ Run the four phases on your task, one phase at a time:
    thing if it is wrong.
 2. **Plan** (6 min). Write one line in your notes first: which file will
    the plan change first? Then press Shift+Tab until the screen says plan
-   mode (Alt+M on some Windows terminals). Ask for a plan: the approach,
-   the files it will touch, the risks, and how you will verify the
-   result. Read the plan. Question one step before you approve it.
+   mode. On some Windows terminals the key is Alt+M. Ask for a plan: the
+   approach, the files it will touch, the risks, and how you will verify
+   the result. Read the plan. Question one step before you approve it.
 3. **Implement** (10 min). Ask Claude to carry out one plan step at a
    time. Read each diff before you approve the next step.
 4. **Verify** (5 min). Run the tests or checks that prove the task is
    done. If no test covers it yet, ask for one first and watch it fail,
    then pass.
 
-This is the same loop as in Session 6 (*The Research → Plan → Implement
-Method*, Session 6), with verification as its own step. This time it runs
+This is the same loop as the slide *The Research → Plan → Implement
+Method* (Session 6), with verification as its own step. This time it runs
 on your own code.
 
 **The trainer calls task 3 at minute 30. Move to task 3 then, even if this
@@ -127,7 +128,7 @@ Write these five lines, in this order:
 2. **Sensor**: one hook, gate or review step that catches a failure after it acts.
 3. **Share**: how the guide and the sensor reach every teammate
    (*Beyond This Course: Sensors, Packaging, Proof*).
-4. **Metric**: one number you will measure, and never felt speed
+4. **Metric**: one number you will measure, not how fast it feels
    (*What Decides Which Number You Get*).
 5. **First step**: the first thing you do back at work. It must fit in
    one morning.
