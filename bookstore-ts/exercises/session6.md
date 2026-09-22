@@ -1,325 +1,306 @@
 # Exercise 6: Spec-Driven Development with Spec Kit
 
-**Session**: 6 — Real Development Workflows **Duration**: 30 minutes
-**Project**: `bookstore-web` — a new frontend for the BookStore API you already
-know.
+**Session**: 6 — Real Development Workflows
+**Duration**: 45 minutes
+**Project**: `bookstore-web`, a new frontend for the BookStore API you already know.
 
-**Goal**: Run a real spec-driven flow end to end and produce every artifact up
-to a task breakdown. You will **not** write any application code. Exercise 7
-implements what you specify here, with a team of agents working in parallel.
+## Goal
 
----
+You run a spec-driven flow from a one-sentence idea to a reviewed task list.
+Spec Kit writes the files. You read them, answer its questions, and check
+what it claims against the running API. You will **not** write any
+application code. Exercise 7 builds what you specify here, with a team of
+agents working in parallel.
+
+## A few words we'll use
+
+- **Spec**: the file `spec.md`. It says *what* the frontend does and *why*.
+  Not how.
+- **Constitution**: the file `.specify/memory/constitution.md`. Rules that
+  every spec, plan and task must follow. It is written for you.
+- **Plan**: the file `plan.md` and four files next to it. It says *how* the
+  frontend gets built.
+- **Task list**: the file `tasks.md`. Small steps in order. A step marked
+  `[P]` may run at the same time as other `[P]` steps.
+- **Check**: the `/verify-exercise 6` command. It compares what the plan
+  says about the API with what your backend really does.
 
 ## Why a frontend
 
-The BookStore API has no UI. That makes it genuinely unspecified: the HTTP
-contract is discoverable, but nothing tells you what happens on an empty list,
-what a failed request looks like, or which fields a book page shows. Those are
-decisions, and decisions are what a specification is for.
+The BookStore API has no user interface. So nothing tells you what an empty
+list looks like, what a failed request shows, or which fields a book page
+has. Those are decisions. Decisions are what a specification is for.
 
-It also breaks into pieces that different agents can build at the same time.
-That is the property Exercise 7 depends on.
+A frontend also splits into parts that different agents can build at the
+same time. Exercise 7 depends on that.
 
 ## Before you start
 
-Setup is in `preparation.md`. Verify it in one command:
+**Where to work.** You need three terminals.
 
-```bash
-cd ../bookstore-web && specify check
-```
-
-You need three terminals. **Not** the frontend dev server. There is no
-frontend yet, and that is the point: this session you specify it. Exercise 7
-builds it.
-
-**Terminal 1 — your backend**, from the `bookstore-ts` project directory
-(any of the four backends works; the spec you write is agnostic):
+*Terminal 1: your backend.* Open it in the `bookstore-ts` folder and start
+the API:
 
 ```bash
 bun run start
 ```
 
-Confirm it answers. This must return JSON, not a connection error:
+Check that it answers. This must print JSON, not a connection error:
 
 ```bash
 curl http://localhost:8080/api/books
 ```
 
-**Terminal 2 — Claude Code, started from `bookstore-web` with read access
-to your backend:**
+*Terminal 2: Claude Code.* Open it in the `bookstore-web` folder. Start
+Claude with access to your backend's source:
 
 ```bash
-cd ../bookstore-web && claude --add-dir ../bookstore-ts
+claude --add-dir ../bookstore-ts
 ```
 
-**Terminal 3 — a plain shell**, anywhere in the repo. You need one for `curl`
-and `git` while Claude Code is busy in terminal 2.
+*Terminal 3: a plain shell.* Open it in the `bookstore-web` folder. You use
+it for `curl` and `git` while Claude is busy in terminal 2.
 
-You will call the API on `http://localhost:8080` directly. The finished frontend
-will reach it at the same-origin path `/api`. `bookstore-web/vite.config.js`
-proxies that to port 8080, so the paths in your spec are the ones you see here.
+Do **not** start the frontend dev server. There is no frontend yet. This
+session you specify it. Exercise 7 builds it.
 
----
+**Check Spec Kit.** In terminal 3, run:
+
+```bash
+specify check
+```
+
+It must report no problems. In terminal 2, type `/speckit` and check that
+Claude offers the `speckit-*` commands. Missing? Run the Spec Kit steps from
+`preparation.md` again (section "Spec Kit and Node"), then restart Claude.
+
+**Training mode is off.** Earlier sessions used a `CLAUDE.md` file that
+makes Claude teach instead of answer. `bookstore-web` has no such file, and
+`--add-dir` does not load the one from your backend. So Claude answers
+directly this session. You do not need the experiment tag.
+
+**Stuck, or out of time?** Say *"just tell me"*. Claude then gives you the
+answer. That is allowed.
+
+**The API paths.** In this exercise you call the API on
+`http://localhost:8080/api/...`. The finished frontend will call the same
+paths as `/api/...` on its own origin. Vite forwards those to port 8080
+(see `vite.config.js`). So the paths in your spec are the paths you see
+here.
 
 ## Tasks
 
-### 1. Read the constitution (2 min)
+### 1. Create the spec and find what it leaves open (7 min)
+
+You create `specs/001-*/spec.md`.
 
-Spec Kit separates two kinds of rules. A **spec** describes one feature and is
-done when that feature ships. A **constitution** holds the rules that outlive
-every feature: stack, architecture, what counts as finished. Spec Kit re-reads
-it at each later step, so a plan or a task that breaks one of these is a defect
-to fix, not a trade-off to weigh.
-
-Open [`.specify/memory/constitution.md`](../../bookstore-web/.specify/memory/constitution.md)
-in `bookstore-web`. Yours is pre-written. You are not authoring one this session.
-
-It has six principles and fits on one page. Read them, then answer this:
-**What does the constitution say about the API contract, and where does it
-say the contract comes from?**
-
-> **Tip**: Use Claude Code to find out!
-
-### 2. `/speckit-specify` — capture intent (3 min)
-
-Use this prompt **exactly as written**:
-
-> A web UI for the BookStore API. Users can browse books and open a book to see
-> its details and its author. The API is already running behind `/api`.
-
-It writes `specs/001-*/spec.md`. Open it and scroll to **Assumptions** at the
-bottom. That is where the spec parks what it invented. Nothing has called the
-API yet, so every one of them is a guess, and they are the field names and
-numbers your UI gets built from.
-
-Now read the **Requirements** section in the `spec.md` with one question in
-mind: **what would someone building this still have to make up?** Three worth
-checking:
-
-- How does a visitor reach page 2 of a list longer than one screen?
-- What does the list show when a page has no books on it?
-- What does the page show for a book id that does not exist?
-
-**Which of those three does the spec actually answer?**
-
-### 3. `/speckit-clarify` — interrogate the spec (6 min)
-
-**This is the core of the exercise.** Spec Kit asks up to five targeted
-questions about what you left underspecified, and writes your answers back into
-the spec.
-
-Unlike the other commands, this one creates **no new file**. Everything lands in
-the spec you already have:
-
-```
-specs/001-*/spec.md                     modified in place, re-saved after every answer
-specs/001-*/checklists/requirements.md  re-validated — only if it exists; ours will not
-```
-
-Two new headings appear, and by design only these two. They are placed near
-the **top** of the spec, just after its overview section, not appended at
-the end:
-
-```markdown
-## Clarifications
-
-### Session YYYY-MM-DD
-
-- Q: <the question it asked> → A: <the answer you gave>
-```
-
-That log is the cheap part. Each answer is *also* applied wherever it
-belongs: Functional Requirements, User Stories, Data Model, Success Criteria,
-or Edge Cases. Where an answer contradicts something the spec already said,
-the old sentence is **replaced, not added to**. What you get back is not the
-file you had plus a section at the top.
-
-**First, snapshot the spec** so you can see all of that later:
-
-```bash
-git add specs/
-```
-
-Staging is enough. No commit needed. `git diff` compares your working tree
-against what you staged, so it will show exactly what `/speckit-clarify`
-touched. You read that diff in task 4, not now.
-
-Now run `/speckit-clarify`. It asks up to five questions, one at a time, and
-waits for each answer.
-
-One rule: **if you are guessing, say so in the answer.** Your words go into the
-spec as written, so the label travels with them. Tasks 4 and 5 come back for
-these.
-
-**Answer fast.** Five questions, six minutes. You are making a first draft,
-not a perfect spec.
-
-Then stop. Do not read the spec yet. That is what you do in task 4, while a
-slow command runs.
-
-### 4. `/speckit-plan` — decide how, and review while it works (6 min)
-
-This is the slowest command in the flow, and it runs unattended for two to four
-minutes. That is not dead time. It is when you review what you just wrote.
-
-**Start it now**, then read on.
-
-It produces **five** files, not one:
-
-```
-specs/001-*/plan.md          the approach
-           research.md       what it learned about the API
-           data-model.md     the entities
-           contracts/        the API contract it extracted
-           quickstart.md     how to verify
-```
-
-Note the second file. `/speckit-plan` does its own research, unprompted.
-Task 5 comes back to that.
-
-#### While it runs: review `specs/001-*/spec.md`
-
-In terminal 3. Do not touch the session running the command:
-
-```bash
-cd ../bookstore-web && git diff specs/001-*/spec.md
-```
-
-The `## Clarifications` log at the top tells you what you were *asked*. Only the
-diff shows **where the answers landed**, and that is the whole point, because
-`/speckit-clarify` rewrote Functional Requirements, User Stories, Data Model,
-Success Criteria and Edge Cases in place while you were answering.
-
-Four things to look for:
-
-- **Your marked guesses.** Find each one in the diff. A guess that became a
-  Functional Requirement now looks exactly like an observed fact to everyone
-  downstream, including the agents in Exercise 7.
-- **Lines that disappeared.** Look for `-` lines outside the Clarifications
-  block. Where an answer contradicted something the spec already said, the old
-  sentence was *replaced*. Deletions are the edits you never see if you only
-  read the finished file.
-- **Answers that travelled further than you expected.** A single reply can
-  rewrite a user story, add an edge case *and* change the data model. Did any of
-  them land somewhere you would not have put them?
-- **Anything you now disagree with.** Write it down; do not fix it yet.
-  `/speckit-plan` is reading this file right now, and editing it mid-run gets
-  you a plan built from two different specs.
-
-**Now compare with your neighbour.** Put their `spec.md` next to yours and find
-**one requirement that differs**. You started from the same prompt, against the
-same API. Would either of you have noticed that difference if neither had
-written a spec?
-
-### 5. Check the plan against reality (4 min)
-
-`/speckit-plan` wrote its own account of what this API does, in two places:
-
-```
-specs/001-*/research.md
-specs/001-*/contracts/
-```
-
-Nobody called the API to write those. They were inferred, and Exercise 7
-builds against them.
-
-So call it yourself. In terminal 3, thirty seconds. This answers the first of
-the three gaps from task 2, plus one thing the spec never thought to ask:
-
-```bash
-# how do you get page 2?
-curl -s 'http://localhost:8080/api/books?page=0&size=3'
-curl -s 'http://localhost:8080/api/books?page=1&size=3'
-
-# what shape is one book?
-curl -s http://localhost:8080/api/books/1
-```
-
-**Page 0 does what you decided in Session 2**: page 1 again, or an error.
-Either way, pages start at 1. And **a book is not a
-book**: `GET /api/books/1` returns `{"book": {…}, "author": {…}}`, a wrapper,
-while the list returns a bare array. Neither is guessable, and neither was in
-your spec.
-
-Now open both files and check them against what you just saw:
-
-- **Shape** — do they say `GET /api/books/{id}` returns a book? The most likely
-  error of the three, because every REST API the model has ever read returns
-  the resource itself.
-- **Paging** — do they say pages start at 1, and what page 0 does? Anything
-  starting at 0 is wrong.
-- **Inventions** — endpoints, fields or status codes that appear nowhere in your
-  curl output. A contract is where a plausible invention does the most damage.
-
-**Did you find one?** Write it down. In a real project it goes back into the
-plan before anyone writes code.
-
-### 6. `/speckit-tasks` — break it down (4 min)
-
-Open `specs/001-*/tasks.md`. This is the artifact Exercise 7 consumes, so read
-it properly.
-
-The task format is `[ID] [P?] [Story]`:
-
-- `[P]` — can run in parallel: different files, no dependencies
-- `[US1]`, `[US2]` — which user story the task belongs to
-
-Find the **Parallel Opportunities** and **Parallel Team Strategy** sections at
-the bottom. That is a staffing plan for agents.
-
-Now check one thing: pick two `[P]` tasks from **different** user stories. Do
-they write the same file? Shared things, such as the API client, the
-stylesheet, or `index.html`, belong to the foundational phase (constitution
-principle IV). If one lives inside a story, the `[P]` is a lie and two
-agents will collide.
-
-### 7. `/speckit-analyze` — validate (3 min)
-
-A read-only consistency check across `spec.md`, `plan.md` and `tasks.md`. It
-writes no files.
-
-Read the report and pick **one finding you agree with** and **one you do not**.
-Be ready to say why.
-
-Two places to look first: the answers you marked as guesses in task 3, and
-whatever you noted in task 5. If something you *know* to be wrong is absent from
-this report, that is the lesson. Consistency is not correctness.
-
-### 8. Commit
-
-```bash
-git add specs/ && git commit -m "spec: bookstore-web frontend"
-```
-
-A spec that lives only in a chat window is not a spec.
-
----
-
-## Pair Discussion (2 min)
-
-- Which `/speckit-clarify` question did you not see coming?
-- Which of your answers travelled further into the spec than you expected?
-- Did `/speckit-plan` get anything wrong about the API? Would `/speckit-analyze`
-  ever have told you?
-- You started from the same prompt against the same API. Where do your two specs
-  differ, and which of those differences would ever have surfaced if neither of
-  you had written one?
-- Could two agents genuinely take your two user stories from `tasks.md` right
-  now? If not, what is in the way?
-
----
+1. **Start the spec** (1 min). In terminal 2, run `/speckit-specify` with
+   this text, exactly as written:
+
+   > A web UI for the BookStore API. Users can browse books and open a book to see
+   > its details and its author. The API is already running behind `/api`.
+
+   The command takes one to two minutes. Do not wait for it.
+2. **Read the constitution while it runs** (3 min). Open
+   `.specify/memory/constitution.md`. It has six principles on one page.
+   Answer two questions in one written sentence. What does the constitution
+   say about the API contract? Where does it say the contract comes from?
+3. **Find the gaps** (3 min). When the command is done, open
+   `specs/001-*/spec.md`. Scroll to **Assumptions** at the end. This is
+   where Spec Kit writes what it invented. Nothing has called the API yet,
+   so each assumption is a guess. Now read the **Requirements** section
+   with three questions in mind:
+   - How does a visitor reach page 2 of a long list?
+   - What does the list show when a page has no books?
+   - What does the page show for a book id that does not exist?
+
+   Write down which of the three the spec answers. Expect one or none.
+
+**Done when**: `spec.md` exists, you wrote the constitution answer, and you
+wrote which of the three questions the spec answers.
+
+### 2. Save the spec, then answer the clarify questions (8 min)
+
+You change `specs/001-*/spec.md` in place. No new file.
+
+1. **Save the spec first** (1 min). In terminal 3:
+
+   ```bash
+   git add specs
+   ```
+
+   You do not commit. Later, `git diff` shows the difference between this
+   saved version and the changed file. Task 3 reads that diff.
+2. **Run `/speckit-clarify`** (6 min). It asks up to five questions about
+   what the spec leaves open, one at a time, and waits for each answer.
+   Answer fast. This is a first draft, not a perfect spec.
+
+   One rule: **if you are guessing, write the word "guess" in your
+   answer.** Your words go into the spec exactly as you type them. So the
+   label stays with the guess. Example answer:
+
+   > 20 books per page (guess, not checked against the API)
+
+   Zero questions? Then Spec Kit found nothing open. Go on to task 3.
+3. **Stop** (1 min). Do not read the spec yet. You read it in task 3, while
+   a slow command runs.
+
+The command changes more than a log. Every answer is also written into
+the section where it belongs: Functional Requirements, User Stories, Data
+Model, Success Criteria or Edge Cases. Where an answer contradicts an old
+sentence, the old sentence is replaced.
+
+**Done when**: `/speckit-clarify` is finished, and every answer you guessed
+contains the word "guess".
+
+### 3. Create the plan, and review the spec while it runs (7 min)
+
+You create five files under `specs/001-*/`: `plan.md`, `research.md`,
+`data-model.md`, `contracts/` and `quickstart.md`.
+
+1. **Start the plan** (1 min). In terminal 2, run `/speckit-plan`. It runs
+   two to four minutes without you. Do not wait. Do not edit the spec while
+   it runs: the command is reading that file.
+2. **Read the diff** (5 min). In terminal 3:
+
+   ```bash
+   git diff -- specs
+   ```
+
+   The `## Clarifications` section near the top lists the questions you were
+   asked. The rest of the diff shows where your answers went. Look for
+   three things:
+   - **Your guesses.** Find each answer with the word "guess". It now looks
+     like a fact to everyone who reads the spec later, including the agents
+     in Exercise 7.
+   - **Removed lines.** Lines that start with `-` outside the Clarifications
+     section. An answer contradicted an old sentence, so Spec Kit removed
+     it. You only see this in the diff.
+   - **Answers in a place you did not expect.** One answer can change a
+     user story, add an edge case and change the data model.
+3. **Write down one thing you disagree with** (1 min). Do not fix it yet.
+   In a real project it goes back into the spec before the plan is used.
+
+**Done when**: the five files exist, and you wrote down one line of the
+spec you disagree with.
+
+### 4. Predict, then check the plan against the API (5 min)
+
+You produce a written list of differences between `research.md` plus
+`contracts/` and the real API.
+
+`/speckit-plan` did its own research. It wrote what it thinks the API does
+into `research.md` and `contracts/`. Exercise 7 builds against those files.
+So check them.
+
+1. **Predict first** (1 min). Before you run anything, write down two
+   predictions:
+   - `GET /api/books/1` returns: a book object, or something else?
+   - The first page of the list is page number: 0 or 1?
+
+   A wrong prediction is fine. A missing prediction is the only failure.
+2. **Call the API** (1 min). In terminal 3:
+
+   ```bash
+   curl -s "http://localhost:8080/api/books?page=0&size=3"
+   curl -s "http://localhost:8080/api/books?page=1&size=3"
+   curl -s "http://localhost:8080/api/books/1"
+   ```
+
+   On Windows PowerShell, type `curl.exe` instead of `curl`.
+   Compare the output with your two predictions.
+3. **Check the two files** (3 min). Open `specs/001-*/research.md` and the
+   file in `specs/001-*/contracts/`. Compare them with the curl output:
+   - **Shape**: what do they say `GET /api/books/{id}` returns? Is that
+     what you saw?
+   - **Paging**: which number is the first page, and what happens with page
+     0? Is that what you saw?
+   - **Inventions**: endpoints, fields or status codes that are not in your
+     curl output. A wrong line in a contract does the most damage, because
+     code gets built on it.
+
+   Write down every difference. An empty list is a valid result. The check
+   in task 6 grades this list against your backend.
+
+**Done when**: both predictions were written before the first curl, and you
+have a list of differences (possibly empty).
+
+### 5. Create the task list and check the `[P]` marks (5 min)
+
+You create `specs/001-*/tasks.md`.
+
+1. **Start the task list** (1 min). In terminal 2, run `/speckit-tasks`. It
+   takes one to two minutes. While it runs, look at your task 4 list: which
+   difference would do the most damage once it is code?
+2. **Read the format** (1 min). Open `specs/001-*/tasks.md`. Each task looks
+   like `[ID] [P?] [Story]`. `[P]` means: different files, no
+   dependencies, so it can run at the same time as other `[P]` tasks.
+   `[US1]` and `[US2]` name the user story. Find the sections **Parallel
+   Opportunities** and **Parallel Team Strategy** near the end. That is the
+   work split for the agents in Exercise 7.
+3. **Check for a collision** (3 min). Pick two `[P]` tasks from
+   **different** user stories. Do they write the same file? Then check the
+   shared files: the API client, the stylesheet, `index.html`. The
+   constitution (principle IV) says these belong to the foundation phase,
+   not to a story. If a story task writes one of them, two agents will edit
+   the same file at the same time. One of them loses its work without an
+   error (*tasks.md: A Schedule, Not a Checklist*). Write down:
+   *collision: yes or no*, and the file name if yes.
+
+**Done when**: you wrote down *collision: yes* with a file name, or
+*collision: no*.
+
+### 6. Commit and run the check (2 min)
+
+1. **Commit** (1 min). In terminal 3:
+
+   ```bash
+   git add specs
+   git commit -m "spec: bookstore-web frontend"
+   ```
+
+   Exercise 7 starts from this commit.
+2. **Start the check** (1 min). In terminal 2, run `/verify-exercise 6`. It
+   asks you for two file names: `research.md` and the contract file. Give
+   them. It calls your backend, compares, and reports. Read the report
+   during the closing round.
+
+**Done when**: `git log` shows the commit, and `/verify-exercise 6` is
+running.
+
+## Bonus (only if time remains)
+
+**Run `/speckit-analyze`.** It reads `spec.md`, `plan.md` and `tasks.md` and
+reports where they contradict each other. It writes no files. Pick one
+finding you agree with and one you do not. Then compare the report with
+your task 4 list. Is a difference you *know* is real missing from the
+report? Then you have seen the limit of this command: the three files can
+agree with each other and still be wrong about the API.
+
+## Closing round (5 min)
+
+The trainer asks the room. Have these answers ready:
+
+- Which `/speckit-clarify` question did you not expect?
+- Which of your answers changed a part of the spec you did not expect?
+- Did your two predictions in task 4 hold? What did the plan get wrong about
+  the API?
+- Did you find a `[P]` collision? Which file?
+- Everyone started from the same sentence. Where does your spec differ from
+  the spec of the person next to you? Would you have seen that difference
+  without a spec?
 
 ## What you should have
 
 ```
 bookstore-web/specs/001-*/
-  spec.md            intent, clarified
+  spec.md            intent, with your clarify answers written in
   plan.md            approach
-  research.md        what the plan learned about the API
+  research.md        what the plan thinks the API does
   data-model.md      entities
-  contracts/         API contract
-  quickstart.md      verification
-  tasks.md           the work queue, with [P] markers
+  contracts/         the API contract, as the plan wrote it
+  quickstart.md      how to verify
+  tasks.md           the work list, with [P] marks
 ```
 
-No application code. That is the point. `/speckit-implement` is Exercise 7.
+No application code. `/speckit-implement` is Exercise 7.
