@@ -33,6 +33,11 @@ Each project's `README.md` explains how to build and run it. Each project's
 
 - [mcp-sqlite](mcp-sqlite/) — a small MCP server (one Python file, standard library only, started with `uv run --script`) that participants register in
   exercise 5. Read-only: two tools, `get_table_definitions` and `execute_query`.
+- [bookstore-plugin](bookstore-plugin/) — everything from exercises 4 and 5 as one
+  Claude Code plugin: the `/commit` and `/changelog` skills, the changelog hook,
+  the security-auditor subagent and the SQLite server. Shown live in session 5;
+  try it yourself with `claude --plugin-dir ../bookstore-plugin` from your
+  language folder.
 
 ## Before the training
 

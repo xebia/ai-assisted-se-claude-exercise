@@ -244,6 +244,16 @@ know Python. Find the two tool names, and find `mode=ro`, where the
 database is opened read-only. The whole server is one file of about 200
 lines (*Building a Custom MCP Server*).
 
+**Run the plugin.** The folder `bookstore-plugin`, next to your language
+folder, holds the skills from exercise 4, the hook, a finished
+security-auditor agent and the SQLite server, packaged as one plugin
+(*Plugins: Bundling It All Together*). Type `/exit`, then start Claude with
+`claude --plugin-dir ../bookstore-plugin`. Type `/help`: the skills now
+appear as `/bookstore-plugin:commit` and `/bookstore-plugin:changelog`,
+next to your own. Type `/mcp`: the plugin's server connected without an
+approval prompt. Its `README.md` explains what is different from your
+files.
+
 ## Closing round (5 min)
 
 First run `/verify-exercise 5` in Claude. It reads `.mcp.json`, calls the
