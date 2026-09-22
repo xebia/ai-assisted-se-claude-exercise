@@ -52,8 +52,8 @@ Gradle wrapper, use `mvn test`. If none of the marker files is in the
 current folder, say the command must run from the bookstore project
 folder, and stop.
 
-All four projects share one git repository. **Every git command is scoped
-with `.` and runs from the project folder.** One git command per tool
+The frontend (`web/`) and the plugin share the project's git repository.
+**Every git command is scoped with `.` and runs from the project folder.** One git command per tool
 call; never join commands with `&&`, `;` or `|` (PowerShell 5.1 does not
 accept `&&`).
 

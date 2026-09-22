@@ -1,6 +1,6 @@
 # Exercise 7 — Agent team built the frontend
 
-**Artifact:** the `bookstore-web` working tree after the team finished, plus
+**Artifact:** the `web` working tree after the team finished, plus
 `specs/001-*/tasks.md`. The commit tagged `foundation` marks where the
 team's work started.
 
@@ -29,7 +29,7 @@ predicted defect.
 
 Run these yourself. Do not take the participant's notes on trust.
 
-1. `git diff --stat foundation` (from `bookstore-web`). List every changed
+1. `git diff --stat foundation` (from `web`). List every changed
    file. Sort each into: story file (under `src/pages/`), foundation file
    (`index.html`, `styles.css`, `src/main.js`, `src/api.js`, `src/ui.js`),
    or other.
