@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "sqlite-bookstore": {
+      "type": "stdio",
+      "command": "uv",
+      "args": [
+        "run",
+        "--script",
+        "${CLAUDE_PLUGIN_ROOT}/mcp-sqlite/server.py",
+        "store.db"
+      ]
+    }
+  }
+}

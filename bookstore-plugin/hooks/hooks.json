@@ -1,0 +1,16 @@
+{
+  "description": "After a git commit, ask Claude to bring CHANGELOG.md up to date with the plugin's changelog skill.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/run-changelog.py\""
+          }
+        ]
+      }
+    ]
+  }
+}
