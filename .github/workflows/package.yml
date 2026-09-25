@@ -32,11 +32,6 @@ jobs:
         with:
           fetch-depth: 0 # render-sheets.sh stamps each PDF with the commit date of its .md
 
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: mcp-sqlite/go.mod
-          cache-dependency-path: mcp-sqlite/go.sum
-
       # Chrome is preinstalled on the runner; pandoc is not.
       - name: Install pandoc
         run: sudo apt-get update -qq && sudo apt-get install -y -qq pandoc
