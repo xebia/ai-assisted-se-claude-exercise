@@ -37,8 +37,7 @@ Run these yourself. Do not take the participant's notes on trust.
    `styles.css`, `src/main.js`, `src/api.js`, `src/ui.js`, one file per
    story under `src/pages/`) applies only when they used that spec.
 1. `git diff --stat foundation` (from `web`). List every changed
-   file. Sort each into: story file (under `src/pages/`), foundation file
-   (`index.html`, `styles.css`, `src/main.js`, `src/api.js`, `src/ui.js`),
+   file. Sort each into: story file (and which story), foundation file,
    or other.
 2. `git log --format=%s foundation..HEAD` — did teammates commit? Not
    required, but a commit by the lead touching a story file is the "lead
