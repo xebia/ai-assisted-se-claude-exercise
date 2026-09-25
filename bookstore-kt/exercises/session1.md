@@ -1,7 +1,7 @@
 # Exercise 1: First Conversations
 
-**Session**: 1 — First Steps & Core Concepts
-**Duration**: 30 minutes
+**Session**: 1 — First Steps & Core Concepts\
+**Duration**: 30 minutes\
 **Project**: "BookStore API" — a Kotlin REST API using only the JDK HTTP
 server and JDBC (no frameworks). Everyone clones the same repo.
 

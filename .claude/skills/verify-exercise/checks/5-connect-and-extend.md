@@ -25,8 +25,8 @@ finished is "the starter file". Never say "Round A/B", "fire", "arm" or
    in the project folder (task 1).
 2. A registered, approved and connected `sqlite-bookstore` MCP server
    (task 2): `.mcp.json` with the server, started with
-   `uv run --script ../mcp-sqlite/server.py store.db` (or `python3` /
-   `python` in place of `uv run --script`).
+   `uv run mcp-sqlite/server.py store.db` (or `python3` / `python` in
+   place of `uv run`).
 3. A `security-auditor` subagent at `.claude/agents/security-auditor.md`
    inside the project folder (task 4). The starter file ships the agent
    body and `model: haiku`. The participant replaced two `(I write this)`
@@ -65,8 +65,9 @@ look.
 ## What full-marks artifacts contain
 
 - `.mcp.json` written by `claude mcp add --scope project`: the command is
-  `uv` with args `run --script ../mcp-sqlite/server.py store.db`, or
-  `python3` / `python` with args `../mcp-sqlite/server.py store.db`. The
+  `uv` with args `run mcp-sqlite/server.py store.db` (`run --script ...`
+  is also fine), or
+  `python3` / `python` with args `mcp-sqlite/server.py store.db`. The
   db argument is the last one. `store.db` exists in the project folder.
   A missing `store.db` makes every tool call return "database not found";
   that is checkable evidence, not a taste call.

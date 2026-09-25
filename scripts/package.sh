@@ -61,11 +61,19 @@ if [ "${PDF:-}" != skip ]; then
 fi
 
 # Lint: paths that only make sense in the old multi-folder layout.
-stale="$(cd "$out" && grep -rnE 'bookstore-(go|kt|py|ts|web)/|(^|[^.])\.\./(bookstore|mcp-sqlite)|cd bookstore-|`bookstore-(go|kt|py|ts|web)` (folder|project)' \
-  --include='*.md' exercises .claude/skills web/README.md bookstore-plugin/README.md 2>/dev/null || true)"
+stale="$(cd "$out" && grep -rnE 'bookstore-(go|kt|py|ts|web)/|(^|[^.])\.\./(bookstore|mcp-sqlite)|cd bookstore-|`bookstore-(go|kt|py|ts|web)`|language folder|four projects share' \
+  --include='*.md' exercises .claude/skills web/README.md bookstore-plugin/README.md README.md 2>/dev/null || true)"
 if [ -n "$stale" ]; then
   echo "old-layout paths still in the package: $(printf '%s\n' "$stale" | wc -l | tr -d ' ') lines" >&2
   printf '%s\n' "$stale" | cut -d: -f1 | sort | uniq -c | sort -rn >&2
+  [ "${STRICT:-0}" = 1 ] && exit 1
+fi
+
+# Lint: shell commands that would wrap in the PDF (pasted as two lines = two commands).
+long="$(cd "$out" && awk 'FNR==1{inb=0} /^ *```/{inb=!inb; next} inb && length(l=$0) && sub(/^ */,"",l) && length(l)>90 && l ~ /^(claude|git|cd|uv|npm|npx|curl|python|python3|go |bun|\.\/|specify|ls|cp|mkdir|sqlite3)/ {printf "%s:%d (%d chars)\n", FILENAME, FNR, length(l)}' exercises/*.md preparation.md 2>/dev/null || true)"
+if [ -n "$long" ]; then
+  echo "shell commands longer than 90 characters (they wrap in the PDF, see conventions.md):" >&2
+  printf '%s\n' "$long" >&2
   [ "${STRICT:-0}" = 1 ] && exit 1
 fi
 

@@ -1,7 +1,7 @@
 # Exercise 5: An MCP Server and a Subagent
 
-**Session**: 5 — MCP Servers & External Tools
-**Duration**: 30 minutes, plus a 5-minute closing round
+**Session**: 5 — MCP Servers & External Tools\
+**Duration**: 30 minutes, plus a 5-minute closing round\
 **Project**: The same BookStore API.
 
 ## Goal
@@ -17,7 +17,7 @@ In this exercise you:
 
 Titles in *italics* are slide titles from this session.
 
-**Where to work.** Open a terminal in the `bookstore-py` folder, the one
+**Where to work.** Open a terminal in the `bookstore` folder, the one
 that contains `main.py`. Start Claude with `claude`. You stay in this folder
 for the whole exercise.
 
@@ -48,10 +48,10 @@ Everything you make in this exercise goes in new files. The slide says:
 commit `.mcp.json`. In this course repo, git ignores it. Your copy stays
 on your machine.
 
-**Two files that came with the repo.** The folder `mcp-sqlite`, next to
-`bookstore-py`, holds the MCP server: one Python file, `server.py`. The
-file `bookstore-py/exercises/starters/security-auditor.md` is a starter
-file: a file you finish yourself, in task 4.
+**Two files that came with the repo.** The folder `mcp-sqlite`, inside
+`bookstore`, holds the MCP server: one Python file, `server.py`. The
+file `exercises/starters/security-auditor.md` is a starter file: a file
+you finish yourself, in task 4.
 
 **The database.** The app creates `store.db` in this folder the first time
 it runs. Look for the file in your editor. Not there? Run `python3 main.py`, wait
@@ -114,7 +114,7 @@ The server has two tools: `get_table_definitions` and `execute_query`
 2. **Register the server** (1 min). Run this in the terminal, on one line:
 
    ```
-   claude mcp add --transport stdio --scope project sqlite-bookstore -- uv run --script ../mcp-sqlite/server.py store.db
+   claude mcp add --scope project sqlite-bookstore -- uv run mcp-sqlite/server.py store.db
    ```
 
    The part after `--` is the command that starts the server
@@ -122,8 +122,8 @@ The server has two tools: `get_table_definitions` and `execute_query`
    `.mcp.json` in this folder (*Under the Hood: `.mcp.json`*). Open that
    file: it holds the command you just typed. If `uv` is missing or
    fails: run `claude mcp remove sqlite-bookstore`, then the command above
-   again with `python3` (on Windows: `python`) in place of `uv run
-   --script`. The server needs only Python, no packages.
+   again with `python3` (on Windows: `python`) in place of `uv run`. The
+   server needs only Python, no packages.
 
 3. **Restart and approve** (2 min). Start `claude`. Claude Code asks
    whether it may use the server from `.mcp.json`. Answer yes: this is
@@ -239,16 +239,16 @@ read-only. Claude should tell you that it cannot do this. The server can
 read and nothing more: that is least privilege from the slide *MCP
 Permissions and Security*.
 
-**Read the server.** Open `../mcp-sqlite/server.py`. You do not need to
+**Read the server.** Open `mcp-sqlite/server.py`. You do not need to
 know Python. Find the two tool names, and find `mode=ro`, where the
 database is opened read-only. The whole server is one file of about 200
 lines (*Building a Custom MCP Server*).
 
-**Run the plugin.** The folder `bookstore-plugin`, next to your language
-folder, holds the skills from exercise 4, the hook, a finished
+**Run the plugin.** The folder `bookstore-plugin`, inside `bookstore`,
+holds the skills from exercise 4, the hook, a finished
 security-auditor agent and the SQLite server, packaged as one plugin
 (*Plugins: Bundling It All Together*). Type `/exit`, then start Claude with
-`claude --plugin-dir ../bookstore-plugin`. Type `/help`: the skills now
+`claude --plugin-dir bookstore-plugin`. Type `/help`: the skills now
 appear as `/bookstore-plugin:commit` and `/bookstore-plugin:changelog`,
 next to your own. Type `/mcp`: the plugin's server connected without an
 approval prompt. Its `README.md` explains what is different from your

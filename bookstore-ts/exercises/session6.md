@@ -1,8 +1,8 @@
 # Exercise 6: Spec-Driven Development with Spec Kit
 
-**Session**: 6 — Real Development Workflows
-**Duration**: 45 minutes
-**Project**: `bookstore-web`, a new frontend for the BookStore API you already know.
+**Session**: 6 — Real Development Workflows\
+**Duration**: 45 minutes\
+**Project**: `web`, a new frontend for the BookStore API you already know.
 
 ## Goal
 
@@ -27,7 +27,7 @@ Titles in *italics* are slide titles from this session.
 
 **Where to work.** You need three terminals.
 
-*Terminal 1: your backend.* Open it in the `bookstore-ts` folder and start
+*Terminal 1: your backend.* Open it in the `bookstore` folder and start
 the API:
 
 ```bash
@@ -40,14 +40,14 @@ Check that it answers. This must print JSON, not a connection error:
 curl http://localhost:8080/api/books
 ```
 
-*Terminal 2: Claude Code.* Open it in the `bookstore-web` folder. Start
-Claude with access to your backend's source:
+*Terminal 2: Claude Code.* Open it in the `web` folder, inside `bookstore`.
+Start Claude with access to your backend's source, one folder up:
 
 ```bash
-claude --add-dir ../bookstore-ts
+claude --add-dir ..
 ```
 
-*Terminal 3: a plain shell.* Open it in the `bookstore-web` folder. You use
+*Terminal 3: a plain shell.* Open it in the `web` folder. You use
 it for `curl` and `git` while Claude is busy in terminal 2.
 
 Do **not** start the frontend dev server. There is no frontend yet. This
@@ -64,9 +64,10 @@ Claude offers the `speckit-*` commands. Missing? Run the Spec Kit steps from
 `preparation.md` again (section "Spec Kit and Node"), then restart Claude.
 
 **Training mode is off.** Earlier sessions used a `CLAUDE.md` file that
-makes Claude teach instead of answer. `bookstore-web` has no such file, and
-`--add-dir` does not load the one from your backend. So Claude answers
-directly this session. You do not need the experiment tag.
+makes Claude teach instead of answer. `web` has no such file, and its
+`.claude/settings.json` tells Claude Code not to load the one from
+`bookstore`. So Claude answers directly this session. You do not need
+the experiment tag.
 
 **Stuck, or out of time?** Say *"just tell me"*. Claude then gives you the
 answer. That is allowed.
@@ -287,7 +288,7 @@ The trainer asks the room. Have these answers ready:
 ## What you should have
 
 ```
-bookstore-web/specs/001-*/
+web/specs/001-*/
   spec.md            intent, with your clarify answers written in
   plan.md            approach
   research.md        what the plan thinks the API does

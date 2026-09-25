@@ -1,7 +1,7 @@
 # Exercise 4: Two Skills and a Hook
 
-**Session**: 4 — Skills, Hooks & Automation
-**Duration**: Part 1: 15 minutes · Part 2: 17 minutes
+**Session**: 4 — Skills, Hooks & Automation\
+**Duration**: Part 1: 15 minutes · Part 2: 17 minutes\
 **Project**: The same BookStore API.
 
 ## Goal
@@ -18,10 +18,10 @@ chain, watch it stay silent, repair it, run it again.
 
 Read this first. Titles in *italics* are slide titles from this session.
 
-**Where to work.** Open a terminal in the `bookstore-go` folder, the one
+**Where to work.** Open a terminal in the `bookstore` folder, the one
 that contains `go.mod`. Run every command from there. Start Claude with
 `claude`. The files you create in this exercise go in
-`bookstore-go/.claude/`.
+`bookstore/.claude/`.
 
 **Training mode.** `CLAUDE.md` tells Claude to teach instead of answer:
 before it explains or fixes something, it asks you one question.
@@ -120,7 +120,7 @@ one commit.
    ```
 
 3. **Make a small change by hand** (1 min). Open any file in
-   `bookstore-go`, add one comment line, save it. Do not ask Claude.
+   `bookstore`, add one comment line, save it. Do not ask Claude.
 
 4. **Run the skill** (2 min). Type `/commit` and watch what it does.
 

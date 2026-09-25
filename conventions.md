@@ -3,13 +3,62 @@
 Read this before editing an exercise or a skill, so all four language
 versions and all eight sessions keep behaving as one course.
 
-## Repo layout
+## Repo layout: source on `main`, one package per language branch
 
 Four projects — `bookstore-go`, `bookstore-kt`, `bookstore-py`,
 `bookstore-ts` — implement the same API with the same deliberate bugs.
 Participants pick one language for the whole course. Each project carries
 `exercises/session1.md … session8.md`, a `README.md` (build/run) and `preparation.md` (install checklist).
 Coaching skills live once, at the repo root, in `.claude/skills/`.
+
+Participants never see this layout. `scripts/package.sh` (run by
+`.github/workflows/package.yml` on every push to `main`, or by hand with
+`just package <lang>`) builds one flat package per language and publishes it
+to the branch of that name (`go`, `kt`, `py`, `ts`). Participants clone one
+branch into a folder named `bookstore`:
+
+```
+bookstore/                 <- bookstore-<lang>/: code, tests, CLAUDE.md, README.md
+  .claude/skills/          <- the root .claude/skills/ (coaches, verifier, helpers)
+  exercises/session1.pdf … session8.pdf, exercises/starters/
+  preparation.pdf
+  web/                     <- bookstore-web/ (sessions 6 and 7)
+  mcp-sqlite/server.py     <- mcp-sqlite/ (session 5)
+  bookstore-plugin/        <- bookstore-plugin/ (session 5 bonus, session 8)
+```
+
+Rules that follow from this:
+
+- **Paths in sheets, skills and READMEs are package paths.** The backend is
+  "the `bookstore` folder", the frontend is `web`, the server is
+  `mcp-sqlite/server.py`, the plugin is `bookstore-plugin`. Never write
+  `bookstore-go/...` or `../bookstore-web` in participant-facing text; the
+  package build (`STRICT=1`) fails on such paths.
+- **Sheets ship as PDF only.** The Markdown is the source; the package
+  renders it (`scripts/render-sheets.sh`, styled by `scripts/sheet.css`)
+  and rewrites `preparation.md` / `exercises/sessionN.md` mentions to `.pdf`.
+  Do not commit PDFs. **A shell command in a code block is at most 90
+  characters** (after the list indentation): the PDF line fits 92, and a
+  command that wraps in the PDF is pasted as two lines, which runs half a
+  command. Drop optional flags (`--transport stdio` is the default, `-b` is
+  `--branch`) before splitting a command with `\`, which PowerShell does not
+  accept. Prompts pasted into Claude may wrap; a newline in the chat box is
+  harmless.
+- **The header block** (`**Session**`, `**Duration**`, `**Project**`) ends
+  the first two lines with `\`, otherwise the three run together in the PDF.
+- **Dry-run in a package, not in the source folder.** `just package go`
+  (needs pandoc and Chrome; `PDF=skip just package go` on a machine without
+  them) writes `dist/bookstore-go`; walk the sheet there, because that is
+  the tree participants have. The trainer's plugin demo runs from a package
+  too, so the room sees the same paths.
+- **`web/` sits inside the backend project.** Claude Code would load the
+  backend `CLAUDE.md` and the participant's `CLAUDE.local.md` in every
+  session started in `web/`; `bookstore-web/.claude/settings.json` excludes
+  them with `claudeMdExcludes`, so sessions 6 and 7 stay in "training mode
+  off" as their sheets say. Keep that setting when the file is regenerated.
+- **`bookstore-plugin/` sits inside the participant's project.** It holds
+  finished versions of what exercises 4 and 5 build. Each project's
+  `CLAUDE.md` tells Claude not to read it unless asked about the plugin.
 
 ## Naming: sessions, not blocks
 

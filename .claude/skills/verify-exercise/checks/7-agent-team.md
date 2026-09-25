@@ -1,6 +1,6 @@
 # Exercise 7 — Agent team built the frontend
 
-**Artifact:** the `bookstore-web` working tree after the team finished, plus
+**Artifact:** the `web` working tree after the team finished, plus
 `specs/001-*/tasks.md`. The commit tagged `foundation` marks where the
 team's work started.
 
@@ -36,8 +36,9 @@ Run these yourself. Do not take the participant's notes on trust.
    or other names are fine. The reference spec's list (`index.html`,
    `styles.css`, `src/main.js`, `src/api.js`, `src/ui.js`, one file per
    story under `src/pages/`) applies only when they used that spec.
-1. `git diff --stat foundation` (from `bookstore-web`). List every changed
-   file. Sort each into: story file (and which story), foundation file,
+1. `git diff --stat foundation` (from `web`). List every changed
+   file. Sort each into: story file (under `src/pages/`), foundation file
+   (`index.html`, `styles.css`, `src/main.js`, `src/api.js`, `src/ui.js`),
    or other.
 2. `git log --format=%s foundation..HEAD` — did teammates commit? Not
    required, but a commit by the lead touching a story file is the "lead

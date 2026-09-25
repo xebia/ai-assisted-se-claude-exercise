@@ -1,7 +1,7 @@
 # Exercise 8: Your Own Project, and Your Roadmap
 
-**Session**: 8, Bringing It All Together
-**Duration**: 35 minutes, plus a 5-minute closing round
+**Session**: 8, Bringing It All Together\
+**Duration**: 35 minutes, plus a 5-minute closing round\
 **Project**: Your own project, not BookStore. Bring one that builds and
 has tests. If you have no project with you, use BookStore (see below).
 
@@ -30,7 +30,7 @@ Claude with `claude`. Keep this one session for the whole exercise.
 task 1.
 
 **No project with you?** Use BookStore. Open a terminal in the
-`bookstore-ts` folder, the one that contains `package.json`. Then this is your
+`bookstore` folder, the one that contains `package.json`. Then this is your
 task for task 2: the book search loads the author of every book with a
 separate query. Change `search()` in `src/store/book.ts` so that one
 search runs one query. In task 1, update `CLAUDE.local.md`, the file you

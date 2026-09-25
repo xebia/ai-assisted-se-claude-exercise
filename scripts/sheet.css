@@ -1,7 +1,7 @@
 /* Print stylesheet for exercise sheets (scripts/render-sheets.sh). */
 @page {
   size: A4;
-  margin: 18mm 18mm 20mm;
+  margin: 18mm 14mm 20mm;
   @bottom-right { content: counter(page) " / " counter(pages); font: 9pt system-ui, sans-serif; color: #666; }
 }
 html { font: 10.5pt/1.5 system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color: #1a1a1a; }
@@ -15,8 +15,10 @@ p, li { orphans: 3; widows: 3; }
 hr { border: 0; border-top: 1px solid #ddd; margin: 1.2em 0; }
 code { font: .9em ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #f3f4f6; padding: .1em .3em; border-radius: 3px; }
 /* Commands must stay copyable and complete: wrap long lines, never clip, never split over pages. */
-pre { background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 5px; padding: .7em .9em; white-space: pre-wrap; overflow-wrap: anywhere; break-inside: avoid; }
-pre code { background: none; padding: 0; font-size: .88em; }
+/* 8pt code and 14mm side margins fit 92 characters on one line (measured); conventions.md caps shell commands at 90. */
+pre { background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 5px; padding: .6em .6em; white-space: pre-wrap; overflow-wrap: anywhere; break-inside: avoid; }
+pre code { background: none; padding: 0; font-size: .76em; }
+li > pre { margin-left: -1.5em; }
 blockquote { margin: .8em 0; padding: .1em 1em; border-left: 4px solid #c8ccd1; color: #333; }
 table { border-collapse: collapse; margin: .8em 0; break-inside: avoid; }
 th, td { border: 1px solid #d0d4d9; padding: .3em .6em; text-align: left; }

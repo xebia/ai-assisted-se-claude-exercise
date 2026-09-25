@@ -37,6 +37,8 @@ jobs:
         run: sudo apt-get update -qq && sudo apt-get install -y -qq pandoc
 
       - name: Assemble the package
+        env:
+          STRICT: "1" # an old-layout path in a sheet, skill or README fails the build
         run: scripts/package.sh "${{ matrix.lang }}" "$RUNNER_TEMP/pkg"
 
       - name: Publish to the ${{ matrix.lang }} branch
