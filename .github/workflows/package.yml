@@ -10,7 +10,7 @@ name: package
 
 on:
   push:
-    branches: [main, feat/packaging]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
