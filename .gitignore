@@ -4,5 +4,8 @@
 # Exercise 5: project-scope MCP registration (participants register from bookstore-<lang>; the file may land here). The old Go binary is no longer used.
 /.mcp.json
 
+# Output of scripts/package.sh
+/dist/
+
 # Old Go build of the MCP server (replaced by mcp-sqlite/server.py, 2026-09-22)
 /mcp-sqlite-server
