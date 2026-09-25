@@ -10,14 +10,15 @@ team in **Exercise 7**.
 
 ## Backend-agnostic by design
 
-This project talks to whichever BookStore backend you started on port `8080`:
+This project talks to whichever BookStore backend you started on port `8080`.
+Yours is one folder up, in `bookstore`:
 
 | Backend | Start it with |
 |---|---|
-| [bookstore-go](../bookstore-go/) | `go run .` |
-| [bookstore-kt](../bookstore-kt/) | `./gradlew run` |
-| [bookstore-py](../bookstore-py/) | `python3 main.py` |
-| [bookstore-ts](../bookstore-ts/) | `bun run start` |
+| Go | `go run .` |
+| Kotlin | `./gradlew run` |
+| Python | `python3 main.py` |
+| TypeScript | `bun run start` |
 
 All four ship the same paths, methods and JSON shapes, so one specification
 covers all of them — but write that specification against the backend you can
@@ -32,10 +33,10 @@ the browser on a single origin — no CORS, and no change to any backend.
 Two terminals — but only from **Exercise 7** onward. Exercise 6 specifies this
 frontend without running it, and needs the backend alone.
 
-**Terminal 1 — a backend:**
+**Terminal 1 — your backend, from the `bookstore` folder:**
 
 ```bash
-cd ../bookstore-kt && ./gradlew run
+cd .. && ./gradlew run        # or go run . / python3 main.py / bun run start
 ```
 
 **Terminal 2 — this frontend:**
@@ -95,12 +96,12 @@ Shapes are not uniform, which matters when you write the spec:
 | `index.html` | Deliberately empty shell. |
 | `specs/` | Created by Spec Kit in Exercise 6. **Commit this** — Exercise 7 needs it. |
 | `specs-reference/` | A finished spec in the same layout, for anyone who did not complete Exercise 6. Exercise 7 says when to copy it. |
-| `.claude/settings.json` | Turns on agent teams (experimental) for this project. Committed; everything else under `.claude/` is generated. |
+| `.claude/settings.json` | Turns on agent teams (experimental) for this project, and keeps the backend's `CLAUDE.md` and `CLAUDE.local.md` one folder up from loading here (`claudeMdExcludes`), so exercises 6 and 7 run without training mode. Committed; everything else under `.claude/` is generated. |
 | `.specify/` (the rest) | Spec Kit tooling. Generated during setup, not committed. |
 
 ## Setup
 
-See the `preparation.md` in your chosen backend project. In short:
+See `preparation.md` in the `bookstore` folder, one up. In short:
 
 ```bash
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git

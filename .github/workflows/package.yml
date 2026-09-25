@@ -1,0 +1,73 @@
+# Publishes one flat, single-language package per BookStore port to a generated
+# branch (go, kt, py, ts). Participants run:
+#
+#   git clone --branch py --single-branch https://github.com/xebia/ai-assisted-se-claude-exercise bookstore
+#
+# The branches are build output. Never edit them by hand; change main instead.
+# Each run adds a commit on top of the branch (no force-push), so `git pull`
+# keeps working for participants who already cloned.
+name: package
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: package
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        lang: [go, kt, py, ts]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # render-sheets.sh stamps each PDF with the commit date of its .md
+
+      # Chrome is preinstalled on the runner; pandoc is not.
+      - name: Install pandoc
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq pandoc
+
+      - name: Assemble the package
+        env:
+          STRICT: "1" # an old-layout path in a sheet, skill or README fails the build
+        run: scripts/package.sh "${{ matrix.lang }}" "$RUNNER_TEMP/pkg"
+
+      - name: Publish to the ${{ matrix.lang }} branch
+        env:
+          BRANCH: ${{ matrix.lang }}
+          REMOTE: https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}
+        run: |
+          set -euo pipefail
+          dest="$RUNNER_TEMP/branch"
+          if git ls-remote --exit-code --heads "$REMOTE" "$BRANCH" >/dev/null; then
+            git clone --quiet --depth 1 --branch "$BRANCH" "$REMOTE" "$dest"
+          else
+            git init --quiet -b "$BRANCH" "$dest"
+            git -C "$dest" remote add origin "$REMOTE"
+          fi
+
+          # Replace the branch content with the fresh package, keep the history.
+          find "$dest" -mindepth 1 -maxdepth 1 ! -name .git -exec rm -rf {} +
+          cp -a "$RUNNER_TEMP/pkg/." "$dest/"
+
+          cd "$dest"
+          # --force: the package holds only files we want to ship, but the
+          # language .gitignore hides .claude/skills/ and *.exe from a plain add.
+          git add --all --force
+          if git diff --cached --quiet; then
+            echo "Package unchanged, nothing to publish."
+            exit 0
+          fi
+          git -c user.name="github-actions[bot]" \
+              -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+              commit --quiet -m "Package $BRANCH from ${GITHUB_SHA::7}"
+          git push origin "HEAD:$BRANCH"

@@ -60,29 +60,31 @@ git --version
 ### 5. Course materials on GitHub
 
 We will be working with the **BookStore API** starter project during the
-training. Clone it locally before the session:
+training. The repository has one branch per language. Clone the TypeScript
+one into a folder named `bookstore`, before the session:
 
 ```bash
-git clone https://github.com/xebia/ai-assisted-se-claude-exercise
+git clone -b ts https://github.com/xebia/ai-assisted-se-claude-exercise bookstore
 ```
 
-Then enter the project folder, install dependencies, and run it to verify
+Then enter the folder, install dependencies, and run it to verify
 everything works:
 
 ```bash
-cd ai-assisted-se-claude-exercise/bookstore-ts
+cd bookstore
 bun install
 bun run start
 ```
 
-### 6. Spec Kit and Node (for Exercise 6)
+### 6. uv, Spec Kit and Node (for Exercises 5 to 7)
 
 In Exercise 6 we use [Spec Kit](https://github.com/github/spec-kit), GitHub's
 spec-driven development toolkit, to specify a frontend for the BookStore API.
 
 **Node.js 20+** — https://nodejs.org/ (the frontend's dev server runs on it)
 
-**uv** — Spec Kit is a Python tool installed via `uv`:
+**uv** — Exercise 5 starts a small Python MCP server with `uv`, and Spec Kit
+is a Python tool installed via `uv`:
 
 ```bash
 curl -LsSf https://astral.sh/uv/install.sh | sh     # macOS / Linux
@@ -95,7 +97,7 @@ Then install Spec Kit and set up the frontend project:
 ```bash
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git
 
-cd ai-assisted-se-claude-exercise/bookstore-web
+cd bookstore/web
 npm install
 specify init --here --force --non-interactive --integration claude
 git checkout -- .specify/memory/constitution.md      # must run AFTER init
@@ -103,7 +105,7 @@ specify check
 ```
 
 Exercise 7 uses **agent teams**, an experimental Claude Code feature that is
-off by default. The file `bookstore-web/.claude/settings.json` is committed
+off by default. The file `web/.claude/settings.json` is committed
 and turns it on for that project only. It needs Claude Code **2.1.178 or
 newer**. Check both:
 
@@ -147,16 +149,17 @@ you can bring? The exercise has a BookStore fallback.
   terminal)
 - Optional: the Claude Code editor integration is installed
 - Git is installed (`git --version` works in your terminal)
-- You have cloned the bookstore project from GitHub and `bun install` finishes
+- You have cloned the `ts` branch of the exercise repository into a folder
+  named `bookstore`, and the project runs and `bun install` finishes
   without errors
 
 - Node.js 20+ is installed (`node --version` works in your terminal)
 - `uv` is installed (`uv --version` works in your terminal)
 - Spec Kit is installed (`specify check` runs without problems)
-- `bookstore-web` is set up (`npm install` finished, `.specify/` exists,
+- `bookstore/web` is set up (`npm install` finished, `.specify/` exists,
   `.specify/memory/constitution.md` starts with "# BookStore Web Constitution"
   and `git status` shows it unmodified)
-- Claude Code is 2.1.178 or newer, and `bookstore-web/.claude/settings.json`
+- Claude Code is 2.1.178 or newer, and `web/.claude/settings.json`
   is present and unmodified (`git status` shows nothing for it)
 - A project of your own is cloned on your laptop, and it builds and has
   tests (for Exercise 8)

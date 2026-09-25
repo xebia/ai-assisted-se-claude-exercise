@@ -1,8 +1,8 @@
 # Exercise 7: An Agent Team Builds Your Frontend
 
-**Session**: 7 — Agentic Workflows
-**Duration**: 35 minutes, plus a 5-minute closing round
-**Project**: `bookstore-web`, the frontend you specified in Exercise 6.
+**Session**: 7 — Agentic Workflows\
+**Duration**: 35 minutes, plus a 5-minute closing round\
+**Project**: `web`, the frontend you specified in Exercise 6.
 
 ## Goal
 
@@ -29,11 +29,12 @@ its own context window and its own task. You can open its transcript and
 talk to it directly. The **agent team** is the lead plus its teammates.
 They share one task list.
 
-**No training mode here.** `bookstore-web` has no `CLAUDE.md`. Claude
-answers directly in this project, the same as in Exercise 6.
+**No training mode here.** `web` has no `CLAUDE.md`, and it does not load
+the one from `bookstore`. Claude answers directly in this project, the same
+as in Exercise 6.
 
 **Agent teams are experimental.** They are off unless a flag is set. This
-project sets the flag in `bookstore-web/.claude/settings.json`. You checked
+project sets the flag in `web/.claude/settings.json`. You checked
 that during preparation. If no team starts in task 3, tell the trainer. Do
 not spend your time on it.
 
@@ -41,7 +42,7 @@ not spend your time on it.
 committed at the end of Exercise 6. Check:
 
 ```bash
-cd ../bookstore-web && ls specs/
+cd web && ls specs/
 ```
 
 Use your own spec when `specs/001-*/tasks.md` exists and has user-story
@@ -56,22 +57,22 @@ git add specs/ && git commit -m "spec: reference spec for exercise 7"
 
 **Three terminals**, the same as in Exercise 6.
 
-**Terminal 1, your backend**, from the `bookstore-py` project directory:
+**Terminal 1, your backend**, from the `bookstore` folder:
 
 ```bash
 python3 main.py
 ```
 
-**Terminal 2, Claude Code, started from `bookstore-web`:**
+**Terminal 2, Claude Code, started from `web`:**
 
 ```bash
-cd ../bookstore-web && claude
+cd web && claude
 ```
 
 This session is your lead for the whole exercise. Keep it open.
 
 **Terminal 3, a plain shell**, for `npm run dev`, `curl` and `git`. Task 1
-tells you when to move it into `bookstore-web`.
+tells you when to move it into `web`.
 
 Keep a browser tab ready for http://localhost:5173. It shows an empty page
 until task 1 is done.
@@ -111,7 +112,7 @@ work. One session, the lead, does it.
 3. When the lead reports back, start the frontend in terminal 3:
 
    ```bash
-   cd ../bookstore-web && npm run dev
+   cd web && npm run dev
    ```
 
    Open http://localhost:5173. You should see the page shell, and no errors
@@ -260,7 +261,7 @@ The trainer asks people at random. Have answers ready:
 ## What you should have
 
 ```
-bookstore-web/
+web/
   index.html, styles.css, src/     built from your spec
   specs/001-*/tasks.md             every story task ticked
   git log                          "spec" → "foundation" → "feat" commits

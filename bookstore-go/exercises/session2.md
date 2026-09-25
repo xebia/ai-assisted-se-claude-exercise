@@ -1,7 +1,7 @@
 # Exercise 2: Write Better Prompts
 
-**Session**: 2 — Bug Fixing & Effective Prompting
-**Duration**: 35 minutes, plus a 5-minute closing round
+**Session**: 2 — Bug Fixing & Effective Prompting\
+**Duration**: 35 minutes, plus a 5-minute closing round\
 **Project**: The same BookStore API. Some of its tests fail on purpose.
 
 ## Goal
@@ -18,13 +18,13 @@ someone who got lucky.
 
 Titles in *italics* are slide titles from this session.
 
-**Where to work.** Open a terminal in the `bookstore-go` folder, the one
+**Where to work.** Open a terminal in the `bookstore` folder, the one
 that contains `go.mod`. Start Claude with `claude`. Keep this one session
 for tasks 1 and 2. Task 3 tells you when to restart it. After that restart
 you do not need the coach any more.
 
 **Your notes.** Keep an empty text file open next to Claude, outside the
-`bookstore-go` folder. Tasks 1 and 3 ask you to copy text into it.
+`bookstore` folder. Tasks 1 and 3 ask you to copy text into it.
 
 **Training mode.** The project's `CLAUDE.md` tells Claude to teach instead
 of answer. Before it explains or fixes a bug, it asks you one question.

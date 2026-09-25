@@ -1,7 +1,7 @@
 # Exercise 3: Change What Claude Sees
 
-**Session**: 3 — Context Engineering
-**Duration**: 45 minutes, plus a 5-minute closing round
+**Session**: 3 — Context Engineering\
+**Duration**: 45 minutes, plus a 5-minute closing round\
 **Project**: The same BookStore API.
 
 ## Goal
@@ -20,7 +20,7 @@ The tasks take 35 minutes. The rest of the time is for the bonus.
 
 Titles in *italics* are slide titles from this session.
 
-**Where to work.** Open a terminal in the `bookstore-ts` folder, the one
+**Where to work.** Open a terminal in the `bookstore` folder, the one
 that contains `package.json`. Start Claude with `claude`. Open a second terminal
 in the same folder now; task 2 uses it for the grader.
 

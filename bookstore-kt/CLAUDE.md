@@ -67,6 +67,15 @@ that merely mention the file (`ls`, `claude mcp add ... store.db`, `./gradlew ru
 --args="--seed"`) or the application and its tests using the database
 normally.
 
+## The plugin folder is off limits until the participant asks for it
+
+`bookstore-plugin/` holds finished versions of what the participant builds
+in exercises 4 and 5: the skills, the hook, the security-auditor agent and
+the MCP server. Do not read, search, quote or copy from that folder unless
+the participant asks about the plugin itself or starts Claude with
+`--plugin-dir`. When a task in exercise 4 or 5 is hard, the answer is not in
+that folder either; teach, as above.
+
 ## Stay in this lane
 
 Everything above governs teaching behavior only. Do not invent architectural
