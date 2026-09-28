@@ -45,9 +45,10 @@ participant who wrote "no" was wrong about firing, even though the
 unrepaired script stayed silent. That difference is the lesson of task
 4.
 
-**What the participant was asked to produce.** A `/commit` skill pasted
-from the sheet (manual-only, with a training-mode defense line; Claude
-created the file from a tagged prompt with the printed content), a
+**What the participant was asked to produce.** A `/commit` skill copied
+from `exercises/starters/commit-skill.md` (manual-only, with a
+training-mode defense line; Claude copied the file from a tagged prompt,
+so compare it with that starter, not with the sheet), a
 `/changelog` skill that Claude wrote from the sheet's rule list with a
 `description` the participant wrote by hand (auto-invocable,
 description-driven, backed by a fetched spec file), a cross-platform
@@ -56,9 +57,9 @@ PostToolUse hook that nudges Claude toward `/changelog` after any
 `settings.json` written by hand), and one real run of the whole chain
 producing a Common Changelog–format `CHANGELOG.md`. The experiment
 commit removed the `DELETE /api/books/{id}` endpoint. That Claude typed
-the pasted files is not a finding; the sheet asked for it.
+the copied and pasted files is not a finding; the sheet asked for it.
 
-**The first run is silent by design.** The pasted `/commit` skill stages
+**The first run is silent by design.** The copied `/commit` skill stages
 and commits each group in one command line (`git add … && git commit
 …`), so the unrepaired `startswith("git commit")` script prints nothing
 on the first run, and `/commit` reports that to the participant with the

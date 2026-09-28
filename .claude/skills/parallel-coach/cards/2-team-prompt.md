@@ -72,7 +72,8 @@ Nudge toward missing elements from this list. Never paste it as a prompt.
 - No done condition → a teammate ticks its tasks after writing the code
   and never opens the browser; the story renders "Not built yet" or throws
 - "Agents" instead of "agent team" or "teammates" → Claude uses subagents;
-  the Ctrl+T task list stays empty and there is nothing to watch
+  no rows with the teammates' names appear in the agent panel, and there is
+  no one to open or message
 - Teammates not named → the participant cannot address one later ("tell
   the list teammate to…") and has to describe it instead
 
@@ -82,11 +83,13 @@ All five load-bearing checks present, in the participant's own words.
 
 ## What to watch
 
-First: press Ctrl+T. A real team shows tasks claimed by named teammates
-within a minute. An empty list means subagents, not a team; the agent
-panel below the prompt input shows subagents too, so the panel alone
-proves nothing. The participant should say "use an agent team, not
-subagents". Second: the lead's own edits. Any edit to a story file (under `src/pages/` in the reference spec) by
+First: the agent panel below the prompt input. A real team shows one row
+per teammate, carrying the names from the prompt, within a minute (with
+agent teams on, a subagent Claude names launches as a teammate). Rows
+without those names are plain subagents; the participant should say "use
+an agent team, not subagents". Do not send anyone to Ctrl+T: on current
+models the session has no Task tools, so that task list stays empty even
+for a real team. Progress shows as ticks in `tasks.md`. Second: the lead's own edits. Any edit to a story file (under `src/pages/` in the reference spec) by
 the lead is the "wait" defect happening live.
 
 ## After the run
