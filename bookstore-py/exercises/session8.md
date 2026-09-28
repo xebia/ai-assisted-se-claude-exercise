@@ -1,162 +1,122 @@
-# Exercise 8: Your Own Project, and Your Roadmap
+# Exercise 8: A Harness Roadmap for Your Team
 
 **Session**: 8, Bringing It All Together\
-**Duration**: 35 minutes, plus a 5-minute closing round\
-**Project**: Your own project, not BookStore. Bring one that builds and
-has tests. If you have no project with you, use BookStore (see below).
+**Duration**: 20 minutes, plus a 10-minute plenary\
+**Project**: None. You think about one real team that you know well.
+You need a text file or a sheet of paper, nothing else.
 
 ## Goal
 
-You apply the workflow of this course to one small task in your own
-codebase: research, plan, implement, verify. Then you write a five-line
-roadmap for your team. Line five is the first thing you do back at work.
+1. You score one real team on the five layers of the harness pyramid.
+2. You mark the lowest layer that is not yet in place. That layer is
+   your lever: the place where one change helps your team most.
+3. You write a five-line roadmap and one first step for back at work.
 
-The point is not to finish a big feature. Pick a task you can describe in
-one sentence. Pick one that fits in twenty minutes: a small bug, a short
-doc update, one helper function. A task that takes you the whole slot to
-describe is the wrong task for this slot.
+## Start here
 
-## Before you start
-
-Titles in *italics* are slide titles from this session, unless a session
-number follows them.
-
-**Where to work.** Open a terminal in the root folder of your own project.
-That is the folder that holds its build file or `.git` folder. Start
-Claude with `claude`. Keep this one session for the whole exercise.
-
-**Save your work first.** Claude edits real files in this exercise. Run
-`git status`. If it shows changes, commit them or run `git stash` before
-task 1.
-
-**No project with you?** Use BookStore. Open a terminal in the
-`bookstore` folder, the one that contains `main.py`. Then this is your
-task for task 2: the book search loads the author of every book with a
-separate query. Change `search()` in `bookstore/store/book.py` so that one
-search runs one query. In task 1, update `CLAUDE.local.md`, the file you
-wrote in session 3. Never edit the course `CLAUDE.md`. Training mode is on
-in BookStore, so Claude may ask you one question before it acts. Answer it
-in one line, or say *just tell me*.
-
-**No training mode here.** Your own project has no course `CLAUDE.md`, so
-Claude answers directly. You do not need *just tell me* in this exercise.
-
-**No coach and no check.** Your project is yours alone, so there is no
-shared answer to grade against. Use the **Done when** line of each task to
-check yourself.
-
-**Your notes.** Keep a text file open next to Claude, outside your project.
-Tasks 2 and 3 ask you to write in it.
+- Write in a text file or on paper. Nobody collects your notes. At the
+  end you read two lines aloud.
+- Pick one real team with one codebase: the team you work in after this
+  course, not your whole company. No next team yet? Take your last team.
+  Write the team's name at the top of your notes.
+- Work alone. The talking comes in the plenary. The trainer calls the
+  plenary after 20 minutes: stop then, finished or not.
 
 ## Tasks
 
-### 1. Write `CLAUDE.md` and pick a task (5 min)
+### 1. Score your team (6 min)
 
-You produce the file `CLAUDE.md` in the root folder of your project. If
-the file already exists, you update it. If you work in BookStore, update
-`CLAUDE.local.md` instead.
+You produce five scores in your notes, one per layer.
 
-1. **Write the file** (3 min). Put in your project's own facts: the build
-   and test commands, the folder layout, and one or two rules you repeat
-   in code review. Copy the example below and replace every line.
-2. **Pick your task** (2 min). Say its goal in one sentence. Use the sizing
-   rule from the Goal section above.
+The five layers come from the slide *A Real Roadmap: One Team's Harness
+Pyramid*. A team builds them from the bottom up. The table says what
+belongs on each layer, and asks one question to help you score it.
 
-Worked example, if you want a starting shape to copy:
+| Layer | What belongs here | Question |
+| --- | --- | --- |
+| 1. Ground rules | The team's own agreements on working with agents | Has the team agreed which files, which tools, and who reviews? |
+| 2. Guides | What steers the agent before it acts: `CLAUDE.md` or `AGENTS.md`, specs and plans, MCP servers, skills | Does the agent find your build commands, conventions and specs before it starts? |
+| 3. Sensors | What checks the agent after it acts: hooks, tests, quality gates, review | Does the agent hear about a failure before a person finds it? |
+| 4. Distribution | How guides and sensors reach every teammate: a plugin or a marketplace | Does a new teammate get the same guides and sensors with one install? |
+| 5. Proof | How you show that a harness change helped: a number you track, or a benchmark repo | Can you show that last month's harness change helped? |
 
-```md
-# CLAUDE.md
+1. For each layer, write one of three scores:
+   - **in place**: most of the team uses or follows it every week.
+   - **partly**: some people or some repos use it, but not most.
+   - **missing**: nobody has it.
+2. Next to each score, write one line: what exists, or what does not.
+   Example: *"Guides: partly. One repo has a `CLAUDE.md`, the others
+   have nothing."* Score each layer as a whole.
 
-## Build & test
-`npm test` runs the suite. `npm run build` must pass before any commit.
+**Done when**: your notes hold five scores, each with one line on what
+exists.
 
-## Layout
-`src/api/` holds the HTTP handlers. `src/db/` holds the queries, no business logic.
-`src/domain/` holds the rules. Domain code must not import from `src/api/`.
+### 2. Find your lever (4 min)
 
-## Conventions
-- New endpoints get a handler test and an integration test.
-- No new dependencies without a one-line reason in the PR description.
-```
+You mark one layer in your notes as your lever.
 
-This file is a guide: Claude reads it before it starts work
-(*Everything You Built Is a Harness*).
+1. Start at the bottom of the pyramid, at ground rules.
+2. Go up, one layer at a time. Stop at the first layer that is not
+   **in place**. A score of **partly** also counts as not in place.
+   Write "my lever" next to that layer. If all five layers are in
+   place, take the layer with the weakest line from task 1.
+3. Write one sentence: why does this layer help your team most?
 
-**Done when**: `CLAUDE.md` exists in the root folder of your project, and
-you can say your task's goal in one sentence.
+Take the lowest layer, even if a higher layer feels like the bigger
+problem. Each layer needs the layers below it. For example, guides that
+the team never agreed on get ignored, and proof without guides and
+sensors has nothing to measure. Most teams score proof as missing, but
+proof is built last.
 
-### 2. Apply the full workflow (25 min)
+**Done when**: one layer is marked as your lever, with one sentence on
+why.
 
-You produce one finished change in your project, with a passing check.
+### 3. Write your roadmap (10 min)
 
-Run the four phases on your task, one phase at a time:
+You produce five roadmap lines, one per layer, and one first step.
 
-1. **Research** (4 min). Ask Claude to explain the code your task touches.
-   Do not let it change anything yet. Read the answer and correct one
-   thing if it is wrong.
-2. **Plan** (6 min). Write one line in your notes first: which file will
-   the plan change first? Then press Shift+Tab until the screen says plan
-   mode. On some Windows terminals the key is Alt+M. Ask for a plan: the
-   approach, the files it will touch, the risks, and how you will verify
-   the result. Read the plan. Question one step before you approve it.
-3. **Implement** (10 min). Ask Claude to carry out one plan step at a
-   time. Read each diff before you approve the next step.
-4. **Verify** (5 min). Run the tests or checks that prove the task is
-   done. If no test covers it yet, ask for one first and watch it fail,
-   then pass.
+1. Write one line per layer, from the bottom up. Each line says what
+   your team adds next on that layer. A layer that is **in place** gets
+   the words "keep as is" and nothing more.
+2. Name a file, a repo, a tool, a person or a number in each line that
+   adds something. "Better docs" names nothing. "An `AGENTS.md` in the
+   payments repo" names a file and a repo.
+3. Under your lever line, copy your sentence from task 2, with "Why:"
+   in front. Then write your **first step**: the first thing you do
+   back at work. It must fit in one morning, about three hours. For
+   ground rules, a first step can be a one-page proposal for the next
+   team meeting.
 
-This is the same loop as the slide *The Research → Plan → Implement
-Method* (Session 6), with verification as its own step. This time it runs
-on your own code.
-
-**The trainer calls task 3 at minute 30. Move to task 3 then, even if this
-task is not finished.**
-
-**Done when**: the change is made, your verification step passed, and you
-can name the plan step that was wrong, if any.
-
-### 3. Your five-line roadmap (5 min)
-
-You produce five lines in your notes. Each line answers one question about
-your team's harness. A harness is everything around the model. Guides
-steer the agent before it acts, sensors observe after it acts
-(*Everything You Built Is a Harness*).
-
-Write these five lines, in this order:
-
-1. **Guide**: one file, skill or spec your team needs before the agent starts.
-2. **Sensor**: one hook, gate or review step that catches a failure after it acts.
-3. **Share**: how the guide and the sensor reach every teammate
-   (*Beyond This Course: Sensors, Packaging, Proof*).
-4. **Metric**: one number you will measure, not how fast it feels
-   (*What Decides Which Number You Get*).
-5. **First step**: the first thing you do back at work. It must fit in
-   one morning.
-
-Worked example, if you want a starting shape to copy:
+Example roadmap, in the shape you can copy:
 
 ```
-1. Guide: an AGENTS.md in the payments repo, with the build command, the folder layout and the two rules we always repeat in review.
-2. Sensor: a PostToolUse hook that runs the linter after every edit.
-3. Share: a plugin in our team marketplace, installed at project scope.
-4. Metric: rework, counted as PRs that need a second round of changes, compared over one quarter.
-5. First step: write AGENTS.md for one repo and make CLAUDE.md import it, before lunch on my first day back.
+Team: payments, 5 developers, Java
+
+1. Ground rules (in place): keep as is.
+2. Guides (missing, my lever): an AGENTS.md in the payments repo, with the build
+   command, the folder layout and the two rules we always repeat in review.
+   Why: every session starts from zero, so every review repeats the same comments.
+   First step: write AGENTS.md for the payments repo, on my first morning back.
+3. Sensors (partly): a PostToolUse hook that runs the linter after every edit.
+4. Distribution (missing): a plugin in our team marketplace, so every teammate
+   installs the same guides and sensors.
+5. Proof (missing): count the PRs that get a second review round, for three months.
 ```
 
-The slide *A Real Roadmap: One Team's Harness Plan* shows the same five
-questions, answered by a whole team. Yours is smaller. That is the point.
+**Done when**: your notes hold five roadmap lines. Your lever line has
+a why sentence and a first step that fits in one morning.
 
-**Done when**: your notes hold five lines, and line five fits in one
-morning.
+## Plenary (10 min)
 
-## Closing round (5 min)
+The whole room talks together. The trainer leads three short rounds:
 
-Popcorn round, whole room, no pairs. The trainer asks 4 to 5 people to
-read line five of their roadmap aloud.
+1. **Hands up**. The trainer names each layer. Raise your hand when
+   your lever is named. The trainer writes the count per layer on the
+   board.
+2. **Read aloud**. The trainer asks four or five people to read their
+   lever line and their first step. Each person reads only those two
+   lines, not the why sentence.
+3. **The room**. Which layer do most teams need first, and why? Then
+   one last question: what do you still want to learn?
 
-Have these answers ready as well:
-
-- Which task took longer than you expected, and what would you set up
-  differently next time?
-- What did writing `CLAUDE.md` teach you about your own project that you
-  had not written down before?
+Have your lever line and first step ready to read.

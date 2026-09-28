@@ -13,55 +13,15 @@ In this exercise you:
 2. Create a subagent that checks the code for security problems. You write
    two lines: when Claude uses it, and which tools it may use.
 
-## Before you start
+## Start here
 
-Titles in *italics* are slide titles from this session.
-
-**Where to work.** Open a terminal in the `bookstore` folder, the one
-that contains `pom.xml`. Start Claude with `claude`. You stay in this folder
-for the whole exercise.
-
-**Chat or terminal.** Everything you type goes to Claude, in the chat,
-except the `claude mcp` commands. Those go to the terminal, after you
-leave Claude with `/exit`.
-
-**Fresh session.** Type `/exit`, then start `claude` again. Do not use
-`/clear`. Claude reads `.mcp.json` and the agent files only when it starts.
-
-**Training mode.** The project's `CLAUDE.md` tells Claude to teach instead
-of answer: before it explains or fixes something, it asks you one
-question. It also tells Claude not to open `store.db` itself. Stuck, or out
-of time? Say *"just tell me"*. Claude then answers directly.
-
-**The experiment tag.** Prompts that must start the work without a
-question begin with this text:
-
-```
-[Exercise 5 experiment — execute directly, no leading questions.]
-```
-
-The tag switches training mode off for that one prompt. Copy those prompts
-exactly as printed, tag included.
-
-**Never edit `CLAUDE.md`.** It holds training mode for sessions 6 to 8.
-Everything you make in this exercise goes in new files. The slide says:
-commit `.mcp.json`. In this course repo, git ignores it. Your copy stays
-on your machine.
-
-**Two files that came with the repo.** The folder `mcp-sqlite`, inside
-`bookstore`, holds the MCP server: one Python file, `server.py`. The
-file `exercises/starters/security-auditor.md` is a starter file: a file
-you finish yourself, in task 4.
-
-**The database.** The app creates `store.db` in this folder the first time
-it runs. Look for the file in your editor. Not there? Run `./gradlew run`, wait
-for `listening on :8080`, and stop it with Ctrl+C.
-
-**Notes.** Some steps ask you to write something down. Use paper or a text
-file, not the chat. The closing round uses your notes.
-
-**Minute 14.** Fourteen minutes after the start, the trainer says "task
-4" out loud. Start task 4 then, even if task 3 is not finished.
+- Open a terminal in the `bookstore` folder and start `claude`. Stay in
+  this folder for the whole exercise.
+- Training mode is on. Prompts that start with the tag
+  `[Exercise 5 experiment — execute directly, no leading questions.]` switch it off for that one prompt. Copy them exactly, tag included.
+  Never edit `CLAUDE.md`.
+- Write your notes on paper or in a text file, not in the chat.
+- Stuck? Type *just tell me*. At minute 14 the trainer calls task 4.
 
 ## Tasks
 
@@ -108,6 +68,11 @@ The server has two tools: `get_table_definitions` and `execute_query`
 (*The `/mcp` Command*). It only runs `SELECT` queries. You start it with
 `uv`, which you installed in the preparation.
 
+The server is one Python file, `mcp-sqlite/server.py`. It reads
+`store.db`, which the app creates the first time it runs. No `store.db`
+in your editor? Run `./gradlew run`, wait for `listening on :8080`, and stop it
+with Ctrl+C.
+
 1. **Leave Claude** (1 min). Type `/exit`. The next command goes to the
    terminal, not to Claude.
 
@@ -120,7 +85,8 @@ The server has two tools: `get_table_definitions` and `execute_query`
    The part after `--` is the command that starts the server
    (*Configuring an MCP Server*). `--scope project` writes it to
    `.mcp.json` in this folder (*Under the Hood: `.mcp.json`*). Open that
-   file: it holds the command you just typed. If `uv` is missing or
+   file: it holds the command you just typed. Git ignores `.mcp.json` in
+   this course, so it stays on your machine. If `uv` is missing or
    fails: run `claude mcp remove sqlite-bookstore`, then the command above
    again with `python3` (on Windows: `python`) in place of `uv run`. The
    server needs only Python, no packages.
@@ -136,7 +102,7 @@ The server has two tools: `get_table_definitions` and `execute_query`
 4. **Check** (1 min). Type `/mcp`. `sqlite-bookstore` shows as connected,
    with both tools. Not connected? Type `/exit` and run `claude mcp list`
    in the terminal: it shows the error. The usual causes: `store.db` is
-   missing (see *Before you start*), or the command in `.mcp.json` has a
+   missing (see the start of this task), or the command in `.mcp.json` has a
    typing error.
 
 **Done when**: `/mcp` shows `sqlite-bookstore` connected, with two tools.
@@ -202,8 +168,8 @@ may use.
    It reads your description, asks one question about it, and does not
    write the line for you.
 
-3. **Test the trigger** (4 min). Type `/exit` and start `claude` again.
-   Agents load at start. Ask, without naming the agent:
+3. **Test the trigger** (4 min). Type `/exit` and start `claude` again,
+   not `/clear`: agents load only at start. Ask, without naming the agent:
 
    ```
    [Exercise 5 experiment — execute directly, no leading questions.] Do a security audit of the bookstore API. Save the full report, exactly as it was produced, to docs/security-audit.md.

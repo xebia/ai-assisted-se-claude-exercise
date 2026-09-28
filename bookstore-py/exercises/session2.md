@@ -14,47 +14,14 @@ The goal is a better prompt, not a fixed bug. If a bug stays unfixed but
 you can name what was missing from your prompt, you have learned more than
 someone who got lucky.
 
-## Before you start
+## Start here
 
-Titles in *italics* are slide titles from this session.
-
-**Where to work.** Open a terminal in the `bookstore` folder, the one
-that contains `main.py`. Start Claude with `claude`. Keep this one session
-for tasks 1 and 2. Task 3 tells you when to restart it. After that restart
-you do not need the coach any more.
-
-**Your notes.** Keep an empty text file open next to Claude, outside the
-`bookstore` folder. Tasks 1 and 3 ask you to copy text into it.
-
-**Training mode.** The project's `CLAUDE.md` tells Claude to teach instead
-of answer. Before it explains or fixes a bug, it asks you one question.
-Never edit `CLAUDE.md`. Sessions 3 to 8 depend on it.
-
-**The loop.** Tasks 1 and 2 use all five steps. Task 3 stops after Revise.
-`/prompt-coach` is a course command. It is installed in the exercise
-project, not in Claude Code.
-
-1. **Draft.** Write your whole prompt. Do not run it yet.
-2. **Coach.** Run `/prompt-coach <task number>`, then paste your draft as
-   your next message. The coach checks it and asks one question.
-3. **Revise.** Improve the prompt until the coach says it is ready. That
-   takes at most two rounds. Out of time? Go to the next step anyway.
-4. **Ship.** Type *ship it*. The coach sends your prompt, word for word,
-   to a sub-agent: a second Claude session that knows only the words in
-   your prompt. Its report comes back into your chat.
-5. **Debrief.** Read the report with the coach. Did its predictions come
-   true?
-
-> **The loop, in short: Draft → Coach → Revise → Ship → Debrief.**
-
-Type *ship it*, *run it anyway* and *just tell me* as plain words, without
-the quotes. *Run it anyway* ships your prompt when you disagree with the
-coach. *Just tell me* makes the coach show you what is missing, with
-examples. Both are allowed.
-
-The coach puts an experiment prefix, like in session 1, in front of every
-prompt it ships. That line switches training mode off for the sub-agent.
-It does not change your words.
+- Open a terminal in the `bookstore` folder and start `claude`. Keep
+  this one session for tasks 1 and 2. Task 3 tells you when to restart.
+- Keep an empty text file open for your notes, outside `bookstore`.
+- Training mode is on: before Claude explains or fixes a bug, it asks
+  you one question. Never edit `CLAUDE.md`. Sessions 3 to 8 need it.
+- Stuck, or out of time? Type *just tell me*.
 
 ## Tasks
 
@@ -71,6 +38,16 @@ parts:
 2. **Request flow**: the path of one request, from `main.py` to the
    database and back. One line per step, each with a `file:line`
    reference, written like `bookstore/handler/book.py:42`.
+
+**How the coach works.** Tasks 1 and 2 use this loop: **Draft → Coach →
+Revise → Ship → Debrief.** Run `/prompt-coach <task number>`, then paste
+your draft as your next message. The coach checks it and asks one
+question. Revise until it says the prompt is ready: at most two rounds.
+Then type *ship it*. The coach sends your prompt, word for word, to a
+sub-agent: a second Claude session that knows only your prompt. Its
+report comes back into your chat. Read it with the coach: did its
+predictions come true? Disagree with the coach? Type *run it anyway*.
+Type these words without quotes.
 
 Steps:
 

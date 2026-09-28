@@ -10,113 +10,40 @@ The commands you have used since session 2 are markdown files in this repo.
 Now you make two of your own, then a hook that runs one of them after
 every commit.
 
-Part 1: paste a `/commit` skill, then let Claude write a `/changelog`
+Part 1: copy a ready-made `/commit` skill, then let Claude write a `/changelog`
 skill and write its `description` yourself. Part 2: wire the hook, run the
 chain, watch it stay silent, repair it, run it again.
 
-## Before you start
+## Start here
 
-Read this first. Titles in *italics* are slide titles from this session.
-
-**Where to work.** Open a terminal in the `bookstore` folder, the one
-that contains `go.mod`. Run every command from there. Start Claude with
-`claude`. The files you create in this exercise go in
-`bookstore/.claude/`.
-
-**Training mode.** `CLAUDE.md` tells Claude to teach instead of answer:
-before it explains or fixes something, it asks you one question.
-
-**The experiment tag.** Prompts that must start the work at once begin
-with this text:
-
-```
-[Exercise 4 experiment — execute directly, no leading questions.]
-```
-
-The tag switches training mode off for that one prompt. Copy those prompts
-exactly as printed, tag included.
-
-**Never edit `CLAUDE.md`.** It holds training mode for sessions 5 to 8.
-Everything you make goes in new files.
-
-**Real commits, on a branch.** You delete the branch after the closing
-round. Your own files survive: they are gitignored.
-
-**No coach this session.** The *Done when* lines are your checklist.
-`/verify-exercise 4` grades your files at the end. Stuck, or out of time?
-Say *"just tell me"*. Claude then answers directly.
+- Open a terminal in the `bookstore` folder and start `claude`.
+  Everything you create goes in `bookstore/.claude/`.
+- Training mode is on. Prompts that start with the tag
+  `[Exercise 4 experiment — execute directly, no leading questions.]` switch it off for that one prompt. Copy them exactly, tag included.
+- Never edit `CLAUDE.md`. Sessions 5 to 8 need it.
+- No coach this session: the *Done when* lines are your checklist, and
+  `/verify-exercise 4` grades your files at the end. Stuck? Type *just
+  tell me*.
 
 ## Part 1 — Two skills (15 min)
 
-### 1. Paste the `/commit` skill and run it (6 min)
+### 1. Copy the `/commit` skill and run it (6 min)
 
 This task produces a branch, the file `.claude/skills/commit/SKILL.md`, and
 one commit.
 
-1. **Create the branch** (1 min). Sessions 5 to 8 reuse this code.
+1. **Create the branch** (1 min). Sessions 5 to 8 reuse this code. You
+   delete the branch after the closing round.
 
    ```
    git switch -c session4-playground
    ```
 
-2. **Let Claude create the file** (1 min). Paste this whole block as one
-   prompt. The first line is the instruction, the rest is the file.
+2. **Let Claude copy the skill** (1 min). The skill is ready in
+   `exercises/starters/commit-skill.md`. Paste:
 
    ```
-   [Exercise 4 experiment — execute directly, no leading questions.] Create .claude/skills/commit/SKILL.md with exactly this content, nothing added or changed:
-
-   ---
-   name: commit
-   description: Analyzes all git changes and creates intelligent commits.
-   disable-model-invocation: true
-   ---
-
-   You are a git commit expert. Analyze the changes and commit them intelligently.
-
-   Execute directly — no leading questions, no coaching.
-
-   1. Review `git status` to see all changes
-   2. Review `git diff --cached` for staged changes
-   3. Review `git diff` for unstaged changes
-   4. Group related changes into 1 to max 5 logical commits
-   5. Write each commit message in **imperative mood**, starting with a
-      present-tense verb. This matches the Common Changelog convention so
-      changelog entries can be generated directly from git history. Examples:
-      - "Add genre filter to book search handler"
-      - "Fix pagination in book listing endpoint"
-      - "Refactor review store for better error handling"
-      - "Bump Go version to 1.22"
-      - "Document review API query parameters"
-
-      Do NOT use past tense ("Added", "Fixed"). Do NOT use a name for a
-      thing ("Genre filter for search").
-   6. Stage and commit each group in ONE command line:
-      `git add <files> && git commit -m "Your message here"`
-      (NO Co-Authored-By line)
-   7. Repeat until all changes are committed
-   8. Confirm: "All changes committed successfully"
-   9. Only if the file `.claude/hooks/run-changelog.py` exists: print the
-      exact command line you used for the last commit. If a hook message
-      about the changelog reached you in this turn, follow it. If no hook
-      message reached you, say exactly this and stop: "Your hook printed
-      nothing for this command line. Compare the line above with the check
-      in your script. Then go on with the sheet."
-
-   **CRITICAL**: Do NOT run `git push`. Do NOT edit the hook script. Do NOT
-   start any other skill on your own: only a hook message may start one.
-
-   ## Example
-
-   **Changes to commit:**
-
-   - Modified: `internal/model/book.go` (added Genre field)
-   - Modified: `internal/handler/book.go` (added genre query parameter)
-   - Modified: `internal/store/book.go` (updated query with genre filter)
-
-   **Generated commit:** git add internal/model/book.go internal/handler/book.go internal/store/book.go && git commit -m "Add genre filter to book search endpoint"
-
-   **Output:** Committed: "Add genre filter to book search endpoint" 3 files
-   changed, 18 insertions(+), 2 deletions(-)
+   [Exercise 4 experiment — execute directly, no leading questions.] Copy exercises/starters/commit-skill.md to .claude/skills/commit/SKILL.md. Change nothing in the content.
    ```
 
 3. **Make a small change by hand** (1 min). Open any file in
@@ -124,9 +51,10 @@ one commit.
 
 4. **Run the skill** (2 min). Type `/commit` and watch what it does.
 
-Three lines in that file matter most (1 min). *"Execute directly — no
-leading questions"* switches training mode off inside the skill; without
-it, Claude asks a question instead of committing.
+Open `.claude/skills/commit/SKILL.md` in your editor. Three lines in it
+matter most (1 min). *"Execute directly — no leading questions"* switches
+training mode off inside the skill; without it, Claude asks a question
+instead of committing.
 `disable-model-invocation: true` means only typing `/commit` runs it.
 *Imperative mood* means the message starts with a present-tense verb:
 "Add", "Fix", "Remove". Task 2's changelog is built from those messages.

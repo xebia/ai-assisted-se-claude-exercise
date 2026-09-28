@@ -16,53 +16,17 @@ code. The clean session also shows whether your rules work.
 
 The tasks take 35 minutes. The rest of the time is for the bonus.
 
-## Before you start
+## Start here
 
-Titles in *italics* are slide titles from this session.
-
-**Where to work.** Open a terminal in the `bookstore` folder, the one
-that contains `go.mod`. Start Claude with `claude`. Open a second terminal
-in the same folder now; task 2 uses it for the grader.
-
-**Check your starting point.** After session 2, all tests pass and the
-work is committed. Run `go test ./...` and `git status` to check. If a
-test fails, or `git status` lists changes, run `/catch-up 2` in Claude.
-It finishes the session 2 work and commits. Before you run it, press
-Shift+Tab until the screen says auto mode, so it works without questions.
-Read on while it works. This exercise resets the project, and a reset
-removes every change that is not committed.
-
-**Fresh session.** Type `/exit`, then start `claude` again. Do not use
-`/clear`: it does not always reload a changed `CLAUDE.local.md`. A fresh
-session remembers nothing and reads all context files again.
-
-**Training mode.** The project's `CLAUDE.md` tells Claude to teach instead
-of answer. Before it explains or fixes something, it asks you one
-question. Tests, git commands and `/` commands are not affected. Stuck,
-or out of time? Say *"just tell me"*. Claude then answers directly. That
-also works with the coach commands.
-
-**The experiment tag.** An experiment must start right away, without a
-teacher question. So the experiment prompts in this sheet start with the
-experiment prefix from sessions 1 and 2. This sheet calls it the tag:
-
-```
-[Exercise 3 experiment — execute directly, no leading questions.]
-```
-
-Copy every prompt exactly as printed, tag included. Both sessions in a
-comparison get the same prompt.
-
-**Never edit `CLAUDE.md`.** It carries training mode for sessions 4 to 8.
-Your own rules go in `CLAUDE.local.md`. Claude reads both files (*The
-CLAUDE.md Hierarchy*). `CLAUDE.local.md` is in `.gitignore`, so it stays
-on your machine.
-
-**Minute cue.** The trainer calls "task 2" at minute 10. Move on then,
-also when your file is not finished. Commands that start with `/` and are
-not in Claude Code itself (`/catch-up`, `/context-coach`,
-`/save-changes`, `/verify-exercise`, `/pollute`) come with this project.
-Each task explains its command where it is used.
+- Open two terminals in the `bookstore` folder. Start `claude` in the
+  first one.
+- Run `go test ./...` and `git status`. A test fails, or `git status` lists
+  changes? Press Shift+Tab until the screen says auto mode, then run
+  `/catch-up 2`. It commits your session 2 work, which the reset in
+  task 2 would otherwise remove.
+- Training mode is on. Never edit `CLAUDE.md`: your own rules go in
+  `CLAUDE.local.md`. Stuck? Type *just tell me*.
+- The trainer calls task 2 at minute 10.
 
 ## Tasks
 
@@ -144,8 +108,11 @@ Compare, in the second terminal, once Grader's report is done.
    and rule 3. Which one will Claude break in the clean session? Write it
    down.
 2. **Clean session** (4 min). In the first terminal, type `/exit` and
-   start `claude` again. Run `/context` and note the percentage of the
-   context window in use. Paste this exactly:
+   start `claude` again. Not `/clear`: it does not always reload a changed
+   `CLAUDE.local.md`. Run `/context` and note the percentage of the
+   context window in use. Paste this exactly. It starts with the
+   experiment tag, which switches training mode off for this one prompt.
+   Both sessions get the same prompt, tag included:
 
    ```
    [Exercise 3 experiment — execute directly, no leading questions.] Add a DELETE /reviews/{id} endpoint to the BookStore API, with tests.

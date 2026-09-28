@@ -24,7 +24,7 @@ bookstore/                 <- bookstore-<lang>/: code, tests, CLAUDE.md, README.
   preparation.pdf
   web/                     <- bookstore-web/ (sessions 6 and 7)
   mcp-sqlite/server.py     <- mcp-sqlite/ (session 5)
-  bookstore-plugin/        <- bookstore-plugin/ (session 5 bonus, session 8)
+  bookstore-plugin/        <- bookstore-plugin/ (session 5 bonus)
 ```
 
 Rules that follow from this:
@@ -164,7 +164,7 @@ source of truth — when it changes there, copy it here again.
   does not reliably reload a changed `CLAUDE.local.md`.
 - **Commit before the first reset**: any exercise that resets the tree
   tells participants to commit earlier sessions' work first (session 2's
-  closing and session 3's "Before you start" both do). Otherwise the reset
+  closing and session 3's "Start here" both do). Otherwise the reset
   removes uncommitted fixes that later sessions build on.
 - **Timing**: budget ≈ expert dry-run × 1.3. Session 3 measured 30 min
   expert → 40 min box.

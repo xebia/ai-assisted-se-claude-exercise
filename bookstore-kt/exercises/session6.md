@@ -21,62 +21,34 @@ has. Those are decisions. Decisions are what a specification is for.
 A frontend also splits into parts that different agents can build at the
 same time. Exercise 7 depends on that.
 
-## Before you start
+## Start here
 
-Titles in *italics* are slide titles from this session.
-
-**Where to work.** You need three terminals.
-
-*Terminal 1: your backend.* Open it in the `bookstore` folder and start
-the API:
+**Terminal 1**, in the `bookstore` folder, runs the backend:
 
 ```bash
 ./gradlew run
 ```
 
-Check that it answers. This must print JSON, not a connection error:
-
-```bash
-curl http://localhost:8080/api/books
-```
-
-*Terminal 2: Claude Code.* Open it in the `web` folder, inside `bookstore`.
-Start Claude with access to your backend's source, one folder up:
+**Terminal 2**, in the `web` folder inside `bookstore`, runs Claude. The
+`..` gives Claude your backend's code:
 
 ```bash
 claude --add-dir ..
 ```
 
-*Terminal 3: a plain shell.* Open it in the `web` folder. You use
-it for `curl` and `git` while Claude is busy in terminal 2.
-
-Do **not** start the frontend dev server. There is no frontend yet. This
-session you specify it. Exercise 7 builds it.
-
-**Check Spec Kit.** In terminal 3, run:
+**Terminal 3**, a plain shell in `web`, for `curl` and `git`. Check the
+backend and Spec Kit there:
 
 ```bash
+curl http://localhost:8080/api/books
 specify check
 ```
 
-It must report no problems. In terminal 2, type `/speckit` and check that
-Claude offers the `speckit-*` commands. Missing? Run the Spec Kit steps from
-`preparation.md` again (section "Spec Kit and Node"), then restart Claude.
+The first prints JSON, the second reports no problems. Do not start the
+frontend: there is none yet.
 
-**Training mode is off.** Earlier sessions used a `CLAUDE.md` file that
-makes Claude teach instead of answer. `web` has no such file, and its
-`.claude/settings.json` tells Claude Code not to load the one from
-`bookstore`. So Claude answers directly this session. You do not need
-the experiment tag.
-
-**Stuck, or out of time?** Say *"just tell me"*. Claude then gives you the
-answer. That is allowed.
-
-**The API paths.** In this exercise you call the API on
-`http://localhost:8080/api/...`. The finished frontend will call the same
-paths as `/api/...` on its own origin. Vite forwards those to port 8080
-(see `vite.config.js`). So the paths in your spec are the paths you see
-here.
+Training mode is off in `web`: Claude answers directly. Stuck? Type
+*just tell me*.
 
 ## Tasks
 
@@ -91,7 +63,9 @@ and *why*. Not how.
    > A web UI for the BookStore API. Users can browse books and open a book to see
    > its details and its author. The API is already running behind `/api`.
 
-   The command takes one to two minutes. Do not wait for it.
+   The command takes one to two minutes. Do not wait for it. Claude does
+   not know `/speckit-specify`? Run the Spec Kit steps in
+   `preparation.md` again, then restart Claude.
 2. **Read the constitution while it runs** (3 min). Open
    `.specify/memory/constitution.md`. The constitution holds the rules that
    every spec, plan and task must follow. It is written for you. It has six
@@ -184,7 +158,9 @@ You produce a written list of differences between `research.md` plus
 
 `/speckit-plan` did its own research. It wrote what it thinks the API does
 into `research.md` and `contracts/`. Exercise 7 builds against those files.
-So check them.
+So check them. The paths you call here are the paths the frontend will
+use: it calls `/api/...`, and Vite forwards that to port 8080
+(`vite.config.js`).
 
 1. **Predict first** (1 min). Before you run anything, write down two
    predictions:

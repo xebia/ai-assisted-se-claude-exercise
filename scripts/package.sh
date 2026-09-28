@@ -10,7 +10,7 @@
 #     .claude/skills/      <- .claude/skills/     (coaches, verify-exercise, ...)
 #     web/                 <- bookstore-web/      (sessions 6 and 7)
 #     mcp-sqlite/          <- mcp-sqlite/         (session 5: server.py, run with uv)
-#     bookstore-plugin/    <- bookstore-plugin/   (session 5 bonus and session 8)
+#     bookstore-plugin/    <- bookstore-plugin/   (session 5 bonus)
 #     exercises/*.pdf      <- the sheets, rendered by scripts/render-sheets.sh
 #     preparation.pdf
 #
