@@ -72,10 +72,11 @@ Run these yourself. Do not take the participant's notes on trust.
   it as page 1, so Next shows page 1 twice, or it returns an error the UI
   shows. Both are a spec defect from Exercise 6 that became code. Mention
   it as a finding either way — it is the point of the closing-round question about marked guesses.
-- **Subagents, not a team.** The participant reports an empty Ctrl+T task
-  list. Not a code defect, but a prompt one: map it to Team, not
-  subagents. Rows in the agent panel are not evidence either way: subagents
-  show there too.
+- **Subagents, not a team.** The participant reports no panel rows with
+  the teammate names from the prompt. Not a code defect, but a prompt one:
+  map it to Team, not subagents. An empty Ctrl+T task list is not evidence
+  either way: on current models the session has no Task tools, so that list
+  stays empty for a real team too.
 
 ## Pass bar
 
