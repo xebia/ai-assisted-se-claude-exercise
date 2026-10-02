@@ -57,7 +57,7 @@ copy bookstore-plugin bookstore-plugin
 # README links, the sheets themselves, and skills that look for a sheet on disk.
 if [ "${PDF:-}" != skip ]; then
   find "$out" -name '*.md' -type f -exec \
-    perl -pi -e 's{\b(preparation|exercises/session\d+)\.md\b}{$1.pdf}g' {} +
+    perl -pi -e 's{\b(preparation|exercises/session\d+(?:-part\d)?)\.md\b}{$1.pdf}g' {} +
 fi
 
 # Lint: paths that only make sense in the old multi-folder layout.

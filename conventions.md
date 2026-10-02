@@ -8,7 +8,8 @@ versions and all eight sessions keep behaving as one course.
 Four projects — `bookstore-go`, `bookstore-kt`, `bookstore-py`,
 `bookstore-ts` — implement the same API with the same deliberate bugs.
 Participants pick one language for the whole course. Each project carries
-`exercises/session1.md … session8.md`, a `README.md` (build/run) and `preparation.md` (install checklist).
+`exercises/session1.md … session8.md` (session 4 is two sheets,
+`session4-part1.md` and `session4-part2.md`, with slides between them), a `README.md` (build/run) and `preparation.md` (install checklist).
 Coaching skills live once, at the repo root, in `.claude/skills/`.
 
 Participants never see this layout. `scripts/package.sh` (run by
@@ -20,7 +21,7 @@ branch into a folder named `bookstore`:
 ```
 bookstore/                 <- bookstore-<lang>/: code, tests, CLAUDE.md, README.md
   .claude/skills/          <- the root .claude/skills/ (coaches, verifier, helpers)
-  exercises/session1.pdf … session8.pdf, exercises/starters/
+  exercises/session1.pdf … session8.pdf (session4-part1/-part2), exercises/starters/
   preparation.pdf
   web/                     <- bookstore-web/ (sessions 6 and 7)
   mcp-sqlite/server.py     <- mcp-sqlite/ (session 5)
