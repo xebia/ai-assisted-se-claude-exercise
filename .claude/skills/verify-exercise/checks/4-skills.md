@@ -10,16 +10,29 @@ gitignored paths — `.claude/skills/commit/SKILL.md`,
 during the session: their three task-3 hook predictions, marked
 confirmed or wrong in task 4.
 
-**This check runs in-session, at the end of task 4**, before the closing
-round. The `session4-playground` branch is deleted after the closing
+**This check runs in two stages.** Participants may run it after Part 1,
+when only the two skills exist, and again at the end of task 4, before
+the closing round. Never refuse the first run because the hook is
+missing: in Part 1 the hook is not supposed to exist yet.
+
+Pick the stage from disk, before anything else:
+
+- **Part 1 stage**: `.claude/hooks/run-changelog.py` does not exist and
+  `.claude/settings.json` is missing or has no `PostToolUse` entry.
+  Grade only the two skills. See *Part 1 stage* below.
+- **Part 2 stage**: the hook script or the `PostToolUse` entry exists.
+  Run the full check in this file. Files that are still missing (no
+  `CHANGELOG.md` yet) are findings, not a reason to stop.
+
+The `session4-playground` branch is deleted after the closing
 round; if the participant already did that, every artifact above lives
 in a gitignored path and survives, but commit hashes cited in
 `CHANGELOG.md` may no longer resolve. Grade the *presence and format* of
 references, never whether they resolve.
 
 **Under review: the artifacts, not a prompt.** This is a Session 4
-exception to this skill's usual framing. In Step 0, instead of a
-prompt, ask for one thing word for word: the three written task-3
+exception to this skill's usual framing. In the Part 2 stage, in Step 0,
+instead of a prompt, ask for one thing word for word: the three written task-3
 predictions, with the participant's confirmed-or-wrong mark on each.
 The sheet told them you would ask, so ask in one line and wait. If they
 do not exist, that is itself a finding. A wrong prediction was a fine
@@ -68,6 +81,32 @@ the chain. Grade the repaired script; if the first run did finish the
 chain anyway, name the reason (a `/commit` that ignored its one-line
 rule, or Claude starting the skill on its own) as luck, not wiring.
 
+## Part 1 stage — the two skills only
+
+Read both SKILL.md files and `common-changelog-spec.md` from disk. Do
+not ask for a prompt and do not ask for predictions: the participant has
+not written them yet. In Step 0, ask one question instead, in one line,
+and wait: *Which words in your description should make Claude start
+`/changelog` right after a commit?* The sheet asks them the same
+question in task 2. Then grade the description as a trigger (see below)
+and compare your prediction with their answer.
+
+Use the rubric rows **/commit skill** and **/changelog skill** only.
+State the grade as *N of 2 dimensions sound*. Use *Establish ground
+truth* steps 1 and 2 only, and the Known traps that are about the two
+skills.
+
+Do not grade, mention or explain anything of Part 2. That means: no
+hook, no `settings.json`, no `CHANGELOG.md`, no predictions, nothing
+about when a hook fires or what `/commit` will report about it. For the
+`/commit` last step, check only that it is still there as in the
+starter. Do not say what it will show. Part 2 depends on the
+participant finding that out by running it.
+
+Header of the report: `## Exercise 4, Part 1 — two skills`. Last line,
+in place of the retry offer: *Run `/verify-exercise 4` again at the end
+of Part 2. Then it grades the hook and `CHANGELOG.md` as well.*
+
 ## Rubric — replaces the Session 2 technique table
 
 | Dimension | Passes when… |
@@ -78,8 +117,8 @@ rule, or Claude starting the skill on its own) as luck, not wiring.
 | **Changelog output** | `# Changelog` heading · `## Unreleased` section · groups in Changed/Added/Removed/Fixed order · imperative-verb entries · every entry ending with a commit hash in round brackets |
 
 Grade each ✅ / ❌ / ⚠️ with the usual discipline: predictions before
-evidence, one specific expected defect per ❌. State the grade as *N of
-4 dimensions sound*.
+evidence, one specific expected defect per ❌. In the Part 2 stage, state
+the grade as *N of 4 dimensions sound*.
 
 **Grading the description as a trigger** — do it the way the context
 coach grades a rule: from the description text alone, *predict* one
@@ -170,6 +209,9 @@ luck, and the hook is covering for it.
 
 ## Pass bar
 
+Part 1 stage: the two lines about the skills only (polarity with the
+execute-directly line, and the spec file). Part 2 stage: all five.
+
 - Invocation polarity correct on both skills, and the execute-directly
   line present in `/commit`
 - The fabricated-event pipe test produces the nested
@@ -186,6 +228,8 @@ setup. Show the exact line that breaks it and let them fix it
 themselves.
 
 ## Close by arbitrating their predictions
+
+Part 2 stage only. In the Part 1 stage there are no predictions yet.
 
 They marked their predictions first; you close. Never the other way
 around. For each of the three, say confirmed or wrong, and cite the
