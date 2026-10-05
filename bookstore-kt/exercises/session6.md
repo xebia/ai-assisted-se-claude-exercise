@@ -52,12 +52,12 @@ Training mode is off in `web`: Claude answers directly. Stuck? Type
 
 ## Tasks
 
-### 1. Create the spec and find what it leaves open (7 min)
+### 1. Create the spec and find what it leaves open
 
 You create `specs/001-*/spec.md`. The spec says *what* the frontend does
 and *why*. Not how.
 
-1. **Start the spec** (1 min). In terminal 2, run `/speckit-specify` with
+1. **Start the spec**. In terminal 2, run `/speckit-specify` with
    this text, exactly as written:
 
    > A web UI for the BookStore API. Users can browse books and open a book to see
@@ -66,12 +66,12 @@ and *why*. Not how.
    The command takes one to two minutes. Do not wait for it. Claude does
    not know `/speckit-specify`? Run the Spec Kit steps in
    `preparation.md` again, then restart Claude.
-2. **Read the constitution while it runs** (3 min). Open
+2. **Read the constitution while it runs**. Open
    `.specify/memory/constitution.md`. The constitution holds the rules that
    every spec, plan and task must follow. It is written for you. It has six
    principles on one page. Answer two questions in one written sentence. What does the constitution
    say about the API contract? Where does it say the contract comes from?
-3. **Find the gaps** (3 min). When the command is done, open
+3. **Find the gaps**. When the command is done, open
    `specs/001-*/spec.md`. Scroll to **Assumptions** at the end. This is
    where Spec Kit writes what it invented. Nothing has called the API yet,
    so each assumption is a guess. Now read the **Requirements** section
@@ -85,11 +85,11 @@ and *why*. Not how.
 **Done when**: `spec.md` exists, you wrote the constitution answer, and you
 wrote which of the three questions the spec answers.
 
-### 2. Save the spec, then answer the clarify questions (8 min)
+### 2. Save the spec, then answer the clarify questions
 
 You change `specs/001-*/spec.md` in place. No new file.
 
-1. **Save the spec first** (1 min). In terminal 3:
+1. **Save the spec first**. In terminal 3:
 
    ```bash
    git add specs
@@ -97,7 +97,7 @@ You change `specs/001-*/spec.md` in place. No new file.
 
    You do not commit. Later, `git diff` shows the difference between this
    saved version and the changed file. Task 3 reads that diff.
-2. **Run `/speckit-clarify`** (6 min). It asks up to five questions about
+2. **Run `/speckit-clarify`**. It asks up to five questions about
    what the spec leaves open, one at a time, and waits for each answer.
    Answer fast. This is a first draft, not a perfect spec.
 
@@ -108,7 +108,7 @@ You change `specs/001-*/spec.md` in place. No new file.
    > 20 books per page (guess, not checked against the API)
 
    Zero questions? Then Spec Kit found nothing open. Go on to task 3.
-3. **Stop** (1 min). Do not read the spec yet. You read it in task 3, while
+3. **Stop**. Do not read the spec yet. You read it in task 3, while
    a slow command runs.
 
 The command does more than list your answers. Every answer is also written
@@ -119,16 +119,16 @@ sentence, the old sentence is replaced.
 **Done when**: `/speckit-clarify` is finished, and every answer you guessed
 contains the word "guess".
 
-### 3. Create the plan, and review the spec while it runs (7 min)
+### 3. Create the plan, and review the spec while it runs
 
 You create five files under `specs/001-*/`: `plan.md`, `research.md`,
 `data-model.md`, `contracts/` and `quickstart.md`. Together they are the
 plan. The plan says *how* the frontend gets built.
 
-1. **Start the plan** (1 min). In terminal 2, run `/speckit-plan`. It runs
+1. **Start the plan**. In terminal 2, run `/speckit-plan`. It runs
    two to four minutes without you. Do not wait. Do not edit the spec while
    it runs: the command is reading that file.
-2. **Read the diff** (5 min). In terminal 3:
+2. **Read the diff**. In terminal 3:
 
    ```bash
    git diff -- specs
@@ -145,13 +145,13 @@ plan. The plan says *how* the frontend gets built.
      it. You only see this in the diff.
    - **Answers in a place you did not expect.** One answer can change a
      user story, add an edge case and change the data model.
-3. **Write down one thing you disagree with** (1 min). Do not fix it yet.
+3. **Write down one thing you disagree with**. Do not fix it yet.
    In a real project it goes back into the spec before the plan is used.
 
 **Done when**: the five files exist, and you wrote down one line of the
 spec you disagree with.
 
-### 4. Predict, then check the plan against the API (5 min)
+### 4. Predict, then check the plan against the API
 
 You produce a written list of differences between `research.md` plus
 `contracts/` and the real API.
@@ -162,13 +162,13 @@ So check them. The paths you call here are the paths the frontend will
 use: it calls `/api/...`, and Vite forwards that to port 8080
 (`vite.config.js`).
 
-1. **Predict first** (1 min). Before you run anything, write down two
+1. **Predict first**. Before you run anything, write down two
    predictions:
    - `GET /api/books/1` returns: a book object, or something else?
    - The first page of the list is page number: 0 or 1?
 
    A wrong prediction is fine. A missing prediction is the only failure.
-2. **Call the API** (1 min). In terminal 3:
+2. **Call the API**. In terminal 3:
 
    ```bash
    curl -s "http://localhost:8080/api/books?page=0&size=3"
@@ -178,7 +178,7 @@ use: it calls `/api/...`, and Vite forwards that to port 8080
 
    On Windows PowerShell, type `curl.exe` instead of `curl`.
    Compare the output with your two predictions.
-3. **Check the two files** (3 min). Open `specs/001-*/research.md` and the
+3. **Check the two files**. Open `specs/001-*/research.md` and the
    file in `specs/001-*/contracts/`. Compare them with the curl output:
    - **Shape**: what do they say `GET /api/books/{id}` returns? Is that
      what you saw?
@@ -194,21 +194,21 @@ use: it calls `/api/...`, and Vite forwards that to port 8080
 **Done when**: both predictions were written before the first curl, and you
 have a list of differences (possibly empty).
 
-### 5. Create the task list and check the `[P]` marks (5 min)
+### 5. Create the task list and check the `[P]` marks
 
 You create `specs/001-*/tasks.md`. The task list holds small steps, in
 order, for building the frontend.
 
-1. **Start the task list** (1 min). In terminal 2, run `/speckit-tasks`. It
+1. **Start the task list**. In terminal 2, run `/speckit-tasks`. It
    takes one to two minutes. While it runs, look at your task 4 list: which
    difference would do the most damage once it is code?
-2. **Read the format** (1 min). Open `specs/001-*/tasks.md`. Each task looks
+2. **Read the format**. Open `specs/001-*/tasks.md`. Each task looks
    like `[ID] [P?] [Story]`. `[P]` means: different files, no
    dependencies, so it can run at the same time as other `[P]` tasks.
    `[US1]` and `[US2]` name the user story. Find the sections **Parallel
    Opportunities** and **Parallel Team Strategy** near the end. That is the
    work split for the agents in Exercise 7.
-3. **Check for a collision** (3 min). Pick two `[P]` tasks from
+3. **Check for a collision**. Pick two `[P]` tasks from
    **different** user stories. Do they write the same file? Then check the
    shared files: the API client, the stylesheet, `index.html`. The
    constitution (principle IV) says these belong to the foundation phase,
@@ -220,9 +220,9 @@ order, for building the frontend.
 **Done when**: you wrote down *collision: yes* with a file name, or
 *collision: no*.
 
-### 6. Commit and run the check (2 min)
+### 6. Commit and run the check
 
-1. **Commit** (1 min). In terminal 3:
+1. **Commit**. In terminal 3:
 
    ```bash
    git add specs
@@ -230,7 +230,7 @@ order, for building the frontend.
    ```
 
    Exercise 7 starts from this commit.
-2. **Start the check** (1 min). In terminal 2, run `/verify-exercise 6`.
+2. **Start the check**. In terminal 2, run `/verify-exercise 6`.
    This is a course command. It compares what the plan says about the API
    with what your backend really does. It asks you for two file names:
    `research.md` and the contract file. Give them. It calls your backend,
@@ -248,7 +248,7 @@ your task 4 list. Is a difference you *know* is real missing from the
 report? Then you have seen the limit of this command. The three files can
 agree with each other and still be wrong about the API.
 
-## Closing round (5 min)
+## Closing round
 
 The trainer asks the room. Have these answers ready:
 

@@ -209,14 +209,26 @@ Proven on Exercise 2; apply to every exercise document:
 - **Recap box for the core loop.** If tasks share a repeated workflow,
   state it once in full, then add a one-line recap box the reader can jump
   back to mid-exercise. Nobody should re-read prose to find step 3.
-- **Timing: total in the heading, phases on the steps.** The heading
-  carries one number: "(12 min)". If a task has phases, put the minutes on
-  the step itself: "3. Run the coach (3 min)". Never in the heading —
-  "9 min: draft 3 · coach & revise 3 · ship & check 3" was flagged as noise
-  by a lead trainer (2026-09-04) and is now banned.
+- **No minutes on the sheet.** The header's `**Duration**` line is the
+  only time a participant sees. No minutes in task headings, on steps, in
+  cues ("at minute 10") or in the closing-round heading. Per-task minutes
+  live in the deck's speaker notes and `trainer-guide.md`, where the
+  budget check (box ÷ 1.1) still uses them. A cue on the sheet names the
+  trainer, not the clock: "The trainer tells you when to start task 2."
+  Lead-trainer feedback (2026-10-05): minute marks add nothing for
+  participants.
+- **Each action appears once, in the step that does it.** No command,
+  slash command, prompt or code block appears before the step that runs
+  it: not in a task intro, not in an overview table, not in *Start here*
+  (except the setup it runs). A task intro is at most two sentences: what
+  the task produces and why, with no instructions in it. Lead-trainer
+  feedback (2026-10-05): participants read a preview as an instruction,
+  copied the wrong text, and only understood when they reached the real
+  step.
 - **Tasks are numbered steps.** Each task is: the file or result it
-  produces, then numbered steps with plain verbs and the exact command,
-  then at most one short note on why, then **Done when**. Rationale never
+  produces (one or two sentences), then numbered steps with plain verbs
+  and the exact command, then at most one short note on why, then
+  **Done when**. Rationale never
   sits inside a step.
 
 ### Reference example
@@ -295,7 +307,9 @@ Run this on every piece before delivering it:
       invented words, no glossary needed.)
 - [ ] Does the sheet say which folder, what a fresh session is, and which
       file each task produces — before the steps?
-- [ ] Headings carry one number only?
+- [ ] No minutes anywhere except the `**Duration**` line?
+- [ ] Every command, prompt and code block appears once, in the step that
+      runs it, and nowhere before it?
 - [ ] The reader test: someone who has only seen the slides reads the
       sheet once and lists every question they still have. Each question
       is a defect. Zero questions before delivery.

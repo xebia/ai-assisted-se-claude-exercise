@@ -1,0 +1,114 @@
+# library-service/app/reviews/api.py
+# Library service, reviews module (team Catalog). Shared for reference.
+from datetime import datetime, timezone
+from typing import Optional
+
+from fastapi import APIRouter, Depends, Header, HTTPException, Response, status
+from pydantic import BaseModel, Field
+from sqlalchemy import DateTime, Integer, String, select
+from sqlalchemy.orm import Mapped, Session, declarative_base, mapped_column
+
+from app.db import get_session
+from app.events import publish
+
+Base = declarative_base()
+router = APIRouter(prefix="/reviews", tags=["reviews"])
+
+
+class Review(Base):
+    __tablename__ = "reviews"
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    book_id: Mapped[int] = mapped_column(Integer, index=True)
+    user_id: Mapped[str] = mapped_column(String(64))
+    rating: Mapped[int] = mapped_column(Integer)
+    body: Mapped[str] = mapped_column(String(2000))
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True))
+    deleted_at: Mapped[Optional[datetime]] = mapped_column(DateTime(timezone=True))
+
+
+class ReviewOut(BaseModel):
+    id: int
+    book_id: int = Field(alias="bookId")
+    rating: int = Field(ge=1, le=5)
+    body: str = Field(max_length=2000)
+
+    model_config = {"from_attributes": True, "populate_by_name": True}
+
+
+# Repository and router live together: one module per resource.
+class ReviewRepository:
+    def __init__(self, session: Session):
+        self.session = session
+
+    def find_active(self, review_id: int) -> Optional[Review]:
+        stmt = select(Review).where(Review.id == review_id, Review.deleted_at.is_(None))
+        return self.session.scalars(stmt).first()
+
+    def soft_delete(self, review: Review) -> None:
+        # Never hard-delete: moderation needs the history.
+        review.deleted_at = datetime.now(timezone.utc)
+        self.session.commit()
+
+
+def get_repo(session: Session = Depends(get_session)) -> ReviewRepository:
+    return ReviewRepository(session)
+
+
+@router.get("/{review_id}", response_model=ReviewOut)
+def get_review(review_id: int, repo: ReviewRepository = Depends(get_repo)):
+    review = repo.find_active(review_id)
+    if review is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="review not found")
+    return review
+
+
+@router.delete("/{review_id}", status_code=status.HTTP_204_NO_CONTENT)
+def delete_review(
+    review_id: int,
+    x_user_id: Optional[str] = Header(default=None),
+    repo: ReviewRepository = Depends(get_repo),
+) -> Response:
+    """Only the author may delete. 204 on success, 404 if already gone."""
+    if not x_user_id:
+        raise HTTPException(status.HTTP_401_UNAUTHORIZED, detail="missing X-User-Id")
+    review = repo.find_active(review_id)
+    if review is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, detail="review not found")
+    if review.user_id != x_user_id:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, detail="not your review")
+    repo.soft_delete(review)
+    publish("review.deleted", {"id": review_id, "bookId": review.book_id})
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+# library-service/tests/reviews/test_api.py
+import pytest
+from fastapi.testclient import TestClient
+
+from app.main import app
+from app.reviews.api import Review
+
+
+@pytest.fixture
+def client(db_session):
+    db_session.add(Review(id=7, book_id=1, user_id="u-42", rating=4, body="good"))
+    db_session.commit()
+    return TestClient(app)
+
+
+def test_owner_can_delete(client):
+    res = client.delete("/reviews/7", headers={"X-User-Id": "u-42"})
+    assert res.status_code == 204
+    assert client.get("/reviews/7").status_code == 404
+
+
+def test_other_user_gets_403(client):
+    res = client.delete("/reviews/7", headers={"X-User-Id": "u-99"})
+    assert res.status_code == 403
+    assert res.json()["detail"] == "not your review"
+
+
+@pytest.mark.parametrize("header", [None, ""])
+def test_missing_user_gets_401(client, header):
+    headers = {} if header is None else {"X-User-Id": header}
+    assert client.delete("/reviews/7", headers=headers).status_code == 401

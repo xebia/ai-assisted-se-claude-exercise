@@ -41,7 +41,7 @@ Training mode is off in `web`: Claude answers directly. Stuck? Type
 
 ## Tasks
 
-### 1. Build the foundation, one session (6 min)
+### 1. Build the foundation, one session
 
 You produce the **foundation**: Phase 1 and Phase 2 of `tasks.md`. These
 are the files every story needs, such as the API client, the page shell and
@@ -88,14 +88,10 @@ work. One session, the lead, does it.
 **Done when**: Phase 1 and 2 are ticked in `tasks.md`, the page shell loads
 on port 5173, and the foundation is committed.
 
-### 2. Draft the team prompt (9 min)
+### 2. Draft the team prompt
 
 You produce one prompt that turns the lead into a team lead. This is the
 core of the exercise.
-
-`tasks.md` already says how to split the work between teammates. Find the
-section **Parallel Team Strategy** near the bottom. Your prompt turns that
-plan into instructions the lead can follow.
 
 The lead starts **teammates**: separate Claude Code sessions. Together
 they are the **agent team**. A teammate starts with its own, empty
@@ -106,76 +102,73 @@ Each user story in `tasks.md` has an **Independent Test**: the steps from
 `quickstart.md` that must pass for that story. The worked example below
 uses it.
 
-Here is a worked example. It is not complete: the coach tells you what
-is missing. **Words in `<angle brackets>` are placeholders.** Replace each
-one with a name from your own `tasks.md`, and remove the brackets. Do not
-paste the example as it is.
+1. **Draft**. Open `tasks.md` and find the section **Parallel Team
+   Strategy** near the bottom: it says how to split the work. Your prompt
+   turns that plan into instructions the lead can follow. Start from the
+   worked example below. It is not complete:
+   the coach tells you what is missing. **Words in `<angle brackets>` are
+   placeholders.** Replace each one with a name from your own `tasks.md`,
+   and remove the brackets. Do not run the prompt yet.
 
-> Read `specs/<your spec folder>/tasks.md`. Spawn an agent team with one
-> teammate per user story, named after the story: `<us1-short-name>`,
-> `<us2-short-name>`. Each teammate works only on the tasks tagged with
-> its story. Each teammate is done when its story's Independent Test in
-> `tasks.md` passes against the running backend and its tasks are ticked.
-> Report per story: files changed, and the result of its Independent Test.
+   > Read `specs/<your spec folder>/tasks.md`. Spawn an agent team with one
+   > teammate per user story, named after the story: `<us1-short-name>`,
+   > `<us2-short-name>`. Each teammate works only on the tasks tagged with
+   > its story. Each teammate is done when its story's Independent Test in
+   > `tasks.md` passes against the running backend and its tasks are ticked.
+   > Report per story: files changed, and the result of its Independent Test.
 
-The coach is the `/parallel-coach 2` command. It reads your draft and points
-out gaps. It never writes the prompt for you. That is your job.
-
-1. **Draft** (4 min). Write your own version for your `tasks.md`. Do not
-   run it yet.
-2. **Coach and revise** (5 min). Run `/parallel-coach 2` and paste your
-   draft as your next message. Revise until the coach says the prompt is
-   ready.
-
-Disagree with the coach? Say *"run it anyway"*. It will let you, and tell
-you what to watch for.
+2. **Coach and revise**. Run `/parallel-coach 2` and paste your draft as
+   your next message. The coach points out gaps. It never writes the
+   prompt for you. Revise until the coach says the prompt is ready.
+   Disagree with the coach? Say *"run it anyway"*. It will let you, and
+   tell you what to watch for.
 
 **Done when**: the coach says your team prompt is ready, and task 1 is done.
 
-### 3. Start the team and watch it (10 min)
+### 3. Start the team and watch it
 
-Before you paste, write two predictions on paper. **Will the lead wait for
-its teammates? Which file will a teammate touch that it should not?** A
-wrong prediction is fine. Only a missing one is a problem.
+You start the team and follow its work in the agent panel.
 
-1. Paste your prompt into the lead, in terminal 2. The coach does not run
+1. **Predict.** Write two predictions on paper. **Will the lead wait for
+   its teammates? Which file will a teammate touch that it should not?**
+   A wrong prediction is fine. Only a missing one is a problem.
+2. Paste your prompt into the lead, in terminal 2. The coach does not run
    this one for you. A team can only start from the session you type in.
-2. Look at the agent panel below the prompt input. Within a minute you
+3. Look at the agent panel below the prompt input. Within a minute you
    should see one row per teammate, with the names from your prompt. Rows
    without your names are plain subagents, not a team. Then tell the lead:
    *"Use an agent team, not subagents."* Still no team? Agent teams are
    experimental: tell the trainer, and do not spend your time on it.
-3. Use the **up and down arrows** to select a teammate, then press
+4. Use the **up and down arrows** to select a teammate, then press
    **Enter**. You are now in its transcript. Read what it is doing. To
    leave, select the lead's row again with the arrows. Do not press
    **Escape** inside a transcript: that interrupts the teammate. You can
    type to a teammate here. Only do that when it is stuck.
-4. Permission prompts from teammates appear in the **lead's** row, not in
+5. Permission prompts from teammates appear in the **lead's** row, not in
    the teammate's transcript. If nothing moves for a while, go back to the
    lead and answer the prompt.
-5. Keep `tasks.md` open in your editor: ticks appear as teammates finish
+6. Keep `tasks.md` open in your editor: ticks appear as teammates finish
    tasks. Refresh http://localhost:5173 every minute. Stories appear while
    you watch.
-
-Watch the lead too. If it starts editing story files itself, tell it:
-*"Wait for your teammates to finish."*
+7. Watch the lead too. If it starts editing story files itself, tell it:
+   *"Wait for your teammates to finish."*
 
 **Done when**: both teammates report done, every story task in `tasks.md`
 is ticked, and both stories show in the browser.
 
-### 4. Quality gates (10 min)
+### 4. Quality gates
 
 Nobody has reviewed this code yet. You run three checks, in the order a
 reviewer would find problems. Then a command repeats them.
 
-1. **Does it do what the spec says?** (4 min) Open `specs/001-*/quickstart.md`
+1. **Does it do what the spec says?** Open `specs/001-*/quickstart.md`
    and follow its steps in the browser. Then test the three gaps from
    Exercise 6, task 1:
    - Go to page 2 of the book list. Does it show different books?
    - Go past the last page. What does an empty page show?
    - Open a book id that does not exist, such as `#/books/9999`. What do
      you see? Is it the raw error text from the backend?
-2. **Did the team respect the file boundaries?** (1 min) In the second
+2. **Did the team respect the file boundaries?** In the second
    tab of terminal 3:
 
    ```bash
@@ -184,7 +177,7 @@ reviewer would find problems. Then a command repeats them.
 
    Every changed file should belong to one story. A foundation file in that
    list means a teammate edited code it did not own.
-3. **Does it still depend on the contract only?** (1 min) The constitution,
+3. **Does it still depend on the contract only?** The constitution,
    principle II, says the frontend may know the HTTP contract and nothing
    else. A backend address in the code breaks that rule. One grep:
 
@@ -193,12 +186,12 @@ reviewer would find problems. Then a command repeats them.
    ```
 
    Any hit is a constitution violation.
-4. **Write down what you found, then run the check** (3 min). The check is
+4. **Write down what you found, then run the check**. The check is
    the `/verify-exercise 7` command. Run it and paste your team prompt when
    it asks. It grades the prompt first. Then it checks the files for the
    same three things, plus the error paths from principle V. Bring its
    report to the closing round.
-5. **Commit** (1 min), one line at a time:
+5. **Commit**, one line at a time:
 
    ```bash
    git add -A
@@ -210,7 +203,7 @@ reviewer would find problems. Then a command repeats them.
 
 ---
 
-## Closing round (5 min)
+## Closing round
 
 The trainer asks people at random. Have answers ready:
 

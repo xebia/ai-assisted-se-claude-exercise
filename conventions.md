@@ -125,10 +125,17 @@ source of truth — when it changes there, copy it here again.
   `git apply` rejects) and runs one git command per call (no `&&`). Reuse
   it for any exercise that needs evidence to survive a reset. Renamed from
   `/bank-diff` 2026-09-07 ("bank" failed the vocabulary rule).
-- `/pollute`: session 3, task 4. Runs the fixed pollution script in the
-  current session (three long cookie recipes, the full verbose test log
-  pasted back), then prints the three over-correcting messages for the
-  participant to send by hand. Chat-only: it never edits files. Exists so
+- `/pollute`: session 3, task 2. Runs the fixed pollution script in the
+  current session: it prints review code from another application
+  (`pollute/foreign/<lang>.txt`, same language, other framework, ORM,
+  soft delete, owner check, 204, other test style and a new dependency)
+  and pastes the full verbose test log, then prints the three
+  over-correcting messages for the participant to send by hand. The
+  foreign code replaced the cookie recipes (2026-10-05): models ignored
+  unrelated text in short sessions, so the pollution now aims for
+  confusion, not for a clean one-to-one trace from defect to step. Keep
+  the four `.txt` files equivalent when one changes; `.txt` keeps them out
+  of the clean session's code searches. Chat-only: it never edits files. Exists so
   participants write only a prediction, not a plan, and so the polluted
   session is built the same way on every machine.
 - **Writing to `.claude/` fails from the desktop bridge.** Stage updated

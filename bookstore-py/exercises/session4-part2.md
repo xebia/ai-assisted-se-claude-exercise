@@ -14,20 +14,19 @@ repair it, and run it again.
 
 - Same folder, same branch as Part 1. Everything you create goes in
   `bookstore/.claude/`.
-- Prompts with the tag
-  `[Exercise 4 experiment — execute directly, no leading questions.]`
-  work as in Part 1. Copy them exactly, tag included.
+- Prompts that start with the experiment tag work as in Part 1. Copy
+  them exactly, tag included.
 - Never edit `CLAUDE.md`.
 - The *Done when* lines are your checklist. Stuck? Type *just tell me*.
 
 ## Tasks
 
-### 3. Set up the hook and predict (5 min)
+### 3. Set up the hook and predict
 
 This task produces `.claude/hooks/run-changelog.py`, an entry in
 `.claude/settings.json`, and three predictions.
 
-1. **Let Claude create the script** (1 min). A matcher only sees the tool
+1. **Let Claude create the script**. A matcher only sees the tool
    name, `Bash` (*Practical Hook Examples*); the script looks at the
    command. It is Python, not a shell script, because many of you are on
    Windows. Paste this whole block:
@@ -50,7 +49,7 @@ This task produces `.claude/hooks/run-changelog.py`, an entry in
        }))
    ```
 
-2. **Add the hook to your settings** (2 min). Create the file
+2. **Add the hook to your settings**. Create the file
    `.claude/settings.json` yourself (it does not exist yet), with exactly
    this content:
 
@@ -75,7 +74,7 @@ This task produces `.claude/hooks/run-changelog.py`, an entry in
    On mac or linux, write `python3` instead of `python`. Not sure? Run
    `python --version`; if that fails, use `python3`.
 
-3. **Write three predictions** (2 min), on paper or in a text file, not
+3. **Write three predictions**, on paper or in a text file, not
    in the chat; the verifier asks for them. One word first: a hook
    **fires** when Claude Code starts your script after a Bash tool call.
    The script then decides whether it prints anything. So a hook can fire
@@ -91,15 +90,16 @@ and Decisions*).
 
 **Done when**: both files exist and your three predictions are written.
 
-**Minute 6**: start task 4, whatever your predictions look like.
+**When the trainer calls task 4**, start it, whatever your predictions
+look like.
 
-### 4. Run the chain: it stays silent, then repair it (10 min)
+### 4. Run the chain: it stays silent, then repair it
 
 The *chain* (*Combining Skills and Hooks*): commit → hook → Claude runs
 your changelog skill. This task produces `CHANGELOG.md` and a repaired
 script.
 
-1. **Remove an endpoint and commit** (4 min). A removal, on purpose: your
+1. **Remove an endpoint and commit**. A removal, on purpose: your
    changelog has to put something under `Removed`. Paste:
 
    ```
@@ -108,7 +108,7 @@ script.
 
    When Claude is done, type `/commit`.
 
-2. **Nothing happens. That is the plan** (2 min). `/commit` ends with the
+2. **Nothing happens. That is the plan**. `/commit` ends with the
    command line it ran and says your hook printed nothing. (If not, ask:
    *Which command line did you run for the last commit?*) The line starts
    with `git add`, because `/commit` stages and commits in one line:
@@ -121,7 +121,7 @@ script.
    the terminal showed a hook error instead, `python` was not found: fix
    the command in `settings.json`.)
 
-3. **Repair the script** (1 min). It must also match a `git commit` after
+3. **Repair the script**. It must also match a `git commit` after
    `&&` or `;`. Paste this whole block:
 
    ```
@@ -151,21 +151,21 @@ script.
    and the message says *invoke it now; do not ask*. The old one read like
    advice, and Claude may answer advice with a suggestion and wait.
 
-4. **Run the chain again** (2 min). Add one more comment line by hand and
+4. **Run the chain again**. Add one more comment line by hand and
    type `/commit`. Now `CHANGELOG.md` appears, with the removal under
    `### Removed`. If nothing happens, look at the message text first, not
    at the matching.
 
-5. **Check your predictions** (1 min). Mark each one confirmed or wrong,
+5. **Check your predictions**. Mark each one confirmed or wrong,
    with one line of evidence from the chat, or one line of reasoning for
    the two you could not test.
 
-Then type `/verify-exercise 4` (2 min). It asks for your three
-predictions first and settles them, then grades both skills, the hook and
-`CHANGELOG.md`. It checks the changelog against the rules in your task 2
-prompt: the heading, the `## Unreleased` section, the group order, the
-verb and the hash on every entry. Read its report before the closing
-round.
+6. **Run the verifier**. Type `/verify-exercise 4`. It asks for your
+   three predictions first and settles them, then grades both skills, the
+   hook and `CHANGELOG.md`. It checks the changelog against the rules in
+   your task 2 prompt: the heading, the `## Unreleased` section, the group
+   order, the verb and the hash on every entry. Read its report before
+   the closing round.
 
 **Done when**: `CHANGELOG.md` exists with the removal under `### Removed`,
 your three predictions are marked, and the verifier is running.
@@ -188,7 +188,7 @@ python .claude/hooks/run-changelog.py < .claude/fake-event.json
 The repaired script prints JSON. Change the command in `fake-event.json`
 to `git status`: it prints nothing.
 
-## Closing round (5 min)
+## Closing round
 
 The trainer asks the room. Have these answers ready:
 

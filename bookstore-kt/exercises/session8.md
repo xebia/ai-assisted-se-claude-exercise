@@ -19,12 +19,12 @@ You need a text file or a sheet of paper, nothing else.
 - Pick one real team with one codebase: the team you work in after this
   course, not your whole company. No next team yet? Take your last team.
   Write the team's name at the top of your notes.
-- Work alone. The talking comes in the plenary. The trainer calls the
-  plenary after 20 minutes: stop then, finished or not.
+- Work alone. The talking comes in the plenary. Stop when the trainer
+  calls the plenary, finished or not.
 
 ## Tasks
 
-### 1. Score your team (6 min)
+### 1. Score your team
 
 You produce five scores in your notes, one per layer.
 
@@ -51,7 +51,7 @@ belongs on each layer, and asks one question to help you score it.
 **Done when**: your notes hold five scores, each with one line on what
 exists.
 
-### 2. Find your lever (4 min)
+### 2. Find your lever
 
 You mark one layer in your notes as your lever.
 
@@ -71,7 +71,7 @@ proof is built last.
 **Done when**: one layer is marked as your lever, with one sentence on
 why.
 
-### 3. Write your roadmap (10 min)
+### 3. Write your roadmap
 
 You produce five roadmap lines, one per layer, and one first step.
 
@@ -106,7 +106,7 @@ Team: payments, 5 developers, Java
 **Done when**: your notes hold five roadmap lines. Your lever line has
 a why sentence and a first step that fits in one morning.
 
-## Plenary (10 min)
+## Plenary
 
 The whole room talks together. The trainer leads three short rounds:
 

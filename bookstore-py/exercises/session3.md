@@ -14,7 +14,7 @@ Two steps: write rules for this project in `CLAUDE.local.md`. Then give
 one prompt to a clean session and to a polluted session, and compare the
 code. The clean session also shows whether your rules work.
 
-The tasks take 35 minutes. The rest of the time is for the bonus.
+If you finish early, do the bonus.
 
 ## Start here
 
@@ -26,30 +26,28 @@ The tasks take 35 minutes. The rest of the time is for the bonus.
   task 2 would otherwise remove.
 - Training mode is on. Never edit `CLAUDE.md`: your own rules go in
   `CLAUDE.local.md`. Stuck? Type *just tell me*.
-- The trainer calls task 2 at minute 10.
+- The trainer tells you when to start task 2.
 
 ## Tasks
 
-### 1. Write `CLAUDE.local.md` (10 min)
+### 1. Write `CLAUDE.local.md`
 
-You're going to build `CLAUDE.local.md`: the file Claude reads
-automatically at the start of every session in this project. `/init`
-writes you a first draft. You then go through it by hand, cut the lines
-that don't earn their place, and add the rules a new teammate would need
-but can't read off the code (*Start with `/init`, then refine by hand*).
+This task produces `CLAUDE.local.md`: the file Claude reads at the start
+of every session in this project. It holds the rules a new teammate needs
+but cannot read from the code (*Start with `/init`, then refine by hand*).
 
-1. **Run `/init`** (2 min). In this project it writes `CLAUDE.local.md`,
+1. **Run `/init`**. In this project it writes `CLAUDE.local.md`,
    not `CLAUDE.md`. Check with `git status`. If `CLAUDE.md` is listed:
    run `git diff CLAUDE.md`, copy the added lines into `CLAUDE.local.md`,
    then run `git checkout -- CLAUDE.md`.
-2. **Delete every line that changes nothing** (4 min). For each line,
+2. **Delete every line that changes nothing**. For each line,
    ask: what would Claude do differently because this line exists? No
    answer: delete it (*Which CLAUDE.md Line Is Worth Its Tokens?*).
    Delete a line like *"Write clean code"*. Keep the exact test command.
    Keep the line that says only the store touches the database. If there
    is none, add this one: *"Every handler (`BookHandler`, `AuthorHandler`, `ReviewHandler`)
    calls the store. Only the store talks to the database."*
-3. **Add three team rules** (3 min). A rule is a decision your team made;
+3. **Add three team rules**. A rule is a decision your team made;
    Claude cannot read it from the code. Write each rule at the end of
    `CLAUDE.local.md`, in one or two sentences. (The `.claude/rules` folder
    comes later, in the "Back at work" section.) Rule 1 is written for
@@ -65,104 +63,86 @@ but can't read off the code (*Start with `/init`, then refine by hand*).
    A rule must be checkable: someone who reads a diff can say "this
    breaks the rule". *"Keep dependencies minimal"* is not checkable.
    *"Never add a new library"* is.
-4. **Run the test command from your file** (1 min). `/init` guessed it.
+4. **Run the test command from your file**. `/init` guessed it.
    Run it exactly as written. If the command does not run, fix the line.
-5. **Optional: ask the coach, one round.** Only if you are done before
-   minute 10. Run `/context-coach 1` (1 is the task number), then paste
+5. **Optional: ask the coach, one round.** Only if the trainer has not
+   called task 2 yet. Run `/context-coach 1` (1 is the task number), then paste
    the whole file as your next message. The coach names the weakest line
    and asks one question. Fix that one thing, then go on.
 
 **Done when**: the file has the lines you kept, a database line and three
 rules. Its test command runs. `git status` does not list `CLAUDE.md`.
 
-### 2. Clean session versus polluted session (20 min)
+### 2. Clean session versus polluted session
 
-In this exercise, you send the same prompt to two sessions and compare
-what they build. One session is fresh. The other you pollute first, with
-long answers, a pasted log, and a wrong fact. That's Session B from the
-slide *Which Session Is in More Trouble?*. Both sessions still read your
-`CLAUDE.local.md`, so the fresh session also tells you whether your rules
-hold up.
+This task produces two saved diffs, `session3-clean.diff` and
+`session3-polluted.diff`: the same prompt, once in a fresh session and
+once in a polluted session. The fresh session also shows whether your
+rules hold.
 
-There are four sessions, run in this order. First, Clean, in the first
-terminal: it edits the project, so let it finish and save before you
-touch anything else. Then Grader, in the second terminal: start it and
-leave it running. It only reads. Then Polluted, back in the first
-terminal: it edits the project too, which is why Clean goes first. Last,
-Compare, in the second terminal, once Grader's report is done.
+The first terminal does all the edits, one session at a time. The second
+terminal only reads.
 
-| Session | Terminal | What you type, in this order | At the end |
-| --- | --- | --- | --- |
-| Clean | first | `/context`, the prompt, `/save-changes clean` | `/exit`, then start Grader in the second terminal |
-| Grader | second | `/verify-exercise 3`, then your guess | leave it running, go back to the first terminal |
-| Polluted | first | `/pollute`, the three messages it prints, `/context`, the prompt, `/save-changes polluted` | stays open |
-| Compare | second | `/exit`, then `/context-coach 2`, then the two diff file names | you give six answers |
-
-1. **Write a prediction and a guess** (2 min). The prompt for both
-   sessions is: add a DELETE endpoint for reviews, with tests. Write one
-   sentence: which session builds the better endpoint, and what will
-   differ. Example: *"I expect `review_v2.py` or review logic in
-   `book.py` in the polluted diff."* A wrong prediction is fine. No
-   prediction is the only failure. Then make one guess. Four lines from
-   your file get tested this round: the database line, rule 1, rule 2,
-   and rule 3. Which one will Claude break in the clean session? Write it
-   down.
-2. **Clean session** (4 min). In the first terminal, type `/exit` and
-   start `claude` again. Not `/clear`: it does not always reload a changed
-   `CLAUDE.local.md`. Run `/context` and note the percentage of the
-   context window in use. Paste this exactly. It starts with the
-   experiment tag, which switches training mode off for this one prompt.
-   Both sessions get the same prompt, tag included:
+1. **Write a prediction and a guess.** Both sessions get a prompt that
+   adds a DELETE endpoint for reviews, with tests. Write one sentence:
+   which session builds the better endpoint, and what will differ?
+   Example: *"I expect the polluted session to put code in the wrong
+   place."* A wrong prediction is fine. No prediction is the only
+   failure. Then make one guess. Four lines from your file get tested
+   this round: the database line, rule 1, rule 2 and rule 3. Which one
+   will Claude break in the clean session? Write it down.
+2. **Run the clean session.** In the first terminal, type `/exit` and
+   start `claude` again. Not `/clear`: it does not always reload a
+   changed `CLAUDE.local.md`. Run `/context` and write down the
+   percentage of the context window in use. Then paste this exactly. The
+   tag at the start switches training mode off for this one prompt:
 
    ```
    [Exercise 3 experiment — execute directly, no leading questions.] Add a DELETE /reviews/{id} endpoint to the BookStore API, with tests.
    ```
 
-   Watch which files Claude opens before it writes code. When it is
-   done, run `/save-changes clean`. It saves all changes to the file
-   `session3-clean.diff` and cleans the project; `CLAUDE.local.md` is not
-   touched. Type `/exit`.
-3. **Start the grader** (1 min). In the second terminal, start `claude`
-   and run `/verify-exercise 3`. It grades `session3-clean.diff` against
-   your `CLAUDE.local.md`. It only reads; it never edits the project. It
-   first asks for your guess: type the name of the line, for example
-   *rule 3*. Then leave it running and go back to the first terminal.
-4. **Polluted session** (7 min). Start `claude` again in the first
-   terminal.
-   1. Run `/pollute`. Claude writes three long cookie recipes and pastes
-      the whole test output. This is Session B from the inside.
-   2. `/pollute` ends by printing three messages for you to send: a
-      wrong fact about a file `review_v2.py`, a correction, and a second
-      wrong fact about `book.py`. Copy and send them one at a time, and
-      wait for each reply. If Claude wants to start editing, answer
-      *"nothing to do yet"*, without the tag.
-   3. Run `/context` and note the percentage.
-   4. Paste the same prompt as in step 2, with the tag. Wait until Claude
-      is done.
-   5. Run `/save-changes polluted`. Keep this session open for the bonus.
-5. **Compare** (6 min). Go to the second terminal. If the grader is still
-   working, wait for it. Its report stays on the screen after you leave;
-   task 3 scrolls up to it. Type `/exit`, start `claude` again, and run
-   `/context-coach 2`. In your next message, type the two file names on
-   one line: `session3-clean.diff session3-polluted.diff`. The coach goes
-   through three checks, one at a time:
+   Watch which files Claude opens before it writes code.
+3. **Save the clean result.** When Claude is done, run
+   `/save-changes clean`. It saves all changes to `session3-clean.diff`
+   and cleans the project. `CLAUDE.local.md` is not touched. Then type
+   `/exit`.
+4. **Start the grader.** In the second terminal, start `claude` and run
+   `/verify-exercise 3`. It grades `session3-clean.diff` against your
+   `CLAUDE.local.md`. It only reads; it never edits the project. It first
+   asks for your guess: type the name of the line, for example *rule 3*.
+   Leave it running and go back to the first terminal.
+5. **Pollute a new session.** In the first terminal, start `claude` and
+   run `/pollute`. Claude prints review code from another application,
+   the "Library service", and pastes the whole test output. Then it
+   prints three messages. Send them one at a time, and wait for each
+   reply. If Claude wants to start editing, answer *"nothing to do yet"*,
+   without the tag. Then run `/context` and write down the percentage.
+6. **Run the polluted session.** Paste the prompt from step 2 again, tag
+   included. When Claude is done, run `/save-changes polluted`. Keep this
+   session open for the bonus.
+7. **Compare.** Go to the second terminal. If the grader is still
+   working, wait for it. Its report stays on the screen; task 3 scrolls
+   up to it. Type `/exit`, start `claude` again, and run
+   `/context-coach 2`. Then type the two file names on one line:
+   `session3-clean.diff session3-polluted.diff`. The coach goes through
+   three checks, one at a time:
    - Did the change land in the right file?
    - Does the new handler copy the existing handlers, including the
      status code the book DELETE returns?
-   - Is there nothing from the wrong fact or the pasted log?
+   - Is there nothing from the pollution: the Library code, the wrong
+     fact or the pasted log?
 
    For each check, the coach shows lines from both diffs next to the
-   current `bookstore/handler/review.py`. You answer *pass* or *fail* for
-   both sessions, for example *clean: pass, polluted: fail*. Three
-   checks, two sessions: six answers, each before the coach gives its
-   own. Then tell the coach the two `/context` percentages and ask
-   whether they explain the difference in the code.
+   current `bookstore/handler/review.py`. You answer *pass* or *fail* for both sessions,
+   for example *clean: pass, polluted: fail*. Give each answer before the
+   coach gives its own. Then tell the coach the two `/context`
+   percentages and ask whether they explain the difference in the code.
 
 **Done when**: `session3-clean.diff` and `session3-polluted.diff` exist.
-You gave six answers before the coach did. For every mistake, you wrote
-down the pollution step behind it; the coach names it.
+You gave six answers before the coach did. For every mistake in the
+polluted diff, you wrote down what in the pollution could have caused it.
 
-### 3. Closing: read the grader's report (5 min)
+### 3. Closing: read the grader's report
 
 Scroll up in the second terminal to the report from `/verify-exercise 3`.
 Write down three lines:
@@ -250,7 +230,7 @@ Replace `polluted` with `clean` or `rules`. The last command deletes files
 Claude created that you never committed. `CLAUDE.local.md` and the saved
 diffs are ignored by git and stay.
 
-## Closing round (5 min)
+## Closing round
 
 The trainer asks the room. Have these answers ready:
 

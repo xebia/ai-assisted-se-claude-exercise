@@ -31,9 +31,6 @@ not only what it says.
   turn: what Claude looked at, why, and what it found. It ends with totals
   per tool and one question for you. `/trace all` does the same for every
   turn since the last `/clear`, one table per turn.
-- **Experiment prefix**: a fixed line you paste at the start of a prompt.
-  It stops training mode from steering the run. Task 1 uses it, on both
-  prompts.
 
 ## How every task works
 
@@ -58,15 +55,12 @@ on time? Just say *"just tell me"*. That is allowed.
 
 ## Tasks
 
-### 1. Explain, with and without a selection (5 min: selected 2 · `/clear` and ask again 2 · compare 1)
-
-This task compares two runs, so both prompts start with the experiment
-prefix. Use it on both, or the two runs are not comparable:
-
-> `[Exercise 1 experiment — execute directly, no leading questions.]`
+### 1. Explain, with and without a selection
 
 Open `bookstore/store/book.py` and select the whole `search()` function.
-Ask:
+Ask the question below. Its first line is the experiment prefix: a fixed
+line that stops training mode from steering the run. Both prompts in this
+task start with it, so the two runs stay comparable.
 
 ```
 [Exercise 1 experiment — execute directly, no leading questions.]
@@ -95,7 +89,7 @@ project first, and the trace shows you how.
 **Done when**: you have both tool-call counts written next to your
 prediction.
 
-### 2. Find a bug (4 min: predict 1 · ask 2 · trace 1)
+### 2. Find a bug
 
 Run `/clear`, so the trace at the end shows this task only.
 
@@ -116,7 +110,7 @@ turn?
 **Done when**: Claude named a bug, and you can say in one sentence what
 `create_review()` fails to check.
 
-### 3. Add validation, then say no (5 min: ask 2 · redirect 2 · trace 1)
+### 3. Add validation, then say no
 
 Run `/clear` again, then ask:
 
@@ -143,7 +137,7 @@ its own change. If it ran nothing, note that. Nobody asked it to.
 `create_review()` calls it, and `python3 -c "import bookstore.server"`
 reports no errors.
 
-### 4. Write a test (4 min: ask 2 · run 1 · trace 1)
+### 4. Write a test
 
 Ask:
 
@@ -161,7 +155,7 @@ calls came before its first edit?
 **Done when**: `python3 -m unittest tests.handler.test_validate_review -v`
 shows five passing tests.
 
-### 5. Refactor (4 min: ask 2 · check 1 · trace 1)
+### 5. Refactor
 
 Open `bookstore/server.py`. The route list is flat and in no particular
 order. Ask:
@@ -179,7 +173,7 @@ Which of those reads were needed for this change?
 **Done when**: `server.py` has one helper per resource (books, reviews,
 authors), and `python3 -c "import bookstore.server"` reports no errors.
 
-### 6. Reset, then ask a big question (4 min: clear 1 · ask 2 · trace 1)
+### 6. Reset, then ask a big question
 
 Run `/clear`. Then run `/trace`. It reports nothing: the context is empty.
 Everything from tasks 1 to 5 is gone for Claude, not for you.
@@ -203,7 +197,7 @@ found.
   Say why in one sentence.
 - Run `/context`. How much of the context window did two questions cost?
 
-## Closing round (4 min)
+## Closing round
 
 The trainer calls on people at random. Have your numbers ready: how many
 tool calls with the selection, and how many without? Which file did Claude

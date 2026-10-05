@@ -17,20 +17,21 @@ In this exercise you:
 
 - Open a terminal in the `bookstore` folder and start `claude`. Stay in
   this folder for the whole exercise.
-- Training mode is on. Prompts that start with the tag
-  `[Exercise 5 experiment — execute directly, no leading questions.]` switch it off for that one prompt. Copy them exactly, tag included.
-  Never edit `CLAUDE.md`.
+- Training mode is on. Some prompts on this sheet start with an
+  experiment tag in square brackets. The tag switches training mode off
+  for that one prompt. Copy those prompts exactly, tag included. Never
+  edit `CLAUDE.md`.
 - Write your notes on paper or in a text file, not in the chat.
-- Stuck? Type *just tell me*. At minute 14 the trainer calls task 4.
+- Stuck? Type *just tell me*. The trainer tells you when to start task 4.
 
 ## Tasks
 
-### 1. Ask without the MCP server (4 min)
+### 1. Ask without the MCP server
 
 This task produces a `permissions.deny` rule in `.claude/settings.json`,
 a prediction and three notes.
 
-1. **Add a deny rule** (1 min). Start `claude` and paste:
+1. **Add a deny rule**. Start `claude` and paste:
 
    ```
    [Exercise 5 experiment — execute directly, no leading questions.] Add the rule Bash(sqlite3 *) to the deny list under permissions in .claude/settings.json. Keep everything else in that file. Create the file if it does not exist.
@@ -38,12 +39,12 @@ a prediction and three notes.
 
    Your hook from session 4 stays in the file.
 
-2. **Write a prediction** (1 min). You will ask three things: the number of
+2. **Write a prediction**. You will ask three things: the number of
    books, the author with the most books, and a SQL query. Write one
    sentence: which of the three can Claude get right from the source code
    alone, and which will be a guess?
 
-3. **Ask** (2 min). Paste:
+3. **Ask**. Paste:
 
    ```
    [Exercise 5 experiment — execute directly, no leading questions.] How many books are in the bookstore database? Which author has the most books? Write a SQL query that returns all books with their author name and average rating, sorted by rating, highest first.
@@ -60,23 +61,21 @@ Code blocks the command before it runs (*MCP Permissions and Security*).
 **Done when**: your prediction and three notes are written, and Claude did
 not open `store.db`.
 
-### 2. Register the MCP server and approve it (6 min)
+### 2. Register the MCP server and approve it
 
 This task produces `.mcp.json` and a connected server.
 
 The server has two tools: `get_table_definitions` and `execute_query`
-(*The `/mcp` Command*). It only runs `SELECT` queries. You start it with
-`uv`, which you installed in the preparation.
+(*The `/mcp` Command*). It only runs `SELECT` queries. The server is one
+Python file, `mcp-sqlite/server.py`. It reads `store.db`, which the app
+creates the first time it runs.
 
-The server is one Python file, `mcp-sqlite/server.py`. It reads
-`store.db`, which the app creates the first time it runs. No `store.db`
-in your editor? Run `./gradlew run`, wait for `listening on :8080`, and stop it
-with Ctrl+C.
+1. **Leave Claude**. Type `/exit`. The next commands go to the
+   terminal, not to Claude. No `store.db` in your editor? Run `./gradlew run`,
+   wait for `listening on :8080`, and stop it with Ctrl+C.
 
-1. **Leave Claude** (1 min). Type `/exit`. The next command goes to the
-   terminal, not to Claude.
-
-2. **Register the server** (1 min). Run this in the terminal, on one line:
+2. **Register the server**. Run this in the terminal, on one line. It
+   starts the server with `uv`, which you installed in the preparation:
 
    ```
    claude mcp add --scope project sqlite-bookstore -- uv run mcp-sqlite/server.py store.db
@@ -91,7 +90,7 @@ with Ctrl+C.
    again with `python3` (on Windows: `python`) in place of `uv run`. The
    server needs only Python, no packages.
 
-3. **Restart and approve** (2 min). Start `claude`. Claude Code asks
+3. **Restart and approve**. Start `claude`. Claude Code asks
    whether it may use the server from `.mcp.json`. Answer yes: this is
    the approval. A project file can start any program on your machine.
    So Claude Code asks you once, per project. It saves your answer in
@@ -99,7 +98,7 @@ with Ctrl+C.
    `claude mcp reset-project-choices` in the terminal, and start `claude`
    again.
 
-4. **Check** (1 min). Type `/mcp`. `sqlite-bookstore` shows as connected,
+4. **Check**. Type `/mcp`. `sqlite-bookstore` shows as connected,
    with both tools. Not connected? Type `/exit` and run `claude mcp list`
    in the terminal: it shows the error. The usual causes: `store.db` is
    missing (see the start of this task), or the command in `.mcp.json` has a
@@ -107,19 +106,19 @@ with Ctrl+C.
 
 **Done when**: `/mcp` shows `sqlite-bookstore` connected, with two tools.
 
-### 3. Ask again, with the MCP server (4 min)
+### 3. Ask again, with the MCP server
 
 This task produces three more notes.
 
-1. **Same question** (2 min). Paste the prompt from task 1, step 3 again,
+1. **Same question**. Paste the prompt from task 1, step 3 again,
    tag included. Watch the tool calls: `get_table_definitions` first, then
    `execute_query`. The names appear as
    `mcp__sqlite-bookstore__execute_query` (*The `/mcp` Command*).
 
-2. **Compare** (1 min). Write down the same three notes. Which answers
+2. **Compare**. Write down the same three notes. Which answers
    changed? Was your prediction right?
 
-3. **Ask one thing the code cannot tell** (1 min). Paste, and note the
+3. **Ask one thing the code cannot tell**. Paste, and note the
    title Claude finds:
 
    ```
@@ -134,7 +133,7 @@ makes two read-only tool calls, and the answer comes from the real data.
 **Done when**: you have three notes per round, and you can say which
 answer in round one (task 1) was a guess.
 
-### 4. Create the security-auditor subagent (9 min)
+### 4. Create the security-auditor subagent
 
 This task produces `.claude/agents/security-auditor.md` and the report of
 the security check, `docs/security-audit.md`.
@@ -142,16 +141,15 @@ the security check, `docs/security-audit.md`.
 A subagent is a markdown file. Its first lines, between two `---` lines,
 are the frontmatter (*Custom Subagents*). The body, the instructions for
 the check, is written for you in the starter file. You write two
-frontmatter lines: `description`, the trigger, and `tools`, what the agent
-may use.
+frontmatter lines yourself, in step 2.
 
-1. **Let Claude create the file** (1 min). Paste:
+1. **Let Claude create the file**. Paste:
 
    ```
    [Exercise 5 experiment — execute directly, no leading questions.] Copy exercises/starters/security-auditor.md to .claude/agents/security-auditor.md. Change nothing in the content.
    ```
 
-2. **Write the two lines** (3 min). Open `.claude/agents/security-auditor.md`
+2. **Write the two lines**. Open `.claude/agents/security-auditor.md`
    in your editor and replace the two `(I write this)` values.
 
    - `description`: Claude reads only this line when it decides whether to
@@ -168,7 +166,7 @@ may use.
    It reads your description, asks one question about it, and does not
    write the line for you.
 
-3. **Test the trigger** (4 min). Type `/exit` and start `claude` again,
+3. **Test the trigger**. Type `/exit` and start `claude` again,
    not `/clear`: agents load only at start. Ask, without naming the agent:
 
    ```
@@ -184,7 +182,7 @@ may use.
    the security-auditor agent"* to the prompt. Then the report still gets
    written.
 
-4. **Check the report** (1 min). Open `docs/security-audit.md`. Near the
+4. **Check the report**. Open `docs/security-audit.md`. Near the
    top it says `**Audited by**: security-auditor`. The starter file asks
    the agent to write that line. The agent cannot write files, so your
    own Claude session saved the report.
@@ -220,7 +218,7 @@ next to your own. Type `/mcp`: the plugin's server connected without an
 approval prompt. Its `README.md` explains what is different from your
 files.
 
-## Closing round (5 min)
+## Closing round
 
 First run `/verify-exercise 5` in Claude. It reads `.mcp.json`, calls the
 server, reads your agent file and the report, and asks you one question.
