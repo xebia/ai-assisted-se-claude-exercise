@@ -38,7 +38,11 @@ mkdir -p "$out"
 copy() {
   mkdir -p "$out/$2"
   # Tracked PDFs never ship: render-sheets.sh makes fresh ones from the .md files.
-  (cd "$repo/$1" && git ls-files -z -- . ':!*.pdf' | tar --null -T - -cf -) | tar -xf - -C "$out/$2"
+  # Tracked files deleted in the working tree (not yet committed) are skipped,
+  # so a package can be built before the deletion is committed.
+  (cd "$repo/$1" && git ls-files -z -- . ':!*.pdf' \
+    | while IFS= read -r -d '' f; do [ -e "$f" ] && printf '%s\0' "$f"; done \
+    | tar --null -T - -cf -) | tar -xf - -C "$out/$2"
 }
 
 copy "bookstore-$lang" .

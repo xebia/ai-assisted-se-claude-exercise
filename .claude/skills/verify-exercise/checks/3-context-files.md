@@ -4,7 +4,7 @@
 (the exercise saves and resets in one move, so expect a clean working
 tree, not live changes). **Which diff:** if `session3-rules.diff` exists,
 grade that one — it is the bonus caching run, and caching tests all four
-lines. Otherwise grade `session3-clean.diff`, the DELETE-endpoint run
+lines. Otherwise grade `session3-clean.diff`, the delete-own-reviews run
 from task 2. Say in the first line of the report which diff you graded
 and why. Only if the participant did the back-at-work scoped-rule item:
 the path-scoped rule file under `.claude/rules/`.
@@ -23,7 +23,7 @@ question. The report is read in task 3, from the terminal scrollback, so
 it must stand on its own: no "as we discussed", no follow-up question at
 the end. In the bonus the participant may run you a second time on the
 caching diff; then grade that one the same way and say which lines it
-tests that the DELETE run did not.
+tests that the delete run did not.
 
 **Words.** The participant's sheet says: the weak prompt (not "bait"),
 the saved diff (not "banked"), the line that helped the most (not "MVP"),
@@ -33,15 +33,15 @@ words below are for you.
 
 **Under review: the context files, not a prompt.** This is the Session 3
 exception to this skill's usual framing. The prompt is fixed and
-deliberately plain — *"Add a DELETE /reviews/{id} endpoint to the
-BookStore API, with tests."* in task 2, *"Add caching to the BookStore
+deliberately plain — *"Let users delete their own reviews in the
+BookStore API. Add the endpoint, with tests."* in task 2, *"Add caching to the BookStore
 API"* in the bonus — plus the exercise's experiment tag. Its weakness is
 the experimental control: whatever discipline shows up in the diff came
 from the participant's context files, or from luck. If the diff shows
 the participant improved the prompt's wording, note it as a broken
 control and grade what you can.
 
-**Three states per line.** A DELETE endpoint tempts Claude to skip
+**Three states per line.** The delete run tempts Claude to skip
 validation or to write tests in its own style; it rarely tempts a new
 library or logic in the wrong layer. So for each of the four lines say
 *held* (the diff shows Claude following it where it mattered), *failed*
@@ -94,8 +94,10 @@ dimensions sound*.
    actual tree (every handler file? anything outside the layer?).
 3. Only then read the diff (`git apply --stat` for the shape, the file
    itself for the content — the changes are no longer in the working
-   tree). For the DELETE run: does the handler validate the id before it
-   calls the store (rule 1)? Do new tests exist, in the project's
+   tree). For the delete run: does the handler validate the id (and any user
+   id it reads) before it calls the store (rule 1)? "Their own" is open on
+   purpose: an owner check is not a defect, but if it reads or writes a
+   user column, did that go through the store (layer line)? Do new tests exist, in the project's
    convention (rule 2; compare against one existing test file, not
    memory)? Was anything added to the dependency manifest (rule 3;
    usually *not tested*)? Does the handler call a store function for the
@@ -130,7 +132,7 @@ dimensions sound*.
 
 - Test command runs as written
 - `CLAUDE.md` unmodified
-- DELETE run: handler validates before the store call · store function
+- Delete run: handler validates before the store call · store function
   does the delete · new tests follow the existing test pattern · no new
   dependency (usually *not tested*)
 - Caching run: no new external dependency · cache in the store layer

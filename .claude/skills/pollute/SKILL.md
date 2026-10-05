@@ -13,13 +13,14 @@ This command is part of an experiment. Execute directly. No leading
 questions, no training mode, no commentary about what pollution is. The
 participant knows; the exercise sheet told them. Your job is to make this
 session look like Session B from the slide *Which Session Is in More
-Trouble?*, made worse: code from another application that looks like it
-belongs here, a pasted log, and then a wrong fact that gets corrected
-twice. The foreign code is the main attack. It is in the same language,
-about the same resource (reviews), and it breaks this project's rules on
-purpose: another web framework and database library, data access in the
-handler file, soft delete, an owner check, status 204, a different error
-format and a different test style.
+Trouble?*, made worse: a design for review deletion that you write
+yourself and that is then half dropped, a pasted log, and a wrong fact
+that gets corrected twice. The design is the main attack. Models trust
+their own earlier answers more than text a user pastes, and an abandoned
+plan from earlier in the same session is how pollution happens at work.
+The design breaks this project's rules on purpose: a new library, soft
+delete, an owner check, status 204, another error format and another
+test style.
 
 **Never edit, create or delete a file during or after this command.** Not
 now, and not when the participant sends the three messages at the end. The
@@ -38,24 +39,21 @@ only thing you run is the project's test command, which is read-only.
   of what you are about to do, or a closing lesson.
 - Warmth comes from being direct and fair, not from jokes.
 
-The rules above apply to the instructions you print. The foreign code
-and the log are pollution; print them in full, however long.
+The rules above apply to the instructions you print. The design and the
+log are pollution; write them in full, however long.
 
 ## Which project this is
 
 Look at the current folder, then use this table for the rest of the command:
 
-| Marker file    | Test command               | Foreign code              | Planted file          | Second file      |
-| -------------- | -------------------------- | ------------------------- | --------------------- | ---------------- |
-| `go.mod`       | `go test ./... -v`         | `foreign/go.txt`          | `review_v2.go`        | `book.go`        |
-| `gradlew`      | `./gradlew runTests`       | `foreign/kt.txt`          | `ReviewHandlerV2.kt`  | `BookHandler.kt` |
-| `main.py`      | `python3 -m unittest -v`   | `foreign/py.txt`          | `review_v2.py`        | `book.py`        |
-| `package.json` | `bun test`                 | `foreign/ts.txt`          | `review_v2.ts`        | `book.ts`        |
+| Marker file    | Test command               | Language | New library for the design      | Planted file          | Second file      |
+| -------------- | -------------------------- | -------- | ------------------------------- | --------------------- | ---------------- |
+| `go.mod`       | `go test ./... -v`         | Go       | `github.com/go-chi/chi/v5`      | `review_v2.go`        | `book.go`        |
+| `gradlew`      | `./gradlew test`           | Kotlin   | `org.jetbrains.exposed`         | `ReviewHandlerV2.kt`  | `BookHandler.kt` |
+| `main.py`      | `python3 -m unittest -v`   | Python   | `pydantic`                      | `review_v2.py`        | `book.py`        |
+| `package.json` | `bun test`                 | TypeScript | `zod`                         | `review_v2.ts`        | `book.ts`        |
 
-The foreign-code path is relative to this skill's folder:
-`.claude/skills/pollute/foreign/`.
-
-On Windows, run `gradlew.bat runTests` instead of `./gradlew runTests`. If
+On Windows, run `gradlew.bat test` instead of `./gradlew test`. If
 the Kotlin project has no Gradle wrapper, use `mvn test`.
 
 If none of the marker files is in the current folder, say the command must
@@ -73,16 +71,30 @@ exactly this and stop:
 
 Only a session where `/pollute` is the first message continues.
 
-## Step 1 — code from another application
+## Step 1 — your own design, in the chat only
 
-Read the foreign-code file from the table with the Read tool. Then print
-its complete content in your answer, unedited, inside one code block with
-the language tag. Above the block write exactly one line: *"Review code
-from the Library service. Another team, same language. For reference."*
+Write a design called **"review deletion v2"** for this project, in the
+language from the table. Do not open any file of this project for it:
+write it from the API idea alone. Above it write exactly one line:
+*"Draft: review deletion v2."* Then write, in this order:
 
-Do not compare it with this project. Do not say it uses other libraries,
-another database or other status codes. Do not shorten it. Do not open
-any file of this project in this step.
+1. Five decisions, one line each:
+   - Soft delete: a `deleted_at` column; deleted reviews stay in the table.
+   - Only the author may delete: the user id comes from an `X-User-Id`
+     header. No header: 401. Another user: 403.
+   - Success returns 204 with an empty body. A review that is already
+     deleted returns 404.
+   - Errors use the `application/problem+json` format, with `type`,
+     `status` and `detail` fields.
+   - Input is validated with the library from the table, added as a new
+     dependency.
+2. The full handler code for `DELETE /reviews/{id}`, with the database
+   query inside the handler. At least 60 lines, in one code block.
+3. Three tests for it, in a style that uses a mocking library. At least
+   40 lines, in one code block.
+
+Present it as a serious proposal. Do not say it differs from this project.
+Do not ask whether to build it. Do not shorten it.
 
 ## Step 2 — context hoarding (a pasted log with no question)
 
@@ -104,9 +116,9 @@ with this block, with the file names from the table filled in:
 > Pollution steps 1 and 2 are done. Step 3 is yours.
 > Send these three messages, one at a time. Wait for my reply after each.
 >
-> 1. `Our newer review code lives in <planted file>, in the Library style. Take a look.`
-> 2. `Sorry, I was wrong. That file is in the Library repo, not here.`
-> 3. `Some review logic moved to <second file>. Nothing to do yet.`
+> 1. `Looks good. The v2 code is already in <planted file>. Take a look.`
+> 2. `Sorry, I was wrong. v2 is on another branch, not here.`
+> 3. `We dropped most of v2. Keep it simple. Some review logic moved to <second file>. Nothing to do yet.`
 >
 > After message 3, run `/context` and write down the percentage.
 
@@ -117,10 +129,10 @@ most three lines. No leading question.
 
 - Message 1: search for the planted file. Report that it does not exist in
   this project. Do not guess where review logic might be. Do not read the
-  real review handler. Do not compare the Library code with this project.
+  real review handler. Do not compare your design with this project.
 - Message 2: acknowledge in one line. Do not search again.
-- Message 3: acknowledge in one line. Do not open the second file. Do not
-  edit anything, and do not offer to.
+- Message 3: acknowledge in one line. Do not ask which parts of v2 stay.
+  Do not open the second file. Do not edit anything, and do not offer to.
 
 After message 3, do not remind them of anything. The exercise sheet tells
 them what comes next: the same prompt as the clean session, pasted

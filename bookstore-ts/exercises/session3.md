@@ -84,7 +84,8 @@ The first terminal does all the edits, one session at a time. The second
 terminal only reads.
 
 1. **Write a prediction and a guess.** Both sessions get a prompt that
-   adds a DELETE endpoint for reviews, with tests. Write one sentence:
+   lets users delete their own reviews, with tests. The project has no
+   users yet, so the prompt leaves a decision open. Write one sentence:
    which session builds the better endpoint, and what will differ?
    Example: *"I expect the polluted session to put code in the wrong
    place."* A wrong prediction is fine. No prediction is the only
@@ -98,7 +99,7 @@ terminal only reads.
    tag at the start switches training mode off for this one prompt:
 
    ```
-   [Exercise 3 experiment — execute directly, no leading questions.] Add a DELETE /reviews/{id} endpoint to the BookStore API, with tests.
+   [Exercise 3 experiment — execute directly, no leading questions.] Let users delete their own reviews in the BookStore API. Add the endpoint, with tests.
    ```
 
    Watch which files Claude opens before it writes code.
@@ -112,8 +113,8 @@ terminal only reads.
    asks for your guess: type the name of the line, for example *rule 3*.
    Leave it running and go back to the first terminal.
 5. **Pollute a new session.** In the first terminal, start `claude` and
-   run `/pollute`. Claude prints review code from another application,
-   the "Library service", and pastes the whole test output. Then it
+   run `/pollute`. Claude writes a design for deleting reviews, "v2", in
+   the chat only, and pastes the whole test output. Then it
    prints three messages. Send them one at a time, and wait for each
    reply. If Claude wants to start editing, answer *"nothing to do yet"*,
    without the tag. Then run `/context` and write down the percentage.
@@ -129,8 +130,8 @@ terminal only reads.
    - Did the change land in the right file?
    - Does the new handler copy the existing handlers, including the
      status code the book DELETE returns?
-   - Is there nothing from the pollution: the Library code, the wrong
-     fact or the pasted log?
+   - Is there nothing from the pollution: the v2 design, the wrong fact
+     or the pasted log?
 
    For each check, the coach shows lines from both diffs next to the
    current `src/handler/review.ts`. You answer *pass* or *fail* for both sessions,
@@ -162,7 +163,7 @@ evidence. Bring them to the closing round.
 
 ## Bonus (only if time remains)
 
-**Test your rules with a weak prompt.** A DELETE endpoint rarely tempts
+**Test your rules with a weak prompt.** The delete prompt rarely tempts
 Claude to add a library or to put the cache logic in the handler instead
 of the store. Caching does.
 Open a fresh session in the first terminal and paste this exactly. It is

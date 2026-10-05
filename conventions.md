@@ -126,16 +126,18 @@ source of truth — when it changes there, copy it here again.
   it for any exercise that needs evidence to survive a reset. Renamed from
   `/bank-diff` 2026-09-07 ("bank" failed the vocabulary rule).
 - `/pollute`: session 3, task 2. Runs the fixed pollution script in the
-  current session: it prints review code from another application
-  (`pollute/foreign/<lang>.txt`, same language, other framework, ORM,
-  soft delete, owner check, 204, other test style and a new dependency)
-  and pastes the full verbose test log, then prints the three
-  over-correcting messages for the participant to send by hand. The
-  foreign code replaced the cookie recipes (2026-10-05): models ignored
-  unrelated text in short sessions, so the pollution now aims for
-  confusion, not for a clean one-to-one trace from defect to step. Keep
-  the four `.txt` files equivalent when one changes; `.txt` keeps them out
-  of the clean session's code searches. Chat-only: it never edits files. Exists so
+  current session: Claude writes its own "review deletion v2" design in
+  the chat (soft delete, `X-User-Id` owner check, 204, `problem+json`, a
+  new library, query in the handler, mocking-library tests) and pastes
+  the full verbose test log, then prints three messages for the
+  participant to send: v2 is in a planted file, a correction, "we dropped
+  most of v2, keep it simple". The task 2 prompt ("Let users delete their
+  own reviews…") leaves a decision open, so the pollution has a gap to
+  fill. History (2026-10-05): cookie recipes, then pasted foreign code
+  from another app; strong models ignored both and produced
+  byte-identical diffs on the fully specified DELETE prompt. Identical
+  diffs are a valid result; the coach checks the `/context` percentages
+  before it doubts that `/pollute` ran. Chat-only: it never edits files. Exists so
   participants write only a prediction, not a plan, and so the polluted
   session is built the same way on every machine.
 - **Writing to `.claude/` fails from the desktop bridge.** Stage updated
