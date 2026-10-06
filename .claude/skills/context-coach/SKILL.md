@@ -48,7 +48,10 @@ these words, so never use them in a reply. Translate:
 | scope, boundary | the limit: what the rule does not cover |
 | prefix, experiment prefix | the experiment tag, the first line of the prompt |
 | MVP | the line that helped the most |
-| verifier | the grader (`/verify-exercise 3`) |
+| verifier, grader | the comparison, or `/verify-exercise 3` |
+| bait run | the first run |
+| retro, retrospective | the team meeting |
+| tidying up on the side, drive-by change | extra clean-up, a change the task did not ask for |
 | wrap, plenary harvest | task 3, the closing round |
 
 Example of the register. Too dense:
@@ -76,8 +79,8 @@ Right:
 - **Predict the behavioral effect of every finding.** "❌ vague" is a grade.
   "Claude already does this, so the line changes nothing and costs tokens in
   every future session" is coaching. For a missing rule: name the concrete
-  wrong behavior you expect in the bait run. The grader checks these
-  predictions.
+  wrong behavior you expect in the first run. `/verify-exercise 3` checks
+  these predictions.
 - **The freeloader test decides.** For every line in a context file ask:
   *what would Claude do differently because this line exists?* No answer:
   the line does not earn its tokens, whatever it says. This is the *Which
