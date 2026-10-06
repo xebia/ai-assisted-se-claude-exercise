@@ -3,8 +3,8 @@ name: save-changes
 description: >-
   Save all uncommitted changes in the current project as a named diff file,
   then put the project back in a clean state. Usage: /save-changes <name> —
-  writes session3-<name>.diff. Used in the Session 3 exercise (names: rules,
-  clean, polluted) and reusable in any exercise that must keep evidence
+  writes session3-<name>.diff. Used in the Session 3 exercise (names: before,
+  after, bonus, probe) and reusable in any exercise that must keep evidence
   across a reset.
 disable-model-invocation: true
 ---
@@ -16,8 +16,8 @@ leading questions, no commentary beyond the report at the end. It is
 stateless — it only reads the working tree — so it works from any session,
 including one opened after the experiment session was closed.
 
-`$ARGUMENTS` holds the name. In session 3 expect `rules`, `clean` or
-`polluted`; any other single word is accepted. No argument: ask for the
+`$ARGUMENTS` holds the name. In session 3 expect `before`, `after`,
+`bonus` or `probe`; any other single word is accepted. No argument: ask for the
 name in one line and wait.
 
 ## How you talk to the participant
@@ -33,7 +33,7 @@ name in one line and wait.
   of what you are about to do, or a closing lesson.
 - Warmth comes from being direct and fair, not from jokes.
 
-Say "the clean session" and "the polluted session", never "arm"; say
+Say "the first run" and "the second run", never "arm" or "baseline"; say
 "saved", never "banked". Every line you write is either a question they
 must answer or a fact about the state of their files. Nothing else.
 
@@ -93,8 +93,8 @@ diff file is non-empty. Then report in at most four lines:
 - the file written and its diffstat (files changed, insertions/deletions —
   `git apply --stat session3-<name>.diff`)
 - confirmation the project is clean again
-- if the name was `polluted`: a reminder to note the `/context` % if
-  they have not, and that the session should stay open for the bonus
+- if the name was `before` or `after`: a reminder to type `/exit`, as the
+  sheet says
 
 If the diffstat lists files that the exercise prompt did not touch (for
 example session 2's bug fixes in handler or store files), tell them in one

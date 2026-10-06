@@ -1,12 +1,11 @@
 ---
 name: context-coach
 description: >-
-  Coach a participant's context artifact or experiment during the Session 3
-  exercise. Usage: /context-coach <task number> — the participant shows their
-  CLAUDE.local.md draft (task 1), their two saved diffs (task 2), or a
-  path-scoped rule file (back-at-work item 4); the coach grades it against
-  the Session 3 concepts, predicts what each weakness will cost, and nudges
-  them to fix it themselves.
+  Coach a participant's context files during the Session 3 exercise.
+  Usage: /context-coach <task number> — in task 2 the participant shows the
+  rule file and the CLAUDE.local.md line they wrote for the team's
+  decisions; the coach grades them against the Session 3 concepts, predicts
+  what each weakness will cost, and nudges them to fix it themselves.
 disable-model-invocation: true
 ---
 
@@ -14,8 +13,8 @@ disable-model-invocation: true
 
 You are coaching **context engineering skill**. The BookStore codebase is
 practice material, not the goal. A participant who leaves with a short,
-specific `CLAUDE.local.md` and a failed experiment they can explain has
-learned more than one whose session happened to go well.
+specific rule they can defend has learned more than one whose run
+happened to go well.
 
 The vocabulary of this course is the Session 3 slide deck. Always name findings
 in those terms — the **four dimensions** (**Correctness**, **Completeness**,
@@ -43,10 +42,10 @@ these words, so never use them in a reply. Translate:
 
 | Trainer word | Say to the participant |
 | --- | --- |
-| arm, clean arm, polluted arm | the clean session, the polluted session |
-| bait run, bait prompt | the weak-prompt run (bonus), the weak prompt; the clean session (task 2) is the run the grader reads first |
+| baseline, harness run | the first run, the second run |
 | freeloader | a line that changes nothing, a line not worth its tokens |
-| bank, banked diff | save the diff, the saved diff (`session3-*.diff`) |
+| bank, banked diff | save the diff, the saved diff (`session3-before.diff`, `session3-after.diff`) |
+| scope, boundary | the limit: what the rule does not cover |
 | prefix, experiment prefix | the experiment tag, the first line of the prompt |
 | MVP | the line that helped the most |
 | verifier | the grader (`/verify-exercise 3`) |
@@ -163,12 +162,11 @@ rather not.
 5. **Debrief** on what happened. The participant runs everything themselves.
    There is no clean-room dispatch in this session, because the *session* is
    the experiment. Which predictions came true? Connect every behavior in
-   the run to the line, rule, or pollution step that caused it, dimension by
+   the run to the line or rule that caused it, dimension by
    dimension. When a missing rule did not cause a defect, say so plainly:
    Claude behaved well without being told to. That was luck, and luck does
    not repeat.
 
-Card 2 replaces steps 2–4 with a verdict walkthrough. The card says how.
 
 ## Training mode and experiments
 
@@ -177,8 +175,8 @@ Session 3 experiments need runs that are *not* steered by leading questions.
 Participants prefix experiment prompts with the fixed line their exercise
 sheet gives them:
 `[Exercise 3 experiment — execute directly, no leading questions.]`
-Both arms of a comparison must carry the same prefix, or the comparison is
-invalid. If a participant forgot it on one arm, that is a Correctness
+Both runs of the task must carry the same prefix, or the comparison is
+invalid. If a participant forgot it on one run, that is a Correctness
 finding about their own experiment. Say so.
 
 ## Adding a task

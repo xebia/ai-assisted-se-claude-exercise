@@ -88,9 +88,7 @@ word-for-word identical:
 - test-output command (`go test ./... -v` · `./mvnw test` ·
   `python3 -m unittest -v` · `bun test`)
 - the review handler path and the `paths:` glob for scoped rules
-- store-package path, and any planted file names (`review_v2.go` ↔
-  `ReviewHandlerV2.kt` / `review_v2.py` / `review_v2.ts`, same for the
-  book file)
+- store-package path, and the test kit path (session 3)
 - dependency rule suffix (kt adds "beyond sqlite-jdbc")
 
 Verify a port with a structural diff: every differing line must contain a
@@ -115,9 +113,8 @@ source of truth — when it changes there, copy it here again.
   the run must teach) are marked per card — don't leak them into exercise
   docs or slides either.
 - `/verify-exercise <n>`: after-the-fact grading against a rubric in
-  `checks/<n>-….md`. Session 3's check runs in-session at the end of the exercise and grades the
-  saved `session3-rules.diff`, then arbitrates the participant's own wrap
-  nominations.
+  `checks/<n>-….md`. Session 3's check runs as the closing task and compares
+  `session3-before.diff` with `session3-after.diff`, decision by decision.
 - `/save-changes <name>`: saves the working tree as `session3-<name>.diff`
   and resets, with preconditions (right cwd, non-empty status, no silent
   overwrite; never `git clean -x`). Windows-safe: writes the diff with
@@ -125,21 +122,22 @@ source of truth — when it changes there, copy it here again.
   `git apply` rejects) and runs one git command per call (no `&&`). Reuse
   it for any exercise that needs evidence to survive a reset. Renamed from
   `/bank-diff` 2026-09-07 ("bank" failed the vocabulary rule).
-- `/pollute`: session 3, task 2. Runs the fixed pollution script in the
-  current session: Claude writes its own "review deletion v2" design in
-  the chat (soft delete, `X-User-Id` owner check, 204, `problem+json`, a
-  new library, query in the handler, mocking-library tests) and pastes
-  the full verbose test log, then prints three messages for the
-  participant to send: v2 is in a planted file, a correction, "we dropped
-  most of v2, keep it simple". The task 2 prompt ("Let users delete their
-  own reviews…") leaves a decision open, so the pollution has a gap to
-  fill. History (2026-10-05): cookie recipes, then pasted foreign code
-  from another app; strong models ignored both and produced
-  byte-identical diffs on the fully specified DELETE prompt. Identical
-  diffs are a valid result; the coach checks the `/context` percentages
-  before it doubts that `/pollute` ran. Chat-only: it never edits files. Exists so
-  participants write only a prediction, not a plan, and so the polluted
-  session is built the same way on every machine.
+- **Session 3 test kit** (redesign 2026-10-06): each project ships a small
+  test kit for handler tests that no existing test uses
+  (`internal/handler/testkit_test.go` · `src/test/kotlin/bookstore/testkit/TestKit.kt`
+  · `tests/testkit.py` · `tests/testkit.ts`). Same API in every language:
+  a setup wrapper, `aBook`/`anAuthor`/`aReview` builders, get/post/delete
+  helpers, `expectStatus`/`expectJson`. The kit header only lists the
+  helpers: no team decision, no "use me", no example test. A dry run
+  (2026-10-07) showed Claude grepping the kit, reading a "team decision"
+  header and following it in the first run; the decision and the shape
+  live in the sheet and in the participant's rule only. The exercise gives three team decisions (use the
+  kit for new tests; new endpoints return 400 for bad input, old 500s
+  stay; no drive-by changes) and has participants put them in context.
+  Never make an existing test use the kit: the exercise depends on the
+  old tests showing the old way. `/pollute` and the clean-versus-polluted
+  experiment were removed in this redesign; strong models ignored the
+  pollution.
 - **Writing to `.claude/` fails from the desktop bridge.** Stage updated
   skill files in `_move-to-dot-claude-skills/` (mirroring the target
   paths, with a README saying what goes where); a human moves them in and

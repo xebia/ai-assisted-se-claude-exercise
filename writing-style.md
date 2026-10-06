@@ -265,7 +265,7 @@ says what for.
 ## Coach output
 
 The coach skills (`/prompt-coach`, `/context-coach`, `/verify-exercise`,
-`/save-changes`, `/pollute`) talk to participants live, mid-exercise. Everything a coach
+`/save-changes`) talk to participants live, mid-exercise. Everything a coach
 says is Tier 1: the participant reads it once, on a clock, and acts on it.
 Every skill's `SKILL.md` carries this block, word for word, under the
 heading *How you talk to the participant*:
