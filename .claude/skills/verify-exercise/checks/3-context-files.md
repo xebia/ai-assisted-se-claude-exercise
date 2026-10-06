@@ -1,177 +1,131 @@
-# Exercise 3 — Context files vs. the weak-prompt run
+# Exercise 3 — The team's decisions, before and after
 
-**Artifact:** `CLAUDE.local.md` and one saved diff at the project root
-(the exercise saves and resets in one move, so expect a clean working
-tree, not live changes). **Which diff:** if `session3-rules.diff` exists,
-grade that one — it is the bonus caching run, and caching tests all four
-lines. Otherwise grade `session3-clean.diff`, the DELETE-endpoint run
-from task 2. Say in the first line of the report which diff you graded
-and why. Only if the participant did the back-at-work scoped-rule item:
-the path-scoped rule file under `.claude/rules/`.
+**Artifacts:** two saved diffs at the project root, `session3-before.diff`
+(the task run without the decisions) and `session3-after.diff` (the same
+task with the participant's context files), plus the context files
+themselves: `.claude/rules/testing.md` (given on the sheet),
+`.claude/rules/handlers.md` and `CLAUDE.local.md` (written by the
+participant). The exercise saves and resets in one move, so expect a
+clean working tree, not live changes.
 
-**When this runs.** During task 2, right after the clean session, in a
-fresh session in the participant's second terminal, while they run the
-polluted session. Nobody is watching. So: **do not ask for the context
-file** — read `CLAUDE.local.md` from disk; it is exactly what Claude saw.
-Ask exactly one question first, and wait for the answer:
+If `session3-bonus.diff` exists (a second, different task run with the
+same files), grade it as a third column after the main comparison. If
+only `session3-before.diff` exists, the second run was skipped: grade
+the first run alone, say so in the first line, and stop after the
+decision table.
 
-> Which of your four lines (the layer line, rule 1, rule 2, rule 3) do you
-> think Claude broke in the clean session? One line, then I grade.
+**When this runs.** Task 4, the closing task, in a fresh session. Do not
+ask for the files: read them from disk. Ask exactly one question first,
+and wait for the answer:
 
-Take any answer, including "no idea", and start. Never ask a second
-question. The report is read in task 3, from the terminal scrollback, so
-it must stand on its own: no "as we discussed", no follow-up question at
-the end. In the bonus the participant may run you a second time on the
-caching diff; then grade that one the same way and say which lines it
-tests that the DELETE run did not.
+> Which decision do you think Claude still broke in the second run?
+> Decision 1 (test kit), 2 (bad input) or 3 (small changes). One line,
+> then I compare.
 
-**Words.** The participant's sheet says: the weak prompt (not "bait"),
-the saved diff (not "banked"), the line that helped the most (not "MVP"),
-a line not worth its tokens (not "freeloader"), the grader (that is you),
-the closing round (not "harvest"). Use those words in the report. Trainer
-words below are for you.
+Take any answer, including "none" or "no idea", and start. "None" is a
+common and fair answer. Never ask a
+second question. The report must stand on its own: no follow-up question
+at the end.
 
-**Under review: the context files, not a prompt.** This is the Session 3
-exception to this skill's usual framing. The prompt is fixed and
-deliberately plain — *"Add a DELETE /reviews/{id} endpoint to the
-BookStore API, with tests."* in task 2, *"Add caching to the BookStore
-API"* in the bonus — plus the exercise's experiment tag. Its weakness is
-the experimental control: whatever discipline shows up in the diff came
-from the participant's context files, or from luck. If the diff shows
-the participant improved the prompt's wording, note it as a broken
-control and grade what you can.
+**Words.** The sheet says: the first run, the second run, the test kit,
+the decisions (1, 2, 3), your rule files, *followed*, *broken*, *not
+tested*, the grader (that is you), the closing round. Use those words.
+Never say baseline, harness, arm, treatment.
 
-**Three states per line.** A DELETE endpoint tempts Claude to skip
-validation or to write tests in its own style; it rarely tempts a new
-library or logic in the wrong layer. So for each of the four lines say
-*held* (the diff shows Claude following it where it mattered), *failed*
-(the diff shows a violation), or *not tested* (nothing in this run could
-have violated it). *Not tested* is an honest result, not a pass. Never
-upgrade it to *held*.
+**The prompt is fixed:** *"Add a DELETE /api/reviews/{id} endpoint to the
+BookStore API, with tests."* with the exercise's experiment tag, in both
+runs. The bonus prompt is *"Add a GET /api/authors/{id}/books endpoint to
+the BookStore API, with tests."* If the two runs used different prompts,
+the comparison is broken: say so in one line and grade each run on its
+own.
 
-**What the participant was asked to produce.** A pruned `/init` output in
-`CLAUDE.local.md` where every line passes the freeloader test, a layer
-line, and three decisions in their own words (validation before store ·
-tests per endpoint in the project's test convention · no new
-dependencies). `@import` is theory only in this course: never a plus,
-never a finding. The path-scoped rule file is a back-at-work item: grade
-it when present, mark the Scoping dimension — n/a when absent, and never
-count its absence against them.
+## The three decisions and how to read them in a diff
 
-## Rubric — replaces the Session 2 technique table
+Use the project at hand for file names. Detect the test kit file (the
+file whose header says "Test helpers for handler tests") and one existing
+handler test file before you read the diffs.
 
-| Dimension | The context files pass when… |
-| --- | --- |
-| **Correctness** | every command, path, and convention the files claim is true of this repo — commands run, files exist, the described patterns actually appear in the code. A `file:line` reference that no longer points at what it names is wrong |
-| **Completeness** | the layer line and all three required decisions are present and *checkable* — a violation could be seen, not argued about |
-| **Relevance** | every line passes the freeloader test — nothing Claude could learn from the code, no restated language defaults, no file inventory |
-| **Scoping** | *(back-at-work — n/a if not attempted)* the rule file's `paths:` glob matches the intended layer's real files and nothing else, and the rule was moved, not copied |
+1. **Test kit.** *Followed* when every new test in the diff uses the kit:
+   its setup function and its builders, in the shape the participant's
+   `testing.md` rule describes. In the first run there is no rule yet:
+   using the kit there means Claude found it on its own. *Broken* when a new test uses the old setup
+   (the shared test environment or test mux used directly, hand-made
+   requests) instead. Also *broken*: an existing test was converted to the
+   kit. *Not tested*: the diff adds no test.
+2. **Bad input.** *Followed* when the new endpoint answers a bad id (not a
+   number) with 400. *Broken* when it answers 500, which is what the old
+   handlers do. Also *broken*: an old handler's 500 was changed in this
+   diff (the decision says old endpoints are fixed later). *Not tested*:
+   the endpoint has no path for bad input. A missing review (a valid id
+   that does not exist) is not bad input; 404 is fine there and is not
+   part of this decision.
+3. **Small changes.** *Followed* when every changed file is needed for the
+   task: the handler, the route registration, the store method if one was
+   needed, and the tests. *Broken* when the diff changes something the
+   task did not ask for: a reformatted file, a renamed helper, an old
+   test rewritten, an old handler changed. Name the file and the line.
 
-Grade each ✅ / ❌ / ⚠️ with the usual discipline: predictions before
-evidence, one specific expected defect per ❌. State the grade as *N of 4
-dimensions sound*.
+**Also check that every new test can run.** A test the runner never
+finds passes nothing and fails nothing. Look for: a test placed after a
+`main` guard or after the call that starts the runner, a test file whose
+name the runner does not pick up, a test function or method the runner
+does not recognise. Report a dead test under *Your files*, with the line.
 
-## What full-marks context files contain
+Read the diffs with `git apply --stat <file>` for the shape and the file
+itself for the content. Compare against the current files in the repo,
+not memory. Run nothing that edits the project.
 
-- A verified test command (verified = you can run it now and it works)
-- The layering rule using this repo's real package/module names
-- Three prohibitions specific enough that the bait diff can show a
-  violation
-- No line that fails the freeloader test. There is no line-count target:
-  the sheet says a line stays because they can say what it changes. The
-  scoped rule, if present, carries only layer-local guidance
-- `CLAUDE.md` itself untouched — `git status` / `git diff CLAUDE.md` is the
-  cheapest check in this file. **Highest-value, least-often-checked:** a
-  modified `CLAUDE.md` silently damages every later session.
+## Report shape
 
-## Establish ground truth
+Make each part a heading the participant can find by scrolling.
 
-1. Run the test command `CLAUDE.local.md` claims, exactly as written. If it
-   fails, that is a Correctness finding regardless of anything else. If
-   the failure is in tests the bait diff never touched, say that the
-   starting point was not clean (`/catch-up 2` was skipped) and grade on.
-2. If a rule file exists, list the files its glob matches against the
-   actual tree (every handler file? anything outside the layer?).
-3. Only then read the diff (`git apply --stat` for the shape, the file
-   itself for the content — the changes are no longer in the working
-   tree). For the DELETE run: does the handler validate the id before it
-   calls the store (rule 1)? Do new tests exist, in the project's
-   convention (rule 2; compare against one existing test file, not
-   memory)? Was anything added to the dependency manifest (rule 3;
-   usually *not tested*)? Does the handler call a store function for the
-   delete, or run its own query (layer line)? For the caching run: where
-   did the cache land, store layer or spread across handlers? Was a
-   library added? Do new tests follow the convention? Is cache
-   invalidation wired to update/delete? Is handler validation still
-   intact? No diff file at all? The save step was skipped. Say so.
-   Without a diff only Correctness and Relevance can be graded.
+1. **Your guess** — one sentence: the decision they named, and whether
+   the second run broke it.
+2. **The decisions, first run and second run** — a table with one row per
+   decision and two columns (three with the bonus): *followed*, *broken*
+   or *not tested*, each with the deciding line from the diff in a short
+   quote, or "no line in this run could break it".
+3. **What the rules changed** — for each decision whose result changed
+   between the runs, name the sentence in their rule file or
+   `CLAUDE.local.md` that most likely caused the change. For each decision
+   that stayed *broken*, point at the gap in their wording: the missing
+   limit, a `paths:` line that matches no files (list the files it
+   matches), a sentence a diff cannot check. Show a tighter version of
+   that one sentence. For a decision Claude *followed* in both runs, say it
+   plainly: Claude followed it without being told this time, and nothing
+   guarantees the next session does.
+4. **Your files** — three lines at most: does the `paths:` line in
+   `handlers.md` match the real handler files? Does `CLAUDE.local.md` have
+   the line that points to the rule files? Any dead test in either diff?
+   Is `CLAUDE.md` unchanged (`git diff --stat CLAUDE.md`)? A changed `CLAUDE.md` is the most
+   important finding in this report: training mode is gone for every
+   later session.
+
+No dimension grade, no score, no question at the end.
 
 ## Known traps
 
-- **Dependency added** — the manifest diff shows a cache/TTL library.
-  The no-dependencies rule was missing, soft ("keep dependencies minimal"),
-  or in a scoped file that did not load for store code.
-- **Tests exist but ignore the convention** — the test rule named testing
-  but not *this repo's* pattern. A generic rule gets you generic tests.
-- **Cache in the wrong layer** — the layering rule was absent, or
-  descriptive ("handlers call stores") instead of a rule.
-- **Glob near-miss** *(scoped rule)* — a typo or wrong depth in the `paths:`
-  pattern. The rule never loaded anywhere, and nothing downstream changed.
-  Check the glob even if the diff looks fine. A correct diff under a dead
-  rule is luck, not scoping.
-- **`CLAUDE.md` modified** — `/init` rewrote it and it was never restored.
-  Training mode is gone. Check even when not mentioned; omissions are
-  findings.
-- **Got away with it** — Claude stayed in the project's style with no rule
-  demanding it. Say plainly this will not repeat. The next session rolls
-  the dice again.
-
-## Pass bar
-
-- Test command runs as written
-- `CLAUDE.md` unmodified
-- DELETE run: handler validates before the store call · store function
-  does the delete · new tests follow the existing test pattern · no new
-  dependency (usually *not tested*)
-- Caching run: no new external dependency · cache in the store layer
-  with invalidation on update/delete · new tests follow the existing
-  test pattern · handler validation intact
-
-Partial is the expected first-attempt outcome. Usually one rule is worded
-too softly to catch a violation. Say which wording, show the diff line it
-failed to prevent, and show the tighter wording: the exercise is over when
-they read this, and the wording is what they take home.
-
-## Report shape for task 3
-
-The sheet tells the participant to find three things in your report.
-Make each one a heading they can find by scrolling:
-
-1. **Your four lines: held, failed or not tested** — one line each for
-   the layer line and rules 1, 2, 3, with the diff line that decides it,
-   or "nothing in this run could break it". Then one sentence on their
-   guess: "You guessed rule 3. The diff shows …" — right, wrong, or not
-   testable by this run, say which.
-2. **The line that helped the most** — the single `CLAUDE.local.md` line
-   that did the most in the bait run. Point at the concrete behavior in
-   the diff it prevented or forced (the dependency *not* added, the test
-   that copies the project's convention, the cache in the store layer). A
-   line whose rule was never tested by the diff cannot win, however well
-   written. A line that was *not tested* cannot win either; say so if
-   their guess named it.
-3. **A line not worth its tokens** — one line where the answer to *"what
-   would Claude do differently because this line exists?"* is nothing.
-   Point at what Claude would have done anyway, or already knew from the
-   code. If every line earns its tokens, say so. A clean sheet is a
-   finding too.
-
-End with the four-dimension grade and the pass bar. No question at the
-end; nobody is there to answer it.
+- **Pointer line missing** — `CLAUDE.local.md` lacks the line that tells
+  Claude to read the matching rule file. `paths:` loads a rule only when
+  Claude opens a matching file with its own file tools; a new file, or an
+  edit through a shell command or a script, may not load it. A decision
+  that stayed *broken* with a correct rule file often has this cause.
+- **Glob near-miss** — `paths:` in `handlers.md` points at a folder that
+  does not exist or misses the file extension. The rule never loaded.
+  The second run looks like the first one. Check by listing files.
+- **No limit in decision 2** — the second run changes old handlers to 400
+  as well. Old tests fail or get edited. Decision 2 and decision 3 break
+  together; name the missing "new endpoints only" sentence.
+- **Decision 3 scoped** — put in a rule file with handler `paths:`. It
+  only loads for handler files; a drive-by change elsewhere is not
+  covered.
+- **Lucky first run** — the first run already followed a decision. Do not
+  call that a failure of the rules. Say what the rules add: the same
+  result in every session, not only this one.
+- **`CLAUDE.md` modified** — check even when not mentioned.
 
 ## Held back
 
-The closing round poses to the room: *a line that is true but useless hurts
-which dimension? A line that is specific but wrong?* Intended: **Relevance** for
-the freeloader, **Correctness** for the wrong line. The wrong one is worse
-because it does damage while looking trustworthy. Answer only if asked
-directly.
+Why a decision that the code contradicts needs context at all: Claude
+copies what it sees, and the old code shows the old way. Do not lecture
+this; it is the closing round's question. Answer only if asked directly.
