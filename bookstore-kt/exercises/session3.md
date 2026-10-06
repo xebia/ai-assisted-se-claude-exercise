@@ -6,63 +6,66 @@
 
 ## Goal
 
-Your team made three decisions last sprint. Claude was not in the
-meeting. In this exercise you:
+Your team made three decisions that the code does not show. In this
+exercise you:
 
-1. Run a task without the decisions, and save what Claude builds.
-2. Put each decision where Claude reads it: two rule files and
-   `CLAUDE.local.md`.
-3. Run the same task again, and let the grader compare the two results.
+1. Run a task, and save what Claude builds.
+2. Write the decisions where Claude reads them.
+3. Run the same task again, and compare the two results.
 
 ## Start here
 
-- Open a terminal in the `bookstore` folder and start `claude`.
-- Run `./gradlew test` and `git status`. A test fails, or `git status`
-  lists changes? Press Shift+Tab until the screen says auto mode, then
-  run `/catch-up 2`. It commits your session 2 work, which the reset in
-  task 1 would otherwise remove.
-- Training mode is on. Never edit `CLAUDE.md`. Stuck? Type *just tell
-  me*.
-- The trainer tells you when to start task 3.
+- Open a terminal in the `bookstore` folder that you cloned.
+- Training mode is on: Claude asks you questions before it helps. Stuck?
+  Type *just tell me* in the chat.
+- Never edit `CLAUDE.md`.
+- Write your notes on paper or in a text file outside the project.
+- The trainer tells you when to start each next task.
 
 ## Your team's decisions
 
-From the notes of last sprint's retrospective:
+Your team agreed on these three decisions in a meeting. They are not in
+the repo, so Claude cannot read them.
 
 1. **Test kit.** "We built a test kit: `src/test/kotlin/bookstore/testkit/TestKit.kt`.
-   From now on, new handler tests use it. We do not rewrite the old
-   tests."
-2. **Bad input.** "Bad input must give a 400, not a 500. New endpoints do
+   New handler tests use it. We do not rewrite the old tests."
+2. **Bad input.** "Bad input gives a 400, not a 500. New endpoints do
    this. We fix the old endpoints later, in a separate change."
-3. **Small changes.** "A change touches only what the task asks for. No
-   tidying up on the side."
+3. **Small changes.** "A change touches only the files the task needs. No
+   extra changes."
 
-Claude cannot read these notes. Nothing in the code says them either:
-the old tests and the old handlers still show the old way.
+The old tests and the old handlers still show the old way.
 
 ## Tasks
 
 ### 1. Run the task without the decisions
 
-This task produces `session3-before.diff`: what Claude builds when it
-knows only the code.
+This task produces `session3-before.diff`: a file with every change Claude
+makes when it knows only the code.
 
-1. **Predict.** For each decision, write *yes* or *no*: will Claude follow
-   it without being told? A wrong prediction is fine. No prediction is
-   the only failure.
-2. **Run the task in a fresh session.** Type `/exit` and start `claude`
-   again. A fresh session always means this: close Claude and start it
-   again, never `/clear`. Then paste this exactly. The tag at the start
-   switches training mode off for this one prompt:
+1. **Get a clean start.** Run `./gradlew test` and `git status`. A test
+   fails, or `git status` lists changes? Start `claude`. Press Shift+Tab
+   until the line under the chat box says auto mode: Claude then does not
+   ask permission. Run `/catch-up 2`. It finishes the session 2 code work
+   and commits it. Step 5 removes work that is not committed. Both clean?
+   Go to step 2.
+2. **Predict.** Before you run anything, write *yes* or *no* for each
+   decision: will Claude follow it without being told? A wrong prediction
+   is fine.
+3. **Start a fresh session.** Type `/exit` if Claude is open, then start
+   `claude`. A fresh session always means this: close Claude and start it
+   again, never `/clear`. Paste this line, with the brackets. The tag at
+   the start switches training mode off for this one prompt, so Claude
+   builds instead of asking questions:
 
    ```
    [Exercise 3 experiment — execute directly, no leading questions.] Add a DELETE /api/reviews/{id} endpoint to the BookStore API, with tests.
    ```
 
-3. **Run the tests.** When Claude is done, run `./gradlew test`. Write down
+4. **Run the tests.** When Claude is done, run `./gradlew test`. Write down
    whether all tests pass.
-4. **Save the result.** Run `/save-changes before`.
-   It saves all changes to `session3-before.diff` and resets the project.
+5. **Save the result.** Run `/save-changes before`. It saves Claude's
+   changes in `session3-before.diff` and removes them from the project.
    Then type `/exit`.
 
 **Done when**: your three predictions are written down, and
@@ -71,11 +74,12 @@ knows only the code.
 ### 2. Put the decisions where Claude reads them
 
 This task produces `.claude/rules/testing.md`, `.claude/rules/handlers.md`
-and `CLAUDE.local.md`. Each decision goes where it is needed, and only
-there (*Rule Discovery: With or Without Paths*).
+and `CLAUDE.local.md`. Decisions 1 and 2 go in rule files with
+`paths:`. Decision 3 goes in `CLAUDE.local.md`
+(*Rule Discovery: With or Without Paths*).
 
-1. **Decision 1: let Claude create the rule.** Start `claude` and paste
-   this whole block:
+1. **Decision 1.** Start `claude` and paste this block. Claude creates the
+   rule file:
 
    ```
    [Exercise 3 experiment — execute directly, no leading questions.] Create .claude/rules/testing.md with exactly this content, nothing added or changed:
@@ -91,88 +95,72 @@ there (*Rule Discovery: With or Without Paths*).
    Never convert an existing test to the kit, also not in a file you edit.
    ```
 
-   Look at the parts of this rule. `paths:` loads the rule when Claude
-   opens a test file. The kit line points to the kit, so the details stay
-   in one place (*Progressive Disclosure*). The "even when" line says what
-   to do when the code shows the old way. The last line is the limit: new
-   tests only.
+2. **Decision 2.** In your editor, create `.claude/rules/handlers.md`. Copy
+   the shape of `testing.md`, with `"src/main/kotlin/bookstore/handler/**/*.kt"` in `paths:`.
+   Write two sentences. First: *New endpoints answer bad input, such as an
+   id that is not a number, with 400.* Second: what happens to the old
+   endpoints for now. They are in the `src/main/kotlin/bookstore/handler/` folder. A rule is checkable when a reader of a diff can say "this breaks
+   the rule".
+3. **Decision 3.** In your editor, create `CLAUDE.local.md` in the
+   `bookstore` folder, or add to it if it exists. Write two lines. First, copy this line exactly:
+   *"Before you write or edit a file under src/test/kotlin/bookstore/handler/ or src/main/kotlin/bookstore/handler/, read the
+   matching file in .claude/rules/."* Second, decision 3 as a checkable
+   rule: name what a change may touch. An example about another
+subject: *"A bug fix may touch only the file with the bug and its test."*
 
-2. **Decision 2: write the rule yourself.** Open your editor and create
-   `.claude/rules/handlers.md`. Copy the shape of `testing.md`:
-   - A `paths:` list with `"src/main/kotlin/bookstore/handler/**/*.kt"`, the handler files.
-   - One sentence on what new endpoints do with bad input.
-   - One sentence on what stays the same, and where.
+Why the first line: a `paths:` rule loads when Claude opens a matching
+file. A new file, or an edit through a script, may not load it. Claude reads `CLAUDE.local.md` at the start
+of every session.
 
-   A rule must be checkable: someone who reads a diff can say "this
-   breaks the rule". *"Handle errors well"* is not checkable. *"Return
-   404 when the book does not exist"* is.
-
-3. **Decision 3, and a line that points to the rules.** Create
-   `CLAUDE.local.md` in the `bookstore` folder, in your editor. Claude reads
-   this file at the start of every session. Write two lines:
-   - First, copy this line exactly: *"Before you write or edit a file under
-     src/test/kotlin/bookstore/handler/ or src/main/kotlin/bookstore/handler/, read the matching file in .claude/rules/."*
-   - Then decision 3, as one checkable rule. It applies to every file, so
-     it gets no `paths:`. Name what a change may touch, so a diff can show
-     a violation.
-
-   Why the first line: `paths:` loads a rule only when Claude opens a
-   matching file with its own file tools. When Claude creates a new file,
-   or edits through a shell command or a script, the rule may not load. The
-   line in `CLAUDE.local.md` is always loaded, so it closes that gap.
-
-4. **Optional: ask the coach, one round.** Only if the trainer has not
-   called task 3 yet. Run `/context-coach 2` (2 is the task number), then
-   paste your `handlers.md` and your decision 3 line as your next
-   message. Fix the one thing it names, then go on.
-
-**Done when**: the three files exist. `handlers.md` has a `paths:` line
-and says which endpoints the rule does not cover. `CLAUDE.local.md` has the
-line that points to the rules. `git status` does not list `CLAUDE.md`.
+**Done when**: the three files exist, `handlers.md` has a `paths:` line and
+says what happens to the old endpoints, and `git status` does not list
+`CLAUDE.md`.
 
 ### 3. Run the same task with the decisions
 
 This task produces `session3-after.diff`.
 
-1. **Start a fresh session.** Type `/exit` and start `claude` again. A
-   fresh session reads your new files from the start.
-2. **Paste the prompt from task 1 again**, tag included. Watch which files
-   Claude opens before it writes a test. Does it open the test kit?
+1. **Start a fresh session.** Type `/exit` and start `claude` again. Claude
+   now reads your new files at the start.
+2. **Paste the prompt from task 1 again**, tag included. In the chat, watch
+   which files Claude reads before it writes a test. Write down whether it
+   reads the test kit.
 3. **Run the tests.** When Claude is done, run `./gradlew test`. Write down
    whether all tests pass.
-4. **Save the result.** Run `/save-changes after`.
-   Then type `/exit`.
+4. **Save the result.** Run `/save-changes after`. Then type `/exit`.
 
 **Done when**: `session3-after.diff` exists.
 
-### 4. Closing: let the grader compare
+### 4. Closing: compare the two runs
 
-Start `claude` and run `/verify-exercise 3`. It first asks which decision
-you think Claude still broke in the second run. Answer in one line;
-*none* is a fine answer. Then
-it compares the two diffs, decision by decision: *followed*, *broken*, or
-*not tested* when the task gave no chance to break it. For each result
-it shows the lines that decided it.
+This task gives you a report on each decision, with the lines that decided
+it.
 
-Write down three lines:
-
-1. Your predictions from task 1, next to what the first run did.
-2. The decision that changed most between the two runs.
-3. One sentence from your rules that you would now write differently.
+1. **Run the comparison.** Start `claude` and run `/verify-exercise 3`. It
+   compares your two diffs with the three decisions. First it asks which
+   decision Claude still broke in the second run. Answer in one line, from
+   what you saw in the chat. *None* is a fine answer.
+2. **Read the report.** Each decision is *followed*, *broken* or *not
+   tested*. *Not tested* means the task gave Claude no chance to break it.
+3. **Write down three lines.** Line 1: your predictions, next to what the
+   first run did. Line 2: the decision that changed most between the two
+   runs. Line 3: one sentence from your rules that you would write
+   differently, or the one that helped most.
 
 **Done when**: three lines are written down. Bring them to the closing
 round.
 
 ## Bonus (only if time remains)
 
-**Same rules, a new task.** Start a fresh session and paste:
+**Check your rules, then try a new task.** Run `/context-coach 2`. As your
+next message, paste your `handlers.md` and your decision 3 line. Improve the one thing it
+names. Then start a fresh session and paste:
 
 ```
 [Exercise 3 experiment — execute directly, no leading questions.] Add a GET /api/authors/{id}/books endpoint to the BookStore API, with tests.
 ```
 
 Run `/save-changes bonus`, then `/verify-exercise 3` in a fresh session.
-You wrote the rules once. Do they hold for a task you did not plan for?
 
 **Change an old test.** Start a fresh session and paste:
 
@@ -181,19 +169,18 @@ You wrote the rules once. Do they hold for a task you did not plan for?
 ```
 
 Run `git diff`. Did Claude change only that test, or did it convert it to
-the kit? Then run `/save-changes probe` to reset the project.
+the kit? Then run `/save-changes probe` to remove the changes.
 
 ## Back at work: try this on your own project
 
-Every review comment you write twice is a rule you have not written yet.
-Pick one comment you keep repeating, and write it as a rule with a
+Pick one review comment that you write often. Write it as a rule with a
 `paths:` line. In a real team, `.claude/rules/` is committed, so every
 teammate gets the same rules. In this course, git ignores it.
 
 ## Appendix: `/save-changes` by hand
 
 If the command stops, it says why. Or run these from the project folder,
-one per line:
+one per line. The first two save your changes. The last three remove them:
 
 ```
 git add -A .
@@ -203,16 +190,16 @@ git checkout -- .
 git clean -fd .
 ```
 
-Replace `before` with `after`, `bonus` or `probe`. The last command
-deletes files Claude created that you never committed. Your rule files,
-`CLAUDE.local.md` and the saved diffs are ignored by git and stay.
+Replace `before` with `after`, `bonus` or `probe`. The last command deletes
+new files that git does not track yet. Your rule files, `CLAUDE.local.md`
+and the saved diffs stay: `git clean` skips files that git ignores.
 
 ## Closing round
 
 The trainer asks the room. Have these answers ready:
 
-- Which decision did Claude follow without being told? Did your
-  prediction hold?
+- Which decision did Claude follow without being told? Was your
+  prediction right?
 - Why does decision 1 go in a rule file with `paths:`, and decision 3 in
   `CLAUDE.local.md`? Why does `CLAUDE.local.md` also point to the rules?
 - Which words in your rule for decision 2 make it checkable?
