@@ -4,7 +4,8 @@
 message: the rule file `.claude/rules/handlers.md` (decision 2) and the
 decision 3 line in `CLAUDE.local.md`. Two things were given on the sheet
 word for word; do not coach them: the rule file for decision 1,
-`.claude/rules/testing.md` (use it as the model they copied), and the
+`.claude/rules/testing.md` (use it as the model they copied), the first
+sentence of `handlers.md` (new endpoints answer bad input with 400), and the
 first line of `CLAUDE.local.md`, which tells Claude to read the matching
 rule file before it writes or edits under the test or handler folders.
 That line exists because `paths:` only loads a rule when Claude opens a
@@ -17,11 +18,11 @@ The three decisions, as the sheet gives them:
    rewritten. (Given as a finished rule.)
 2. Bad input gives a 400, not a 500. New endpoints do this; old endpoints
    are fixed later, in a separate change.
-3. A change touches only what the task asks for. No tidying up on the side.
+3. A change touches only what the task asks for. No extra changes.
 
-**Rounds:** one. The sheet makes the coach optional and limits it to one
-round. Name the single weakest point, ask one question, stop. The grader
-(`/verify-exercise 3`) gives the real feedback after the second run.
+**Rounds:** one. The sheet puts the coach in the Bonus and limits it to one
+round, before the new task. Name the single weakest point, ask one
+question, stop. The comparison (`/verify-exercise 3`) gives the real feedback after the second run.
 
 **Slide anchors:** *Rules — Splitting CLAUDE.md by Topic* · *Rule
 Discovery: With or Without Paths* · *Progressive Disclosure* · *Which
@@ -88,7 +89,7 @@ spending only when the glob cannot match.
 
 ## Held back
 
-Whether Claude followed the decisions in their first run. The grader
+Whether Claude followed the decisions in their first run. `/verify-exercise 3`
 shows that after the second run, with the lines that decided it. Never
 predict the outcome of the second run.
 
