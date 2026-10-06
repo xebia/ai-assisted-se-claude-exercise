@@ -25,7 +25,7 @@ someone who got lucky.
 
 ## Tasks
 
-### 1. A prompt that writes `docs/orientation.md` (11 min)
+### 1. A prompt that writes `docs/orientation.md`
 
 You produce the file `docs/orientation.md`, next to `pom.xml`. The `docs/`
 folder does not exist yet.
@@ -39,42 +39,39 @@ parts:
    database and back. One line per step, each with a `file:line`
    reference, written like `src/main/kotlin/bookstore/handler/BookHandler.kt:42`.
 
-**How the coach works.** Tasks 1 and 2 use this loop: **Draft → Coach →
-Revise → Ship → Debrief.** Run `/prompt-coach <task number>`, then paste
-your draft as your next message. The coach checks it and asks one
-question. Revise until it says the prompt is ready: at most two rounds.
-Then type *ship it*. The coach sends your prompt, word for word, to a
-sub-agent: a second Claude session that knows only your prompt. Its
-report comes back into your chat. Read it with the coach: did its
-predictions come true? Disagree with the coach? Type *run it anyway*.
-Type these words without quotes.
+Tasks 1 and 2 follow the coach loop from the slides: **Draft → Coach →
+Revise → Ship → Debrief.**
 
 Steps:
 
-1. **Draft your prompt** (4 min). Use these techniques:
+1. **Draft your prompt**. Use these techniques:
    CONTEXT-TASK-OUTCOME, role framing, Scope it, Direct it, Define done,
    `@file`, and examples. One of the seven adds nothing here; the closing
    round asks which one. **Your prompt must say: write the result to
    `docs/orientation.md`, and create the folder.** Without that line, the
    sub-agent only reports in the chat.
-2. **Coach and revise** (3 min). Run `/prompt-coach 1` and paste your
-   draft. Revise until the coach says the prompt is ready.
-3. **Save your prompt, then ship** (4 min). Copy your final prompt into
-   your notes. Then type *ship it*. Read task 2 while the sub-agent works.
-   When the report is back, open `docs/orientation.md` and check two
-   `file:line` references. Do they point at the line they name?
+2. **Coach and revise**. Run `/prompt-coach 1` (1 is the task number),
+   then paste your draft as your next message. The coach checks it and
+   asks one question. Revise until it says the prompt is ready: at most
+   two rounds. Disagree with the coach? Type *run it anyway*, without
+   quotes.
+3. **Save your prompt, then ship**. Copy your final prompt into
+   your notes. Then type *ship it*. The coach sends your prompt, word for
+   word, to a sub-agent: a second Claude session that knows only your
+   prompt. Read task 2 while the sub-agent works.
+4. **Debrief**. The sub-agent's report comes back into your chat. Read it
+   with the coach: did its predictions come true? Then open
+   `docs/orientation.md` and check two `file:line` references. Do they
+   point at the line they name?
 
 The prompt on the slide *Let's do a Prompt Analysis* has the same four
 parts: the technology, where to start, what to deliver, and proof for
 every statement.
 
-After this exercise, run `/verify-exercise 2` in any Claude session. It asks for the prompt from your notes and checks the
-file against it, one line at a time.
-
 **Done when**: `docs/orientation.md` exists, and every step in the request
 flow has a `file:line` reference.
 
-### 2. A prompt that asks for failing tests first (9 min)
+### 2. A prompt that asks for failing tests first
 
 You produce two new test cases in `src/test/kotlin/bookstore/util/PaginationTest.kt` and a
 fix in `src/main/kotlin/bookstore/util/Pagination.kt`.
@@ -86,28 +83,28 @@ You decide this, not Claude. Session 6 builds on your choice.
 
 Steps:
 
-1. **Draft your prompt** (3 min). Techniques you need here: Scope it,
+1. **Draft your prompt**. Techniques you need here: Scope it,
    Direct it (say "tests first" in those words), Examples, Constrain it,
    Define done. For Examples, point at the existing test function
    `firstPage()` in `src/test/kotlin/bookstore/util/PaginationTest.kt`. Your new cases
    belong in that same style. Ask for both test runs in the report:
    before the fix and after.
-2. **Coach and revise** (2 min). Run `/prompt-coach 2` and paste your
+2. **Coach and revise**. Run `/prompt-coach 2` and paste your
    draft.
-3. **Ship and test** (4 min). Type *ship it*. Then run
+3. **Ship and test**. Type *ship it*. Then run
    `./mvnw test` (or `./gradlew test`) yourself. The sub-agent reports only
    what your prompt asked for.
 
 The better prompt on the slide *Which Prompt is More Effective?* named
 the function, said no mocks, and asked for a failing test before the fix.
 
-**Twenty minutes after the start, the trainer calls task 3. Move to task 3
-then, even if this task is not finished.**
+**When the trainer calls task 3, move to task 3, even if this task is not
+finished.**
 
 **Done when**: the report shows the new tests failing *before* the fix
 and passing *after*, and `./mvnw test` (or `./gradlew test`) passes.
 
-### 3. A prompt for plan mode (11 min)
+### 3. A prompt for plan mode
 
 You fix `createReviewNonexistentBook` in
 `src/test/kotlin/bookstore/handler/ReviewHandlerTest.kt`. It expects `404` but gets `201`. The
@@ -116,30 +113,29 @@ review flow runs from `src/main/kotlin/bookstore/handler/ReviewHandler.kt` to
 That makes it a job for plan mode: Claude proposes a plan, you approve it,
 then it writes code (*Plan Mode: Explore Before Editing*).
 
-Two things are different here. You do not type *ship it*: you run the
-prompt yourself, in a fresh session that has not seen the coach's advice.
-And training mode is on there, so Claude may ask one question before it
-plans. Answer it in one line. Do not put the experiment prefix in this
-prompt.
+This time you do not type *ship it*. You run the prompt yourself, in a
+fresh session that has not seen the coach's advice.
 
 Steps:
 
-1. **Copy the error** (1 min). Run `./mvnw test` (or `./gradlew test`). Copy
+1. **Copy the error**. Run `./mvnw test` (or `./gradlew test`). Copy
    the output of `createReviewNonexistentBook` into your notes,
    exactly as printed.
-2. **Draft your planning prompt** (3 min). Techniques you need here:
+2. **Draft your planning prompt**. Techniques you need here:
    error context (the paste from step 1), plan mode, directed thinking,
    Scope it, Define done. Directed thinking means: write in the prompt
    what the plan must think about (*Prompting & Extended Thinking*). Ask
-   for one recommendation with reasons, not a list of options.
-3. **Coach and revise** (2 min). Run `/prompt-coach 3` and paste your
+   for one recommendation with reasons, not a list of options. Do not
+   start this prompt with the experiment prefix.
+3. **Coach and revise**. Run `/prompt-coach 3` and paste your
    draft. When the coach says it is ready, copy the prompt into your
    notes.
-4. **Run it in plan mode** (3 min). Close Claude and start it again with
+4. **Run it in plan mode**. Close Claude and start it again with
    `claude`. The coach is gone now; you do not need it again. Press
    Shift+Tab until the screen says plan mode. Paste your prompt and read
-   the plan.
-5. **Question one step, then approve** (2 min). Pick one step. Ask Claude
+   the plan. Training mode is on, so Claude may ask one question before
+   it plans. Answer it in one line.
+5. **Question one step, then approve**. Pick one step. Ask Claude
    why that step, and what breaks if it is wrong. Write the step and the
    answer in your notes. When Claude asks whether to go ahead, choose the
    *Yes* answer that accepts the edits automatically. Claude leaves plan
@@ -148,11 +144,11 @@ Steps:
 **Done when**: your notes hold the plan step you questioned and Claude's
 answer, and `createReviewNonexistentBook` passes.
 
-### 4. Closing: make the tests pass, then commit (4 min)
+### 4. Closing: make the tests pass, then commit
 
 Sessions 3 to 8 build on this code, so every test should pass at the end.
 
-1. **Fix the two book tests** (2 min). `createBookReturns201` and
+1. **Fix the two book tests**. `createBookReturns201` and
    `deleteBookReturns204` still fail. The prompt below is written for
    you. Run `./mvnw test` (or `./gradlew test`), paste the output of those
    two tests at the marked place, and send the whole text to Claude. The
@@ -170,14 +166,14 @@ Sessions 3 to 8 build on this code, so every test should pass at the end.
    Read the prompt once more. The paste is error context (*Providing
    Error Context*). The file name is Scope it. "Do not change any test
    file" is Constrain it. The last line is Define done.
-2. **Check the validation test** (1 min). If a `createReviewValidation`
+2. **Check the validation test**. If a `createReviewValidation`
    test fails too, send this:
 
    ```
    [Exercise 2 experiment — execute directly, no leading questions.]
    Add input validation to createReview in src/main/kotlin/bookstore/handler/ReviewHandler.kt: rating must be 1-5, review_text must be between 10 and 500 characters
    ```
-3. **Catch up and commit** (1 min). Whatever state you are in: press
+3. **Catch up and commit**. Whatever state you are in: press
    Shift+Tab until the screen says auto mode, then run `/catch-up 2`. It
    fixes the tests that still fail, in the project's own style, and
    commits. Leave it running while the trainer starts session 3. If its
@@ -202,7 +198,7 @@ Review src/main/kotlin/bookstore/store/BookStore.kt.
 Review src/main/kotlin/bookstore/store/BookStore.kt as a database performance specialist. Focus on the number of queries.
 ```
 
-## Closing round (5 min)
+## Closing round
 
 The trainer asks the group. Have these answers ready:
 
@@ -210,3 +206,9 @@ The trainer asks the group. Have these answers ready:
 - Which single sentence in one of your prompts helped the most?
 - Which missing technique cost you something? Did the coach predict it?
 - Where did you disagree with the coach, and were you right?
+
+## After the closing round
+
+Run `/verify-exercise 2` in any Claude session. It asks for your task 1
+prompt from your notes and checks `docs/orientation.md` against it, one
+line at a time.

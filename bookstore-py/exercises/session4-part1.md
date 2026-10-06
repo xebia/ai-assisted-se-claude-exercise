@@ -17,57 +17,60 @@ every commit. It has its own sheet.
 
 - Open a terminal in the `bookstore` folder and start `claude`.
   Everything you create goes in `bookstore/.claude/`.
-- Training mode is on. Prompts that start with the tag
-  `[Exercise 4 experiment — execute directly, no leading questions.]` switch it off for that one prompt. Copy them exactly, tag included.
+- Training mode is on. Some prompts on this sheet start with an
+  experiment tag in square brackets. The tag switches training mode off
+  for that one prompt. Copy those prompts exactly, tag included.
 - Never edit `CLAUDE.md`. Sessions 5 to 8 need it.
 - No coach this session: the *Done when* lines are your checklist, and
   `/verify-exercise 4` grades your files. Stuck? Type *just tell me*.
 
 ## Tasks
 
-### 1. Copy the `/commit` skill and run it (6 min)
+### 1. Copy the `/commit` skill and run it
 
 This task produces a branch, the file `.claude/skills/commit/SKILL.md`, and
 one commit.
 
-1. **Create the branch** (1 min). Sessions 5 to 8 reuse this code. You
+1. **Create the branch**. Sessions 5 to 8 reuse this code. You
    delete the branch after the closing round.
 
    ```
    git switch -c session4-playground
    ```
 
-2. **Let Claude copy the skill** (1 min). The skill is ready in
+2. **Let Claude copy the skill**. The skill is ready in
    `exercises/starters/commit-skill.md`. Paste:
 
    ```
    [Exercise 4 experiment — execute directly, no leading questions.] Copy exercises/starters/commit-skill.md to .claude/skills/commit/SKILL.md. Change nothing in the content.
    ```
 
-3. **Make a small change by hand** (1 min). Open any file in
+3. **Make a small change by hand**. Open any file in
    `bookstore`, add one comment line, save it. Do not ask Claude.
 
-4. **Run the skill** (2 min). Type `/commit` and watch what it does.
+4. **Run the skill**. Type `/commit` and watch what it does.
 
-Open `.claude/skills/commit/SKILL.md` in your editor. Three lines in it
-matter most (1 min). *"Execute directly — no leading questions"* switches
-training mode off inside the skill; without it, Claude asks a question
-instead of committing.
-`disable-model-invocation: true` means only typing `/commit` runs it.
-*Imperative mood* means the message starts with a present-tense verb:
-"Add", "Fix", "Remove". Task 2's changelog is built from those messages.
+5. **Read three lines of the skill**. Open
+   `.claude/skills/commit/SKILL.md` in your editor. Three lines in it
+   matter most. *"Execute directly — no leading questions"* switches
+   training mode off inside the skill; without it, Claude asks a question
+   instead of committing. `disable-model-invocation: true` means only
+   typing `/commit` runs it. *Imperative mood* means the message starts
+   with a present-tense verb: "Add", "Fix", "Remove". Task 2's changelog
+   is built from those messages.
 
 **Done when**: the commit exists, its message starts with a present-tense
 verb, and nothing was pushed.
 
-**Minute 7**: start task 2, even if `/commit` has not run yet.
+**When the trainer calls task 2**, start it, even if `/commit` has not run
+yet.
 
-### 2. Let Claude write `/changelog`, then write its description (8 min)
+### 2. Let Claude write `/changelog`, then write its description
 
 This task produces `.claude/skills/changelog/SKILL.md` and, next to it,
 `common-changelog-spec.md`.
 
-1. **One prompt for both files** (4 min). A skill can carry extra files,
+1. **One prompt for both files**. A skill can carry extra files,
    loaded only when it runs (*Anatomy of a Skill*). So the specification
    lives next to the skill, not inside it. Paste:
 
@@ -86,13 +89,13 @@ This task produces `.claude/skills/changelog/SKILL.md` and, next to it,
    If your network blocks the page, ask Claude to write the spec file
    from what it knows about Common Changelog.
 
-2. **Check two things** (1 min). `common-changelog-spec.md` holds the group
+2. **Check two things**. `common-changelog-spec.md` holds the group
    names and the rules, not an empty page. The `SKILL.md` frontmatter has
    **no** `disable-model-invocation` line: Claude must be able to start
    this skill by itself. The hook in Part 2 only suggests it; Claude
    decides.
 
-3. **Write the `description`** (3 min). In your editor, replace
+3. **Write the `description`**. In your editor, replace
    `(I write this)`. Claude
    reads only this line when it decides whether to start a skill on its
    own (*Which Description Gets This Skill Invoked at the Right Moment?*).
