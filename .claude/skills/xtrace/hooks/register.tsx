@@ -1,0 +1,459 @@
+import { atom, read, update } from 'claude-code'
+import type { EngineInterface, Register } from 'claude-code'
+import type { Category, Compaction, Row, Selection, Turn } from '../types'
+import { CATEGORIES, parseArgs, withNewCategories, wordsOf } from './args'
+import { attachHookContext, buildReport, counterSegments, firstWords, paletteFor, paneHeaderSegments, paneSegments, paneTotalSegments, turnTotalLines, targetOf, tokensOf, usageText } from './report'
+import { commandsFor, enabledInstalls, pluginsFor } from './hookmatch'
+import type { PluginHooks } from './hookmatch'
+
+// The engine follows `$` and the state atoms only within this file, never across
+// an import, so every helper that takes `$` and every atom is declared here.
+
+const ROW_CAP = 2000
+const TURN_CAP = 200
+
+const ROWS = atom({ plugin: 'xtrace', key: 'rows' } as const, [] as Row[])
+const TURNS = atom({ plugin: 'xtrace', key: 'turns' } as const, [] as Turn[])
+const COMPACTIONS = atom({ plugin: 'xtrace', key: 'compactions' } as const, [] as Compaction[])
+const SELECTION = atom(
+  { plugin: 'xtrace', key: 'selection' } as const,
+  { categories: [...CATEGORIES], scope: 'turn', known: [...CATEGORIES] } as Selection,
+)
+
+let counter = 0
+const mintId = (prefix: string) => `${prefix}-${Date.now().toString(36)}-${(counter++).toString(36)}`
+
+const MCP = /^mcp__([^_]+(?:_[^_]+)*)__(.+)$/
+
+function splitMcp(tool: string): { server: string; name: string } | undefined {
+  const m = MCP.exec(tool)
+  return m && m[1] !== undefined && m[2] !== undefined ? { server: m[1], name: m[2] } : undefined
+}
+
+function addRow($: EngineInterface, row: Row) {
+  return update($, ROWS, list => [...list, row].slice(-ROW_CAP))
+}
+
+function finishRow($: EngineInterface, id: string, patch: Partial<Row>) {
+  return update($, ROWS, list => list.map(r => (r.id === id ? { ...r, ...patch } : r)))
+}
+
+function addTurn($: EngineInterface, turn: Turn) {
+  return update($, TURNS, list => [...list, turn].slice(-TURN_CAP))
+}
+
+// The engine's clock for display only: a report or a drawing never fails for want of it.
+async function nowOrUndefined($: EngineInterface): Promise<number | undefined> {
+  try { return await $.clock.now() } catch { return undefined }
+}
+
+function completeTurn($: EngineInterface, turnId: string, completedAt: number) {
+  return update($, TURNS, list => list.map(t => (t.turnId === turnId ? { ...t, isComplete: true, completedAt } : t)))
+}
+
+async function currentTurnId($: EngineInterface): Promise<string> {
+  const turns = await read($, TURNS)
+  return turns.at(-1)?.turnId ?? 'before-first-turn'
+}
+
+// Merged settings, read in session.start (which a hot reload fires again).
+let settings: unknown = undefined
+
+// The enabled plugins' hooks.json files, read in session.start after settings.
+let pluginHooks: PluginHooks[] = []
+
+async function loadPluginHooks($: EngineInterface, cwd: string | undefined): Promise<PluginHooks[]> {
+  const home = await $.env.get('HOME')
+  const configDir = (await $.env.get('CLAUDE_CONFIG_DIR')) ?? (home !== undefined ? `${home}/.claude` : undefined)
+  if (configDir === undefined) return []
+  const installed = JSON.parse(await $.fs.read(`${configDir}/plugins/installed_plugins.json`))
+  const out: PluginHooks[] = []
+  for (const p of enabledInstalls(settings, installed, cwd)) {
+    try { out.push({ name: p.name, config: JSON.parse(await $.fs.read(`${p.installPath}/hooks/hooks.json`)) }) } catch {}
+  }
+  return out
+}
+
+// One helper for every classic event; each registration names its event literally.
+async function recordHook(event: string, $: EngineInterface, e: any, next: (e: any) => Promise<any>) {
+  const toolName: string | undefined = typeof e.tool_name === 'string' ? e.tool_name : typeof e.tool === 'string' ? e.tool : undefined
+  const id = mintId('hook')
+  let startedAt = 0
+  try {
+    startedAt = await $.clock.now()
+    await addRow($, {
+      id, turnId: await currentTurnId($), kind: 'hooks',
+      name: toolName ? `${event} ${toolName}` : event,
+      target: commandsFor(settings, event, toolName).join(', '),
+      plugins: pluginsFor(pluginHooks, event, toolName).join(', '),
+      outcome: 'running', startedAt,
+    })
+  } catch {}
+  const ran = await next(e)
+  try {
+    const r = (ran ?? {}) as Record<string, unknown>
+    const blocked = r.deny !== undefined || r.block !== undefined || r.preventContinuation === true || r.decision === 'block'
+    const context = Array.isArray(r.additionalContext) && r.additionalContext.length > 0
+    const ms = (await $.clock.now()) - startedAt
+    // Context appended while the hook ran has already marked the row; keep it.
+    await update($, ROWS, list => list.map(row => row.id !== id ? row : {
+      ...row, ms,
+      outcome: blocked ? 'blocked' : context || (row.chars ?? 0) > 0 ? 'context' : 'none',
+    }))
+  } catch {}
+  return ran
+}
+
+// The menu dialog and the live pane.
+
+const MENU = 'xtrace-menu'
+const PANE = 'xtrace'
+const PANE_PREF = 'pane'
+const NARROW = 'xtrace: widen the terminal to 144 columns to see the pane'
+
+function toggleCategory(s: Selection, c: Category): Selection {
+  return {
+    ...s,
+    categories: s.categories.includes(c)
+      ? s.categories.filter(x => x !== c)
+      : CATEGORIES.filter(x => x === c || s.categories.includes(x)),
+  }
+}
+
+async function isPanePreferred($: EngineInterface): Promise<boolean> {
+  try { return (await $.store.get(PANE_PREF)) === true } catch { return false }
+}
+
+async function openPane($: EngineInterface): Promise<void> {
+  const opened = await $.ui.open({ id: PANE, title: 'xtrace' })
+  if (!opened.isPlaced) $.ui.toast(NARROW)
+}
+
+async function setPane($: EngineInterface, mode: 'on' | 'off' | 'toggle'): Promise<'on' | 'off'> {
+  const want = mode === 'toggle' ? !(await isPanePreferred($)) : mode === 'on'
+  await $.store.set(PANE_PREF, want)
+  if (want) await openPane($)
+  else await $.ui.close({ id: PANE })
+  return want ? 'on' : 'off'
+}
+
+export const register: Register = on => {
+  const runningAgents: string[] = []                      // tool_use_ids of Agent calls in flight, newest last
+  const parentOfAgent = new Map<string, string>()         // agentId -> Agent tool_use_id
+
+  on('session.start', async ($, e, next) => {
+    try { settings = await $.settings.read() } catch { settings = undefined }
+    try { await update($, SELECTION, withNewCategories) } catch {}
+    try { pluginHooks = await loadPluginHooks($, e.cwd) } catch { pluginHooks = [] }
+    try {
+      await $.command.register({
+        name: 'xtrace',
+        description: 'Trace every tool, MCP, skill, hook, subagent, command and context access',
+        argumentHint: '[all | tools mcp skills hooks agents commands context model] [session] | pane [on|off]',
+      })
+    } catch {}
+    try {
+      if (await isPanePreferred($)) await openPane($)
+    } catch {}
+    return next(e)
+  })
+
+  on('turn.start', async ($, e, next) => {
+    try {
+      await addTurn($, { turnId: e.turnId, text: firstWords(e.text), startedAt: await $.clock.now(), isComplete: false })
+    } catch {}
+    return next(e)
+  })
+
+  on('turn.complete', async ($, e, next) => {
+    try {
+      if (e.agentId === undefined) await completeTurn($, e.turnId, await $.clock.now())
+    } catch {}
+    return next(e)
+  })
+
+  on('tool.call', async ($, e, next) => {
+    const tool = String(e.tool)
+    const { tool: _t, tool_use_id, agentId, consent: _c, ...args } = e as Record<string, unknown> & { tool_use_id?: string; agentId?: string }
+    const id = typeof tool_use_id === 'string' ? tool_use_id : mintId('call')
+    const mcp = splitMcp(tool)
+    let startedAt = 0
+    try {
+      startedAt = await $.clock.now()
+      const agent = typeof agentId === 'string' ? agentId : undefined
+      let parentId: string | undefined
+      if (agent !== undefined) {
+        parentId = parentOfAgent.get(agent)
+        if (parentId === undefined) {
+          parentId = runningAgents.at(-1)
+          if (parentId !== undefined) parentOfAgent.set(agent, parentId)
+        }
+      }
+      const row: Row = {
+        id,
+        turnId: await currentTurnId($),
+        agentId: agent,
+        parentId,
+        kind: mcp ? 'mcp' : tool === 'Agent' ? 'agents' : 'tools',
+        name: mcp ? `${mcp.server} / ${mcp.name}` : tool === 'Agent' ? String(args.subagent_type ?? 'general-purpose') : tool,
+        target: tool === 'Agent' ? String(args.description ?? '') : targetOf(tool, args),
+        outcome: 'running',
+        startedAt,
+      }
+      await addRow($, row)
+      if (tool === 'Agent') runningAgents.push(id)
+    } catch {}
+
+    try {
+      const ran = await next(e)
+      try {
+        const ms = (await $.clock.now()) - startedAt
+        const outcome: Row['outcome'] = ran.deny !== undefined ? 'denied' : ran.isError === true ? 'error' : 'ok'
+        // What the model reads back: the result text, the deny text, and any reminders riding along.
+        const read = typeof ran.text === 'string' ? ran.text : typeof ran.deny === 'string' ? ran.deny : ''
+        const chars = read.length + (ran.context ?? []).reduce((n: number, c: string) => n + c.length, 0)
+        await finishRow($, id, { outcome, ms, chars })
+      } catch {}
+      return ran
+    } finally {
+      const at = runningAgents.indexOf(id)
+      if (at >= 0) runningAgents.splice(at, 1)
+    }
+  })
+
+  on('agent.spawn', async ($, e, next) => {
+    const ran = await next(e)
+    try {
+      await finishRow($, e.tool_use_id, { detail: ran.model ?? e.model ?? 'inherit' })
+      if (ran.agentId !== undefined) parentOfAgent.set(ran.agentId, e.tool_use_id)
+    } catch {}
+    return ran
+  })
+
+  // One row per model request, with the usage the API reported for it.
+  on('turn.step', async function* ($, e, next) {
+    const id = mintId('step')
+    let startedAt = 0
+    try {
+      startedAt = await $.clock.now()
+      const agent = typeof e.agentId === 'string' ? e.agentId : undefined
+      await addRow($, {
+        id, turnId: await currentTurnId($), agentId: agent,
+        parentId: agent !== undefined ? parentOfAgent.get(agent) ?? runningAgents.at(-1) : undefined,
+        kind: 'model', name: `step ${e.index}`, target: e.model, outcome: 'running', startedAt,
+      })
+    } catch {}
+    const r = yield* next(e)
+    try {
+      const u = r.usage
+      const usage = u ? { model: u.model, input: u.input_tokens, cacheRead: u.cache_read_input_tokens, cacheWrite: u.cache_creation_input_tokens, output: u.output_tokens } : undefined
+      await finishRow($, id, {
+        outcome: usage ? 'ok' : 'error', ms: (await $.clock.now()) - startedAt,
+        usage, target: usage ? usageText(usage) : e.model,
+      })
+    } catch {}
+    return r
+  })
+
+  on('skill.prompt', async ($, e, next) => {
+    const ran = await next(e)
+    try {
+      await addRow($, {
+        id: mintId('skill'), turnId: await currentTurnId($), kind: 'skills',
+        name: e.skill, target: `${ran.text.length} chars`, chars: ran.text.length, outcome: 'ok', startedAt: await $.clock.now(),
+      })
+    } catch {}
+    return ran
+  })
+
+  on('command.run', { command: 'xtrace' }, async ($, e) => {
+    const parsed = parseArgs(e.args)
+    if (parsed.mode === 'error') return { text: parsed.message }
+    if (parsed.mode === 'menu') {
+      const opened = await $.ui.open({ id: MENU, title: 'xtrace', focus: true, closeOnEscape: true, rows: 14 })
+      return { text: opened.isPlaced ? 'xtrace: pick what to show.' : `xtrace: ${opened.reason}` }
+    }
+    if (parsed.mode === 'pane') return { text: `xtrace: live pane ${await setPane($, parsed.pane)}.` }
+    await update($, SELECTION, () => ({ ...parsed.selection, known: [...CATEGORIES] }))
+    const [rows, turns, compactions] = await Promise.all([read($, ROWS), read($, TURNS), read($, COMPACTIONS)])
+    return { text: buildReport({ rows, turns, compactions, selection: parsed.selection, now: await nowOrUndefined($) }) }
+  })
+
+  on('command.run', async ($, e, next) => {
+    if (e.command === 'xtrace') return next(e)
+    const id = mintId('cmd')
+    let startedAt = 0
+    try {
+      startedAt = await $.clock.now()
+      await addRow($, { id, turnId: await currentTurnId($), kind: 'commands', name: e.command, target: e.args, outcome: 'running', startedAt })
+    } catch {}
+    try {
+      const ran = await next(e)
+      try { await finishRow($, id, { outcome: 'ok', ms: (await $.clock.now()) - startedAt }) } catch {}
+      return ran
+    } catch (err) {
+      try { await finishRow($, id, { outcome: 'error', ms: (await $.clock.now()) - startedAt }) } catch {}
+      throw err
+    }
+  })
+
+  on('session.append', async ($, e, next) => {
+    try {
+      if (e.door === 'attachment' || e.door === 'hook-context') {
+        const text = e.message.content.map(b => (b.type === 'text' ? b.text : '')).join('')
+        if (text.length === 0) return next(e)                // an empty append says nothing
+        const turnId = await currentTurnId($)
+        if (e.origin.kind === 'hook') {
+          // A hook's context belongs on its hooks row; a row of its own only when there is none.
+          const event = e.origin.event
+          let merged = false
+          await update($, ROWS, list => {
+            const attached = attachHookContext(list, turnId, event, text.length)
+            merged = attached !== undefined
+            return attached ?? list
+          })
+          if (merged) return next(e)
+        }
+        const name = e.origin.kind === 'hook' ? `hook ${e.origin.event}` : `${e.door} ${e.message.name ?? ''}`.trim()
+        await addRow($, {
+          id: e.uuid, turnId, agentId: e.agentId, kind: 'context',
+          name, target: `${text.length} chars`, chars: text.length, outcome: 'ok', startedAt: await $.clock.now(),
+        })
+      }
+    } catch {}
+    return next(e)
+  })
+
+  on('session.compact', async ($, e, next) => {
+    const ran = await next(e)
+    try {
+      // Only a main-conversation compaction that happened (not a skip or a precompute).
+      if (e.agentId === undefined && ran.skip === undefined && e.trigger !== 'precompute') {
+        const turnId = await currentTurnId($)
+        const at = await $.clock.now()
+        await update($, COMPACTIONS, list => [...list, { at, turnId }].slice(-50))
+      }
+    } catch {}
+    return ran
+  })
+
+  on('classic.PreToolUse', ($, e, next) => recordHook('PreToolUse', $, e, next))
+  on('classic.PostToolUse', ($, e, next) => recordHook('PostToolUse', $, e, next))
+  on('classic.PostToolUseFailure', ($, e, next) => recordHook('PostToolUseFailure', $, e, next))
+  on('classic.UserPromptSubmit', ($, e, next) => recordHook('UserPromptSubmit', $, e, next))
+  on('classic.Stop', ($, e, next) => recordHook('Stop', $, e, next))
+  on('classic.SessionStart', ($, e, next) => recordHook('SessionStart', $, e, next))
+  on('classic.SessionEnd', ($, e, next) => recordHook('SessionEnd', $, e, next))
+  on('classic.SubagentStart', ($, e, next) => recordHook('SubagentStart', $, e, next))
+  on('classic.SubagentStop', ($, e, next) => recordHook('SubagentStop', $, e, next))
+  on('classic.PreCompact', ($, e, next) => recordHook('PreCompact', $, e, next))
+  on('classic.PostCompact', ($, e, next) => recordHook('PostCompact', $, e, next))
+  on('classic.Notification', ($, e, next) => recordHook('Notification', $, e, next))
+  on('classic.PermissionRequest', ($, e, next) => recordHook('PermissionRequest', $, e, next))
+  on('classic.PermissionDenied', ($, e, next) => recordHook('PermissionDenied', $, e, next))
+  on('ui.close', async ($, e, next) => {
+    try {
+      // The person closed the pane with the engine's own key: remember it as off.
+      if (e.id === PANE && e.origin.kind === 'person') await $.store.set(PANE_PREF, false)
+    } catch {}
+    return next(e)
+  })
+
+  on('ui.render', { component: 'Pane', requestId: MENU }, async ($, e) => {
+    const { Box, Text, Button } = $.ui.resolve(e)
+    const s = await read($, SELECTION)
+    const isAll = CATEGORIES.every(c => s.categories.includes(c))
+    const canShow = s.categories.length > 0
+
+    return (
+      <Box flexDirection="column">
+        <Text bold>What should /xtrace show?</Text>
+        {CATEGORIES.map((c, i) => (
+          <Button
+            key={`cat-${c}`}
+            hotkey={String(i + 1)}
+            plain
+            label={`[${s.categories.includes(c) ? 'x' : ' '}] ${c}`}
+            onPress={() => update($, SELECTION, cur => toggleCategory(cur, c))}
+          />
+        ))}
+        <Text> </Text>
+        <Button key="all" hotkey="a" plain label={`[${isAll ? 'x' : ' '}] all`}
+          onPress={() => update($, SELECTION, cur => ({ ...cur, categories: isAll ? [] : [...CATEGORIES] }))} />
+        <Button key="scope" hotkey="s" plain label={`[${s.scope === 'session' ? 'x' : ' '}] whole session`}
+          onPress={() => update($, SELECTION, cur => ({ ...cur, scope: cur.scope === 'session' ? 'turn' : 'session' }))} />
+        <Button key="pane" hotkey="p" plain label="toggle live pane"
+          onPress={async () => { await setPane($, 'toggle') }} />
+        <Text> </Text>
+        <Box gap={2}>
+          <Button key="show" hotkey="0" variant="primary" label="show" dimColor={!canShow}
+            onPress={async () => {
+              if (!canShow) return
+              const cur = await read($, SELECTION)
+              await $.ui.close({ id: MENU })
+              await $.command.run({ command: 'xtrace', args: wordsOf(cur) })
+            }} />
+          <Button key="cancel" role="dismiss" label="cancel" onPress={() => $.ui.close({ id: MENU })} />
+        </Box>
+      </Box>
+    )
+  })
+
+  on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
+    const { Box, Text } = $.ui.resolve(e)
+    const rows: Row[] = await read($, ROWS)
+    const turns: Turn[] = await read($, TURNS)
+    const selection: Selection = await read($, SELECTION)
+    const pal = paletteFor((await $.config.list().catch(() => [])).find(row => row.key === 'theme')?.value)
+    const counters = counterSegments(CATEGORIES.map(c => [c, rows.filter(r => r.kind === c).length]), pal)
+    const turnId = turns.at(-1)?.turnId
+    const picked = new Set(selection.categories)
+    const shown = rows.filter(r => r.turnId === turnId && picked.has(r.kind))
+    const turn = turns.at(-1)
+    const now = await nowOrUndefined($)
+    const total = turn !== undefined && now !== undefined ? turnTotalLines(turn, rows, now) : undefined
+    // Counters, rule, header, the rows, rule, the total's lines, rule.
+    const room = Math.max(1, (e.viewport?.rows ?? 24) - 6 - (total?.length ?? 0))
+    const width = e.props.bodyColumns > 0 ? e.props.bodyColumns : 80
+    const rule = '─'.repeat(Math.max(1, Math.min(width, 120)))
+    const withPlugins = picked.has('hooks')
+    const tokens = tokensOf(rows.filter(r => r.turnId === turnId))
+
+    return (
+      <Box flexDirection="column">
+        <Text wrap="truncate-end">
+          {counters.map((s, i) => <Text key={`count-${i}`} color={s.color}>{s.text}</Text>)}
+        </Text>
+        <Text dimColor>{rule}</Text>
+        {shown.length === 0 && <Text dimColor>No rows in this turn yet.</Text>}
+        {shown.length > 0 && (
+          <Text wrap="truncate-end">
+            {paneHeaderSegments(width, withPlugins, pal).map((s, i) => (
+              <Text key={`head-${i}`} color={s.color} underline={s.underline}>{s.text}</Text>
+            ))}
+          </Text>
+        )}
+        {shown.slice(-room).map(r => (
+          <Text key={r.id} wrap="truncate-end">
+            {paneSegments(r, width, withPlugins, tokens.get(r.id), pal).map((s, i) => (
+              <Text key={`${r.id}-${i}`} color={s.color} bold={s.bold}>{s.text}</Text>
+            ))}
+          </Text>
+        ))}
+        {shown.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
+        {shown.length > 0 && total !== undefined && (
+          <Box flexDirection="column">
+            {total.map((line, n) => (
+              <Text key={`total-${n}`} wrap="truncate-end">
+                {paneTotalSegments(line, width, n === 0, pal).map((s, i) => (
+                  <Text key={`total-${n}-${i}`} color={s.color} bold={s.bold}>{s.text}</Text>
+                ))}
+              </Text>
+            ))}
+          </Box>
+        )}
+        {shown.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
+      </Box>
+    )
+  })
+}
