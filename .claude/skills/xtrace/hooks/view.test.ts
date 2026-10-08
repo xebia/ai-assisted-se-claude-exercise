@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { applyView, canNav, canPage, COLUMNS, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, pageRows, rowWindow, scrollRows, sortMark, turnTitle, viewedTurn, withSort } from './view'
+import { applyView, canNav, canPage, COLUMNS, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, pageRows, rowWindow, scrollRows, scrollStep, sortMark, turnTitle, viewedTurn, withSort } from './view'
 import type { Row, Turn } from '../types'
 
 const row = (over: Partial<Row>): Row => ({
@@ -95,6 +95,8 @@ describe('parseFilter: mistakes are reported, not applied', () => {
     expect(parseFilter('name:').errors).toEqual(['no value for "name:"'])
     expect(parseFilter('name:!').errors).toEqual(['no value after "!" in "name:!"'])
     expect(parseFilter(':x').errors).toEqual(['no column before ":" in ":x"'])
+    expect(parseFilter('kind:,').errors).toEqual(['no value for "kind:,"'])
+    expect(parseFilter('outcome:!,').errors).toEqual(['no value for "outcome:!,"'])
     expect(parseFilter('sort:nope').errors).toEqual([`unknown sort column "nope"; columns: ${COLUMNS.join(' ')}`])
   })
 })
@@ -274,5 +276,14 @@ describe('scrollRows', () => {
   })
   test('rows that fit do not scroll', () => {
     expect(scrollRows(5, 8, undefined, false, -1)).toBeUndefined()
+  })
+})
+
+describe('scroll steps', () => {
+  test('a page key (by the pane height or more) moves one window, not the pane height', () => {
+    expect(scrollStep(-20, 20)).toBe('up')
+    expect(scrollStep(40, 20)).toBe('down')
+    expect(scrollStep(-1, 20)).toBe(-1)
+    expect(scrollStep(3, 20)).toBe(3)
   })
 })

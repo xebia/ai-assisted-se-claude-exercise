@@ -160,7 +160,9 @@ function loopTotals(rows: Row[], sub: boolean): LoopTotals | undefined {
 
 // The spend follows the context: what the loop cost at list price, `+ ?` when a model has no price.
 const growthText = (t: LoopTotals) =>
-  `${t.requests} request(s) · context +${fmtTokens(t.to - t.from)} (${fmtTokens(t.from)} → ${fmtTokens(t.to)}) · ${fmtCost(t.cost)}${t.isPartial ? ' + ?' : ''}`
+  `${t.requests} request(s) · context +${fmtTokens(t.to - t.from)} (${fmtTokens(t.from)} → ${fmtTokens(t.to)}) · ${spendText(t)}`
+const spendText = (t: LoopTotals) =>
+  t.isPartial && t.cost === 0 ? '≈$?' : `${fmtCost(t.cost)}${t.isPartial ? ' + ?' : ''}`
 const splitText = (t: LoopTotals) =>
   `output ${fmtTokens(t.output)} · cache read ${fmtTokens(t.cacheRead)} · uncached ${fmtTokens(t.input)} · cache write ${fmtTokens(t.cacheWrite)}`
 

@@ -83,6 +83,7 @@ function termOf(column: Column, raw: string): Match | string {
   if (value === '') return `no value after "!" in "${column}:${raw}"`
   // kind and outcome are short closed sets: exact, a comma list ORs. The rest: substring.
   const wanted = value.split(',').filter(Boolean)
+  if ((column === 'kind' || column === 'outcome') && wanted.length === 0) return `no value for "${column}:${raw}"`
   const hit = column === 'kind' || column === 'outcome'
     ? (row: Row) => wanted.includes(cellText(row, column).toLowerCase())
     : (row: Row) => cellText(row, column).toLowerCase().includes(value)
@@ -236,6 +237,10 @@ export function scrollRows(count: number, room: number, start: number | undefine
 
 export const pageRows = (count: number, room: number, start: number | undefined, sorted: boolean, dir: Page): number | undefined =>
   scrollRows(count, room, start, sorted, dir === 'up' ? -room : room)
+
+// A page key moves the engine's window by the pane's height; here it moves one row window.
+export const scrollStep = (by: number, bodyRows: number): number | Page =>
+  Math.abs(by) >= bodyRows ? (by < 0 ? 'up' : 'down') : by
 
 export function canPage(count: number, room: number, start: number | undefined, sorted: boolean, dir: Page): boolean {
   const { from } = rowWindow(count, room, start, sorted)

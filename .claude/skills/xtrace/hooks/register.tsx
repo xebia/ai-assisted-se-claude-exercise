@@ -5,7 +5,7 @@ import { CATEGORIES, parseArgs, withNewCategories, wordsOf } from './args'
 import { attachHookContext, buildReport, counterSegments, denialCategory, firstWords, paletteFor, paneHeaderCells, paneSegments, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
 import { commandsFor, enabledInstalls, pluginsFor } from './hookmatch'
 import type { PluginHooks } from './hookmatch'
-import { applyView, canNav, canPage, EXAMPLES, navLabel, navTarget, parseFilter, pageRows, PLACEHOLDER, rowWindow, scrollRows, sortMark, turnTitle, viewedTurn, withSort } from './view'
+import { applyView, canNav, canPage, EXAMPLES, navLabel, navTarget, parseFilter, pageRows, PLACEHOLDER, rowWindow, scrollRows, scrollStep, sortMark, turnTitle, viewedTurn, withSort } from './view'
 import type { Column, Nav, Page } from './view'
 
 // The engine follows `$` and the state atoms only within this file, never across
@@ -164,14 +164,19 @@ async function navigate($: EngineInterface, to: Nav): Promise<void> {
 }
 
 // The row window as last drawn: a scroll or a page press moves it by what was on screen.
-let drawnWindow = { count: 0, room: 1, sorted: false }
+// One pane, so the last drawing is the one on screen.
+let drawnWindow = { count: 0, room: 1, sorted: false, turnId: undefined as string | undefined }
+
+// A row start belongs to the turn it was set on: another turn starts from its default.
+const startFor = (v: View, turnId: string | undefined) => (v.rowTurnId === turnId ? v.rowStart : undefined)
 
 async function moveRows($: EngineInterface, by: number | Page): Promise<void> {
-  const { count, room, sorted } = drawnWindow
+  const { count, room, sorted, turnId } = drawnWindow
   try {
-    await update($, VIEW, v => ({
-      ...v, rowStart: typeof by === 'number' ? scrollRows(count, room, v.rowStart, sorted, by) : pageRows(count, room, v.rowStart, sorted, by),
-    }))
+    await update($, VIEW, v => {
+      const start = startFor(v, turnId)
+      return { ...v, rowTurnId: turnId, rowStart: typeof by === 'number' ? scrollRows(count, room, start, sorted, by) : pageRows(count, room, start, sorted, by) }
+    })
   } catch {}
 }
 
@@ -416,8 +421,10 @@ export const register: Register = on => {
   })
   // The pane is drawn to fit, so the engine never scrolls it: a wheel tick or a
   // scroll key moves the row window instead, and the window stays undrawn.
-  on('ui.scroll', { requestId: PANE }, async ($, e) => {
-    if (drawnWindow.count > drawnWindow.room) await moveRows($, e.by)
+  // Rows that fit leave the scroll to the engine, so a pane too short for its fixed lines still scrolls.
+  on('ui.scroll', { requestId: PANE }, async ($, e, next) => {
+    if (drawnWindow.count <= drawnWindow.room) return next(e)
+    await moveRows($, scrollStep(e.by, e.bodyRows))
     return {}
   })
 
@@ -509,9 +516,10 @@ export const register: Register = on => {
     const overflows = shown.length > base
     const room = overflows ? Math.max(1, base - 1) : base
     const sorted = parsed.sort !== undefined
-    const win = rowWindow(shown.length, room, view.rowStart, sorted)
+    const rowStart = startFor(view, turnId)
+    const win = rowWindow(shown.length, room, rowStart, sorted)
     const visible = shown.slice(win.from, win.to)
-    drawnWindow = { count: shown.length, room, sorted }
+    drawnWindow = { count: shown.length, room, sorted, turnId }
 
     return (
       <Box flexDirection="column">
@@ -560,12 +568,12 @@ export const register: Register = on => {
           </Box>
         )}
         {overflows && (
-          <Box key="paging" flexDirection="row" gap={2}>
+          <Box key="paging" flexDirection="row" gap={2} width={ruleWidth} justifyContent="center">
             {win.from > 0 && <Box key="hidden"><Text dimColor>{`↑ ${win.from} ${sorted ? 'rows above' : 'earlier rows'}`}</Text></Box>}
             <Box flexDirection="row" gap={1}>
               {PAGE.map(b => (
                 <Button key={`page-${b.dir}`} hotkey={b.hotkey} plain label={b.label}
-                  dimColor={!canPage(shown.length, room, view.rowStart, sorted, b.dir)} onPress={() => moveRows($, b.dir)} />
+                  dimColor={!canPage(shown.length, room, rowStart, sorted, b.dir)} onPress={() => moveRows($, b.dir)} />
               ))}
             </Box>
             <Box key="page-label"><Text dimColor>{`rows ${win.from + 1}–${win.to} of ${shown.length}`}</Text></Box>

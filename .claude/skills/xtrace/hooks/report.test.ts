@@ -369,20 +369,20 @@ describe('paneHeaderCells', () => {
 })
 
 describe('cost', () => {
-  const cents = (usd: number | undefined) => (usd === undefined ? undefined : Math.round(usd * 1e6))   // to a millionth of a dollar
+  const micros = (usd: number | undefined) => (usd === undefined ? undefined : Math.round(usd * 1e6))   // to a millionth of a dollar
   const u = (model: string, input: number, cacheRead: number, cacheWrite: number, output: number) => ({ model, input, cacheRead, cacheWrite, output })
   test('list price per token kind; cache writes at the 1-hour rate (2x input)', () => {
     // Opus 5.5: $4 in, $20 out, $0.20 cache read, $8 cache write per MTok.
-    expect(cents(costOf(u('claude-opus-5-5', 1000, 100_000, 2000, 500)))).toBe(cents(0.05))
+    expect(micros(costOf(u('claude-opus-5-5', 1000, 100_000, 2000, 500)))).toBe(micros(0.05))
   })
   test('the model id may carry a suffix or a platform prefix; the longest known name wins', () => {
-    expect(cents(costOf(u('claude-opus-5-5[1m]', 1_000_000, 0, 0, 0)))).toBe(cents(4))
-    expect(cents(costOf(u('claude-opus-5', 1_000_000, 0, 0, 0)))).toBe(cents(5))
-    expect(cents(costOf(u('us.anthropic.claude-sonnet-5-5', 0, 0, 0, 1_000_000)))).toBe(cents(10))
+    expect(micros(costOf(u('claude-opus-5-5[1m]', 1_000_000, 0, 0, 0)))).toBe(micros(4))
+    expect(micros(costOf(u('claude-opus-5', 1_000_000, 0, 0, 0)))).toBe(micros(5))
+    expect(micros(costOf(u('us.anthropic.claude-sonnet-5-5', 0, 0, 0, 1_000_000)))).toBe(micros(10))
   })
   test('Haiku 5.5 costs more once the prompt is over 100K tokens', () => {
-    expect(cents(costOf(u('claude-haiku-5-5', 50_000, 0, 0, 1_000_000)))).toBe(cents(0.005 + 0.5))
-    expect(cents(costOf(u('claude-haiku-5-5', 150_000, 0, 0, 1_000_000)))).toBe(cents(0.075 + 2.5))
+    expect(micros(costOf(u('claude-haiku-5-5', 50_000, 0, 0, 1_000_000)))).toBe(micros(0.005 + 0.5))
+    expect(micros(costOf(u('claude-haiku-5-5', 150_000, 0, 0, 1_000_000)))).toBe(micros(0.075 + 2.5))
   })
   test('an unknown model has no price', () => {
     expect(costOf(u('gpt-9', 1000, 0, 0, 0))).toBeUndefined()
@@ -402,6 +402,11 @@ describe('cost', () => {
     const b = row({ id: 's1', kind: 'model', startedAt: 2002, usage: u('gpt-9', 1000, 100_000, 2000, 500) })
     const done: Turn = { ...turn2, isComplete: true, completedAt: 14300 }
     expect(turnTotalLines(done, [a, b], 0)[0]).toMatch(/≈\$0\.05 \+ \?$/)
+  })
+  test('a loop with no priced model says so instead of claiming under a cent', () => {
+    const b = row({ id: 's1', kind: 'model', startedAt: 2002, usage: u('claude-opus-4-5@20251101', 1000, 100_000, 2000, 500) })
+    const done: Turn = { ...turn2, isComplete: true, completedAt: 14300 }
+    expect(turnTotalLines(done, [b], 0)[0]).toMatch(/· ≈\$\?$/)
   })
 })
 
