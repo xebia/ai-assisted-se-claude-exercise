@@ -90,8 +90,50 @@ export function tokensOf(rows: Row[]): Map<string, string> {
   return new Map([...tokenValues(rows)].map(([id, v]) => [id, `${v.exact ? '+' : '~'}${fmtTokens(v.n)}`]))
 }
 
+// --- Cost -------------------------------------------------------------------
+
+// First-party API list prices, $ per million tokens (claude-api skill, cached 2026-10-06):
+// input, output, cache read. A cache write is priced at the 1-hour rate, 2x input:
+// the usage a mod sees does not split 5-minute from 1-hour writes, and Claude Code
+// writes 1-hour entries, so the figure is an estimate (shown with ≈).
+type Price = { input: number; output: number; cacheRead: number }
+const PRICES: Record<string, Price> = {
+  'claude-fable-5-1': { input: 10, output: 50, cacheRead: 0.25 },
+  'claude-mythos-5-1': { input: 10, output: 50, cacheRead: 0.25 },
+  'claude-fable-5': { input: 10, output: 50, cacheRead: 1 },
+  'claude-mythos-5': { input: 10, output: 50, cacheRead: 1 },
+  'claude-opus-5-5': { input: 4, output: 20, cacheRead: 0.2 },
+  'claude-opus-5': { input: 5, output: 25, cacheRead: 0.5 },
+  'claude-opus-4-8': { input: 5, output: 25, cacheRead: 0.5 },
+  'claude-opus-4-7': { input: 5, output: 25, cacheRead: 0.5 },
+  'claude-opus-4-6': { input: 5, output: 25, cacheRead: 0.5 },
+  'claude-sonnet-5-5': { input: 2, output: 10, cacheRead: 0.2 },
+  'claude-sonnet-5': { input: 2, output: 10, cacheRead: 0.2 },
+  'claude-sonnet-4-6': { input: 3, output: 15, cacheRead: 0.3 },
+  'claude-haiku-5-5': { input: 0.1, output: 0.5, cacheRead: 0.01 },
+  'claude-haiku-4-5': { input: 1, output: 5, cacheRead: 0.1 },
+}
+// Haiku 5.5 is priced higher for prompts over 100K tokens.
+const HAIKU_LONG: Price = { input: 0.5, output: 2.5, cacheRead: 0.05 }
+const CACHE_WRITE = 2
+
+// The longest known name the id contains: `claude-opus-5-5[1m]`, `us.anthropic.claude-sonnet-5-5`.
+function priceOf(u: Usage): Price | undefined {
+  const name = Object.keys(PRICES).filter(k => u.model.includes(k)).sort((a, b) => b.length - a.length)[0]
+  if (name === undefined) return undefined
+  return name === 'claude-haiku-5-5' && contextOf(u) > 100_000 ? HAIKU_LONG : PRICES[name]
+}
+
+export function costOf(u: Usage): number | undefined {
+  const p = priceOf(u)
+  if (p === undefined) return undefined
+  return (u.input * p.input + u.cacheWrite * p.input * CACHE_WRITE + u.cacheRead * p.cacheRead + u.output * p.output) / 1e6
+}
+
+export const fmtCost = (usd: number): string => (usd < 0.01 ? '≈<$0.01' : `≈$${usd.toFixed(2)}`)
+
 // One line per loop for the report: requests, context growth, output, cache split.
-type LoopTotals = { requests: number; from: number; to: number; output: number; cacheRead: number; input: number; cacheWrite: number }
+type LoopTotals = { requests: number; from: number; to: number; output: number; cacheRead: number; input: number; cacheWrite: number; cost: number; isPartial: boolean }
 
 // The main loop's (sub false) or the subagents' (sub true) model requests, summed.
 function loopTotals(rows: Row[], sub: boolean): LoopTotals | undefined {
@@ -105,11 +147,13 @@ function loopTotals(rows: Row[], sub: boolean): LoopTotals | undefined {
   return {
     requests: loop.length, from: contextOf(first), to: contextOf(last),
     output: sum(u => u.output), cacheRead: sum(u => u.cacheRead), input: sum(u => u.input), cacheWrite: sum(u => u.cacheWrite),
+    cost: sum(u => costOf(u) ?? 0), isPartial: loop.some(r => r.usage !== undefined && costOf(r.usage) === undefined),
   }
 }
 
+// The spend follows the context: what the loop cost at list price, `+ ?` when a model has no price.
 const growthText = (t: LoopTotals) =>
-  `${t.requests} request(s) · context +${fmtTokens(t.to - t.from)} (${fmtTokens(t.from)} → ${fmtTokens(t.to)})`
+  `${t.requests} request(s) · context +${fmtTokens(t.to - t.from)} (${fmtTokens(t.from)} → ${fmtTokens(t.to)}) · ${fmtCost(t.cost)}${t.isPartial ? ' + ?' : ''}`
 const splitText = (t: LoopTotals) =>
   `output ${fmtTokens(t.output)} · cache read ${fmtTokens(t.cacheRead)} · uncached ${fmtTokens(t.input)} · cache write ${fmtTokens(t.cacheWrite)}`
 

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { attachHookContext, counterSegments, DARK, LIGHT, msStyle, paletteFor, buildReport, firstWords, fmtDuration, fmtTokens, outcomeStyle, paneHeader, paneHeaderCells, paneLine, paneSegments, paneTotalSegments, scopedTurns, targetOf, tokenStyle, tokenTotals, tokenValues, tokensOf, turnTotal, turnTotalLines } from './report'
+import { attachHookContext, costOf, counterSegments, fmtCost, DARK, LIGHT, msStyle, paletteFor, buildReport, firstWords, fmtDuration, fmtTokens, outcomeStyle, paneHeader, paneHeaderCells, paneLine, paneSegments, paneTotalSegments, scopedTurns, targetOf, tokenStyle, tokenTotals, tokenValues, tokensOf, turnTotal, turnTotalLines } from './report'
 import type { Row, Turn } from '../types'
 
 const turn1: Turn = { turnId: 't1', text: 'find the n plus one', startedAt: 1000, isComplete: true }
@@ -203,7 +203,7 @@ describe('tokens', () => {
   })
   test('totals per loop', () => {
     const [line] = tokenTotals([step0, read, step1])
-    expect(line).toBe('Tokens: 2 request(s) · context +2.7k (10.0k → 12.7k) · output 250 · cache read 19.0k · uncached 600 · cache write 3.1k')
+    expect(line).toBe('Tokens: 2 request(s) · context +2.7k (10.0k → 12.7k) · ≈$0.04 · output 250 · cache read 19.0k · uncached 600 · cache write 3.1k')
   })
   test('the report has a Tokens column and the totals', () => {
     const text = buildReport({ rows: [step0, read, ctx, step1], turns: [turn2], compactions: [], selection: { categories: ['tools', 'model'], scope: 'turn' } })
@@ -276,11 +276,11 @@ describe('turn totals', () => {
   })
   test('a finished turn: time from prompt to answer, then its tokens', () => {
     expect(turnTotalLines(done, [step0, step1], 99999)).toEqual([
-      'Total: 12.3s · 2 request(s) · context +2.7k (10.0k → 12.7k)',
+      'Total: 12.3s · 2 request(s) · context +2.7k (10.0k → 12.7k) · ≈$0.04',
       'output 250 · cache read 19.0k · uncached 600 · cache write 3.1k',
     ])
     expect(turnTotal(done, [step0, step1], 99999)).toBe(
-      'Total: 12.3s · 2 request(s) · context +2.7k (10.0k → 12.7k) · output 250 · cache read 19.0k · uncached 600 · cache write 3.1k')
+      'Total: 12.3s · 2 request(s) · context +2.7k (10.0k → 12.7k) · ≈$0.04 · output 250 · cache read 19.0k · uncached 600 · cache write 3.1k')
   })
   test('a running turn counts to now', () => {
     expect(turnTotal({ ...done, isComplete: false, completedAt: undefined }, [step0], 7000)).toMatch(/^Total: 5\.0s so far · 1 request\(s\)/)
@@ -301,7 +301,7 @@ describe('turn totals', () => {
   })
   test('the report still reads the subagent part as one line', () => {
     const sub = { ...step0, id: 'a0', agentId: 'ag1' }
-    expect(turnTotal(done, [step0, sub], 0)).toMatch(/subagents: 1 request\(s\) · context [^·]+· output /)
+    expect(turnTotal(done, [step0, sub], 0)).toMatch(/subagents: 1 request\(s\) · context [^·]+· ≈\$\d+\.\d\d · output /)
   })
   test('the report puts the total under each turn; several turns also get a session line', () => {
     const t1: Turn = { ...turn1, isComplete: true, completedAt: 1500 }
@@ -365,5 +365,42 @@ describe('paneHeaderCells', () => {
     const ms = paneHeaderCells(100, false, { ms: '▼' }).find(c => c.column === 'ms')
     expect(ms?.text.trim()).toBe('ms▼')
     expect(ms?.text.startsWith(' ')).toBe(true)                  // still right-aligned
+  })
+})
+
+describe('cost', () => {
+  const cents = (usd: number | undefined) => (usd === undefined ? undefined : Math.round(usd * 1e6))   // to a millionth of a dollar
+  const u = (model: string, input: number, cacheRead: number, cacheWrite: number, output: number) => ({ model, input, cacheRead, cacheWrite, output })
+  test('list price per token kind; cache writes at the 1-hour rate (2x input)', () => {
+    // Opus 5.5: $4 in, $20 out, $0.20 cache read, $8 cache write per MTok.
+    expect(cents(costOf(u('claude-opus-5-5', 1000, 100_000, 2000, 500)))).toBe(cents(0.05))
+  })
+  test('the model id may carry a suffix or a platform prefix; the longest known name wins', () => {
+    expect(cents(costOf(u('claude-opus-5-5[1m]', 1_000_000, 0, 0, 0)))).toBe(cents(4))
+    expect(cents(costOf(u('claude-opus-5', 1_000_000, 0, 0, 0)))).toBe(cents(5))
+    expect(cents(costOf(u('us.anthropic.claude-sonnet-5-5', 0, 0, 0, 1_000_000)))).toBe(cents(10))
+  })
+  test('Haiku 5.5 costs more once the prompt is over 100K tokens', () => {
+    expect(cents(costOf(u('claude-haiku-5-5', 50_000, 0, 0, 1_000_000)))).toBe(cents(0.005 + 0.5))
+    expect(cents(costOf(u('claude-haiku-5-5', 150_000, 0, 0, 1_000_000)))).toBe(cents(0.075 + 2.5))
+  })
+  test('an unknown model has no price', () => {
+    expect(costOf(u('gpt-9', 1000, 0, 0, 0))).toBeUndefined()
+  })
+  test('formatted to the cent, tiny amounts as under a cent', () => {
+    expect(fmtCost(0.4249)).toBe('≈$0.42')
+    expect(fmtCost(12.5)).toBe('≈$12.50')
+    expect(fmtCost(0.004)).toBe('≈<$0.01')
+  })
+  test('the total puts the spend after the context', () => {
+    const step = row({ id: 's0', kind: 'model', startedAt: 2001, usage: u('claude-opus-5-5', 1000, 100_000, 2000, 500) })
+    const done: Turn = { ...turn2, isComplete: true, completedAt: 14300 }
+    expect(turnTotalLines(done, [step], 0)[0]).toMatch(/context \+0 \(103\.0k → 103\.0k\) · ≈\$0\.05$/)
+  })
+  test('a loop with an unpriced model says the spend is partial', () => {
+    const a = row({ id: 's0', kind: 'model', startedAt: 2001, usage: u('claude-opus-5-5', 1000, 100_000, 2000, 500) })
+    const b = row({ id: 's1', kind: 'model', startedAt: 2002, usage: u('gpt-9', 1000, 100_000, 2000, 500) })
+    const done: Turn = { ...turn2, isComplete: true, completedAt: 14300 }
+    expect(turnTotalLines(done, [a, b], 0)[0]).toMatch(/≈\$0\.05 \+ \?$/)
   })
 })
