@@ -505,9 +505,9 @@ export const register: Register = on => {
     const marks = parsed.sort !== undefined ? { [parsed.sort.column]: sortMark(parsed.sort, parsed.sort.column) } : {}
     const header = paneHeaderCells(width, withPlugins, marks)
     // Unsorted, the newest rows that fit; sorted, the first ones in order.
-    // A turn that overflows gives two lines to the earlier-rows hint and the paging row.
+    // A turn that overflows gives one line to the paging line: the earlier-rows hint and its controls.
     const overflows = shown.length > base
-    const room = overflows ? Math.max(1, base - 2) : base
+    const room = overflows ? Math.max(1, base - 1) : base
     const sorted = parsed.sort !== undefined
     const win = rowWindow(shown.length, room, view.rowStart, sorted)
     const visible = shown.slice(win.from, win.to)
@@ -559,7 +559,18 @@ export const register: Register = on => {
             })}
           </Box>
         )}
-        {overflows && win.from > 0 && <Box key="hidden"><Text dimColor>{`↑ ${win.from} ${sorted ? 'rows above' : 'earlier rows'}`}</Text></Box>}
+        {overflows && (
+          <Box key="paging" flexDirection="row" gap={2}>
+            {win.from > 0 && <Box key="hidden"><Text dimColor>{`↑ ${win.from} ${sorted ? 'rows above' : 'earlier rows'}`}</Text></Box>}
+            <Box flexDirection="row" gap={1}>
+              {PAGE.map(b => (
+                <Button key={`page-${b.dir}`} hotkey={b.hotkey} plain label={b.label}
+                  dimColor={!canPage(shown.length, room, view.rowStart, sorted, b.dir)} onPress={() => moveRows($, b.dir)} />
+              ))}
+            </Box>
+            <Box key="page-label"><Text dimColor>{`rows ${win.from + 1}–${win.to} of ${shown.length}`}</Text></Box>
+          </Box>
+        )}
         {visible.map(r => (
           <Text key={r.id} wrap="truncate-end">
             {paneSegments(r, width, withPlugins, tokens.get(r.id), pal).map((s, i) => (
@@ -583,15 +594,6 @@ export const register: Register = on => {
         )}
         {selected.length > 0 && isFiltered && <Box key="shown"><Text dimColor>{`${shown.length} of ${selected.length} rows shown`}</Text></Box>}
         {selected.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
-        {overflows && (
-          <Box key="paging" flexDirection="row" gap={1} width={ruleWidth} justifyContent="center">
-            {PAGE.map(b => (
-              <Button key={`page-${b.dir}`} hotkey={b.hotkey} plain label={b.label}
-                dimColor={!canPage(shown.length, room, view.rowStart, sorted, b.dir)} onPress={() => moveRows($, b.dir)} />
-            ))}
-            <Box key="page-label"><Text dimColor>{`rows ${win.from + 1}–${win.to} of ${shown.length}`}</Text></Box>
-          </Box>
-        )}
         {turns.length > 0 && (
           <Box key="nav" flexDirection="row" gap={1} width={ruleWidth} justifyContent="center">
             {NAV.map(b => {
