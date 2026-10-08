@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { attachHookContext, counterSegments, DARK, LIGHT, msStyle, paletteFor, buildReport, firstWords, fmtDuration, fmtTokens, outcomeStyle, paneHeader, paneHeaderSegments, paneLine, paneSegments, paneTotalSegments, scopedTurns, targetOf, tokenStyle, tokenTotals, tokensOf, turnTotal, turnTotalLines } from './report'
+import { attachHookContext, counterSegments, DARK, LIGHT, msStyle, paletteFor, buildReport, firstWords, fmtDuration, fmtTokens, outcomeStyle, paneHeader, paneHeaderCells, paneHeaderSegments, paneLine, paneSegments, paneTotalSegments, scopedTurns, targetOf, tokenStyle, tokenTotals, tokenValues, tokensOf, turnTotal, turnTotalLines } from './report'
 import type { Row, Turn } from '../types'
 
 const turn1: Turn = { turnId: 't1', text: 'find the n plus one', startedAt: 1000, isComplete: true }
@@ -319,5 +319,47 @@ describe('turn totals', () => {
     const second = paneTotalSegments('output 250 · cache read 19.0k · uncached 600 · cache write 3.1k', 30, false)
     expect(second[0]).toEqual({ text: '         ' })
     expect(second.map(s => s.text).join('')).toHaveLength(28)
+  })
+})
+
+describe('tokenValues', () => {
+  const step = (id: string, startedAt: number, input: number, output: number): Row =>
+    row({ id, kind: 'model', name: 'step', startedAt, usage: { model: 'm', input, cacheRead: 0, cacheWrite: 0, output } })
+  test('model rows are exact: their output', () => {
+    const v = tokenValues([step('s0', 1, 1000, 200)])
+    expect(v.get('s0')).toEqual({ n: 200, exact: true })
+  })
+  test('rows with text are estimates: chars / 4, rounded up', () => {
+    expect(tokenValues([row({ id: 'r1', chars: 4001 })]).get('r1')).toEqual({ n: 1001, exact: false })
+  })
+  test('rows between two requests share the measured growth by their text', () => {
+    const v = tokenValues([step('s0', 1, 1000, 100), row({ id: 'r1', startedAt: 2, chars: 300 }), row({ id: 'r2', startedAt: 3, chars: 100 }), step('s1', 4, 1500, 50)])
+    expect(v.get('r1')).toEqual({ n: 300, exact: false })    // grown 400 = 1500 - 1000 - 100, 3/4 of it
+    expect(v.get('r2')).toEqual({ n: 100, exact: false })
+  })
+  test('tokensOf formats the same values', () => {
+    const rows = [step('s0', 1, 1000, 200), row({ id: 'r1', startedAt: 2, chars: 4000 })]
+    expect(tokensOf(rows).get('s0')).toBe('+200')
+    expect(tokensOf(rows).get('r1')).toBe('~1.0k')
+  })
+})
+
+describe('paneHeaderCells', () => {
+  test('one cell per visible column, fitted like the rows', () => {
+    const cells = paneHeaderCells(100, false)
+    expect(cells.map(c => c.column)).toEqual(['kind', 'name', 'target', 'outcome', 'tokens', 'ms'])
+    expect(cells.map(c => c.text).join(' ').trimEnd()).toBe(paneHeader(100, false))
+  })
+  test('plugins appears only with hooks', () => {
+    expect(paneHeaderCells(100, true).map(c => c.column)).toContain('plugins')
+  })
+  test('a mark is appended when it fits, else takes the last place', () => {
+    const name = paneHeaderCells(100, false, { name: '▲' }).find(c => c.column === 'name')
+    expect(name?.text.trim()).toBe('name▲')
+    const outcome = paneHeaderCells(100, false, { outcome: '▼' }).find(c => c.column === 'outcome')
+    expect(outcome?.text.trim()).toBe('outcom▼')                 // the column is 7 wide
+    const ms = paneHeaderCells(100, false, { ms: '▼' }).find(c => c.column === 'ms')
+    expect(ms?.text.trim()).toBe('ms▼')
+    expect(ms?.text.startsWith(' ')).toBe(true)                  // still right-aligned
   })
 })

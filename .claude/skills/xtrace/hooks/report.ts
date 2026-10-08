@@ -57,12 +57,14 @@ export function usageText(u: Usage): string {
 // exact. Other rows with text: about chars / 4, then corrected per loop: the
 // growth between two requests (next context − this context − this output)
 // is split over the rows recorded between them by their share of the text.
-export function tokensOf(rows: Row[]): Map<string, string> {
-  const out = new Map<string, string>()
+export type TokenValue = { n: number; exact: boolean }
+
+export function tokenValues(rows: Row[]): Map<string, TokenValue> {
+  const out = new Map<string, TokenValue>()
   const groups = new Map<string, Row[]>()
   for (const r of rows) {
-    if (r.kind === 'model' && r.usage !== undefined) out.set(r.id, `+${fmtTokens(r.usage.output)}`)   // what it wrote; stays in the context
-    else if (r.chars !== undefined && r.chars > 0) out.set(r.id, `~${fmtTokens(Math.ceil(r.chars / 4))}`)
+    if (r.kind === 'model' && r.usage !== undefined) out.set(r.id, { n: r.usage.output, exact: true })   // what it wrote; stays in the context
+    else if (r.chars !== undefined && r.chars > 0) out.set(r.id, { n: Math.ceil(r.chars / 4), exact: false })
     const key = `${r.turnId}|${r.agentId ?? ''}`
     groups.set(key, [...(groups.get(key) ?? []), r])
   }
@@ -77,10 +79,15 @@ export function tokensOf(rows: Row[]): Map<string, string> {
       const between = sorted.filter(r => r.kind !== 'model' && r.startedAt > a.startedAt && r.startedAt < b.startedAt && (r.chars ?? 0) > 0)
       const chars = between.reduce((sum, r) => sum + (r.chars ?? 0), 0)
       if (grown <= 0 || chars === 0) continue
-      for (const r of between) out.set(r.id, `~${fmtTokens((grown * (r.chars ?? 0)) / chars)}`)
+      for (const r of between) out.set(r.id, { n: (grown * (r.chars ?? 0)) / chars, exact: false })
     }
   }
   return out
+}
+
+// The same values as the pane and the report print them: `+310`, `~1.0k`.
+export function tokensOf(rows: Row[]): Map<string, string> {
+  return new Map([...tokenValues(rows)].map(([id, v]) => [id, `${v.exact ? '+' : '~'}${fmtTokens(v.n)}`]))
 }
 
 // One line per loop for the report: requests, context growth, output, cache split.
@@ -285,6 +292,21 @@ function paneCells(cells: string[], paneWidth: number, withPlugins: boolean): st
 
 export function paneHeader(width: number, withPlugins: boolean): string {
   return paneCells(withPlugins ? PANE_HEADER : PANE_HEADER.filter(h => h !== 'plugins'), width, withPlugins)
+}
+
+// The header's cells for the pane's sort buttons, fitted like the rows. A
+// sorted column ends in its mark; where the label fills the column the mark
+// takes its last place, so it is never cut off.
+export function paneHeaderCells(width: number, withPlugins: boolean, marks: Partial<Record<string, string>> = {}): { column: string; text: string }[] {
+  const labels = withPlugins ? PANE_HEADER : PANE_HEADER.filter(h => h !== 'plugins')
+  const widths = paneWidths(Math.max(1, width - PANE_MARGIN), withPlugins)
+  const marked = labels.map((label, i) => {
+    const mark = marks[label] ?? ''
+    const w = widths[i] ?? 0
+    return mark === '' || label.length + mark.length <= w ? label + mark : label.slice(0, Math.max(0, w - mark.length)) + mark
+  })
+  const fitted = fitCells(marked, width, withPlugins)
+  return labels.map((column, i) => ({ column, text: fitted[i] ?? '' }))
 }
 
 export function paneLine(row: Row, width: number, withPlugins: boolean, tokens = ''): string {
