@@ -434,6 +434,9 @@ describe('pane filter and sort', () => {
     const ui = await twoRows($, on)
     expect((await ui.find({ key: 'filter' }))?.props.placeholder).toBe('try: outcome:!ok · kind:tools sort:-ms · tokens:>5k')
     expect((await ui.find({ key: 'filter' }))?.props.autoFocus).toBe(true)        // the cursor starts in the filter
+    // The label is the mod's own, brighter than the engine's dim examples.
+    expect((await ui.find({ key: 'filter' }))?.props.label).toBeUndefined()
+    expect((await ui.find({ key: 'filter-label' }))?.text).toBe('filter:')
   })
 
   test('typing a filter narrows the rows and shows the count', async ($, on) => {
