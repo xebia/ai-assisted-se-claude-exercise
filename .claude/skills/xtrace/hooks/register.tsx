@@ -451,8 +451,12 @@ export const register: Register = on => {
     const now = await nowOrUndefined($)
     const total = turn !== undefined && now !== undefined ? turnTotalLines(turn, rows, now) : undefined
     const extra = (view.help ? EXAMPLES.length : 0) + (parsed.errors.length > 0 ? 1 : 0) + (isFiltered ? 1 : 0)
-    // Counters, filter bar, rule, prompt, header, the rows, rule, the total's lines, rule, nav.
-    const room = Math.max(1, (e.viewport?.rows ?? 24) - 8 - (turn !== undefined ? 1 : 0) - extra - (total?.length ?? 0))
+    const agentsAt = total?.findIndex(line => line.startsWith('subagents:')) ?? -1
+    // The pane's own rows, not the terminal's: content taller than the pane scrolls,
+    // and a scrolled pane draws the filter's cursor on the wrong row.
+    const bodyRows = e.props.scroll.bodyRows > 0 ? e.props.scroll.bodyRows : (e.viewport?.rows ?? 24)
+    // Counters, filter bar, rule, [prompt, rule,] header, the rows, rule, the total's lines, rule, nav.
+    const room = Math.max(1, bodyRows - 7 - (turn !== undefined ? 2 : 0) - extra - (total?.length ?? 0) - (agentsAt > 0 ? 1 : 0))
     const width = e.props.bodyColumns > 0 ? e.props.bodyColumns : 80
     const ruleWidth = Math.max(1, Math.min(width, 120))
     const rule = '─'.repeat(ruleWidth)
@@ -468,7 +472,7 @@ export const register: Register = on => {
           {counters.map((s, i) => <Text key={`count-${i}`} color={s.color}>{s.text}</Text>)}
         </Text>
         <Box flexDirection="row" gap={2}>
-          <Input key="filter" label="filter:" placeholder={PLACEHOLDER} value={view.filter} submitLabel="keep"
+          <Input key="filter" label="filter:" autoFocus placeholder={PLACEHOLDER} value={view.filter} submitLabel="keep"
             onInput={value => setFilter($, value)} onSubmit={value => setFilter($, value)} />
           <Button key="help" hotkey="h" plain label="?"
             onPress={async () => { try { await update($, VIEW, v => ({ ...v, help: !v.help })) } catch {} }} />
@@ -486,6 +490,7 @@ export const register: Register = on => {
             </Text>
           </Box>
         )}
+        {turn !== undefined && <Text dimColor>{rule}</Text>}
         {isEvicted && <Box key="evicted"><Text dimColor>rows for this turn fell out of the 2000-row buffer</Text></Box>}
         {!isEvicted && selected.length === 0 && <Text dimColor>No rows in this turn yet.</Text>}
         {selected.length > 0 && (
@@ -513,13 +518,15 @@ export const register: Register = on => {
         {selected.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
         {selected.length > 0 && total !== undefined && (
           <Box flexDirection="column">
-            {total.map((line, n) => (
+            {total.flatMap((line, n) => [
+              // A short rule sets the subagents' block apart from the main loop's.
+              ...(n === agentsAt && n > 0 ? [<Text key="agents-rule" dimColor>{'╌'.repeat(Math.min(24, ruleWidth))}</Text>] : []),
               <Text key={`total-${n}`} wrap="truncate-end">
                 {paneTotalSegments(line, width, n === 0, pal).map((s, i) => (
                   <Text key={`total-${n}-${i}`} color={s.color} bold={s.bold}>{s.text}</Text>
                 ))}
-              </Text>
-            ))}
+              </Text>,
+            ])}
           </Box>
         )}
         {selected.length > 0 && isFiltered && <Box key="shown"><Text dimColor>{`${shown.length} of ${selected.length} rows shown`}</Text></Box>}

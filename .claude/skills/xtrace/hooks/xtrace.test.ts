@@ -433,6 +433,7 @@ describe('pane filter and sort', () => {
   test('the empty bar shows examples', async ($, on) => {
     const ui = await twoRows($, on)
     expect((await ui.find({ key: 'filter' }))?.props.placeholder).toBe('try: outcome:!ok · kind:tools sort:-ms · tokens:>5k')
+    expect((await ui.find({ key: 'filter' }))?.props.autoFocus).toBe(true)        // the cursor starts in the filter
   })
 
   test('typing a filter narrows the rows and shows the count', async ($, on) => {
@@ -470,6 +471,20 @@ describe('pane filter and sort', () => {
     expect(await ui.find({ type: 'Text', text: /slowest first/ })).toBeUndefined()
     await ui.press({ key: 'help' })
     expect(await ui.find({ type: 'Text', text: /kind:tools sort:-ms\s+tool calls, slowest first/ })).toBeDefined()
+  })
+})
+
+describe('pane height', () => {
+  test('the rows fit the pane\'s own rows, so it never scrolls', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await xtrace($, 'tools')
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    for (let i = 0; i < 30; i++) await $.tool.call({ tool: 'Bash', command: `echo ${i}`, tool_use_id: `u${i}` })
+    const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+    // 20 body rows less counters, filter, rule, prompt, rule, header, rule, total, rule, nav.
+    expect(await ui.findAll({ type: 'Text', text: /^tools\s+Bash\s/ })).toHaveLength(10)
   })
 })
 

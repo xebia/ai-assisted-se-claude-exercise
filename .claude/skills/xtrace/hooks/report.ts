@@ -149,7 +149,7 @@ export function turnTotalLines(turn: Turn, rows: Row[], now: number): string[] {
   const sub = loopTotals(own, true)
   const lines = [`Total: ${time} · ${main ? growthText(main) : 'no model requests recorded'}`]
   if (main) lines.push(splitText(main))
-  if (sub) lines.push(`subagents: ${growthText(sub)} · ${splitText(sub)}`)
+  if (sub) lines.push(`subagents: ${growthText(sub)}`, splitText(sub))
   return lines
 }
 
@@ -422,9 +422,11 @@ const NAME_COLUMN = paneWidths(80, false)[0]! + 1
 // are indented to the same place.
 export function paneTotalSegments(line: string, width: number, isFirst: boolean, pal: Palette = DARK): Segment[] {
   const room = Math.max(1, width - PANE_MARGIN - NAME_COLUMN)
-  const lead: Segment = isFirst && line.startsWith('Total:')
-    ? { text: 'Total:'.padEnd(NAME_COLUMN), color: pal.value, bold: true }
+  // `Total:` heads the first line, `Agents:` the subagents' block; the rest are indented.
+  const head = isFirst && line.startsWith('Total:') ? 'Total:' : line.startsWith('subagents:') ? 'subagents:' : undefined
+  const lead: Segment = head !== undefined
+    ? { text: (head === 'Total:' ? 'Total:' : 'Agents:').padEnd(NAME_COLUMN), color: pal.value, bold: true }
     : { text: ' '.repeat(NAME_COLUMN) }
-  const rest = isFirst && line.startsWith('Total:') ? line.slice('Total:'.length).trim() : line
+  const rest = head !== undefined ? line.slice(head.length).trim() : line
   return [lead, ...labelValueSegments(trim(rest, room), pal)]
 }

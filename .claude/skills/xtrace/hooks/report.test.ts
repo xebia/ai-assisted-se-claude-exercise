@@ -293,7 +293,15 @@ describe('turn totals', () => {
   })
   test('subagents get their own part', () => {
     const sub = { ...step0, id: 'a0', agentId: 'ag1' }
-    expect(turnTotalLines(done, [step0, sub], 0)[2]).toMatch(/^subagents: 1 request\(s\) · /)
+    const lines = turnTotalLines(done, [step0, sub], 0)
+    expect(lines[2]).toMatch(/^subagents: 1 request\(s\) · context /)    // overall first
+    expect(lines[2]).not.toContain('output')
+    expect(lines[3]).toMatch(/^output /)                                  // the detail on its own line
+    expect(lines).toHaveLength(4)
+  })
+  test('the report still reads the subagent part as one line', () => {
+    const sub = { ...step0, id: 'a0', agentId: 'ag1' }
+    expect(turnTotal(done, [step0, sub], 0)).toMatch(/subagents: 1 request\(s\) · context [^·]+· output /)
   })
   test('the report puts the total under each turn; several turns also get a session line', () => {
     const t1: Turn = { ...turn1, isComplete: true, completedAt: 1500 }
@@ -312,6 +320,9 @@ describe('turn totals', () => {
     const second = paneTotalSegments('output 250 · cache read 19.0k · uncached 600 · cache write 3.1k', 30, false)
     expect(second[0]).toEqual({ text: '         ' })
     expect(second.map(s => s.text).join('')).toHaveLength(28)
+    const agents = paneTotalSegments('subagents: 1 request(s) · context +0 (48.3k → 48.3k)', 100, false)
+    expect(agents[0]).toEqual({ text: 'Agents:  ', color: DARK.value, bold: true })
+    expect(agents.map(s => s.text).join('')).not.toContain('subagents')
   })
 })
 
