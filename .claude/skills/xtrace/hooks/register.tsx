@@ -5,8 +5,8 @@ import { CATEGORIES, parseArgs, withNewCategories, wordsOf } from './args'
 import { attachHookContext, buildReport, counterSegments, firstWords, paletteFor, paneHeaderCells, paneSegments, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
 import { commandsFor, enabledInstalls, pluginsFor } from './hookmatch'
 import type { PluginHooks } from './hookmatch'
-import { applyView, EXAMPLES, parseFilter, PLACEHOLDER, sortMark, withSort } from './view'
-import type { Column } from './view'
+import { applyView, canNav, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, sortMark, viewedTurn, withSort } from './view'
+import type { Column, Nav } from './view'
 
 // The engine follows `$` and the state atoms only within this file, never across
 // an import, so every helper that takes `$` and every atom is declared here.
@@ -148,6 +148,23 @@ async function setFilter($: EngineInterface, filter: string): Promise<void> {
 async function sortBy($: EngineInterface, column: Column): Promise<void> {
   try { await update($, VIEW, v => ({ ...v, filter: withSort(v.filter, column) })) } catch {}
 }
+
+// Read the turns at press time, so a press at an end (or a fast double press) is a no-op.
+async function navigate($: EngineInterface, to: Nav): Promise<void> {
+  try {
+    const turns = await read($, TURNS)
+    const { pinnedTurnId } = await read($, VIEW)
+    if (!canNav(turns, pinnedTurnId, to)) return
+    await update($, VIEW, v => ({ ...v, pinnedTurnId: navTarget(turns, v.pinnedTurnId, to) }))
+  } catch {}
+}
+
+const NAV: { to: Nav; hotkey: string; label: string }[] = [
+  { to: 'first', hotkey: 'f', label: '⏮' },
+  { to: 'prev', hotkey: 'p', label: '◀' },
+  { to: 'next', hotkey: 'n', label: '▶' },
+  { to: 'latest', hotkey: 'l', label: '⏭' },
+]
 
 export const register: Register = on => {
   const runningAgents: string[] = []                      // tool_use_ids of Agent calls in flight, newest last
@@ -419,10 +436,12 @@ export const register: Register = on => {
     const view: View = await read($, VIEW)
     const pal = paletteFor((await $.config.list().catch(() => [])).find(row => row.key === 'theme')?.value)
     const counters = counterSegments(CATEGORIES.map(c => [c, rows.filter(r => r.kind === c).length]), pal)
-    const turn = turns.at(-1)
+    const { turn } = viewedTurn(turns, view.pinnedTurnId)
     const turnId = turn?.turnId
     const picked = new Set(selection.categories)
     const turnRows = rows.filter(r => r.turnId === turnId)
+    // An old turn with no rows left: the 2000-row buffer dropped them.
+    const isEvicted = turn !== undefined && turnRows.length === 0 && rows.length >= ROW_CAP
     const tokens = tokensOf(turnRows)
     const counts = new Map([...tokenValues(turnRows)].map(([id, v]) => [id, v.n]))
     const parsed = parseFilter(view.filter)
@@ -432,8 +451,8 @@ export const register: Register = on => {
     const now = await nowOrUndefined($)
     const total = turn !== undefined && now !== undefined ? turnTotalLines(turn, rows, now) : undefined
     const extra = (view.help ? EXAMPLES.length : 0) + (parsed.errors.length > 0 ? 1 : 0) + (isFiltered ? 1 : 0)
-    // Counters, filter bar, rule, header, the rows, rule, the total's lines, rule.
-    const room = Math.max(1, (e.viewport?.rows ?? 24) - 7 - extra - (total?.length ?? 0))
+    // Counters, filter bar, rule, header, the rows, rule, the total's lines, rule, nav.
+    const room = Math.max(1, (e.viewport?.rows ?? 24) - 8 - extra - (total?.length ?? 0))
     const width = e.props.bodyColumns > 0 ? e.props.bodyColumns : 80
     const rule = '─'.repeat(Math.max(1, Math.min(width, 120)))
     const withPlugins = picked.has('hooks')
@@ -458,7 +477,8 @@ export const register: Register = on => {
           <Text key={`example-${x.text}`} dimColor wrap="truncate-end">{`  ${x.text.padEnd(28)} ${x.meaning}`}</Text>
         ))}
         <Text dimColor>{rule}</Text>
-        {selected.length === 0 && <Text dimColor>No rows in this turn yet.</Text>}
+        {isEvicted && <Box key="evicted"><Text dimColor>rows for this turn fell out of the 2000-row buffer</Text></Box>}
+        {!isEvicted && selected.length === 0 && <Text dimColor>No rows in this turn yet.</Text>}
         {selected.length > 0 && (
           <Box flexDirection="row">
             {header.flatMap((c, i) => {
@@ -495,6 +515,16 @@ export const register: Register = on => {
         )}
         {selected.length > 0 && isFiltered && <Box key="shown"><Text dimColor>{`${shown.length} of ${selected.length} rows shown`}</Text></Box>}
         {selected.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
+        {turns.length > 0 && (
+          <Box flexDirection="row" gap={1}>
+            {NAV.map(b => {
+              const can = canNav(turns, view.pinnedTurnId, b.to)
+              return <Button key={`nav-${b.to}`} hotkey={b.hotkey} plain label={b.label} dimColor={!can}
+                onPress={() => navigate($, b.to)} />
+            })}
+            <Box key="nav-label"><Text dimColor wrap="truncate-end">{navLabel(turns, view.pinnedTurnId)}</Text></Box>
+          </Box>
+        )}
       </Box>
     )
   })

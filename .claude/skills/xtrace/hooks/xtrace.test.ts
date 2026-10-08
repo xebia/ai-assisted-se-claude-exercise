@@ -472,3 +472,55 @@ describe('pane filter and sort', () => {
     expect(await ui.find({ type: 'Text', text: /kind:tools sort:-ms\s+tool calls, slowest first/ })).toBeDefined()
   })
 })
+
+describe('pane turn navigation', () => {
+  // Turn t1 runs Bash ls, turn t2 runs Read a.go.
+  const twoTurns = async ($: Engine, on: On) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await xtrace($, 'tools')
+    await $.turn.start({ text: 'list files', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    await $.turn.start({ text: 'read it', turnId: 't2' })
+    await $.tool.call({ tool: 'Read', file_path: 'a.go', tool_use_id: 'u2' })
+    return $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+  }
+
+  test('follows the latest turn and labels it', async ($, on) => {
+    const ui = await twoTurns($, on)
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2 · "read it"')
+    expect(await ui.find({ type: 'Text', text: /Read\s+a\.go/ })).toBeDefined()
+    expect((await ui.find({ key: 'nav-next' }))?.props.dimColor).toBe(true)
+  })
+
+  test('prev shows the earlier turn; a new turn keeps it and says live', async ($, on) => {
+    const ui = await twoTurns($, on)
+    await ui.press({ key: 'nav-prev' })
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/2 · "list files" · ● live: 2')
+    expect(await ui.find({ type: 'Text', text: /Bash\s+ls/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /Read\s+a\.go/ })).toBeUndefined()
+    await $.turn.start({ text: 'run tests', turnId: 't3' })
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/3 · "list files" · ● live: 3')
+    await ui.press({ key: 'nav-latest' })
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 3/3 · "run tests"')
+  })
+
+  test('first and next walk the turns; prev at the start does nothing', async ($, on) => {
+    const ui = await twoTurns($, on)
+    await ui.press({ key: 'nav-first' })
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/2 · "list files" · ● live: 2')
+    await ui.press({ key: 'nav-prev' })
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/2 · "list files" · ● live: 2')
+    await ui.press({ key: 'nav-next' })
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2 · "read it"')
+  })
+
+  test('the filter stays while navigating', async ($, on) => {
+    const ui = await twoTurns($, on)
+    await ui.input({ key: 'filter', text: 'name:bash' })
+    await ui.press({ key: 'nav-prev' })
+    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('name:bash')
+    expect(await ui.find({ type: 'Text', text: /Bash\s+ls/ })).toBeDefined()
+  })
+})
