@@ -575,6 +575,25 @@ describe('pane height', () => {
   })
 })
 
+describe('pane footer', () => {
+  test('the totals and the nav row sit at the bottom of the pane, however few rows there are', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await xtrace($, 'tools')
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+    const root = await ui.drawn()
+    expect(root.props).toMatchObject({ flexDirection: 'column', minHeight: 20 })   // the pane's own rows
+    // A spacer takes the free space just before the footer's rule, so the footer is pushed down.
+    const kids = (root.children ?? []) as { type?: string; props?: Record<string, unknown> }[]
+    const at = kids.findIndex(k => k.props?.flexGrow === 1)
+    expect(at).toBeGreaterThan(0)
+    expect((kids[at + 1]?.children ?? [])[0]).toMatch(/^─+$/)
+  })
+})
+
 describe('pane turn navigation', () => {
   // Turn t1 runs Bash ls, turn t2 runs Read a.go.
   const twoTurns = async ($: Engine, on: On) => {

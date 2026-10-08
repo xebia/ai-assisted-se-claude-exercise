@@ -526,7 +526,9 @@ export const register: Register = on => {
     const pagingSide = Math.floor((pagingWidth - 9) / 2)
 
     return (
-      <Box flexDirection="column">
+      // At least the pane's height, so the spacer below can push the footer to the bottom;
+      // an overfull tree still grows and scrolls.
+      <Box flexDirection="column" minHeight={bodyRows}>
         <Text wrap="truncate-end">
           {counters.map((s, i) => <Text key={`count-${i}`} color={s.color}>{s.text}</Text>)}
         </Text>
@@ -597,6 +599,8 @@ export const register: Register = on => {
             ))}
           </Text>
         ))}
+        {/* The free space: the totals and the nav row stay at the bottom of the pane. */}
+        <Box key="footer-spacer" flexGrow={1} />
         {selected.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
         {selected.length > 0 && total !== undefined && (
           <Box flexDirection="column">
