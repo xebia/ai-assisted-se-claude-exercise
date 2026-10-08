@@ -472,7 +472,7 @@ export const register: Register = on => {
           {counters.map((s, i) => <Text key={`count-${i}`} color={s.color}>{s.text}</Text>)}
         </Text>
         <Box flexDirection="row" gap={2}>
-          <Input key="filter" label="filter:" autoFocus placeholder={PLACEHOLDER} value={view.filter} submitLabel="keep"
+          <Input key="filter" label="filter" autoFocus placeholder={PLACEHOLDER} value={view.filter} submitLabel="keep"
             onInput={value => setFilter($, value)} onSubmit={value => setFilter($, value)} />
           <Button key="help" hotkey="h" plain label="?"
             onPress={async () => { try { await update($, VIEW, v => ({ ...v, help: !v.help })) } catch {} }} />
