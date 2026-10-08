@@ -441,7 +441,7 @@ export const register: Register = on => {
     const picked = new Set(selection.categories)
     const turnRows = rows.filter(r => r.turnId === turnId)
     // An old turn with no rows left: the 2000-row buffer dropped them.
-    const isEvicted = turn !== undefined && turnRows.length === 0 && rows.length >= ROW_CAP
+    const isEvicted = turn !== undefined && turn.turnId !== turns.at(-1)?.turnId && turnRows.length === 0 && rows.length >= ROW_CAP
     const tokens = tokensOf(turnRows)
     const counts = new Map([...tokenValues(turnRows)].map(([id, v]) => [id, v.n]))
     const parsed = parseFilter(view.filter)

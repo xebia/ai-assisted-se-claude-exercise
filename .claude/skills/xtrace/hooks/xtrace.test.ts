@@ -523,4 +523,36 @@ describe('pane turn navigation', () => {
     expect((await ui.find({ key: 'filter' }))?.props.value).toBe('name:bash')
     expect(await ui.find({ type: 'Text', text: /Bash\s+ls/ })).toBeDefined()
   })
+
+  test('next and latest on the latest turn do nothing', async ($, on) => {
+    const ui = await twoTurns($, on)
+    await ui.press({ key: 'nav-next' })
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2 · "read it"')
+    await ui.press({ key: 'nav-latest' })
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2 · "read it"')
+  })
+
+  // Each call is two rows (tools and hooks): 1001 calls overflow the 2000-row buffer and drop t1's rows.
+  const fullBuffer = async ($: Engine, on: On) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await xtrace($, 'tools')
+    await $.turn.start({ text: 'old turn', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u0' })
+    await $.turn.start({ text: 'busy turn', turnId: 't2' })
+    for (let i = 1; i <= 1001; i++) await $.tool.call({ tool: 'Read', file_path: `f${i}.go`, tool_use_id: `u${i}` })
+    await $.turn.start({ text: 'fresh turn', turnId: 't3' })
+    return $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+  }
+
+  // One test for both cases: filling the buffer takes about 30 s.
+  test('a full buffer: the empty latest turn is plain, an old emptied turn says it fell out', { timeoutMs: 120_000 }, async ($, on) => {
+    const ui = await fullBuffer($, on)
+    expect(await ui.find({ key: 'evicted' })).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /No rows in this turn yet/ })).toBeDefined()
+    await ui.press({ key: 'nav-first' })
+    expect(await ui.find({ key: 'evicted' })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /No rows in this turn yet/ })).toBeUndefined()
+  })
 })
