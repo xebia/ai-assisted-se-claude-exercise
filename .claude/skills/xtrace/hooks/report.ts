@@ -327,7 +327,7 @@ function paneWidths(width: number, withPlugins: boolean): number[] {
 }
 
 // Columns kept free at the pane's right edge, so right-aligned ms does not touch the border.
-const PANE_MARGIN = 2
+export const PANE_MARGIN = 2
 
 // Each cell fitted to its column: cut with an ellipsis, padded; ms right-aligned.
 function fitCells(cells: string[], paneWidth: number, withPlugins: boolean): string[] {

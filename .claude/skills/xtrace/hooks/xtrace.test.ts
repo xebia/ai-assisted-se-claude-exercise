@@ -528,13 +528,15 @@ describe('pane height', () => {
     const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
     expect((await ui.find({ key: 'hidden' }))?.text).toBe('↑ 21 earlier rows')
     expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 22–30 of 30')
-    // The hint and the controls share one line.
+    // One line: the hint at the left, the controls centred, the range and ↓ at the right.
     const line = await ui.find({ key: 'paging' })
-    expect(line?.text).toMatch(/^↑ 21 earlier rows.*▲.*▼.*rows 22–30 of 30$/)
-    expect(line?.props).toMatchObject({ justifyContent: 'center', width: 100 })   // centred like the nav bar
-    // Same shape as the nav row: the buttons sit directly in the centred row, not in a box of their own.
-    const kids = (line?.children ?? []) as { type?: string }[]
-    expect(kids.map(k => k.type)).toEqual(['Box', 'Button', 'Button', 'Box'])   // hint, ▲, ▼, rows a–b of n
+    expect(line?.text).toMatch(/^↑ 21 earlier rows.*▲.*▼.*rows 22–30 of 30.*↓$/)
+    const parts = (line?.children ?? []) as { type?: string; props?: Record<string, unknown> }[]
+    expect(parts.map(p => p.props?.justifyContent)).toEqual(['flex-start', 'center', 'flex-end'])
+    // The sides are equal, so the controls sit in the middle; the right side ends with the ms column.
+    const widths = parts.map(p => p.props?.width as number)
+    expect(widths[0]).toBe(widths[2])
+    expect(widths.reduce((a, b) => a + b, 0)).toBe(98)
     expect(await ui.find({ type: 'Text', text: /echo 29/ })).toBeDefined()
     await ui.press({ key: 'page-up' })
     expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 13–21 of 30')

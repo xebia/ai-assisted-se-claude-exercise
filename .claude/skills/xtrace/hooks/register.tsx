@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 import type { Category, Compaction, Row, Selection, Turn, View } from '../types'
 import { CATEGORIES, parseArgs, withNewCategories, wordsOf } from './args'
-import { attachHookContext, buildReport, counterSegments, denialCategory, firstWords, paletteFor, paneHeaderCells, paneSegments, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
+import { attachHookContext, buildReport, counterSegments, denialCategory, firstWords, PANE_MARGIN, paletteFor, paneHeaderCells, paneSegments, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
 import { commandsFor, enabledInstalls, pluginsFor } from './hookmatch'
 import type { PluginHooks } from './hookmatch'
 import { applyView, canNav, canPage, EXAMPLES, navLabel, navTarget, parseFilter, pageRows, PLACEHOLDER, rowWindow, scrollRows, scrollStep, sortMark, turnTitle, viewedTurn, withSort } from './view'
@@ -520,6 +520,10 @@ export const register: Register = on => {
     const win = rowWindow(shown.length, room, rowStart, sorted)
     const visible = shown.slice(win.from, win.to)
     drawnWindow = { count: shown.length, room, sorted, turnId }
+    // The paging line spans the rows (they end PANE_MARGIN short of the pane's edge);
+    // its controls, `u: ▲ d: ▼`, take 9 columns in the middle.
+    const pagingWidth = Math.max(9, width - PANE_MARGIN)
+    const pagingSide = Math.floor((pagingWidth - 9) / 2)
 
     return (
       <Box flexDirection="column">
@@ -568,15 +572,22 @@ export const register: Register = on => {
           </Box>
         )}
         {overflows && (
-          // Built like the nav row, which centres as one group: buttons as direct children,
-          // each text in a keyed Box and cut rather than wrapped, so none grows to the free space.
-          <Box key="paging" flexDirection="row" gap={1} width={ruleWidth} justifyContent="center">
-            {win.from > 0 && <Box key="hidden"><Text dimColor wrap="truncate-end">{`↑ ${win.from} ${sorted ? 'rows above' : 'earlier rows'}`}</Text></Box>}
-            {PAGE.map(b => (
-              <Button key={`page-${b.dir}`} hotkey={b.hotkey} plain label={b.label}
-                dimColor={!canPage(shown.length, room, rowStart, sorted, b.dir)} onPress={() => moveRows($, b.dir)} />
-            ))}
-            <Box key="page-label"><Text dimColor wrap="truncate-end">{`rows ${win.from + 1}–${win.to} of ${shown.length}`}</Text></Box>
+          // Three parts: the hint at the left, the controls in the middle, the range and ↓ at
+          // the right edge of the rows (the ms column's end). Equal sides keep the middle centred.
+          <Box key="paging" flexDirection="row" width={pagingWidth}>
+            <Box width={pagingSide} justifyContent="flex-start">
+              {win.from > 0 && <Box key="hidden"><Text dimColor wrap="truncate-end">{`↑ ${win.from} ${sorted ? 'rows above' : 'earlier rows'}`}</Text></Box>}
+            </Box>
+            <Box width={pagingWidth - 2 * pagingSide} justifyContent="center" gap={1}>
+              {PAGE.map(b => (
+                <Button key={`page-${b.dir}`} hotkey={b.hotkey} plain label={b.label}
+                  dimColor={!canPage(shown.length, room, rowStart, sorted, b.dir)} onPress={() => moveRows($, b.dir)} />
+              ))}
+            </Box>
+            <Box width={pagingSide} justifyContent="flex-end" gap={1}>
+              <Box key="page-label"><Text dimColor wrap="truncate-end">{`rows ${win.from + 1}–${win.to} of ${shown.length}`}</Text></Box>
+              <Text dimColor>↓</Text>
+            </Box>
           </Box>
         )}
         {visible.map(r => (
