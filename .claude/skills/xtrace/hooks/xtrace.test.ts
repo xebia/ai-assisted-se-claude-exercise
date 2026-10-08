@@ -251,6 +251,17 @@ const answerSession = (on: On) => {
 }
 const startSession = ($: Engine) => $.session.start({ cwd: '/tmp', surface: 'terminal', isInteractive: true })
 
+// The pane's rows as text: each row is a Box of cell Boxes, keyed `row-<id>`; its
+// cells joined with a space, as the terminal shows them.
+type Drawn = string | { children?: unknown[]; props?: { children?: unknown } }
+const textOf = (n: unknown): string => typeof n === 'string' ? n
+  : Array.isArray(n) ? n.map(textOf).join('')
+  : n !== null && typeof n === 'object' ? textOf((n as { children?: unknown }).children ?? (n as { props?: { children?: unknown } }).props?.children ?? '')
+  : ''
+const paneRows = async (ui: { findAll: (q: { type: string }) => Promise<{ key: string | undefined; children: unknown[] }[]> }) =>
+  (await ui.findAll({ type: 'Box' })).filter(b => b.key?.startsWith('row-')).map(b => b.children.map(textOf).join(' '))
+const findRow = async (ui: Parameters<typeof paneRows>[0], re: RegExp) => (await paneRows(ui)).find(t => re.test(t))
+
 const paneProps = (bodyColumns: number) => ({
   title: 'xtrace', isFocused: true, bodyColumns, placement: 'dock' as const,
   scroll: { offset: 0, bodyRows: 20 }, view: {},
@@ -347,9 +358,9 @@ describe('live pane', () => {
       on('tool.call', { tool: 'Read' }, async () => {
         // Mounted while the Read is in flight, so its row is still running.
         const ui = await $.ui.mount({ plugin: 'xtrace', surface, component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
-        sawRunning = await ui.find({ type: 'Text', text: /Read .*running/ })
-        sawBash = await ui.find({ type: 'Text', text: /Bash\s+ls\s+ok/ })
-        sawStop = await ui.find({ type: 'Text', text: /Stop/ })
+        sawRunning = await findRow(ui, /Read .*running/)
+        sawBash = await findRow(ui, /Bash\s+ls\s+ok/)
+        sawStop = await findRow(ui, /Stop/)
         counters = await ui.find({ type: 'Text', text: /tools 2 · mcp 0 · skills 0 · hooks 3/ })
         return { result: {}, text: '' }
       })
@@ -469,8 +480,8 @@ describe('pane filter and sort', () => {
   test('typing a filter narrows the rows and shows the count', async ($, on) => {
     const ui = await twoRows($, on)
     await ui.input({ key: 'filter', text: 'name:bash', kind: 'change' })
-    expect(await ui.find({ type: 'Text', text: /Bash\s+ls\s+ok/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /Read\s+a\.go/ })).toBeUndefined()
+    expect(await findRow(ui, /Bash\s+ls\s+ok/)).toBeDefined()
+    expect(await findRow(ui, /Read\s+a\.go/)).toBeUndefined()
     expect((await ui.find({ key: 'shown' }))?.text).toBe('1 of 2 rows shown')
   })
 
@@ -478,8 +489,8 @@ describe('pane filter and sort', () => {
     const ui = await twoRows($, on)
     await ui.input({ key: 'filter', text: 'foo:1 name:read' })
     expect((await ui.find({ key: 'filter-error' }))?.text).toContain('unknown column "foo"')
-    expect(await ui.find({ type: 'Text', text: /Read\s+a\.go/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /Bash\s+ls/ })).toBeUndefined()
+    expect(await findRow(ui, /Read\s+a\.go/)).toBeDefined()
+    expect(await findRow(ui, /Bash\s+ls/)).toBeUndefined()
   })
 
   test('pressing a header sorts and writes the sort into the bar', async ($, on) => {
@@ -487,9 +498,8 @@ describe('pane filter and sort', () => {
     await ui.press({ key: 'sort-name' })
     expect((await ui.find({ key: 'filter' }))?.props.value).toBe('sort:name')
     expect((await ui.find({ key: 'sort-name' }))?.props.label).toBe('name▲')
-    // Outer row Texts only: an inner segment holds one cell, the counters line reads `tools 2 · …`.
-    const rows = await ui.findAll({ type: 'Text', text: /^tools\s+(Bash|Read)\s/ })
-    expect(rows.map(r => r.text)).toEqual([expect.stringMatching(/Bash/), expect.stringMatching(/Read/)])
+    const rows = await paneRows(ui)
+    expect(rows).toEqual([expect.stringMatching(/Bash/), expect.stringMatching(/Read/)])
     await ui.press({ key: 'sort-name' })
     expect((await ui.find({ key: 'filter' }))?.props.value).toBe('sort:-name')
     await ui.press({ key: 'sort-name' })
@@ -515,7 +525,7 @@ describe('pane height', () => {
     const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
     // 20 body rows less counters, filter, rule, prompt, rule, header, rule, total, rule, nav,
     // and, as 30 rows overflow, the one paging line (earlier-rows hint and controls).
-    expect(await ui.findAll({ type: 'Text', text: /^tools\s+Bash\s/ })).toHaveLength(9)
+    expect(await paneRows(ui).then(rs => rs.filter(t => /^tools\s+Bash\s/.test(t)))).toHaveLength(9)
   })
 
   test('an overflowing turn says what is hidden and pages through it', async ($, on) => {
@@ -537,11 +547,11 @@ describe('pane height', () => {
     const widths = parts.map(p => p.props?.width as number)
     expect(widths[0]).toBe(widths[2])
     expect(widths.reduce((a, b) => a + b, 0)).toBe(98)
-    expect(await ui.find({ type: 'Text', text: /echo 29/ })).toBeDefined()
+    expect(await findRow(ui, /echo 29/)).toBeDefined()
     await ui.press({ key: 'page-up' })
     expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 13–21 of 30')
-    expect(await ui.find({ type: 'Text', text: /echo 14/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /echo 29/ })).toBeUndefined()
+    expect(await findRow(ui, /echo 14/)).toBeDefined()
+    expect(await findRow(ui, /echo 29/)).toBeUndefined()
     await ui.press({ key: 'page-down' })
     expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 22–30 of 30')
   })
@@ -558,7 +568,7 @@ describe('pane height', () => {
     await $.turn.start({ text: 'b', turnId: 't2' })
     for (let i = 0; i < 30; i++) await $.tool.call({ tool: 'Bash', command: `echo b${i}`, tool_use_id: `b${i}` })
     expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 22–30 of 30')
-    expect(await ui.find({ type: 'Text', text: /echo b29/ })).toBeDefined()
+    expect(await findRow(ui, /echo b29/)).toBeDefined()
   })
 
   test('changing the filter goes back to the newest rows', async ($, on) => {
@@ -573,6 +583,95 @@ describe('pane height', () => {
     await ui.input({ key: 'filter', text: 'echo', kind: 'change' })
     expect((await ui.find({ key: 'page-label' }))?.text).toMatch(/^rows \d+–30 of 30$/)
   })
+})
+
+describe('pane columns', () => {
+  // The desktop draws proportional text: columns line up only by boxes of a fixed width.
+  test('header labels and row cells sit in boxes of the same column widths; rules are one line', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await xtrace($, 'tools')
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'desktop', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+    const widths = (b: { children: unknown[] } | undefined) =>
+      ((b?.children ?? []) as { props?: { width?: unknown } }[]).map(c => c.props?.width)
+    const row = await ui.find({ key: 'row-u1' })
+    const header = (await ui.findAll({ type: 'Box' })).find(b => b.key === undefined && widths(b).length > 0 && (b.children as { props?: { key?: string } }[])[0]?.props?.key === 'hcell-kind')
+    expect(widths(row).every(w => typeof w === 'number')).toBe(true)
+    expect(widths(row)).toEqual(widths(header))
+    expect((await ui.find({ key: 'rule-top' }))?.props).toMatchObject({ height: 1, overflow: 'hidden' })
+  })
+
+  // A desktop button is padded, so it would push its label right and cut it: there the
+  // label is text, the sort button revealed over it under the pointer.
+  for (const surface of ['terminal', 'desktop'] as const) {
+    test(`header labels: ${surface === 'desktop' ? 'text, the sort button on hover' : 'sort buttons'} (${surface})`, async ($, on) => {
+      answerTurns(on)
+      answerUi(on)
+      on('tool.call', () => ({ result: {}, text: '' }))
+      await xtrace($, 'tools')
+      await $.turn.start({ text: 'x', turnId: 't1' })
+      await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+      const ui = await $.ui.mount({ plugin: 'xtrace', surface, component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+      const cell = await ui.find({ key: 'hcell-outcome' })
+      const kids = (cell?.children ?? []) as { type?: string; props?: Record<string, unknown> }[]
+      if (surface === 'desktop') {
+        expect(kids[0]).toMatchObject({ type: 'Text' })
+        expect(textOf(kids[0])).toBe('outcome')
+        expect(kids[1]).toMatchObject({ props: { position: 'absolute', display: 'none' }, hover: { display: 'flex' } })
+      } else {
+        expect(kids).toHaveLength(1)
+        expect(kids[0]).toMatchObject({ type: 'Button' })
+      }
+      await ui.press({ key: 'sort-ms' })
+      expect((await ui.find({ key: 'filter' }))?.props.value).toBe('sort:ms')
+    })
+  }
+
+  // Text `─` wraps onto a second line in proportional text; the desktop gets a drawn line.
+  for (const surface of ['terminal', 'desktop'] as const) {
+    test(`rules are ${surface === 'desktop' ? 'SVG lines' : '─ text'} (${surface})`, async ($, on) => {
+      answerTurns(on)
+      answerUi(on)
+      on('tool.call', () => ({ result: {}, text: '' }))
+      await xtrace($, 'tools')
+      await $.turn.start({ text: 'x', turnId: 't1' })
+      await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+      const ui = await $.ui.mount({ plugin: 'xtrace', surface, component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+      for (const key of ['rule-top', 'rule-prompt', 'rule-total', 'rule-nav']) {
+        const rule = await ui.find({ key })
+        if (surface === 'desktop') {
+          expect((rule?.children as { type?: string }[])[0]?.type).toBe('Svg')
+          expect(textOf(rule)).toBe('')
+        } else {
+          expect((rule?.children as { type?: string }[])[0]?.type).toBe('Text')
+          expect(textOf(rule)).toBe('─'.repeat(100))
+        }
+      }
+    })
+  }
+})
+
+describe('pane footer figures', () => {
+  // The terminal cuts the figures by count; the desktop gets them whole, cut at the box's edge.
+  for (const surface of ['terminal', 'desktop'] as const) {
+    test(`fill the room to the margin (${surface})`, async ($, on) => {
+      answerTurns(on)
+      answerUi(on)
+      on('tool.call', () => ({ result: {}, text: '' }))
+      await xtrace($, 'tools')
+      await $.turn.start({ text: 'x', turnId: 't1' })
+      await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+      const ui = await $.ui.mount({ plugin: 'xtrace', surface, component: 'Pane', requestId: 'xtrace', props: paneProps(40) })
+      const figures = await ui.find({ key: 'total-0-figures' })
+      expect(figures?.props).toMatchObject({ width: 40 - 2 - 9 })
+      const text = textOf(figures)
+      if (surface === 'terminal') expect(text.length).toBeLessThanOrEqual(29)
+      else expect(text.length).toBeGreaterThan(29)
+    })
+  }
 })
 
 describe('pane footer', () => {
@@ -590,7 +689,7 @@ describe('pane footer', () => {
     const kids = (root.children ?? []) as { type?: string; props?: Record<string, unknown> }[]
     const at = kids.findIndex(k => k.props?.flexGrow === 1)
     expect(at).toBeGreaterThan(0)
-    expect((kids[at + 1]?.children ?? [])[0]).toMatch(/^─+$/)
+    expect(textOf(kids[at + 1])).toMatch(/^─+$/)
   })
 })
 
@@ -613,7 +712,7 @@ describe('pane turn navigation', () => {
     expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2')
     expect((await ui.find({ key: 'prompt' }))?.text).toBe('prompt: "read it"')
     expect((await ui.find({ key: 'nav' }))?.props).toMatchObject({ justifyContent: 'center', width: 100 })   // centered under the rules
-    expect(await ui.find({ type: 'Text', text: /Read\s+a\.go/ })).toBeDefined()
+    expect(await findRow(ui, /Read\s+a\.go/)).toBeDefined()
     expect((await ui.find({ key: 'nav-next' }))?.props.dimColor).toBe(true)
   })
 
@@ -622,8 +721,8 @@ describe('pane turn navigation', () => {
     await ui.press({ key: 'nav-prev' })
     expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/2 · ● live: 2')
     expect((await ui.find({ key: 'prompt' }))?.text).toBe('prompt: "list files"')
-    expect(await ui.find({ type: 'Text', text: /Bash\s+ls/ })).toBeDefined()
-    expect(await ui.find({ type: 'Text', text: /Read\s+a\.go/ })).toBeUndefined()
+    expect(await findRow(ui, /Bash\s+ls/)).toBeDefined()
+    expect(await findRow(ui, /Read\s+a\.go/)).toBeUndefined()
     await $.turn.start({ text: 'run tests', turnId: 't3' })
     expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/3 · ● live: 3')
     await ui.press({ key: 'nav-latest' })
@@ -645,7 +744,7 @@ describe('pane turn navigation', () => {
     await ui.input({ key: 'filter', text: 'name:bash' })
     await ui.press({ key: 'nav-prev' })
     expect((await ui.find({ key: 'filter' }))?.props.value).toBe('name:bash')
-    expect(await ui.find({ type: 'Text', text: /Bash\s+ls/ })).toBeDefined()
+    expect(await findRow(ui, /Bash\s+ls/)).toBeDefined()
   })
 
   test('next and latest on the latest turn do nothing', async ($, on) => {

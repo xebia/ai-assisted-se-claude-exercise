@@ -449,6 +449,21 @@ export function paneSegments(row: Row, width: number, withPlugins: boolean, toke
   return fitted.flatMap((text, i) => [...(i > 0 ? [{ text: ' ' }] : []), { text, ...cells[i]?.[1] }])
 }
 
+// The pane's row as cells of their own, each with its column's width: a surface
+// that draws proportional text (the desktop) lines the columns up by the cell
+// boxes, never by padding. Text is cut to the column, never padded.
+export type Cell = Segment & { width: number; isRight: boolean }
+
+export function paneRowCells(row: Row, width: number, withPlugins: boolean, tokens = '', pal: Palette = DARK): Cell[] {
+  const widths = paneWidths(Math.max(1, width - PANE_MARGIN), withPlugins)
+  const segments = paneSegments(row, width, withPlugins, tokens, pal).filter((_, i) => i % 2 === 0)
+  return segments.map((s, i) => ({ ...s, text: s.text.trim(), width: widths[i] ?? 0, isRight: i === segments.length - 1 }))
+}
+
+export function paneHeaderWidths(width: number, withPlugins: boolean): number[] {
+  return paneWidths(Math.max(1, width - PANE_MARGIN), withPlugins)
+}
+
 // Words with a digit (and the arrow between two counts) are values, `·` a
 // separator, the rest labels. Neighbours of one kind merge into one segment.
 export function labelValueSegments(text: string, pal: Palette = DARK): Segment[] {
@@ -468,13 +483,18 @@ export function counterSegments(counts: [string, number][], pal: Palette = DARK)
 }
 
 // Where the name column starts: the kind column and the space after it.
-const NAME_COLUMN = paneWidths(80, false)[0]! + 1
+export const NAME_COLUMN = paneWidths(80, false)[0]! + 1
 
 // One line of the pane's footer, fitted to the pane. Its figures start under
 // the name column: the first line puts `Total:` in front of them, the others
 // are indented to the same place.
-export function paneTotalSegments(line: string, width: number, isFirst: boolean, pal: Palette = DARK): Segment[] {
-  const room = Math.max(1, width - PANE_MARGIN - NAME_COLUMN)
+// The cells the footer's figures have: the pane less its margin and the lead.
+export const paneTotalRoom = (width: number) => Math.max(1, width - PANE_MARGIN - NAME_COLUMN)
+
+// `isCut` false leaves the cutting to the surface: proportional text (the desktop)
+// fits more characters than the room's cells, so a cut by count stops short.
+export function paneTotalSegments(line: string, width: number, isFirst: boolean, pal: Palette = DARK, isCut = true): Segment[] {
+  const room = isCut ? paneTotalRoom(width) : Infinity
   // `Total:` heads the first line, `Agents:` the subagents' block; the rest are indented.
   const head = isFirst && line.startsWith('Total:') ? 'Total:' : line.startsWith('subagents:') ? 'subagents:' : undefined
   const lead: Segment = head !== undefined

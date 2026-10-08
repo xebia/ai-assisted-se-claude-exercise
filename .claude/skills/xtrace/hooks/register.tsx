@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 import type { Category, Compaction, Row, Selection, Turn, View } from '../types'
 import { CATEGORIES, parseArgs, withNewCategories, wordsOf } from './args'
-import { attachHookContext, buildReport, counterSegments, denialCategory, firstWords, PANE_MARGIN, paletteFor, paneHeaderCells, paneSegments, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
+import { attachHookContext, buildReport, counterSegments, denialCategory, firstWords, NAME_COLUMN, PANE_MARGIN, paletteFor, paneHeaderCells, paneHeaderWidths, paneRowCells, paneTotalRoom, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
 import { commandsFor, enabledInstalls, pluginsFor } from './hookmatch'
 import type { PluginHooks } from './hookmatch'
 import { applyView, canNav, canPage, EXAMPLES, navLabel, navTarget, parseFilter, pageRows, PLACEHOLDER, rowWindow, scrollRows, scrollStep, sortMark, turnTitle, viewedTurn, withSort } from './view'
@@ -179,6 +179,11 @@ async function moveRows($: EngineInterface, by: number | Page): Promise<void> {
     })
   } catch {}
 }
+
+// A one-pixel line as wide as its box; dashed for the subagents' rule.
+const ruleSvg = (color: string, isDashed: boolean) =>
+  `<svg xmlns="http://www.w3.org/2000/svg" width="100%" height="1" preserveAspectRatio="none">` +
+  `<line x1="0" y1="0.5" x2="100%" y2="0.5" stroke="${color}" stroke-width="1"${isDashed ? ' stroke-dasharray="4 3"' : ''}/></svg>`
 
 const PAGE: { dir: Page; hotkey: string; label: string }[] = [
   { dir: 'up', hotkey: 'u', label: '▲' },
@@ -477,7 +482,10 @@ export const register: Register = on => {
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
-    const { Box, Text, Button, Input } = $.ui.resolve(e)
+    const elements = $.ui.resolve(e)
+    const { Box, Text, Button, Input } = elements
+    // Off the terminal (whose table draws an Svg as nothing), rules are lines, not text.
+    const Svg = e.surface !== 'terminal' && 'Svg' in elements ? elements.Svg : undefined
     const rows: Row[] = await read($, ROWS)
     const turns: Turn[] = await read($, TURNS)
     const selection: Selection = await read($, SELECTION)
@@ -507,10 +515,20 @@ export const register: Register = on => {
     const base = Math.max(1, bodyRows - 7 - (turn !== undefined ? 2 : 0) - extra - (total?.length ?? 0) - (agentsAt > 0 ? 1 : 0))
     const width = e.props.bodyColumns > 0 ? e.props.bodyColumns : 80
     const ruleWidth = Math.max(1, Math.min(width, 120))
-    const rule = '─'.repeat(ruleWidth)
+    // A rule one line high across its width. The terminal draws it as text; a surface
+    // with proportional text (the desktop) would wrap `─` onto a second line, which
+    // its boxes do not clip, so there it is an SVG line filling the box.
+    const rule = (key: string, w = ruleWidth, char = '─') => (
+      <Box key={key} width={w} height={1} overflow="hidden" alignItems="center">
+        {Svg !== undefined
+          ? <Svg alt="" source={ruleSvg(pal.separator, char !== '─')} />
+          : <Text dimColor wrap="truncate-end">{char.repeat(w)}</Text>}
+      </Box>
+    )
     const withPlugins = picked.has('hooks')
     const marks = parsed.sort !== undefined ? { [parsed.sort.column]: sortMark(parsed.sort, parsed.sort.column) } : {}
     const header = paneHeaderCells(width, withPlugins, marks)
+    const columnWidths = paneHeaderWidths(width, withPlugins)
     // Unsorted, the newest rows that fit; sorted, the first ones in order.
     // A turn that overflows gives one line to the paging line: the earlier-rows hint and its controls.
     const overflows = shown.length > base
@@ -546,7 +564,7 @@ export const register: Register = on => {
         {view.help && EXAMPLES.map(x => (
           <Text key={`example-${x.text}`} dimColor wrap="truncate-end">{`  ${x.text.padEnd(28)} ${x.meaning}`}</Text>
         ))}
-        <Text dimColor>{rule}</Text>
+        {rule('rule-top')}
         {turn !== undefined && (
           <Box key="prompt">
             <Text wrap="truncate-end">
@@ -555,21 +573,32 @@ export const register: Register = on => {
             </Text>
           </Box>
         )}
-        {turn !== undefined && <Text dimColor>{rule}</Text>}
+        {turn !== undefined && rule('rule-prompt')}
         {isEvicted && <Box key="evicted"><Text dimColor>rows for this turn fell out of the 2000-row buffer</Text></Box>}
         {!isEvicted && selected.length === 0 && <Text dimColor>No rows in this turn yet.</Text>}
         {selected.length > 0 && (
-          <Box flexDirection="row">
-            {header.flatMap((c, i) => {
+          // Each label in a box of its column's width, like the rows' cells, so they line up
+          // on a surface that draws proportional text too.
+          <Box flexDirection="row" gap={1}>
+            {header.map((c, i) => {
               const label = c.text.trim()
-              const pad = ' '.repeat(c.text.length - label.length)
               const isLast = i === header.length - 1
-              return [
-                ...(i > 0 ? [<Text key={`hgap-${i}`}> </Text>] : []),
-                ...(isLast && pad !== '' ? [<Text key={`hpad-${i}`}>{pad}</Text>] : []),
-                <Button key={`sort-${c.column}`} plain dimColor label={label} onPress={() => sortBy($, c.column as Column)} />,
-                ...(!isLast && pad !== '' ? [<Text key={`hpad-${i}`}>{pad}</Text>] : []),
-              ]
+              const sort = <Button key={`sort-${c.column}`} plain dimColor label={label} onPress={() => sortBy($, c.column as Column)} />
+              return (
+                <Box key={`hcell-${c.column}`} width={columnWidths[i] ?? 1} flexShrink={0}
+                  justifyContent={isLast ? 'flex-end' : 'flex-start'}>
+                  {e.surface === 'terminal' ? sort : [
+                    // The desktop draws a native button, padded: at rest the label is text, lined
+                    // up with the cells below; under the pointer the button shows over it.
+                    <Text key={`hlabel-${c.column}`} dimColor wrap="truncate-end">{label}</Text>,
+                    // Unkeyed: the keyed cell is the hover scope, a keyed Box would be its own.
+                    <Box position="absolute" top={0} {...(isLast ? { right: 0 } : { left: 0 })}
+                      display="none" hover={{ display: 'flex' }}>
+                      {sort}
+                    </Box>,
+                  ]}
+                </Box>
+              )
             })}
           </Box>
         )}
@@ -593,30 +622,45 @@ export const register: Register = on => {
           </Box>
         )}
         {visible.map(r => (
-          <Text key={r.id} wrap="truncate-end">
-            {paneSegments(r, width, withPlugins, tokens.get(r.id), pal).map((s, i) => (
-              <Text key={`${r.id}-${i}`} color={s.color} bold={s.bold}>{s.text}</Text>
+          <Box key={`row-${r.id}`} flexDirection="row" gap={1}>
+            {paneRowCells(r, width, withPlugins, tokens.get(r.id), pal).map((c, i) => (
+              <Box key={`${r.id}-${i}`} width={c.width} flexShrink={0} justifyContent={c.isRight ? 'flex-end' : 'flex-start'}>
+                <Text color={c.color} bold={c.bold} wrap="truncate-end">{c.text}</Text>
+              </Box>
             ))}
-          </Text>
+          </Box>
         ))}
         {/* The free space: the totals and the nav row stay at the bottom of the pane. */}
         <Box key="footer-spacer" flexGrow={1} />
-        {selected.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
+        {selected.length > 0 && total !== undefined && rule('rule-total')}
         {selected.length > 0 && total !== undefined && (
           <Box flexDirection="column">
             {total.flatMap((line, n) => [
               // A short rule sets the subagents' block apart from the main loop's.
-              ...(n === agentsAt && n > 0 ? [<Text key="agents-rule" dimColor>{'╌'.repeat(Math.min(24, ruleWidth))}</Text>] : []),
-              <Text key={`total-${n}`} wrap="truncate-end">
-                {paneTotalSegments(line, width, n === 0, pal).map((s, i) => (
-                  <Text key={`total-${n}-${i}`} color={s.color} bold={s.bold}>{s.text}</Text>
-                ))}
-              </Text>,
+              ...(n === agentsAt && n > 0 ? [rule('agents-rule', Math.min(24, ruleWidth), '╌')] : []),
+              // The lead (`Total:` or the indent) in a box of the kind column's width, so the
+              // figures start under the name column on any surface.
+              (() => {
+                const [lead, ...rest] = paneTotalSegments(line, width, n === 0, pal, e.surface === 'terminal')
+                return (
+                  <Box key={`total-${n}`} flexDirection="row">
+                    <Box key={`total-${n}-lead`} width={NAME_COLUMN} flexShrink={0}>
+                      <Text color={lead?.color} bold={lead?.bold}>{lead?.text.trim() ?? ''}</Text>
+                    </Box>
+                    {/* The figures take the room up to the margin and are cut at its edge. */}
+                    <Box key={`total-${n}-figures`} width={paneTotalRoom(width)} flexShrink={1}>
+                      <Text wrap="truncate-end">
+                        {rest.map((s, i) => <Text key={`total-${n}-${i}`} color={s.color} bold={s.bold}>{s.text}</Text>)}
+                      </Text>
+                    </Box>
+                  </Box>
+                )
+              })(),
             ])}
           </Box>
         )}
         {selected.length > 0 && isFiltered && <Box key="shown"><Text dimColor>{`${shown.length} of ${selected.length} rows shown`}</Text></Box>}
-        {selected.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
+        {selected.length > 0 && total !== undefined && rule('rule-nav')}
         {turns.length > 0 && (
           <Box key="nav" flexDirection="row" gap={1} width={ruleWidth} justifyContent="center">
             {NAV.map(b => {

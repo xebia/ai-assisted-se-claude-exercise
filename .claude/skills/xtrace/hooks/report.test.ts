@@ -324,6 +324,10 @@ describe('turn totals', () => {
     expect(agents[0]).toEqual({ text: 'Agents:  ', color: DARK.value, bold: true })
     expect(agents.map(s => s.text).join('')).not.toContain('subagents')
   })
+  test('pane footer uncut: the whole line, for a surface that cuts proportional text itself', () => {
+    const line = 'output 250 · cache read 19.0k · uncached 600 · cache write 3.1k'
+    expect(paneTotalSegments(line, 30, false, DARK, false).slice(1).map(s => s.text).join('')).toBe(line)
+  })
 })
 
 describe('tokenValues', () => {
