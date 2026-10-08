@@ -5,9 +5,12 @@
 team's work started.
 
 **What the participant was asked to produce.** A team prompt: the lead
-reads `tasks.md`, spawns one teammate per user story, each teammate owns
-its story's file, the foundation stays untouched, each story is done when
-its Independent Test passes. The lead waits and reports.
+reads `tasks.md` and spawns one builder per user story plus a `reviewer`
+that writes no code. Each builder owns its story's file, and the
+foundation stays untouched. When a builder's Independent Test passes, it
+sends its file list to the reviewer. The reviewer sends its findings back
+to that builder, and a story is done only after the reviewer approves it.
+The lead waits and reports.
 
 **Under review: the team prompt.** Ask for it verbatim. The code is
 evidence about that prompt.
@@ -20,10 +23,10 @@ predicted defect.
 | Check | Present when the prompt… |
 | --- | --- |
 | **Source of work** | names `tasks.md` and that story tags decide who does what |
-| **Team, not subagents** | says agent team / teammates, one per story, named |
-| **File ownership** | names the foundation files as finished; each teammate edits only its story's file |
-| **Done per teammate** | the story's Independent Test passes, tasks ticked |
-| **Lead waits** | the lead does not implement stories and waits for all teammates |
+| **Team, not subagents** | says agent team / teammates: one named builder per story, and a `reviewer` that writes no code |
+| **File ownership** | names the foundation files as finished; each builder edits only its story's file |
+| **Closed review loop** | builder sends its files to the reviewer, the reviewer sends findings back to that builder by name, and a story is done only when its Independent Test passes and the reviewer approves it |
+| **Lead waits** | the lead does not implement stories, does not fix findings, and waits for all teammates |
 
 ## Establish ground truth
 
@@ -54,6 +57,13 @@ Run these yourself. Do not take the participant's notes on trust.
 6. Read the story files for `import` lines. Any import from
    `node_modules` or a CDN is a constitution I violation.
 
+7. Ask the participant what the reviewer sent back to a builder, and
+   what they found in the browser that the reviewer did not (task 4,
+   step 2). Their answer is the only evidence of the loop: you cannot
+   read the teammates' transcripts. Compare it with steps 1, 4 and 5. A
+   defect that is still in the code after the reviewer approved the story
+   means the reviewer missed it, or its finding never reached the builder.
+
 ## Known traps
 
 - **Foundation edited.** The most likely defect. A teammate wanted a helper
@@ -61,8 +71,18 @@ Run these yourself. Do not take the participant's notes on trust.
   diff or a commit shows it. Map it to the File ownership check.
 - **Lead built a story.** The lead's transcript or a commit shows story
   code written by the lead. Map it to Lead waits.
+- **Finding went to the lead.** The reviewer reported to the lead, and the
+  lead fixed it, or nobody did. Map it to Closed review loop. With
+  subagents this is the default route for a finding; in a team it is a
+  prompt gap.
+- **Approved but broken.** The reviewer approved a story that still leaks
+  backend text or changed a foundation file. Say which check the reviewer
+  was told to run and whether the prompt named it. The browser problems
+  from task 4 are expected misses: the reviewer reads code, it does not
+  open the browser.
 - **Ticked but not tested.** Tasks ticked, but the browser shows "Not built
-  yet" or a console error for one story. Map it to Done per teammate.
+  yet" or a console error for one story. Map it to Closed review loop: the
+  done condition did not require the Independent Test.
 - **Backend error text on screen.** `#/books/abc` shows "invalid id", or
   the list shows "db error". Constitution V. Usually the page module reads
   `outcome.error` that the client was supposed to drop — check whether the
@@ -82,6 +102,7 @@ Run these yourself. Do not take the participant's notes on trust.
 
 - No foundation file in `git diff --stat foundation`
 - Every story task ticked, and both stories render in the browser
+- The participant can name one finding the reviewer sent to a builder
 - Grep clean; all four error paths render a fixed sentence
 - Partial is a normal first-attempt outcome. Name which story or which
   boundary failed; do not round up.
@@ -91,4 +112,6 @@ Run these yourself. Do not take the participant's notes on trust.
 None for the verifier. The held-back fact for this session lives in the
 `/parallel-coach` card for task 2 (nothing enforces file ownership except
 the prompt). By the time the verifier runs, the run has already taught it —
-say it plainly if the evidence shows it.
+say it plainly if the evidence shows it. Add the second half: the reviewer
+is the check behind the prompt, and it catches only what it was told to
+check.

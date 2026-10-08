@@ -7,13 +7,20 @@
 ## Goal
 
 In Exercise 6 you wrote a spec, a plan and a task list, and no code. In
-this exercise an agent team builds the code. You do four things:
+this exercise an agent team builds the code.
+
+The teammates in an agent team can send messages to each other, without
+the lead. You use that in this exercise: one
+teammate reviews the work of the others. It sends what it finds straight
+to the teammate that wrote the code.
+
+You do four things:
 
 1. Build the shared part of the frontend, in one Claude session.
-2. Write one prompt that gives each user story to its own teammate, and
-   improve that prompt with a coach.
-3. Start the team and watch it work.
-4. Check the result against the constitution and your spec.
+2. Write one prompt that starts a team: one builder per user story and
+   one reviewer. Improve that prompt with a coach.
+3. Start the team and watch the teammates talk to each other.
+4. Check the part of the result that the reviewer cannot check.
 
 You will not write application code yourself.
 
@@ -23,7 +30,7 @@ You will not write application code yourself.
 - **Terminal 2**, in `web` (inside `bookstore`): `claude`. This session
   is your **lead** for the whole exercise.
 - **Terminal 3**, in `web`, for `npm run dev`. Open a second tab in
-  `web` for `git` and `grep`.
+  `web` for `git`.
 
 **Use the reference spec**, unless you are sure your own spec from
 Exercise 6 is complete: `specs/001-*/tasks.md` exists, with at most three
@@ -98,9 +105,19 @@ they are the **agent team**. A teammate starts with its own, empty
 context. It does not see this chat.
 Everything it must know is in your prompt, or in a file your prompt names.
 
-Each user story in `tasks.md` has an **Independent Test**: the steps from
-`quickstart.md` that must pass for that story. The worked example below
-uses it.
+Your team has two kinds of teammates:
+
+- A **builder** for each user story. It writes the code for that story.
+- One **reviewer**. It writes no code. It checks each story and tells the
+  builder what to fix.
+
+A builder and the reviewer send messages to each other directly, by name.
+The lead does not pass the messages on. This is different from
+subagents: a subagent reports back only to the session that started it.
+
+Each user story in `tasks.md` has an **Independent Test**. It lists the
+steps from `quickstart.md` that must pass for that story. The example
+prompt below uses this test.
 
 1. **Draft**. Open `tasks.md` and find the section **Parallel Team
    Strategy** near the bottom: it says how to split the work. Your prompt
@@ -110,12 +127,17 @@ uses it.
    placeholders.** Replace each one with a name from your own `tasks.md`,
    and remove the brackets. Do not run the prompt yet.
 
-   > Read `specs/<your spec folder>/tasks.md`. Spawn an agent team with one
-   > teammate per user story, named after the story: `<us1-short-name>`,
-   > `<us2-short-name>`. Each teammate works only on the tasks tagged with
-   > its story. Each teammate is done when its story's Independent Test in
-   > `tasks.md` passes against the running backend and its tasks are ticked.
-   > Report per story: files changed, and the result of its Independent Test.
+   > Read `specs/<your spec folder>/tasks.md`. Spawn an agent team. Spawn
+   > one builder per user story, named after the story: `<us1-short-name>`,
+   > `<us2-short-name>`. Each builder works only on the tasks tagged with
+   > its story. Also spawn a teammate named `reviewer` that writes no code.
+   > When a builder's Independent Test in `tasks.md` passes against the
+   > running backend, the builder sends `reviewer` the list of files it
+   > changed. The reviewer checks three things: no foundation file changed
+   > (`git diff --stat foundation`), no backend address is in the code
+   > (`grep -rn "8080\|localhost" src/ index.html`), and every error path
+   > shows a fixed sentence, as principle V in `.specify/memory/constitution.md` says.
+   > Report per story: files changed, and what the reviewer found.
 
 2. **Coach and revise**. Run `/parallel-coach 2` and paste your draft as
    your next message. The coach points out gaps. It never writes the
@@ -127,39 +149,52 @@ uses it.
 
 ### 3. Start the team and watch it
 
-You start the team and follow its work in the agent panel.
+You start the team. In the agent panel you follow the messages between
+the builders and the reviewer.
 
-1. **Predict.** Write two predictions on paper. **Will the lead wait for
-   its teammates? Which file will a teammate touch that it should not?**
-   A wrong prediction is fine. Only a missing one is a problem.
+1. **Predict.** Write two predictions on paper. **Will the reviewer send
+   a story back to its builder? If yes, for what? Will the lead wait for
+   its teammates?** A wrong prediction is fine. Only a missing one is a
+   problem.
 2. Paste your prompt into the lead, in terminal 2. The coach does not run
    this one for you. A team can only start from the session you type in.
 3. Look at the agent panel below the prompt input. Within a minute you
-   should see one row per teammate, with the names from your prompt. Rows
-   without your names are plain subagents, not a team. Then tell the lead:
-   *"Use an agent team, not subagents."* Still no team? Agent teams are
+   should see one row per teammate: each builder and the reviewer, with
+   the names from your prompt. Rows without your names are plain
+   subagents, not a team. If you see rows without your names, tell the
+   lead: *"Use an agent team, not subagents."* Still no team? Agent teams are
    experimental: tell the trainer, and do not spend your time on it.
-4. Use the **up and down arrows** to select a teammate, then press
-   **Enter**. You are now in its transcript. Read what it is doing. To
-   leave, select the lead's row again with the arrows. Do not press
-   **Escape** inside a transcript: that interrupts the teammate. You can
-   type to a teammate here. Only do that when it is stuck.
-5. Permission prompts from teammates appear in the **lead's** row, not in
+4. **Open the reviewer.** Use the **up and down arrows** to select
+   `reviewer`, then press **Enter**. You are now in its transcript. Find a
+   message from a builder: the list of files it changed. Then find what
+   the reviewer sends back to that builder. To leave, select the lead's
+   row again with the arrows. Do not press **Escape** inside a
+   transcript: that interrupts the teammate.
+5. **Talk to a builder.** Select one builder and press **Enter**. Type
+   this message:
+
+   > Which files do you own, and what has the reviewer told you so far?
+
+   The message goes to this builder only. The lead does not see it. Read
+   the answer, then go back to the lead's row.
+6. Permission prompts from teammates appear in the **lead's** row, not in
    the teammate's transcript. If nothing moves for a while, go back to the
    lead and answer the prompt.
-6. Keep `tasks.md` open in your editor: ticks appear as teammates finish
+7. Keep `tasks.md` open in your editor: ticks appear as builders finish
    tasks. Refresh http://localhost:5173 every minute. Stories appear while
    you watch.
-7. Watch the lead too. If it starts editing story files itself, tell it:
-   *"Wait for your teammates to finish."*
+8. Watch the lead too. It may start editing story files itself, or fix a
+   finding of the reviewer itself. If it does, tell it: *"Wait for your
+   teammates to finish."*
 
-**Done when**: both teammates report done, every story task in `tasks.md`
-is ticked, and both stories show in the browser.
+**Done when**: the lead's report says the reviewer approved every story,
+every story task in `tasks.md` is ticked, and both stories show in the
+browser.
 
-### 4. Quality gates
+### 4. Check what the reviewer cannot check
 
-Nobody has reviewed this code yet. You run three checks, in the order a
-reviewer would find problems. Then a command repeats them.
+The reviewer read the code, but it did not open the browser. You check
+the result as a user would. Then a command grades your prompt.
 
 1. **Does it do what the spec says?** Open `specs/001-*/quickstart.md`
    and follow its steps in the browser. Then test the three gaps from
@@ -168,38 +203,23 @@ reviewer would find problems. Then a command repeats them.
    - Go past the last page. What does an empty page show?
    - Open a book id that does not exist, such as `#/books/9999`. What do
      you see? Is it the raw error text from the backend?
-2. **Did the team respect the file boundaries?** In the second
-   tab of terminal 3:
-
-   ```bash
-   git diff --stat foundation
-   ```
-
-   Every changed file should belong to one story. A foundation file in that
-   list means a teammate edited code it did not own.
-3. **Does it still depend on the contract only?** The constitution,
-   principle II, says the frontend may know the HTTP contract and nothing
-   else. A backend address in the code breaks that rule. One grep:
-
-   ```bash
-   grep -rn "8080\|localhost" src/ index.html
-   ```
-
-   Any hit is a constitution violation.
-4. **Write down what you found, then run the check**. The check is
-   the `/verify-exercise 7` command. Run it and paste your team prompt when
-   it asks. It grades the prompt first. Then it checks the files for the
-   same three things, plus the error paths from principle V. Bring its
-   report to the closing round.
-5. **Commit**, one line at a time:
+2. **Compare with the reviewer.** The lead's report lists what the
+   reviewer found for each story. Look at each problem you found in step
+   1. Did the reviewer report it? Write down one problem the reviewer
+   missed, or write "none".
+3. **Run the check**: the `/verify-exercise 7` command. Paste your team
+   prompt when it asks. It grades the prompt first. Then it checks the
+   files, including the three checks the reviewer did. Bring its report
+   to the closing round.
+4. **Commit**, in the second tab of terminal 3, one line at a time:
 
    ```bash
    git add -A
    git commit -m "feat: bookstore-web, built by agent team"
    ```
 
-**Done when**: you followed the quickstart, ran the two commands, and
-`/verify-exercise 7` has run.
+**Done when**: you followed the quickstart, compared your findings with
+the reviewer's, and `/verify-exercise 7` has run.
 
 ---
 
@@ -207,15 +227,18 @@ reviewer would find problems. Then a command repeats them.
 
 The trainer asks people at random. Have answers ready:
 
-- What did the coach flag in your team prompt before it said the prompt was
-  ready?
-- Did the lead wait, or did it start building a story itself? Did your
-  prediction from task 3 come true?
-- Did a teammate touch a file it did not own? Which one, and why?
+- What did the coach say was missing in your team prompt before it said
+  the prompt was ready?
+- Find one message that went from one teammate to another. What did it
+  say? What did the builder do next? Did your prediction from task 3
+  come true?
+- What did you find in the browser that the reviewer did not find? Why
+  could the reviewer not find it?
 - In Exercise 6 you marked some answers as guesses. Find one in the running
   frontend. Does the code treat it as a fact?
-- Close with **one take-away**: which part of this exercise needed a team,
-  and which part would have been faster in a single session?
+- Close with **one take-away**. Which part of this exercise needed
+  teammates that talk to each other? Which part would have been faster
+  in a single session?
 
 ---
 
