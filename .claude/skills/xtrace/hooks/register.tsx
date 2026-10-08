@@ -568,15 +568,15 @@ export const register: Register = on => {
           </Box>
         )}
         {overflows && (
-          <Box key="paging" flexDirection="row" gap={2} width={ruleWidth} justifyContent="center">
-            {win.from > 0 && <Box key="hidden"><Text dimColor>{`↑ ${win.from} ${sorted ? 'rows above' : 'earlier rows'}`}</Text></Box>}
-            <Box flexDirection="row" gap={1}>
-              {PAGE.map(b => (
-                <Button key={`page-${b.dir}`} hotkey={b.hotkey} plain label={b.label}
-                  dimColor={!canPage(shown.length, room, rowStart, sorted, b.dir)} onPress={() => moveRows($, b.dir)} />
-              ))}
-            </Box>
-            <Box key="page-label"><Text dimColor>{`rows ${win.from + 1}–${win.to} of ${shown.length}`}</Text></Box>
+          // Built like the nav row, which centres as one group: buttons as direct children,
+          // each text in a keyed Box and cut rather than wrapped, so none grows to the free space.
+          <Box key="paging" flexDirection="row" gap={1} width={ruleWidth} justifyContent="center">
+            {win.from > 0 && <Box key="hidden"><Text dimColor wrap="truncate-end">{`↑ ${win.from} ${sorted ? 'rows above' : 'earlier rows'}`}</Text></Box>}
+            {PAGE.map(b => (
+              <Button key={`page-${b.dir}`} hotkey={b.hotkey} plain label={b.label}
+                dimColor={!canPage(shown.length, room, rowStart, sorted, b.dir)} onPress={() => moveRows($, b.dir)} />
+            ))}
+            <Box key="page-label"><Text dimColor wrap="truncate-end">{`rows ${win.from + 1}–${win.to} of ${shown.length}`}</Text></Box>
           </Box>
         )}
         {visible.map(r => (

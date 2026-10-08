@@ -532,6 +532,9 @@ describe('pane height', () => {
     const line = await ui.find({ key: 'paging' })
     expect(line?.text).toMatch(/^↑ 21 earlier rows.*▲.*▼.*rows 22–30 of 30$/)
     expect(line?.props).toMatchObject({ justifyContent: 'center', width: 100 })   // centred like the nav bar
+    // Same shape as the nav row: the buttons sit directly in the centred row, not in a box of their own.
+    const kids = (line?.children ?? []) as { type?: string }[]
+    expect(kids.map(k => k.type)).toEqual(['Box', 'Button', 'Button', 'Box'])   // hint, ▲, ▼, rows a–b of n
     expect(await ui.find({ type: 'Text', text: /echo 29/ })).toBeDefined()
     await ui.press({ key: 'page-up' })
     expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 13–21 of 30')
