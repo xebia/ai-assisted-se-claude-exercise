@@ -1,4 +1,4 @@
-import type { Row } from '../types'
+import type { Row, Turn } from '../types'
 
 // The live pane's view: the filter bar's language and sorting (this task),
 // which turn is shown (the navigation helpers below). Pure, no `$`.
@@ -136,4 +136,67 @@ export function applyView(rows: Row[], parsed: ParsedFilter, tokens: Map<string,
   const kept = rows.filter(r => parsed.match(r, tokens.get(r.id)))
   const sort = parsed.sort
   return sort === undefined ? kept : [...kept].sort((a, b) => compare(a, b, sort, tokens))
+}
+
+const isSortTerm = (t: string) => t.toLowerCase().startsWith('sort:')
+
+// A header click: that column ascending, then descending, then unsorted. The
+// sort term is rewritten where the last one stood, so the bar reads as typed.
+export function withSort(text: string, column: Column): string {
+  const terms = text.trim().split(/\s+/).filter(Boolean)
+  const at = terms.findLastIndex(isSortTerm)
+  const current = at >= 0 ? parseFilter(terms[at] ?? '').sort : undefined
+  const next = current?.column !== column ? `sort:${column}` : current.desc ? undefined : `sort:-${column}`
+  const kept = terms.filter(t => !isSortTerm(t))
+  if (next !== undefined) {
+    const place = at >= 0 ? terms.slice(0, at).filter(t => !isSortTerm(t)).length : kept.length
+    kept.splice(place, 0, next)
+  }
+  return kept.join(' ')
+}
+
+export const sortMark = (sort: Sort | undefined, column: Column): string =>
+  sort?.column !== column ? '' : sort.desc ? '▼' : '▲'
+
+// --- Which turn the pane shows. A pin is a turnId, not an index: TURNS is
+// capped, so indexes shift as old turns drop. No pin follows the latest turn.
+
+export type Nav = 'first' | 'prev' | 'next' | 'latest'
+
+export function viewedTurn(turns: Turn[], pinnedTurnId?: string): { turn?: Turn; index: number; isLive: boolean } {
+  const isLive = pinnedTurnId === undefined
+  if (turns.length === 0) return { turn: undefined, index: -1, isLive }
+  if (isLive) return { turn: turns.at(-1), index: turns.length - 1, isLive }
+  const at = turns.findIndex(t => t.turnId === pinnedTurnId)
+  const index = at >= 0 ? at : 0             // evicted: the oldest turn kept
+  return { turn: turns[index], index, isLive }
+}
+
+function navIndex(turns: Turn[], pinnedTurnId: string | undefined, to: Nav): number {
+  const { index } = viewedTurn(turns, pinnedTurnId)
+  const last = turns.length - 1
+  switch (to) {
+    case 'first': return 0
+    case 'prev': return Math.max(0, index - 1)
+    case 'next': return Math.min(last, index + 1)
+    default: return last
+  }
+}
+
+export function canNav(turns: Turn[], pinnedTurnId: string | undefined, to: Nav): boolean {
+  return turns.length > 1 && navIndex(turns, pinnedTurnId, to) !== viewedTurn(turns, pinnedTurnId).index
+}
+
+// The pin after moving; onto the latest turn means following live again.
+export function navTarget(turns: Turn[], pinnedTurnId: string | undefined, to: Nav): string | undefined {
+  if (turns.length === 0) return undefined
+  const i = navIndex(turns, pinnedTurnId, to)
+  return i >= turns.length - 1 ? undefined : turns[i]?.turnId
+}
+
+export function navLabel(turns: Turn[], pinnedTurnId?: string): string {
+  const { turn, index, isLive } = viewedTurn(turns, pinnedTurnId)
+  if (turn === undefined) return 'no turns yet'
+  const live = !isLive && index < turns.length - 1 ? ` · ● live: ${turns.length}` : ''
+  return `turn ${index + 1}/${turns.length} · "${turn.text}"${live}`
 }

@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { applyView, COLUMNS, EXAMPLES, parseFilter, PLACEHOLDER } from './view'
-import type { Row } from '../types'
+import { applyView, canNav, COLUMNS, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, sortMark, viewedTurn, withSort } from './view'
+import type { Row, Turn } from '../types'
 
 const row = (over: Partial<Row>): Row => ({
   id: 'r', turnId: 't1', kind: 'tools', name: 'Read', target: 'a.go', outcome: 'ok', startedAt: 1, ...over,
@@ -111,5 +111,95 @@ describe('sorting', () => {
   })
   test('the last sort term wins', () => {
     expect(parseFilter('sort:ms sort:-name').sort).toEqual({ column: 'name', desc: true })
+  })
+})
+
+describe('withSort', () => {
+  test('a new column sorts ascending, then descending, then off', () => {
+    expect(withSort('', 'ms')).toBe('sort:ms')
+    expect(withSort('sort:ms', 'ms')).toBe('sort:-ms')
+    expect(withSort('sort:-ms', 'ms')).toBe('')
+  })
+  test('another column replaces the sort term in place', () => {
+    expect(withSort('kind:tools sort:-ms name:bash', 'name')).toBe('kind:tools sort:name name:bash')
+  })
+  test('other terms and their order are kept; a missing sort is appended', () => {
+    expect(withSort('kind:tools  name:bash', 'ms')).toBe('kind:tools name:bash sort:ms')
+    expect(withSort('kind:tools sort:ms name:bash', 'ms')).toBe('kind:tools sort:-ms name:bash')
+    expect(withSort('kind:tools sort:-ms name:bash', 'ms')).toBe('kind:tools name:bash')
+  })
+  test('several or invalid sort terms collapse to one', () => {
+    expect(withSort('sort:nope kind:mcp', 'ms')).toBe('sort:ms kind:mcp')
+    expect(withSort('sort:name kind:mcp sort:ms', 'ms')).toBe('kind:mcp sort:-ms')
+  })
+  test('the result parses to the sort it shows', () => {
+    expect(parseFilter(withSort('sort:tokens', 'tokens')).sort).toEqual({ column: 'tokens', desc: true })
+  })
+})
+
+describe('sortMark', () => {
+  test('marks only the sorted column', () => {
+    expect(sortMark({ column: 'ms', desc: false }, 'ms')).toBe('▲')
+    expect(sortMark({ column: 'ms', desc: true }, 'ms')).toBe('▼')
+    expect(sortMark({ column: 'ms', desc: true }, 'name')).toBe('')
+    expect(sortMark(undefined, 'ms')).toBe('')
+  })
+})
+
+const turn = (turnId: string, text = turnId): Turn => ({ turnId, text, startedAt: 0, isComplete: true })
+const T = [turn('t1', 'list files'), turn('t2', 'fix it'), turn('t3', 'run tests')]
+
+describe('viewedTurn', () => {
+  test('no pin follows the latest turn', () => {
+    expect(viewedTurn(T)).toEqual({ turn: T[2], index: 2, isLive: true })
+  })
+  test('a pin shows its turn', () => {
+    expect(viewedTurn(T, 't1')).toEqual({ turn: T[0], index: 0, isLive: false })
+  })
+  test('an evicted pin falls back to the oldest turn kept', () => {
+    expect(viewedTurn(T, 'gone')).toEqual({ turn: T[0], index: 0, isLive: false })
+  })
+  test('no turns', () => {
+    expect(viewedTurn([])).toEqual({ turn: undefined, index: -1, isLive: true })
+    expect(viewedTurn([], 't1')).toEqual({ turn: undefined, index: -1, isLive: false })
+  })
+})
+
+describe('navTarget and canNav', () => {
+  test('from live: back moves, forward does not', () => {
+    expect(navTarget(T, undefined, 'prev')).toBe('t2')
+    expect(navTarget(T, undefined, 'first')).toBe('t1')
+    expect(canNav(T, undefined, 'prev')).toBe(true)
+    expect(canNav(T, undefined, 'next')).toBe(false)
+    expect(canNav(T, undefined, 'latest')).toBe(false)
+  })
+  test('from a pin: next onto the latest turn follows live again', () => {
+    expect(navTarget(T, 't1', 'next')).toBe('t2')
+    expect(navTarget(T, 't2', 'next')).toBeUndefined()
+    expect(navTarget(T, 't1', 'latest')).toBeUndefined()
+  })
+  test('at the first turn, back is a no-op', () => {
+    expect(canNav(T, 't1', 'prev')).toBe(false)
+    expect(canNav(T, 't1', 'first')).toBe(false)
+    expect(navTarget(T, 't1', 'prev')).toBe('t1')
+  })
+  test('one turn or none: nothing moves', () => {
+    for (const to of ['first', 'prev', 'next', 'latest'] as const) {
+      expect(canNav([turn('t1')], undefined, to)).toBe(false)
+      expect(canNav([], undefined, to)).toBe(false)
+      expect(navTarget([], undefined, to)).toBeUndefined()
+    }
+  })
+})
+
+describe('navLabel', () => {
+  test('live: position and prompt', () => {
+    expect(navLabel(T)).toBe('turn 3/3 · "run tests"')
+  })
+  test('pinned before the latest: the live hint', () => {
+    expect(navLabel(T, 't1')).toBe('turn 1/3 · "list files" · ● live: 3')
+  })
+  test('no turns', () => {
+    expect(navLabel([])).toBe('no turns yet')
   })
 })
