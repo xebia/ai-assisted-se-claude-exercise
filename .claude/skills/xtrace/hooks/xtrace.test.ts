@@ -489,7 +489,8 @@ describe('pane turn navigation', () => {
 
   test('follows the latest turn and labels it', async ($, on) => {
     const ui = await twoTurns($, on)
-    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2 · "read it"')
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2')
+    expect((await ui.find({ key: 'prompt' }))?.text).toBe('prompt: "read it"')
     expect(await ui.find({ type: 'Text', text: /Read\s+a\.go/ })).toBeDefined()
     expect((await ui.find({ key: 'nav-next' }))?.props.dimColor).toBe(true)
   })
@@ -497,23 +498,24 @@ describe('pane turn navigation', () => {
   test('prev shows the earlier turn; a new turn keeps it and says live', async ($, on) => {
     const ui = await twoTurns($, on)
     await ui.press({ key: 'nav-prev' })
-    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/2 · "list files" · ● live: 2')
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/2 · ● live: 2')
+    expect((await ui.find({ key: 'prompt' }))?.text).toBe('prompt: "list files"')
     expect(await ui.find({ type: 'Text', text: /Bash\s+ls/ })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /Read\s+a\.go/ })).toBeUndefined()
     await $.turn.start({ text: 'run tests', turnId: 't3' })
-    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/3 · "list files" · ● live: 3')
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/3 · ● live: 3')
     await ui.press({ key: 'nav-latest' })
-    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 3/3 · "run tests"')
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 3/3')
   })
 
   test('first and next walk the turns; prev at the start does nothing', async ($, on) => {
     const ui = await twoTurns($, on)
     await ui.press({ key: 'nav-first' })
-    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/2 · "list files" · ● live: 2')
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/2 · ● live: 2')
     await ui.press({ key: 'nav-prev' })
-    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/2 · "list files" · ● live: 2')
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/2 · ● live: 2')
     await ui.press({ key: 'nav-next' })
-    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2 · "read it"')
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2')
   })
 
   test('the filter stays while navigating', async ($, on) => {
@@ -527,9 +529,9 @@ describe('pane turn navigation', () => {
   test('next and latest on the latest turn do nothing', async ($, on) => {
     const ui = await twoTurns($, on)
     await ui.press({ key: 'nav-next' })
-    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2 · "read it"')
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2')
     await ui.press({ key: 'nav-latest' })
-    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2 · "read it"')
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2')
   })
 
   // Each call is two rows (tools and hooks): 1001 calls overflow the 2000-row buffer and drop t1's rows.

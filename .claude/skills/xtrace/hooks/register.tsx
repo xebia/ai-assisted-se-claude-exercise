@@ -5,7 +5,7 @@ import { CATEGORIES, parseArgs, withNewCategories, wordsOf } from './args'
 import { attachHookContext, buildReport, counterSegments, firstWords, paletteFor, paneHeaderCells, paneSegments, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
 import { commandsFor, enabledInstalls, pluginsFor } from './hookmatch'
 import type { PluginHooks } from './hookmatch'
-import { applyView, canNav, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, sortMark, viewedTurn, withSort } from './view'
+import { applyView, canNav, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, sortMark, turnTitle, viewedTurn, withSort } from './view'
 import type { Column, Nav } from './view'
 
 // The engine follows `$` and the state atoms only within this file, never across
@@ -451,8 +451,8 @@ export const register: Register = on => {
     const now = await nowOrUndefined($)
     const total = turn !== undefined && now !== undefined ? turnTotalLines(turn, rows, now) : undefined
     const extra = (view.help ? EXAMPLES.length : 0) + (parsed.errors.length > 0 ? 1 : 0) + (isFiltered ? 1 : 0)
-    // Counters, filter bar, rule, header, the rows, rule, the total's lines, rule, nav.
-    const room = Math.max(1, (e.viewport?.rows ?? 24) - 8 - extra - (total?.length ?? 0))
+    // Counters, filter bar, rule, prompt, header, the rows, rule, the total's lines, rule, nav.
+    const room = Math.max(1, (e.viewport?.rows ?? 24) - 8 - (turn !== undefined ? 1 : 0) - extra - (total?.length ?? 0))
     const width = e.props.bodyColumns > 0 ? e.props.bodyColumns : 80
     const rule = '─'.repeat(Math.max(1, Math.min(width, 120)))
     const withPlugins = picked.has('hooks')
@@ -477,6 +477,14 @@ export const register: Register = on => {
           <Text key={`example-${x.text}`} dimColor wrap="truncate-end">{`  ${x.text.padEnd(28)} ${x.meaning}`}</Text>
         ))}
         <Text dimColor>{rule}</Text>
+        {turn !== undefined && (
+          <Box key="prompt">
+            <Text wrap="truncate-end">
+              <Text color={pal.label}>prompt: </Text>
+              <Text color={pal.value}>{turnTitle(turn.text)}</Text>
+            </Text>
+          </Box>
+        )}
         {isEvicted && <Box key="evicted"><Text dimColor>rows for this turn fell out of the 2000-row buffer</Text></Box>}
         {!isEvicted && selected.length === 0 && <Text dimColor>No rows in this turn yet.</Text>}
         {selected.length > 0 && (

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { applyView, canNav, COLUMNS, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, sortMark, viewedTurn, withSort } from './view'
+import { applyView, canNav, COLUMNS, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, sortMark, turnTitle, viewedTurn, withSort } from './view'
 import type { Row, Turn } from '../types'
 
 const row = (over: Partial<Row>): Row => ({
@@ -193,13 +193,30 @@ describe('navTarget and canNav', () => {
 })
 
 describe('navLabel', () => {
-  test('live: position and prompt', () => {
-    expect(navLabel(T)).toBe('turn 3/3 · "run tests"')
+  test('live: the position alone, no prompt', () => {
+    expect(navLabel(T)).toBe('turn 3/3')
   })
   test('pinned before the latest: the live hint', () => {
-    expect(navLabel(T, 't1')).toBe('turn 1/3 · "list files" · ● live: 3')
+    expect(navLabel(T, 't1')).toBe('turn 1/3 · ● live: 3')
   })
   test('no turns', () => {
     expect(navLabel([])).toBe('no turns yet')
+  })
+})
+
+describe('turnTitle', () => {
+  test('a typed prompt is quoted', () => {
+    expect(turnTitle('fix it')).toBe('"fix it"')
+  })
+  test('a leading tag names the turn, with its from when it has one', () => {
+    expect(turnTitle('<agent-message from="ace7b01faae49260b"> [Subagent hand-back] The text')).toBe('[agent message from ace7b01]')
+    expect(turnTitle('<task-notification> <task-id>adc08193</task-id> <status>completed</status>')).toBe('[task notification]')
+  })
+  test('an empty prompt says so', () => {
+    expect(turnTitle('')).toBe('[no prompt]')
+    expect(turnTitle('   ')).toBe('[no prompt]')
+  })
+  test('a prompt that only mentions a tag later is still a prompt', () => {
+    expect(turnTitle('why does <Box> drop its key')).toBe('"why does <Box> drop its key"')
   })
 })

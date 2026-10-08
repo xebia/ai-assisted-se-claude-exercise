@@ -194,9 +194,22 @@ export function navTarget(turns: Turn[], pinnedTurnId: string | undefined, to: N
   return i >= turns.length - 1 ? undefined : turns[i]?.turnId
 }
 
+// Position only; the turn's prompt has its own line above the header.
 export function navLabel(turns: Turn[], pinnedTurnId?: string): string {
   const { turn, index, isLive } = viewedTurn(turns, pinnedTurnId)
   if (turn === undefined) return 'no turns yet'
   const live = !isLive && index < turns.length - 1 ? ` · ● live: ${turns.length}` : ''
-  return `turn ${index + 1}/${turns.length} · "${turn.text}"${live}`
+  return `turn ${index + 1}/${turns.length}${live}`
+}
+
+// A turn the person did not type (a subagent's hand-back, a task notification)
+// starts with a tag: name it by the tag, and by its `from` when it has one.
+export function turnTitle(text: string): string {
+  const trimmed = text.trim()
+  if (trimmed === '') return '[no prompt]'
+  const tag = /^<([a-z][\w-]*)([^>]*)>/i.exec(trimmed)
+  if (tag === null) return `"${trimmed}"`
+  const from = /\bfrom="([^"]*)"/.exec(tag[2] ?? '')?.[1]
+  const name = (tag[1] ?? '').replace(/-/g, ' ')
+  return from !== undefined ? `[${name} from ${from.slice(0, 7)}]` : `[${name}]`
 }
