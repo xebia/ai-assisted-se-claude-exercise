@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 import type { Category, Compaction, Row, Selection, Turn, View } from '../types'
 import { CATEGORIES, parseArgs, withNewCategories, wordsOf } from './args'
-import { attachHookContext, buildReport, counterSegments, firstWords, paletteFor, paneHeaderCells, paneSegments, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
+import { attachHookContext, buildReport, counterSegments, denialCategory, firstWords, paletteFor, paneHeaderCells, paneSegments, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
 import { commandsFor, enabledInstalls, pluginsFor } from './hookmatch'
 import type { PluginHooks } from './hookmatch'
 import { applyView, canNav, canPage, EXAMPLES, navLabel, navTarget, parseFilter, pageRows, PLACEHOLDER, rowWindow, scrollRows, sortMark, turnTitle, viewedTurn, withSort } from './view'
@@ -40,6 +40,10 @@ function addRow($: EngineInterface, row: Row) {
 
 function finishRow($: EngineInterface, id: string, patch: Partial<Row>) {
   return update($, ROWS, list => list.map(r => (r.id === id ? { ...r, ...patch } : r)))
+}
+
+function finishRowWith($: EngineInterface, id: string, patch: (row: Row) => Partial<Row>) {
+  return update($, ROWS, list => list.map(r => (r.id === id ? { ...r, ...patch(r) } : r)))
 }
 
 function addTurn($: EngineInterface, turn: Turn) {
@@ -186,6 +190,7 @@ const NAV: { to: Nav; hotkey: string; label: string }[] = [
 export const register: Register = on => {
   const runningAgents: string[] = []                      // tool_use_ids of Agent calls in flight, newest last
   const parentOfAgent = new Map<string, string>()         // agentId -> Agent tool_use_id
+  const deniedCalls = new Set<string>()                   // tool_use_ids auto mode denied: their error result reads as denied
 
   on('session.start', async ($, e, next) => {
     try { settings = await $.settings.read() } catch { settings = undefined }
@@ -254,7 +259,7 @@ export const register: Register = on => {
       const ran = await next(e)
       try {
         const ms = (await $.clock.now()) - startedAt
-        const outcome: Row['outcome'] = ran.deny !== undefined ? 'denied' : ran.isError === true ? 'error' : 'ok'
+        const outcome: Row['outcome'] = ran.deny !== undefined || deniedCalls.has(id) ? 'denied' : ran.isError === true ? 'error' : 'ok'
         // What the model reads back: the result text, the deny text, and any reminders riding along.
         const read = typeof ran.text === 'string' ? ran.text : typeof ran.deny === 'string' ? ran.deny : ''
         const chars = read.length + (ran.context ?? []).reduce((n: number, c: string) => n + c.length, 0)
@@ -396,7 +401,19 @@ export const register: Register = on => {
   on('classic.PostCompact', ($, e, next) => recordHook('PostCompact', $, e, next))
   on('classic.Notification', ($, e, next) => recordHook('Notification', $, e, next))
   on('classic.PermissionRequest', ($, e, next) => recordHook('PermissionRequest', $, e, next))
-  on('classic.PermissionDenied', ($, e, next) => recordHook('PermissionDenied', $, e, next))
+  // Auto mode answers a call it denies as an ordinary error result; this event says
+  // which call it was and why. Before or after the call finished, its row reads denied.
+  on('classic.PermissionDenied', async ($, e, next) => {
+    try {
+      const id = typeof e.tool_use_id === 'string' ? e.tool_use_id : undefined
+      if (id !== undefined && !deniedCalls.has(id)) {
+        deniedCalls.add(id)
+        const why = typeof e.reason === 'string' ? denialCategory(e.reason) : undefined
+        await finishRowWith($, id, row => ({ outcome: row.outcome === 'running' ? row.outcome : 'denied', target: why !== undefined ? `[${why}] ${row.target}` : row.target }))
+      }
+    } catch {}
+    return recordHook('PermissionDenied', $, e, next)
+  })
   // The pane is drawn to fit, so the engine never scrolls it: a wheel tick or a
   // scroll key moves the row window instead, and the window stays undrawn.
   on('ui.scroll', { requestId: PANE }, async ($, e) => {

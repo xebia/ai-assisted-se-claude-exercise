@@ -390,6 +390,33 @@ describe('plugin hooks', () => {
   })
 })
 
+describe('denied calls', () => {
+  const REASON = '[Auto-Mode Bypass] Spawning a subagent here would sidestep review'
+
+  test('auto mode denying a call marks its row denied with the category', async ($, on) => {
+    answerTurns(on)
+    on('classic.PermissionDenied', () => ({}))
+    // Core fires PermissionDenied while the call is in flight, then answers it as an error.
+    on('tool.call', { tool: 'Agent' }, async () => {
+      await $.classic.PermissionDenied({ tool_name: 'Agent', tool_input: {}, tool_use_id: 'u1', reason: REASON })
+      return { result: {}, text: 'Permission for this action was denied', isError: true }
+    })
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Agent', subagent_type: 'Explore', description: 'find handlers', prompt: 'p', tool_use_id: 'u1' })
+    expect(await xtrace($, 'agents')).toContain('| agents | Explore | [Auto-Mode Bypass] find handlers | denied |')
+  })
+
+  test('a denial that arrives after the call finished still marks it', async ($, on) => {
+    answerTurns(on)
+    on('classic.PermissionDenied', () => ({}))
+    on('tool.call', { tool: 'Bash' }, () => ({ result: {}, text: 'denied', isError: true }))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u2' })
+    await $.classic.PermissionDenied({ tool_name: 'Bash', tool_input: {}, tool_use_id: 'u2', reason: '[Data Exfiltration] x' })
+    expect(await xtrace($, 'tools')).toContain('| tools | Bash | [Data Exfiltration] ls | denied |')
+  })
+})
+
 describe('model rows', () => {
   test('a model request becomes a model row with its usage', async ($, on) => {
     answerTurns(on)

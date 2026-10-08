@@ -12,6 +12,13 @@ export function trim(text: string, max = TARGET_MAX): string {
   return one.length <= max ? one : one.slice(0, max - 1) + '…'
 }
 
+// What auto mode's denial reason names: its leading `[Category]`, else the reason itself, shortened.
+export function denialCategory(reason: string): string | undefined {
+  const text = reason.trim()
+  if (text === '') return undefined
+  return /^\[([^\]]+)\]/.exec(text)?.[1] ?? firstWords(text, 7)
+}
+
 export function firstWords(text: string, n = 8): string {
   const words = text.trim().split(/\s+/).filter(Boolean)
   return words.length <= n ? words.join(' ') : words.slice(0, n).join(' ') + '…'

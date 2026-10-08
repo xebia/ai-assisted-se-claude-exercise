@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { attachHookContext, costOf, counterSegments, fmtCost, DARK, LIGHT, msStyle, paletteFor, buildReport, firstWords, fmtDuration, fmtTokens, outcomeStyle, paneHeader, paneHeaderCells, paneLine, paneSegments, paneTotalSegments, scopedTurns, targetOf, tokenStyle, tokenTotals, tokenValues, tokensOf, turnTotal, turnTotalLines } from './report'
+import { attachHookContext, costOf, counterSegments, denialCategory, fmtCost, DARK, LIGHT, msStyle, paletteFor, buildReport, firstWords, fmtDuration, fmtTokens, outcomeStyle, paneHeader, paneHeaderCells, paneLine, paneSegments, paneTotalSegments, scopedTurns, targetOf, tokenStyle, tokenTotals, tokenValues, tokensOf, turnTotal, turnTotalLines } from './report'
 import type { Row, Turn } from '../types'
 
 const turn1: Turn = { turnId: 't1', text: 'find the n plus one', startedAt: 1000, isComplete: true }
@@ -402,5 +402,16 @@ describe('cost', () => {
     const b = row({ id: 's1', kind: 'model', startedAt: 2002, usage: u('gpt-9', 1000, 100_000, 2000, 500) })
     const done: Turn = { ...turn2, isComplete: true, completedAt: 14300 }
     expect(turnTotalLines(done, [a, b], 0)[0]).toMatch(/≈\$0\.05 \+ \?$/)
+  })
+})
+
+describe('denialCategory', () => {
+  test('the bracketed category auto mode puts first', () => {
+    expect(denialCategory('[Auto-Mode Bypass] Spawning an agent to …')).toBe('Auto-Mode Bypass')
+    expect(denialCategory('  [Data Exfiltration] sends the repo')).toBe('Data Exfiltration')
+  })
+  test('no category: the reason, trimmed', () => {
+    expect(denialCategory('Auto mode could not determine the safety of this action')).toBe('Auto mode could not determine the safety…')
+    expect(denialCategory('')).toBeUndefined()
   })
 })
