@@ -491,6 +491,7 @@ describe('pane turn navigation', () => {
     const ui = await twoTurns($, on)
     expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2')
     expect((await ui.find({ key: 'prompt' }))?.text).toBe('prompt: "read it"')
+    expect((await ui.find({ key: 'nav' }))?.props).toMatchObject({ justifyContent: 'center', width: 100 })   // centered under the rules
     expect(await ui.find({ type: 'Text', text: /Read\s+a\.go/ })).toBeDefined()
     expect((await ui.find({ key: 'nav-next' }))?.props.dimColor).toBe(true)
   })

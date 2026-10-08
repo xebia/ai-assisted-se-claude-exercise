@@ -454,7 +454,8 @@ export const register: Register = on => {
     // Counters, filter bar, rule, prompt, header, the rows, rule, the total's lines, rule, nav.
     const room = Math.max(1, (e.viewport?.rows ?? 24) - 8 - (turn !== undefined ? 1 : 0) - extra - (total?.length ?? 0))
     const width = e.props.bodyColumns > 0 ? e.props.bodyColumns : 80
-    const rule = '─'.repeat(Math.max(1, Math.min(width, 120)))
+    const ruleWidth = Math.max(1, Math.min(width, 120))
+    const rule = '─'.repeat(ruleWidth)
     const withPlugins = picked.has('hooks')
     const marks = parsed.sort !== undefined ? { [parsed.sort.column]: sortMark(parsed.sort, parsed.sort.column) } : {}
     const header = paneHeaderCells(width, withPlugins, marks)
@@ -524,7 +525,7 @@ export const register: Register = on => {
         {selected.length > 0 && isFiltered && <Box key="shown"><Text dimColor>{`${shown.length} of ${selected.length} rows shown`}</Text></Box>}
         {selected.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
         {turns.length > 0 && (
-          <Box flexDirection="row" gap={1}>
+          <Box key="nav" flexDirection="row" gap={1} width={ruleWidth} justifyContent="center">
             {NAV.map(b => {
               const can = canNav(turns, view.pinnedTurnId, b.to)
               return <Button key={`nav-${b.to}`} hotkey={b.hotkey} plain label={b.label} dimColor={!can}
