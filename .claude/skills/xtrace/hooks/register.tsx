@@ -1,10 +1,12 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
-import type { Category, Compaction, Row, Selection, Turn } from '../types'
+import type { Category, Compaction, Row, Selection, Turn, View } from '../types'
 import { CATEGORIES, parseArgs, withNewCategories, wordsOf } from './args'
-import { attachHookContext, buildReport, counterSegments, firstWords, paletteFor, paneHeaderSegments, paneSegments, paneTotalSegments, turnTotalLines, targetOf, tokensOf, usageText } from './report'
+import { attachHookContext, buildReport, counterSegments, firstWords, paletteFor, paneHeaderCells, paneSegments, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
 import { commandsFor, enabledInstalls, pluginsFor } from './hookmatch'
 import type { PluginHooks } from './hookmatch'
+import { applyView, EXAMPLES, parseFilter, PLACEHOLDER, sortMark, withSort } from './view'
+import type { Column } from './view'
 
 // The engine follows `$` and the state atoms only within this file, never across
 // an import, so every helper that takes `$` and every atom is declared here.
@@ -19,6 +21,8 @@ const SELECTION = atom(
   { plugin: 'xtrace', key: 'selection' } as const,
   { categories: [...CATEGORIES], scope: 'turn', known: [...CATEGORIES] } as Selection,
 )
+
+const VIEW = atom({ plugin: 'xtrace', key: 'view' } as const, { filter: '', help: false } as View)
 
 let counter = 0
 const mintId = (prefix: string) => `${prefix}-${Date.now().toString(36)}-${(counter++).toString(36)}`
@@ -135,6 +139,14 @@ async function setPane($: EngineInterface, mode: 'on' | 'off' | 'toggle'): Promi
   if (want) await openPane($)
   else await $.ui.close({ id: PANE })
   return want ? 'on' : 'off'
+}
+
+async function setFilter($: EngineInterface, filter: string): Promise<void> {
+  try { await update($, VIEW, v => ({ ...v, filter })) } catch {}
+}
+
+async function sortBy($: EngineInterface, column: Column): Promise<void> {
+  try { await update($, VIEW, v => ({ ...v, filter: withSort(v.filter, column) })) } catch {}
 }
 
 export const register: Register = on => {
@@ -400,48 +412,77 @@ export const register: Register = on => {
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
-    const { Box, Text } = $.ui.resolve(e)
+    const { Box, Text, Button, Input } = $.ui.resolve(e)
     const rows: Row[] = await read($, ROWS)
     const turns: Turn[] = await read($, TURNS)
     const selection: Selection = await read($, SELECTION)
+    const view: View = await read($, VIEW)
     const pal = paletteFor((await $.config.list().catch(() => [])).find(row => row.key === 'theme')?.value)
     const counters = counterSegments(CATEGORIES.map(c => [c, rows.filter(r => r.kind === c).length]), pal)
-    const turnId = turns.at(-1)?.turnId
-    const picked = new Set(selection.categories)
-    const shown = rows.filter(r => r.turnId === turnId && picked.has(r.kind))
     const turn = turns.at(-1)
+    const turnId = turn?.turnId
+    const picked = new Set(selection.categories)
+    const turnRows = rows.filter(r => r.turnId === turnId)
+    const tokens = tokensOf(turnRows)
+    const counts = new Map([...tokenValues(turnRows)].map(([id, v]) => [id, v.n]))
+    const parsed = parseFilter(view.filter)
+    const selected = turnRows.filter(r => picked.has(r.kind))
+    const shown = applyView(selected, parsed, counts)
+    const isFiltered = view.filter.trim() !== ''
     const now = await nowOrUndefined($)
     const total = turn !== undefined && now !== undefined ? turnTotalLines(turn, rows, now) : undefined
-    // Counters, rule, header, the rows, rule, the total's lines, rule.
-    const room = Math.max(1, (e.viewport?.rows ?? 24) - 6 - (total?.length ?? 0))
+    const extra = (view.help ? EXAMPLES.length : 0) + (parsed.errors.length > 0 ? 1 : 0) + (isFiltered ? 1 : 0)
+    // Counters, filter bar, rule, header, the rows, rule, the total's lines, rule.
+    const room = Math.max(1, (e.viewport?.rows ?? 24) - 7 - extra - (total?.length ?? 0))
     const width = e.props.bodyColumns > 0 ? e.props.bodyColumns : 80
     const rule = '─'.repeat(Math.max(1, Math.min(width, 120)))
     const withPlugins = picked.has('hooks')
-    const tokens = tokensOf(rows.filter(r => r.turnId === turnId))
+    const marks = parsed.sort !== undefined ? { [parsed.sort.column]: sortMark(parsed.sort, parsed.sort.column) } : {}
+    const header = paneHeaderCells(width, withPlugins, marks)
+    // Unsorted, the newest rows that fit; sorted, the first ones in order.
+    const visible = parsed.sort === undefined ? shown.slice(-room) : shown.slice(0, room)
 
     return (
       <Box flexDirection="column">
         <Text wrap="truncate-end">
           {counters.map((s, i) => <Text key={`count-${i}`} color={s.color}>{s.text}</Text>)}
         </Text>
+        <Box flexDirection="row" gap={2}>
+          <Input key="filter" label="filter:" placeholder={PLACEHOLDER} value={view.filter} submitLabel="keep"
+            onInput={value => setFilter($, value)} onSubmit={value => setFilter($, value)} />
+          <Button key="help" hotkey="h" plain label="?"
+            onPress={async () => { try { await update($, VIEW, v => ({ ...v, help: !v.help })) } catch {} }} />
+        </Box>
+        {parsed.errors.length > 0 && <Box key="filter-error"><Text dimColor wrap="truncate-end">{parsed.errors.join(' · ')}</Text></Box>}
+        {view.help && EXAMPLES.map(x => (
+          <Text key={`example-${x.text}`} dimColor wrap="truncate-end">{`  ${x.text.padEnd(28)} ${x.meaning}`}</Text>
+        ))}
         <Text dimColor>{rule}</Text>
-        {shown.length === 0 && <Text dimColor>No rows in this turn yet.</Text>}
-        {shown.length > 0 && (
-          <Text wrap="truncate-end">
-            {paneHeaderSegments(width, withPlugins, pal).map((s, i) => (
-              <Text key={`head-${i}`} color={s.color} underline={s.underline}>{s.text}</Text>
-            ))}
-          </Text>
+        {selected.length === 0 && <Text dimColor>No rows in this turn yet.</Text>}
+        {selected.length > 0 && (
+          <Box flexDirection="row">
+            {header.flatMap((c, i) => {
+              const label = c.text.trim()
+              const pad = ' '.repeat(c.text.length - label.length)
+              const isLast = i === header.length - 1
+              return [
+                ...(i > 0 ? [<Text key={`hgap-${i}`}> </Text>] : []),
+                ...(isLast && pad !== '' ? [<Text key={`hpad-${i}`}>{pad}</Text>] : []),
+                <Button key={`sort-${c.column}`} plain dimColor label={label} onPress={() => sortBy($, c.column as Column)} />,
+                ...(!isLast && pad !== '' ? [<Text key={`hpad-${i}`}>{pad}</Text>] : []),
+              ]
+            })}
+          </Box>
         )}
-        {shown.slice(-room).map(r => (
+        {visible.map(r => (
           <Text key={r.id} wrap="truncate-end">
             {paneSegments(r, width, withPlugins, tokens.get(r.id), pal).map((s, i) => (
               <Text key={`${r.id}-${i}`} color={s.color} bold={s.bold}>{s.text}</Text>
             ))}
           </Text>
         ))}
-        {shown.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
-        {shown.length > 0 && total !== undefined && (
+        {selected.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
+        {selected.length > 0 && total !== undefined && (
           <Box flexDirection="column">
             {total.map((line, n) => (
               <Text key={`total-${n}`} wrap="truncate-end">
@@ -452,7 +493,8 @@ export const register: Register = on => {
             ))}
           </Box>
         )}
-        {shown.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
+        {selected.length > 0 && isFiltered && <Box key="shown"><Text dimColor>{`${shown.length} of ${selected.length} rows shown`}</Text></Box>}
+        {selected.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
       </Box>
     )
   })

@@ -46,6 +46,12 @@ export type Selection = {
   known?: Category[]         // the categories that existed when it was saved; later ones start on
 }
 
+export type View = {
+  filter: string             // the pane's filter bar, its sort term included
+  pinnedTurnId?: string      // the turn shown; undefined follows the latest
+  help: boolean              // the filter cheat sheet is shown
+}
+
 // The keys are spelled inline: `claude plugin validate` reads them from this literal.
 declare module 'claude-code' {
   interface PluginState {
@@ -54,6 +60,7 @@ declare module 'claude-code' {
       turns: Turn[]
       compactions: Compaction[]
       selection: Selection
+      view: View
     }
   }
 }

@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { attachHookContext, counterSegments, DARK, LIGHT, msStyle, paletteFor, buildReport, firstWords, fmtDuration, fmtTokens, outcomeStyle, paneHeader, paneHeaderCells, paneHeaderSegments, paneLine, paneSegments, paneTotalSegments, scopedTurns, targetOf, tokenStyle, tokenTotals, tokenValues, tokensOf, turnTotal, turnTotalLines } from './report'
+import { attachHookContext, counterSegments, DARK, LIGHT, msStyle, paletteFor, buildReport, firstWords, fmtDuration, fmtTokens, outcomeStyle, paneHeader, paneHeaderCells, paneLine, paneSegments, paneTotalSegments, scopedTurns, targetOf, tokenStyle, tokenTotals, tokenValues, tokensOf, turnTotal, turnTotalLines } from './report'
 import type { Row, Turn } from '../types'
 
 const turn1: Turn = { turnId: 't1', text: 'find the n plus one', startedAt: 1000, isComplete: true }
@@ -230,13 +230,6 @@ describe('pane colors', () => {
     expect(segs[2]).toMatchObject({ text: expect.stringMatching(/^PreToolUse Bash/), color: DARK.kind.hooks })
     expect(segs[2]?.bold).toBeUndefined()
     expect(paneSegments(hook, 100, true, '', LIGHT)[0]).toMatchObject({ color: LIGHT.kind.hooks })
-  })
-  test('header: the text matches the plain header, only the labels are underlined, in grey', () => {
-    const segs = paneHeaderSegments(100, true)
-    expect(segs.map(s => s.text).join('').trimEnd()).toBe(paneHeader(100, true))
-    expect(segs.filter(s => s.underline).map(s => s.text)).toEqual(['kind', 'name', 'target', 'plugins', 'outcome', 'tokens', 'ms'])
-    expect(segs.filter(s => s.underline).every(s => s.color === DARK.label && !s.bold)).toBe(true)
-    expect(segs.filter(s => !s.underline).every(s => s.text.trim() === '')).toBe(true)
   })
   test('outcomes', () => {
     expect(outcomeStyle('ok')).toEqual({ color: DARK.outcome })

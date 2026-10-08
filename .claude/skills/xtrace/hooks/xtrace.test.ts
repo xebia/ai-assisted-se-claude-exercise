@@ -416,3 +416,59 @@ describe('model rows', () => {
     expect(await xtrace($, 'tools')).toMatch(/\| tools \| Bash \| ls \| ok \| \d+ \| ~1\.0k \|/)
   })
 })
+
+describe('pane filter and sort', () => {
+  // Two tool rows in one turn: Read a.go, then Bash ls.
+  const twoRows = async ($: Engine, on: On) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await xtrace($, 'tools')
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Read', file_path: 'a.go', tool_use_id: 'u1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u2' })
+    return $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+  }
+
+  test('the empty bar shows examples', async ($, on) => {
+    const ui = await twoRows($, on)
+    expect((await ui.find({ key: 'filter' }))?.props.placeholder).toBe('try: outcome:!ok · kind:tools sort:-ms · tokens:>5k')
+  })
+
+  test('typing a filter narrows the rows and shows the count', async ($, on) => {
+    const ui = await twoRows($, on)
+    await ui.input({ key: 'filter', text: 'name:bash', kind: 'change' })
+    expect(await ui.find({ type: 'Text', text: /Bash\s+ls\s+ok/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /Read\s+a\.go/ })).toBeUndefined()
+    expect((await ui.find({ key: 'shown' }))?.text).toBe('1 of 2 rows shown')
+  })
+
+  test('a mistake is named and the rest still filters', async ($, on) => {
+    const ui = await twoRows($, on)
+    await ui.input({ key: 'filter', text: 'foo:1 name:read' })
+    expect((await ui.find({ key: 'filter-error' }))?.text).toContain('unknown column "foo"')
+    expect(await ui.find({ type: 'Text', text: /Read\s+a\.go/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /Bash\s+ls/ })).toBeUndefined()
+  })
+
+  test('pressing a header sorts and writes the sort into the bar', async ($, on) => {
+    const ui = await twoRows($, on)
+    await ui.press({ key: 'sort-name' })
+    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('sort:name')
+    expect((await ui.find({ key: 'sort-name' }))?.props.label).toBe('name▲')
+    // Outer row Texts only: an inner segment holds one cell, the counters line reads `tools 2 · …`.
+    const rows = await ui.findAll({ type: 'Text', text: /^tools\s+(Bash|Read)\s/ })
+    expect(rows.map(r => r.text)).toEqual([expect.stringMatching(/Bash/), expect.stringMatching(/Read/)])
+    await ui.press({ key: 'sort-name' })
+    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('sort:-name')
+    await ui.press({ key: 'sort-name' })
+    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('')
+  })
+
+  test('help shows the examples', async ($, on) => {
+    const ui = await twoRows($, on)
+    expect(await ui.find({ type: 'Text', text: /slowest first/ })).toBeUndefined()
+    await ui.press({ key: 'help' })
+    expect(await ui.find({ type: 'Text', text: /kind:tools sort:-ms\s+tool calls, slowest first/ })).toBeDefined()
+  })
+})

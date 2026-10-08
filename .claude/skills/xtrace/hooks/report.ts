@@ -381,22 +381,6 @@ export function msStyle(ms: number | undefined, pal: Palette = DARK): Omit<Segme
   return { color: pal.ms[step] }
 }
 
-// The header: grey labels, underlined so each column's start is visible; the
-// padding stays plain.
-export function paneHeaderSegments(width: number, withPlugins: boolean, pal: Palette = DARK): Segment[] {
-  const labels = withPlugins ? PANE_HEADER : PANE_HEADER.filter(h => h !== 'plugins')
-  const fitted = fitCells(labels, width, withPlugins)
-  const last = fitted.length - 1
-  return fitted.flatMap((cell, i) => {
-    const label = cell.trim()
-    const pad = ' '.repeat(cell.length - label.length)
-    const parts: Segment[] = i === last
-      ? [{ text: pad }, { text: label, color: pal.label, underline: true }]
-      : [{ text: label, color: pal.label, underline: true }, { text: pad }]
-    return [...(i > 0 ? [{ text: ' ' }] : []), ...parts.filter(p => p.text !== '')]
-  })
-}
-
 export function paneSegments(row: Row, width: number, withPlugins: boolean, tokens = '', pal: Palette = DARK): Segment[] {
   const ms = row.ms === undefined ? '' : String(row.ms)
   const cells: [string, Omit<Segment, 'text'>][] = [
