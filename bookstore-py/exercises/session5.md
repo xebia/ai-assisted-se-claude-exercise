@@ -56,7 +56,7 @@ a prediction and three notes.
 
 Why a deny rule. `CLAUDE.md` asks Claude not to open `store.db`, but
 Claude can still decide to do it. With a `permissions.deny` rule, Claude
-Code blocks the command before it runs (*MCP Permissions and Security*).
+Code blocks the command before it runs (*MCP Permissions: Allow, Ask, Deny*).
 
 **Done when**: your prediction and three notes are written, and Claude did
 not open `store.db`.
@@ -65,8 +65,8 @@ not open `store.db`.
 
 This task produces `.mcp.json` and a connected server.
 
-The server has two tools: `get_table_definitions` and `execute_query`
-(*The `/mcp` Command*). It only runs `SELECT` queries. The server is one
+The server has two tools: `get_table_definitions` and `execute_query`.
+It only runs `SELECT` queries. The server is one
 Python file, `mcp-sqlite/server.py`. It reads `store.db`, which the app
 creates the first time it runs.
 
@@ -83,7 +83,7 @@ creates the first time it runs.
 
    The part after `--` is the command that starts the server
    (*Configuring an MCP Server*). `--scope project` writes it to
-   `.mcp.json` in this folder (*Under the Hood: `.mcp.json`*). Open that
+   `.mcp.json` in this folder. Open that
    file: it holds the command you just typed. Git ignores `.mcp.json` in
    this course, so it stays on your machine. If `uv` is missing or
    fails: run `claude mcp remove sqlite-bookstore`, then the command above
@@ -113,7 +113,7 @@ This task produces three more notes.
 1. **Same question**. Paste the prompt from task 1, step 3 again,
    tag included. Watch the tool calls: `get_table_definitions` first, then
    `execute_query`. The names appear as
-   `mcp__sqlite-bookstore__execute_query` (*The `/mcp` Command*).
+   `mcp__sqlite-bookstore__execute_query` (*"Claude Cannot See the Database"*).
 
 2. **Compare**. Write down the same three notes. Which answers
    changed? Was your prediction right?
@@ -139,7 +139,7 @@ This task produces `.claude/agents/security-auditor.md` and the report of
 the security check, `docs/security-audit.md`.
 
 A subagent is a markdown file. Its first lines, between two `---` lines,
-are the frontmatter (*Custom Subagents*). The body, the instructions for
+are the frontmatter (*An Agent File Is a Workflow*). The body, the instructions for
 the check, is written for you in the starter file. You write two
 frontmatter lines yourself, in step 2.
 
@@ -159,7 +159,7 @@ frontmatter lines yourself, in step 2.
      slide *Which Subagent Description Invokes Reliably?* is `Reviews
      code for security issues.` Write a better one, in your own words.
    - `tools`: tool names, separated by commas, written as on the slide
-     *Custom Subagents*. The agent must never change code. Give it the
+     *An Agent File Is a Workflow*. The agent must never change code. Give it the
      smallest set that still lets it find and read files.
 
    Optional, if you have time: run `/mcp-coach 4` (4 is the task number).
@@ -206,7 +206,7 @@ Permissions and Security*.
 **Read the server.** Open `mcp-sqlite/server.py`. You do not need to
 know Python. Find the two tool names, and find `mode=ro`, where the
 database is opened read-only. The whole server is one file of about 200
-lines (*Building a Custom MCP Server*).
+lines.
 
 **Run the plugin.** The folder `bookstore-plugin`, inside `bookstore`,
 holds the skills from exercise 4, the hook, a finished

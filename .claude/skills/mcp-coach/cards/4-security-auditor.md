@@ -21,8 +21,8 @@ the agent may use"; the test in step 3 is "test the trigger"; the agent
 
 **Slide anchors:** *How Subagents Get Invoked* (the description is the
 trigger) · *Which Subagent Description Invokes Reliably?* (the A/B vote) ·
-*Custom Subagents* (the frontmatter fields, `tools: Read, Grep, Glob`
-example) · *MCP Permissions and Security* (least privilege, restricted
+*An Agent File Is a Workflow* (the frontmatter fields, `tools: Read, Grep, Glob`
+example) · *MCP Permissions: Allow, Ask, Deny* (least privilege, restricted
 tools).
 
 ## Technique applicability
