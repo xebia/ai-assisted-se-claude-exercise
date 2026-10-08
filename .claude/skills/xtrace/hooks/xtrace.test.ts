@@ -483,8 +483,41 @@ describe('pane height', () => {
     await $.turn.start({ text: 'x', turnId: 't1' })
     for (let i = 0; i < 30; i++) await $.tool.call({ tool: 'Bash', command: `echo ${i}`, tool_use_id: `u${i}` })
     const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
-    // 20 body rows less counters, filter, rule, prompt, rule, header, rule, total, rule, nav.
-    expect(await ui.findAll({ type: 'Text', text: /^tools\s+Bash\s/ })).toHaveLength(10)
+    // 20 body rows less counters, filter, rule, prompt, rule, header, rule, total, rule, nav,
+    // and, as 30 rows overflow, the earlier-rows hint and the paging row.
+    expect(await ui.findAll({ type: 'Text', text: /^tools\s+Bash\s/ })).toHaveLength(8)
+  })
+
+  test('an overflowing turn says what is hidden and pages through it', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await xtrace($, 'tools')
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    for (let i = 0; i < 30; i++) await $.tool.call({ tool: 'Bash', command: `echo ${i}`, tool_use_id: `u${i}` })
+    const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+    expect((await ui.find({ key: 'hidden' }))?.text).toBe('↑ 22 earlier rows')
+    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 23–30 of 30')
+    expect(await ui.find({ type: 'Text', text: /echo 29/ })).toBeDefined()
+    await ui.press({ key: 'page-up' })
+    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 15–22 of 30')
+    expect(await ui.find({ type: 'Text', text: /echo 14/ })).toBeDefined()
+    expect(await ui.find({ type: 'Text', text: /echo 29/ })).toBeUndefined()
+    await ui.press({ key: 'page-down' })
+    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 23–30 of 30')
+  })
+
+  test('changing the filter goes back to the newest rows', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await xtrace($, 'tools')
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    for (let i = 0; i < 30; i++) await $.tool.call({ tool: 'Bash', command: `echo ${i}`, tool_use_id: `u${i}` })
+    const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+    await ui.press({ key: 'page-up' })
+    await ui.input({ key: 'filter', text: 'echo', kind: 'change' })
+    expect((await ui.find({ key: 'page-label' }))?.text).toMatch(/^rows \d+–30 of 30$/)
   })
 })
 

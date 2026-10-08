@@ -5,8 +5,8 @@ import { CATEGORIES, parseArgs, withNewCategories, wordsOf } from './args'
 import { attachHookContext, buildReport, counterSegments, firstWords, paletteFor, paneHeaderCells, paneSegments, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
 import { commandsFor, enabledInstalls, pluginsFor } from './hookmatch'
 import type { PluginHooks } from './hookmatch'
-import { applyView, canNav, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, sortMark, turnTitle, viewedTurn, withSort } from './view'
-import type { Column, Nav } from './view'
+import { applyView, canNav, canPage, EXAMPLES, navLabel, navTarget, parseFilter, pageRows, PLACEHOLDER, rowWindow, scrollRows, sortMark, turnTitle, viewedTurn, withSort } from './view'
+import type { Column, Nav, Page } from './view'
 
 // The engine follows `$` and the state atoms only within this file, never across
 // an import, so every helper that takes `$` and every atom is declared here.
@@ -142,11 +142,11 @@ async function setPane($: EngineInterface, mode: 'on' | 'off' | 'toggle'): Promi
 }
 
 async function setFilter($: EngineInterface, filter: string): Promise<void> {
-  try { await update($, VIEW, v => ({ ...v, filter })) } catch {}
+  try { await update($, VIEW, v => ({ ...v, filter, rowStart: undefined })) } catch {}
 }
 
 async function sortBy($: EngineInterface, column: Column): Promise<void> {
-  try { await update($, VIEW, v => ({ ...v, filter: withSort(v.filter, column) })) } catch {}
+  try { await update($, VIEW, v => ({ ...v, filter: withSort(v.filter, column), rowStart: undefined })) } catch {}
 }
 
 // Read the turns at press time, so a press at an end (or a fast double press) is a no-op.
@@ -155,9 +155,26 @@ async function navigate($: EngineInterface, to: Nav): Promise<void> {
     const turns = await read($, TURNS)
     const { pinnedTurnId } = await read($, VIEW)
     if (!canNav(turns, pinnedTurnId, to)) return
-    await update($, VIEW, v => ({ ...v, pinnedTurnId: navTarget(turns, v.pinnedTurnId, to) }))
+    await update($, VIEW, v => ({ ...v, pinnedTurnId: navTarget(turns, v.pinnedTurnId, to), rowStart: undefined }))
   } catch {}
 }
+
+// The row window as last drawn: a scroll or a page press moves it by what was on screen.
+let drawnWindow = { count: 0, room: 1, sorted: false }
+
+async function moveRows($: EngineInterface, by: number | Page): Promise<void> {
+  const { count, room, sorted } = drawnWindow
+  try {
+    await update($, VIEW, v => ({
+      ...v, rowStart: typeof by === 'number' ? scrollRows(count, room, v.rowStart, sorted, by) : pageRows(count, room, v.rowStart, sorted, by),
+    }))
+  } catch {}
+}
+
+const PAGE: { dir: Page; hotkey: string; label: string }[] = [
+  { dir: 'up', hotkey: 'u', label: '▲' },
+  { dir: 'down', hotkey: 'd', label: '▼' },
+]
 
 const NAV: { to: Nav; hotkey: string; label: string }[] = [
   { to: 'first', hotkey: 'f', label: '⏮' },
@@ -380,6 +397,13 @@ export const register: Register = on => {
   on('classic.Notification', ($, e, next) => recordHook('Notification', $, e, next))
   on('classic.PermissionRequest', ($, e, next) => recordHook('PermissionRequest', $, e, next))
   on('classic.PermissionDenied', ($, e, next) => recordHook('PermissionDenied', $, e, next))
+  // The pane is drawn to fit, so the engine never scrolls it: a wheel tick or a
+  // scroll key moves the row window instead, and the window stays undrawn.
+  on('ui.scroll', { requestId: PANE }, async ($, e) => {
+    if (drawnWindow.count > drawnWindow.room) await moveRows($, e.by)
+    return {}
+  })
+
   on('ui.close', async ($, e, next) => {
     try {
       // The person closed the pane with the engine's own key: remember it as off.
@@ -456,7 +480,7 @@ export const register: Register = on => {
     // and a scrolled pane draws the filter's cursor on the wrong row.
     const bodyRows = e.props.scroll.bodyRows > 0 ? e.props.scroll.bodyRows : (e.viewport?.rows ?? 24)
     // Counters, filter bar, rule, [prompt, rule,] header, the rows, rule, the total's lines, rule, nav.
-    const room = Math.max(1, bodyRows - 7 - (turn !== undefined ? 2 : 0) - extra - (total?.length ?? 0) - (agentsAt > 0 ? 1 : 0))
+    const base = Math.max(1, bodyRows - 7 - (turn !== undefined ? 2 : 0) - extra - (total?.length ?? 0) - (agentsAt > 0 ? 1 : 0))
     const width = e.props.bodyColumns > 0 ? e.props.bodyColumns : 80
     const ruleWidth = Math.max(1, Math.min(width, 120))
     const rule = '─'.repeat(ruleWidth)
@@ -464,7 +488,13 @@ export const register: Register = on => {
     const marks = parsed.sort !== undefined ? { [parsed.sort.column]: sortMark(parsed.sort, parsed.sort.column) } : {}
     const header = paneHeaderCells(width, withPlugins, marks)
     // Unsorted, the newest rows that fit; sorted, the first ones in order.
-    const visible = parsed.sort === undefined ? shown.slice(-room) : shown.slice(0, room)
+    // A turn that overflows gives two lines to the earlier-rows hint and the paging row.
+    const overflows = shown.length > base
+    const room = overflows ? Math.max(1, base - 2) : base
+    const sorted = parsed.sort !== undefined
+    const win = rowWindow(shown.length, room, view.rowStart, sorted)
+    const visible = shown.slice(win.from, win.to)
+    drawnWindow = { count: shown.length, room, sorted }
 
     return (
       <Box flexDirection="column">
@@ -508,6 +538,7 @@ export const register: Register = on => {
             })}
           </Box>
         )}
+        {overflows && win.from > 0 && <Box key="hidden"><Text dimColor>{`↑ ${win.from} ${sorted ? 'rows above' : 'earlier rows'}`}</Text></Box>}
         {visible.map(r => (
           <Text key={r.id} wrap="truncate-end">
             {paneSegments(r, width, withPlugins, tokens.get(r.id), pal).map((s, i) => (
@@ -531,6 +562,15 @@ export const register: Register = on => {
         )}
         {selected.length > 0 && isFiltered && <Box key="shown"><Text dimColor>{`${shown.length} of ${selected.length} rows shown`}</Text></Box>}
         {selected.length > 0 && total !== undefined && <Text dimColor>{rule}</Text>}
+        {overflows && (
+          <Box key="paging" flexDirection="row" gap={1} width={ruleWidth} justifyContent="center">
+            {PAGE.map(b => (
+              <Button key={`page-${b.dir}`} hotkey={b.hotkey} plain label={b.label}
+                dimColor={!canPage(shown.length, room, view.rowStart, sorted, b.dir)} onPress={() => moveRows($, b.dir)} />
+            ))}
+            <Box key="page-label"><Text dimColor>{`rows ${win.from + 1}–${win.to} of ${shown.length}`}</Text></Box>
+          </Box>
+        )}
         {turns.length > 0 && (
           <Box key="nav" flexDirection="row" gap={1} width={ruleWidth} justifyContent="center">
             {NAV.map(b => {

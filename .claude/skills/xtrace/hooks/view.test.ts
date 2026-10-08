@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { applyView, canNav, COLUMNS, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, sortMark, turnTitle, viewedTurn, withSort } from './view'
+import { applyView, canNav, canPage, COLUMNS, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, pageRows, rowWindow, scrollRows, sortMark, turnTitle, viewedTurn, withSort } from './view'
 import type { Row, Turn } from '../types'
 
 const row = (over: Partial<Row>): Row => ({
@@ -218,5 +218,61 @@ describe('turnTitle', () => {
   })
   test('a prompt that only mentions a tag later is still a prompt', () => {
     expect(turnTitle('why does <Box> drop its key')).toBe('"why does <Box> drop its key"')
+  })
+})
+
+describe('rowWindow', () => {
+  test('by default unsorted shows the newest rows, sorted the top', () => {
+    expect(rowWindow(30, 8, undefined, false)).toEqual({ from: 22, to: 30 })
+    expect(rowWindow(30, 8, undefined, true)).toEqual({ from: 0, to: 8 })
+  })
+  test('a start is kept inside the rows', () => {
+    expect(rowWindow(30, 8, 5, false)).toEqual({ from: 5, to: 13 })
+    expect(rowWindow(30, 8, 99, false)).toEqual({ from: 22, to: 30 })
+    expect(rowWindow(30, 8, -3, false)).toEqual({ from: 0, to: 8 })
+  })
+  test('rows that fit need no window', () => {
+    expect(rowWindow(5, 8, undefined, false)).toEqual({ from: 0, to: 5 })
+    expect(rowWindow(0, 8, undefined, true)).toEqual({ from: 0, to: 0 })
+  })
+})
+
+describe('pageRows and canPage', () => {
+  test('up from the newest rows goes one page back, then stops at the top', () => {
+    expect(pageRows(30, 8, undefined, false, 'up')).toBe(14)
+    expect(pageRows(30, 8, 14, false, 'up')).toBe(6)
+    expect(pageRows(30, 8, 6, false, 'up')).toBe(0)
+    expect(canPage(30, 8, 0, false, 'up')).toBe(false)
+  })
+  test('down back onto the default window returns undefined, so a live turn follows again', () => {
+    expect(pageRows(30, 8, 14, false, 'down')).toBeUndefined()
+    expect(pageRows(30, 8, 0, false, 'down')).toBe(8)
+    expect(canPage(30, 8, undefined, false, 'down')).toBe(false)
+  })
+  test('sorted: the default is the top', () => {
+    expect(canPage(30, 8, undefined, true, 'up')).toBe(false)
+    expect(pageRows(30, 8, undefined, true, 'down')).toBe(8)
+    expect(pageRows(30, 8, 8, true, 'up')).toBeUndefined()
+  })
+  test('nothing to page when the rows fit', () => {
+    for (const dir of ['up', 'down'] as const) expect(canPage(5, 8, undefined, false, dir)).toBe(false)
+  })
+})
+
+describe('scrollRows', () => {
+  test('a wheel tick moves one row; past the top it stops', () => {
+    expect(scrollRows(30, 8, undefined, false, -1)).toBe(21)
+    expect(scrollRows(30, 8, 0, false, -1)).toBe(0)
+  })
+  test('scrolling back onto the default window follows live again', () => {
+    expect(scrollRows(30, 8, 21, false, 1)).toBeUndefined()
+    expect(scrollRows(30, 8, 21, false, 50)).toBeUndefined()
+  })
+  test('sorted: down from the top, and back up to it', () => {
+    expect(scrollRows(30, 8, undefined, true, 3)).toBe(3)
+    expect(scrollRows(30, 8, 3, true, -3)).toBeUndefined()
+  })
+  test('rows that fit do not scroll', () => {
+    expect(scrollRows(5, 8, undefined, false, -1)).toBeUndefined()
   })
 })

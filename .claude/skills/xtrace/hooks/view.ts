@@ -213,3 +213,31 @@ export function turnTitle(text: string): string {
   const name = (tag[1] ?? '').replace(/-/g, ' ')
   return from !== undefined ? `[${name} from ${from.slice(0, 7)}]` : `[${name}]`
 }
+
+// --- Which of a turn's shown rows fit the pane. A start is the first row in
+// view; none is the default: unsorted the newest rows (a live turn keeps
+// showing its latest), sorted the top.
+
+export type Page = 'up' | 'down'
+
+export function rowWindow(count: number, room: number, start: number | undefined, sorted: boolean): { from: number; to: number } {
+  const last = Math.max(0, count - room)
+  const from = start === undefined ? (sorted ? 0 : last) : Math.min(Math.max(0, start), last)
+  return { from, to: Math.min(count, from + room) }
+}
+
+// Move the window by `by` rows (a wheel tick, a scroll key); landing on the
+// default window returns undefined, so it follows the live turn again.
+export function scrollRows(count: number, room: number, start: number | undefined, sorted: boolean, by: number): number | undefined {
+  const last = Math.max(0, count - room)
+  const next = Math.min(Math.max(0, rowWindow(count, room, start, sorted).from + by), last)
+  return next === (sorted ? 0 : last) ? undefined : next
+}
+
+export const pageRows = (count: number, room: number, start: number | undefined, sorted: boolean, dir: Page): number | undefined =>
+  scrollRows(count, room, start, sorted, dir === 'up' ? -room : room)
+
+export function canPage(count: number, room: number, start: number | undefined, sorted: boolean, dir: Page): boolean {
+  const { from } = rowWindow(count, room, start, sorted)
+  return dir === 'up' ? from > 0 : from < Math.max(0, count - room)
+}

@@ -49,6 +49,7 @@ export type Selection = {
 export type View = {
   filter: string             // the pane's filter bar, its sort term included
   pinnedTurnId?: string      // the turn shown; undefined follows the latest
+  rowStart?: number          // first row in view when paged or scrolled; undefined: newest (sorted: top)
   help: boolean              // the filter cheat sheet is shown
 }
 
