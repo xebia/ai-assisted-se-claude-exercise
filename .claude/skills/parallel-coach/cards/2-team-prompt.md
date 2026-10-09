@@ -94,7 +94,7 @@ Nudge toward missing elements from this list. Never paste it as a prompt.
   subagents. No rows with the teammates' names appear in the agent panel.
   There is no reviewer to open or message.
 - Teammates not named → the builders cannot send messages to the reviewer.
-  The participant cannot open "the list builder" in task 3.
+  The participant cannot ask the lead to wake "the list builder" in task 4.
 
 ## Ready bar
 
@@ -118,14 +118,13 @@ Third: the lead's own edits. If the lead edits a story file (under
 
 ## After the run
 
-Evidence for the debrief: the reviewer's transcript, `git diff --stat
-foundation` in terminal 3, the tick marks in `tasks.md`, and what the
+Evidence for the debrief: the reviewer's transcript, the output of
+`git diff --stat foundation`, the tick marks in `tasks.md`, and what the
 browser shows for each story. Ask which finding went from the reviewer to
 a builder, and what the builder changed after it. If every changed file
 belongs to exactly one story, connect that to the ownership clause. If a
 foundation file changed, ask whether the reviewer reported it and to
-whom. Ask for their written prediction from task 3 and compare it with
-what happened.
+whom.
 
 ## Held back
 

@@ -59,7 +59,7 @@ Run these yourself. Do not take the participant's notes on trust.
 
 7. Ask the participant what the reviewer sent back to a builder, and
    what they found in the browser that the reviewer did not (task 4,
-   step 2). Their answer is the only evidence of the loop: you cannot
+   steps 2 and 4). Their answer is the only evidence of the loop: you cannot
    read the teammates' transcripts. Compare it with steps 1, 4 and 5. A
    defect that is still in the code after the reviewer approved the story
    means the reviewer missed it, or its finding never reached the builder.
@@ -108,6 +108,12 @@ Run these yourself. Do not take the participant's notes on trust.
 - Grep clean; all four error paths render a fixed sentence
 - Partial is a normal result on a first attempt. Name which story or which
   boundary failed. Do not call a partial result a pass.
+
+## No retry
+
+No retry. A second team run costs many minutes and tokens, and the
+exercise moves on to task 5. Do not offer to re-run the team. Name the
+smallest fix as the clause to take into their next team prompt.
 
 ## Held back
 

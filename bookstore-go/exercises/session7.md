@@ -13,13 +13,15 @@ The teammates in an agent team can send messages to each other, without
 the lead. You use that here. One teammate reviews the work of the others.
 It sends what it finds straight to the teammate that wrote the code.
 
-You do four things:
+You do five things:
 
 1. Build the shared part of the frontend, in one Claude session.
 2. Write one prompt that starts a team: one builder per user story and
    one reviewer. Improve that prompt with a coach.
-3. Start the team and watch the teammates talk to each other.
-4. Check the part of the result that the reviewer cannot check.
+3. Start the team and watch it work.
+4. Question the team, and check what the reviewer cannot check.
+5. Let three subagents design a new look for your frontend, each in its
+   own worktree.
 
 You will not write application code yourself.
 
@@ -28,8 +30,8 @@ You will not write application code yourself.
 - **Terminal 1**, in `bookstore`: `go run .`
 - **Terminal 2**, in `web` (inside `bookstore`): `claude`. This is your
   **lead** session for the whole exercise.
-- **Terminal 3**, in `web`, for the frontend. Open a second tab in `web`
-  for `git`.
+- **Terminal 3**, in `web`. Leave it open: you start the frontend there
+  in task 1.
 - You need the task list from Exercise 6. No task list? Task 1 gives you one.
 - Training mode is off in `web`: Claude answers directly. Stuck? Type
   *just tell me*.
@@ -64,12 +66,13 @@ foundation is done, so the lead builds it alone.
    > each story its own page file, created as a stub in Phase 2, so no
    > story edits the router. Tell me what you moved. Then implement Phase 1
    > and Phase 2, and nothing from any user story. Tick each task off in
-   > `tasks.md` when it is done. When you finish, list the files you
-   > created, and for each story the one file it owns.
+   > `tasks.md` when it is done. Then commit everything with the message
+   > "foundation" and add the git tag `foundation`. When you finish, list
+   > the files you created, and for each story the one file it owns.
 
-   The run takes two to four minutes. **Do not wait. Start task 2 now.**
-   Drafting a prompt changes no files, so it cannot disturb this run.
-   When the lead reports back, write down its file list. Task 2 needs it.
+   The run takes one to three minutes. Wait for it. While you wait, read
+   the introduction of task 2. When the lead reports back, write down its
+   file list. Task 2 needs it.
 4. When the lead reports back, start the frontend in terminal 3:
 
    ```bash
@@ -78,14 +81,6 @@ foundation is done, so the lead builds it alone.
 
    Open http://localhost:5173. You should see the page shell, and no errors
    in the browser console.
-5. Commit and tag, in the second tab of terminal 3. Run the three lines
-   one at a time:
-
-   ```bash
-   git add -A
-   git commit -m "foundation"
-   git tag foundation
-   ```
 
 The prompt in step 3 fixes a shared file, such as the router, in the plan
 before any code exists. A defect in the plan is fixed in the plan, not by
@@ -93,7 +88,7 @@ hand in the code. The tag marks where story work begins. The check in task 4
 uses it.
 
 **Done when**: Phase 1 and 2 are ticked in `tasks.md`, the page shell loads
-on port 5173, and the foundation is committed.
+on port 5173, and the lead reports the commit and the tag `foundation`.
 
 ### 2. Draft the team prompt
 
@@ -149,77 +144,129 @@ prompt below uses this test.
 
 ### 3. Start the team and watch it
 
-You start the team. In the agent panel you follow the messages between
-the builders and the reviewer.
+You start the team. Then you only watch. In this task you type nothing,
+except in the two cases at the end.
 
-1. **Predict.** Write two predictions on paper. **Will the reviewer send
-   a story back to its builder? If yes, for what? Will the lead wait for
-   its teammates?** A wrong prediction is fine. Only a missing one is a
-   problem.
-2. Paste your prompt into the lead, in terminal 2. The coach does not run
+1. Paste your prompt into the lead, in terminal 2. The coach does not run
    this one for you. A team can only start from the session you type in.
-3. Look at the agent panel below the prompt input. Within a minute you
+2. Look at the agent panel below the prompt input. Within a minute you
    should see one row per teammate: each builder and the reviewer, with
    the names from your prompt. Rows without your names are plain
    subagents, not a team. In that case, tell the lead: *"Use an agent
    team, not subagents."* Still no team? Agent teams are experimental.
-   Tell the trainer, and do not spend more time on it.
-4. **Open the reviewer.** Use the **up and down arrows** to select
-   `reviewer`, then press **Enter**. You are now in its transcript. Find a
-   message from a builder: the list of files it changed. Then find what
-   the reviewer sends back to that builder. To leave, select the lead's
-   row with the arrows. Do not press **Escape** inside a transcript: that
-   interrupts the teammate.
-5. **Talk to a builder.** Select one builder and press **Enter**. Type
-   this message:
+   Tell the trainer, do not spend more time on it, and go on with task 5.
+3. Watch. Keep `tasks.md` open in your editor: ticks appear as builders
+   finish tasks. Refresh http://localhost:5173 now and then. Stories
+   appear while you watch. To see what one teammate does, select its
+   row with the **up and down arrows** and press **Enter**. To leave,
+   select the lead's row again. Do not press **Escape** in a transcript:
+   that interrupts the teammate.
 
-   > Which files do you own, and what has the reviewer told you so far?
+You type something only in these two cases:
 
-   The message goes to this builder only. The lead does not see it. Read
-   the answer, then go back to the lead's row.
-6. Permission prompts from teammates appear in the **lead's** row, not in
-   the teammate's transcript. If nothing moves for a while, go back to the
-   lead and answer the prompt.
-7. Keep `tasks.md` open in your editor: ticks appear as builders finish
-   tasks. Refresh http://localhost:5173 every minute. Stories appear while
-   you watch.
-8. Watch the lead too. It may start editing story files itself, or fix a
-   reviewer finding itself. If it does, tell it: *"Wait for your teammates
-   to finish."*
+- A permission prompt from a teammate appears in the **lead's** row.
+  Answer it there.
+- The lead starts editing story files itself, or fixes a finding of the
+  reviewer itself. Tell it: *"Wait for your teammates to finish."*
 
 **Done when**: the lead's report says the reviewer approved every story,
 every story task in `tasks.md` is ticked, and both stories show in the
 browser.
 
-### 4. Check what the reviewer cannot check
+### 4. Question the team, then check what the reviewer cannot
 
-The reviewer read the code, but it did not open the browser. So you check
-the result as a user would. Then a command grades your prompt.
+The teammates still exist after the run, each with its own memory of
+what it did. You ask the reviewer what happened. Then you check the
+result in the browser, which the reviewer did not open.
 
-1. **Does it do what the spec says?** Open `specs/001-*/quickstart.md`
+1. **Bring back the reviewer.** When no teammate is working, their rows
+   disappear from the panel after a short time. They are not stopped.
+   Tell the lead:
+
+   > Ask reviewer to list every finding it sent, and to which builder.
+
+   The reviewer's row comes back while it works. Select it with the
+   arrows and press **Enter**. The row stays while you are in its
+   transcript.
+2. **Read and ask.** Scroll up in the reviewer's transcript. Find a
+   message from a builder: its list of files. Then find what the
+   reviewer sent back to that builder. Now ask the reviewer a question
+   yourself. Type, for example:
+
+   > Did the builder fix what you found? How did you check?
+
+   This message goes to the reviewer only. The lead does not see it.
+   When you have the answer, select the lead's row again.
+3. **Does it do what the spec says?** Open `specs/001-*/quickstart.md`
    and follow its steps in the browser. Then test the three gaps from
    Exercise 6, task 1:
    - Go to page 2 of the book list. Does it show different books?
    - Go past the last page. What does an empty page show?
    - Open a book id that does not exist, such as `#/books/9999`. What do
      you see? Is it the raw error text from the backend?
-2. **Compare with the reviewer.** The lead's report lists what the
-   reviewer found for each story. Look at each problem you found in step
-   1. Did the reviewer report it? Write down one problem the reviewer
-   missed, or write "none".
-3. **Run the check**: type `/verify-exercise 7`. Paste your team prompt
+4. **Compare with the reviewer.** Look at each problem you found in the
+   browser. Did the reviewer report it? Write down one problem the
+   reviewer missed, or write "none".
+5. **Run the check**: type `/verify-exercise 7`. Paste your team prompt
    when it asks. It grades the prompt first. Then it checks the files,
    including the three checks the reviewer did. Bring its report to the
    closing round.
-4. **Commit**, in the second tab of terminal 3, one line at a time:
+6. **Commit.** Tell the lead:
 
-   ```bash
-   git add -A
-   git commit -m "feat: bookstore-web, built by agent team"
-   ```
+   > Commit everything with the message "feat: bookstore-web, built by
+   > agent team".
 
-**Done when**: you followed the quickstart, compared your findings with
-the reviewer's, and `/verify-exercise 7` has run.
+**Done when**:
+
+- you asked the reviewer one question
+- you followed the quickstart and compared your findings with the
+  reviewer's
+- `/verify-exercise 7` has run, and the lead has committed
+
+### 5. Three designs, three worktrees
+
+The frontend works, but it looks plain. Three subagents now give it a
+new look, each a different one, at the same time. Each subagent works in
+its own **worktree**: its own branch and folder, so it cannot edit the
+files of the others. The three do not need to talk to each other. That
+is why you use subagents here, not an agent team.
+
+1. Send the lead this prompt. Replace the three styles with your own
+   ideas if you like:
+
+   > Start three subagents, not teammates, each in its own worktree.
+   > Each one gives the frontend in `web` a new look: one "retro
+   > terminal", one "cosy bookshop", one "brutalist". They may change the
+   > stylesheet and the HTML markup only. They must not change the API
+   > client or what any page does. Each one commits its work on its own
+   > branch. When all three are done, list the three branch names.
+
+2. **Look at each design.** For each branch, tell the lead:
+
+   > Check out `<branch>` in detached mode.
+
+   Detached means you look at that branch without switching your own
+   branch. Then refresh http://localhost:5173. The dev server shows that
+   design.
+3. **Merge your favourite.** Tell the lead:
+
+   > Switch back to the branch you started on, and merge `<favourite>`.
+
+4. **Merge a second one.** Tell the lead:
+
+   > Now also merge `<second branch>`. If there is a conflict, do not
+   > solve it. Show me the files with a conflict.
+
+   Read what the lead reports. Then tell it: *"Abort that merge."* No
+   conflict? Then the two designs changed different files. Tell the
+   trainer.
+
+While the subagents worked, the worktrees kept them out of each other's
+files. The conflict came only when you merged two designs that changed
+the same file.
+
+**Done when**: you have seen all three designs, your favourite is
+merged, and you have seen what the second merge does.
 
 ---
 
@@ -230,12 +277,13 @@ The trainer asks people at random. Have answers ready:
 - What did the coach say was missing in your team prompt before it said
   the prompt was ready?
 - Find one message that went from one teammate to another. What did it
-  say? What did the builder do next? Did your prediction from task 3
-  come true?
+  say? What did the builder do next?
 - What did you find in the browser that the reviewer did not find? Why
   could the reviewer not find it?
 - In Exercise 6 you marked some answers as guesses. Find one in the running
   frontend. Does the code treat it as a fact?
+- Task 3 used an agent team. Task 5 used subagents in worktrees. Why the
+  difference?
 - Close with **one take-away**. Which part of this exercise needed
   teammates that talk to each other? Which part would have been faster
   in a single session?
@@ -248,7 +296,7 @@ The trainer asks people at random. Have answers ready:
 web/
   index.html, styles.css, src/     built from your spec
   specs/001-*/tasks.md             every story task ticked
-  git log                          "spec" → "foundation" → "feat" commits
+  git log                          "spec" → "foundation" → "feat" → your design
 ```
 
 Every line of application code in this project was written from a spec you
