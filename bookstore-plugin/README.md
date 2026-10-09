@@ -37,7 +37,7 @@ claude --plugin-dir bookstore-plugin
   `/bookstore-plugin:changelog`.
 
 `--plugin-dir` loads a plugin for one session. To share it, put it in a
-marketplace and install it (*Installing and Sharing a Plugin*).
+marketplace and install it (*Your Own Marketplace: a Git Repo*).
 
 Hooks and an MCP server from this folder ran with your rights, and the
 plugin skipped the approval prompt you saw in exercise 5. Audit a plugin
