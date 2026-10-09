@@ -147,8 +147,9 @@ look.
   else in `settings.json`. If the `hooks` block is gone, say so; session 4's
   chain no longer runs.
 - **Generic description** ("Reviews code for security issues") — passed
-  the file-exists check but fails the trigger-quality dimension. This is
-  the exercise's own A/B slide, now graded for real.
+  the file-exists check but fails the trigger-quality dimension. It is the
+  weak side of the A/B slide *Which Subagent Description Invokes
+  Reliably?*.
 - **Tools beyond read-only** — `Edit`, `Write` or `Bash` in the `tools:` list
   breaks the "must never change code" rule in the exercise text. Flag as
   a correctness defect, not a style note. The most likely cause: the
@@ -171,8 +172,8 @@ look.
   Not a failure by itself, but it means the trigger dimension gets a ❌
   regardless of how well-written the prose sounds, because the evidence
   says it does not act as a trigger.
-- **Got away with it** — a real security report despite a weak trigger,
-  because the participant asked directly. Say plainly that the automatic
+- **Report without a working trigger** — a real security report despite a
+  weak trigger, because the participant asked for the agent directly. Say plainly that the automatic
   start was never tested, so nothing here confirms the trigger works.
 
 ## Pass bar
