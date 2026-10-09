@@ -10,9 +10,8 @@ In Exercise 6 you wrote a spec, a plan and a task list, and no code. In
 this exercise an agent team builds the code.
 
 The teammates in an agent team can send messages to each other, without
-the lead. You use that in this exercise: one
-teammate reviews the work of the others. It sends what it finds straight
-to the teammate that wrote the code.
+the lead. You use that here. One teammate reviews the work of the others.
+It sends what it finds straight to the teammate that wrote the code.
 
 You do four things:
 
@@ -27,22 +26,13 @@ You will not write application code yourself.
 ## Start here
 
 - **Terminal 1**, in `bookstore`: `bun run start`
-- **Terminal 2**, in `web` (inside `bookstore`): `claude`. This session
-  is your **lead** for the whole exercise.
-- **Terminal 3**, in `web`, for `npm run dev`. Open a second tab in
-  `web` for `git`.
-
-**Use the reference spec**, unless you are sure your own spec from
-Exercise 6 is complete: `specs/001-*/tasks.md` exists, with at most three
-user stories. Paste this into the lead:
-
-> Copy the folder `specs-reference/001-browse-books` to
-> `specs/001-browse-books`. If `specs/` already holds another folder,
-> move that folder to `specs-old/` first. Then commit with the message
-> "spec: reference spec for exercise 7".
-
-Training mode is off in `web`: Claude answers directly. Stuck? Type
-*just tell me*.
+- **Terminal 2**, in `web` (inside `bookstore`): `claude`. This is your
+  **lead** session for the whole exercise.
+- **Terminal 3**, in `web`, for the frontend. Open a second tab in `web`
+  for `git`.
+- You need the task list from Exercise 6. No task list? Task 1 gives you one.
+- Training mode is off in `web`: Claude answers directly. Stuck? Type
+  *just tell me*.
 
 ---
 
@@ -52,15 +42,20 @@ Training mode is off in `web`: Claude answers directly. Stuck? Type
 
 You produce the **foundation**: Phase 1 and Phase 2 of `tasks.md`. These
 are the files every story needs, such as the API client, the page shell and
-the stylesheet. The constitution says no story
-may start before the foundation is done. So this part is not parallel
-work. One session, the lead, does it.
+the stylesheet. The constitution says no story may start before the
+foundation is done, so the lead builds it alone.
 
-1. Open `specs/001-*/tasks.md` and find **Phase 1** and **Phase 2**. If
-   a story task writes a shared file, such as the router, you do not fix
-   it by hand. The prompt below makes the lead fix it first: a defect in
-   the plan is fixed in the plan, not in code.
-2. Send the lead this prompt. Copy it as written:
+1. **Check your spec.** Your own spec from Exercise 6 is complete if
+   `specs/001-*/tasks.md` exists and has at most three user stories. If it
+   is complete, go to step 2. If not, or if you are not sure, use the
+   reference spec. Paste this into the lead:
+
+   > Copy the folder `specs-reference/001-browse-books` to
+   > `specs/001-browse-books`. If `specs/` already holds another folder,
+   > move that folder to `specs-old/` first. Then commit with the message
+   > "spec: reference spec for exercise 7".
+2. Open `specs/001-*/tasks.md` and find **Phase 1** and **Phase 2**.
+3. Send the lead this prompt. Copy it as written:
 
    > Read `specs/001-*/tasks.md` and `.specify/memory/constitution.md`.
    > First fix the task list. If a user-story task writes a file that more
@@ -75,7 +70,7 @@ work. One session, the lead, does it.
    The run takes two to four minutes. **Do not wait. Start task 2 now.**
    Drafting a prompt changes no files, so it cannot disturb this run.
    When the lead reports back, write down its file list. Task 2 needs it.
-3. When the lead reports back, start the frontend in terminal 3:
+4. When the lead reports back, start the frontend in terminal 3:
 
    ```bash
    npm run dev
@@ -83,14 +78,19 @@ work. One session, the lead, does it.
 
    Open http://localhost:5173. You should see the page shell, and no errors
    in the browser console.
-4. Commit and tag, in the second tab of terminal 3. The tag marks where the foundation ends and story work
-   begins. The check in task 4 uses it. Run the three lines one at a time:
+5. Commit and tag, in the second tab of terminal 3. Run the three lines
+   one at a time:
 
    ```bash
    git add -A
    git commit -m "foundation"
    git tag foundation
    ```
+
+The prompt in step 3 fixes a shared file, such as the router, in the plan
+before any code exists. A defect in the plan is fixed in the plan, not by
+hand in the code. The tag marks where story work begins. The check in task 4
+uses it.
 
 **Done when**: Phase 1 and 2 are ticked in `tasks.md`, the page shell loads
 on port 5173, and the foundation is committed.
@@ -101,9 +101,9 @@ You produce one prompt that turns the lead into a team lead. This is the
 core of the exercise.
 
 The lead starts **teammates**: separate Claude Code sessions. Together
-they are the **agent team**. A teammate starts with its own, empty
-context. It does not see this chat.
-Everything it must know is in your prompt, or in a file your prompt names.
+they are the **agent team**. A teammate starts with an empty context and
+does not see this chat. Everything it must know is in your prompt, or in a
+file your prompt names.
 
 Your team has two kinds of teammates:
 
@@ -112,20 +112,20 @@ Your team has two kinds of teammates:
   builder what to fix.
 
 A builder and the reviewer send messages to each other directly, by name.
-The lead does not pass the messages on. This is different from
-subagents: a subagent reports back only to the session that started it.
+The lead does not pass the messages on. A subagent is different: it
+reports back only to the session that started it.
 
 Each user story in `tasks.md` has an **Independent Test**. It lists the
 steps from `quickstart.md` that must pass for that story. The example
 prompt below uses this test.
 
 1. **Draft**. Open `tasks.md` and find the section **Parallel Team
-   Strategy** near the bottom: it says how to split the work. Your prompt
+   Strategy** near the bottom. It says how to split the work. Your prompt
    turns that plan into instructions the lead can follow. Start from the
-   worked example below. It is not complete:
-   the coach tells you what is missing. **Words in `<angle brackets>` are
-   placeholders.** Replace each one with a name from your own `tasks.md`,
-   and remove the brackets. Do not run the prompt yet.
+   worked example below. It is not complete: the coach tells you what is
+   missing. Words in `<angle brackets>` are placeholders. Replace each one
+   with a name from your own `tasks.md`, and remove the brackets. Do not
+   run the prompt yet.
 
    > Read `specs/<your spec folder>/tasks.md`. Spawn an agent team. Spawn
    > one builder per user story, named after the story: `<us1-short-name>`,
@@ -161,15 +161,15 @@ the builders and the reviewer.
 3. Look at the agent panel below the prompt input. Within a minute you
    should see one row per teammate: each builder and the reviewer, with
    the names from your prompt. Rows without your names are plain
-   subagents, not a team. If you see rows without your names, tell the
-   lead: *"Use an agent team, not subagents."* Still no team? Agent teams are
-   experimental: tell the trainer, and do not spend your time on it.
+   subagents, not a team. In that case, tell the lead: *"Use an agent
+   team, not subagents."* Still no team? Agent teams are experimental.
+   Tell the trainer, and do not spend more time on it.
 4. **Open the reviewer.** Use the **up and down arrows** to select
    `reviewer`, then press **Enter**. You are now in its transcript. Find a
    message from a builder: the list of files it changed. Then find what
    the reviewer sends back to that builder. To leave, select the lead's
-   row again with the arrows. Do not press **Escape** inside a
-   transcript: that interrupts the teammate.
+   row with the arrows. Do not press **Escape** inside a transcript: that
+   interrupts the teammate.
 5. **Talk to a builder.** Select one builder and press **Enter**. Type
    this message:
 
@@ -184,8 +184,8 @@ the builders and the reviewer.
    tasks. Refresh http://localhost:5173 every minute. Stories appear while
    you watch.
 8. Watch the lead too. It may start editing story files itself, or fix a
-   finding of the reviewer itself. If it does, tell it: *"Wait for your
-   teammates to finish."*
+   reviewer finding itself. If it does, tell it: *"Wait for your teammates
+   to finish."*
 
 **Done when**: the lead's report says the reviewer approved every story,
 every story task in `tasks.md` is ticked, and both stories show in the
@@ -193,7 +193,7 @@ browser.
 
 ### 4. Check what the reviewer cannot check
 
-The reviewer read the code, but it did not open the browser. You check
+The reviewer read the code, but it did not open the browser. So you check
 the result as a user would. Then a command grades your prompt.
 
 1. **Does it do what the spec says?** Open `specs/001-*/quickstart.md`
@@ -207,10 +207,10 @@ the result as a user would. Then a command grades your prompt.
    reviewer found for each story. Look at each problem you found in step
    1. Did the reviewer report it? Write down one problem the reviewer
    missed, or write "none".
-3. **Run the check**: the `/verify-exercise 7` command. Paste your team
-   prompt when it asks. It grades the prompt first. Then it checks the
-   files, including the three checks the reviewer did. Bring its report
-   to the closing round.
+3. **Run the check**: type `/verify-exercise 7`. Paste your team prompt
+   when it asks. It grades the prompt first. Then it checks the files,
+   including the three checks the reviewer did. Bring its report to the
+   closing round.
 4. **Commit**, in the second tab of terminal 3, one line at a time:
 
    ```bash
@@ -254,5 +254,5 @@ web/
 Every line of application code in this project was written from a spec you
 wrote. You typed none of it yourself.
 
-**Before session 8**: think of one real team that you know well, with
+**Before Session 8**: think of one real team that you know well, with
 one codebase. Exercise 8 is about that team. You need no laptop project.

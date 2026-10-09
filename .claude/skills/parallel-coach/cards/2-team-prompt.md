@@ -65,36 +65,36 @@ Nudge toward missing elements from this list. Never paste it as a prompt.
 ## Nudge bank
 
 - "Your reviewer finds a problem in the list page. Who does it tell?"
-- "When is a story done? Your prompt says when the builder sends its
-  files. What if the reviewer finds a problem after that?"
+- "Your prompt says when the builder sends its files. Is the story done
+  if the reviewer then finds a problem?"
 - "Your prompt says 'build the user stories in parallel'. What does the
   lead do while the teammates work?"
-- "Which files may a builder edit? Your prompt says which story it owns.
-  Does `tasks.md` say which files that is?"
+- "Your prompt says which story a builder owns. Which files may that
+  builder edit?"
 - "A teammate starts with an empty context. It does not see this chat. How
   does it know that `api.js` is finished?"
-- "You wrote 'spawn agents'. Claude may read that as subagents. A subagent
-  reports to the session that started it. What word does the slide use?"
+- "You wrote 'spawn agents'. Claude may start subagents. A subagent only
+  reports to the session that started it. Which word does the slide use?"
 
 ## Predicted defects for common gaps
 
 - Loop not closed (no "send findings to the builder") → the reviewer
-  reports to the lead. The lead fixes the finding itself, or the finding
-  stays in a report nobody acts on. The builder never hears of it.
+  reports to the lead. The lead fixes the finding itself, or nobody acts
+  on it. The builder never hears about it.
 - No "done only after approval" → the builder reports done when its
   Independent Test passes. The reviewer's finding arrives after the
-  builder stopped, and the lead calls the story finished.
-- No "wait" instruction → the lead spawns the teammates and then starts
-  User Story 1 itself, so two sessions edit the same page file
-- Foundation not named as finished → a builder adds a helper to the
-  shared API client. The other builder adds a different one. The second
-  save overwrites the first, and one story breaks. The reviewer sees it in
-  `git diff --stat foundation` only if the prompt asks for that check.
-- "Agents" instead of "agent team" or "teammates" → Claude uses subagents.
-  No rows with the teammates' names appear in the agent panel, and there
-  is no reviewer to open or message.
-- Teammates not named → the builders cannot address the reviewer, and the
-  participant cannot open "the list builder" in task 3
+  builder stopped. The lead calls the story finished anyway.
+- No "wait" instruction → the lead starts the teammates and then builds
+  User Story 1 itself. Two sessions now edit the same page file.
+- Foundation not named as finished → one builder adds a helper to the
+  shared API client. The other builder adds a different helper. The second
+  save overwrites the first, and one story breaks. The reviewer only sees
+  this if the prompt asks for `git diff --stat foundation`.
+- "Agents" instead of "agent team" or "teammates" → Claude starts
+  subagents. No rows with the teammates' names appear in the agent panel.
+  There is no reviewer to open or message.
+- Teammates not named → the builders cannot send messages to the reviewer.
+  The participant cannot open "the list builder" in task 3.
 
 ## Ready bar
 
@@ -103,16 +103,18 @@ All five load-bearing checks present, in the participant's own words.
 ## What to watch
 
 First: the agent panel below the prompt input. A real team shows one row
-per teammate, carrying the names from the prompt, within a minute (with
-agent teams on, a subagent Claude names launches as a teammate). Rows
-without those names are plain subagents; the participant should say "use
-an agent team, not subagents". Do not send anyone to Ctrl+T: on current
-models the session has no Task tools, so that task list stays empty even
-for a real team. Progress shows as ticks in `tasks.md`. Second: the
-reviewer's transcript. A message from a builder with a file list, and a
-reply to that builder, is the loop working. Third: the lead's own edits.
-Any edit to a story file (under `src/pages/` in the reference spec) by the
-lead is the "wait" defect happening live.
+per teammate within a minute, with the names from the prompt. (With agent
+teams on, a subagent that Claude names starts as a teammate.) Rows without
+those names are plain subagents. The participant should say "use an agent
+team, not subagents". Do not send anyone to Ctrl+T. On current models the
+session has no Task tools, so that task list stays empty even for a real
+team. Progress shows as ticks in `tasks.md`.
+
+Second: the reviewer's transcript. A message from a builder with a file
+list, and a reply to that builder, means the loop works.
+
+Third: the lead's own edits. If the lead edits a story file (under
+`src/pages/` in the reference spec), the "wait" defect is happening live.
 
 ## After the run
 

@@ -67,35 +67,37 @@ Run these yourself. Do not take the participant's notes on trust.
 ## Known traps
 
 - **Foundation edited.** The most likely defect. A teammate wanted a helper
-  and put it in `api.js` or `ui.js`. Name the file and the teammate if the
-  diff or a commit shows it. Map it to the File ownership check.
+  and put it in `api.js` or `ui.js`. If the diff or a commit shows it, name
+  the file and the teammate. Map it to the File ownership check.
 - **Lead built a story.** The lead's transcript or a commit shows story
-  code written by the lead. Map it to Lead waits.
-- **Finding went to the lead.** The reviewer reported to the lead, and the
+  code that the lead wrote. Map it to Lead waits.
+- **Finding went to the lead.** The reviewer reported to the lead. The
   lead fixed it, or nobody did. Map it to Closed review loop. With
-  subagents this is the default route for a finding; in a team it is a
-  prompt gap.
-- **Approved but broken.** The reviewer approved a story that still leaks
-  backend text or changed a foundation file. Say which check the reviewer
-  was told to run and whether the prompt named it. The browser problems
-  from task 4 are expected misses: the reviewer reads code, it does not
-  open the browser.
-- **Ticked but not tested.** Tasks ticked, but the browser shows "Not built
-  yet" or a console error for one story. Map it to Closed review loop: the
-  done condition did not require the Independent Test.
+  subagents this is the normal route for a finding. In a team it means the
+  prompt has a gap.
+- **Approved but broken.** The reviewer approved a story that still shows
+  backend text or changed a foundation file. Say which check the prompt
+  told the reviewer to run, or that it named none. Browser problems from
+  task 4 are expected misses: the reviewer reads code and does not open
+  the browser.
+- **Ticked but not tested.** Tasks are ticked, but the browser shows "Not
+  built yet" or a console error for one story. Map it to Closed review
+  loop. The prompt did not require the Independent Test before done.
 - **Backend error text on screen.** `#/books/abc` shows "invalid id", or
-  the list shows "db error". Constitution V. Usually the page module reads
-  `outcome.error` that the client was supposed to drop — check whether the
-  foundation client leaks it or the story re-fetches on its own.
-- **Page 0.** A page module that starts counting at 0 sends `page=0`. What
-  happens next depends on the participant's Session 2 fix: the API treats
-  it as page 1, so Next shows page 1 twice, or it returns an error the UI
-  shows. Both are a spec defect from Exercise 6 that became code. Mention
-  it as a finding either way — it is the point of the closing-round question about marked guesses.
-- **Subagents, not a team.** The participant reports no panel rows with
-  the teammate names from the prompt. Not a code defect, but a prompt one:
-  map it to Team, not subagents. An empty Ctrl+T task list is not evidence
-  either way: on current models the session has no Task tools, so that list
+  the list shows "db error". This breaks constitution V. Usually the page
+  module reads `outcome.error`, which the client should drop. Check
+  whether the foundation client passes it on, or the story fetches again
+  on its own.
+- **Page 0.** A page module that starts counting at 0 sends `page=0`. The
+  result depends on the participant's Session 2 fix. Either the API treats
+  it as page 1, so Next shows page 1 twice, or it returns an error that the
+  UI shows. Both come from a spec defect in Exercise 6 that became code.
+  Report it as a finding either way. It is the point of the closing-round
+  question about guesses.
+- **Subagents, not a team.** The participant sees no panel rows with the
+  teammate names from the prompt. This is a prompt defect, not a code
+  defect. Map it to Team, not subagents. An empty Ctrl+T task list proves
+  nothing. On current models the session has no Task tools, so that list
   stays empty for a real team too.
 
 ## Pass bar
@@ -104,8 +106,8 @@ Run these yourself. Do not take the participant's notes on trust.
 - Every story task ticked, and both stories render in the browser
 - The participant can name one finding the reviewer sent to a builder
 - Grep clean; all four error paths render a fixed sentence
-- Partial is a normal first-attempt outcome. Name which story or which
-  boundary failed; do not round up.
+- Partial is a normal result on a first attempt. Name which story or which
+  boundary failed. Do not call a partial result a pass.
 
 ## Held back
 
