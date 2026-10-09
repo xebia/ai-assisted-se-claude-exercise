@@ -19,11 +19,11 @@ the agent may use"; the test in step 3 is "test the trigger"; the agent
 "starts by itself" or "did not start". Do not say "fire", "arm",
 "auto-invoke" or "Round A/B".
 
-**Slide anchors:** *How Subagents Get Invoked* (the description is the
+**Slide anchors:** *How Agents Get Invoked* (the description is the
 trigger) · *Which Subagent Description Invokes Reliably?* (the A/B vote) ·
-*Custom Subagents* (the frontmatter fields, `tools: Read, Grep, Glob`
-example) · *MCP Permissions and Security* (least privilege, restricted
-tools).
+*An Agent File Encodes a Task* (the frontmatter fields, the
+`tools: Read, Grep, Glob` example) · *Ad Hoc Subagent vs. Agent File*
+(`tools` is enforced, so least privilege is not a request).
 
 ## Technique applicability
 
@@ -71,28 +71,28 @@ description.
 
 ## Predicted defects for common gaps
 
-- No code-event trigger → Claude only starts the agent when asked by
-  name or with the exact phrase "security review" — silent on new
-  vulnerable code, the moment this agent exists for
-- Generic job description ("reviews code") → inconsistent invocation,
-  sometimes starting on unrelated review requests, sometimes not starting
-  on real security asks
-- A promise beyond tool scope → the report claims it "fixed" something,
-  or the participant expects a diff that never comes
+- No code-event trigger → Claude starts the agent only when you ask by
+  name or say "security review". When a teammate adds vulnerable code,
+  Claude stays silent. That is the moment this agent exists for.
+- Generic job description ("reviews code") → Claude sometimes starts the
+  agent on an unrelated review request, and sometimes does not start it on
+  a real security request.
+- A promise beyond the tools → the report says it fixed something, or you
+  expect a diff that never comes.
 
 ## Greenlight bar
 
 All three load-bearing elements present, and no write or shell tool in
-`tools:`. `tools: (I write this)` or an empty `tools:` line counts as a
-defect: the agent then fails to load, or inherits every tool of the main
+`tools:`. A `tools: (I write this)` line or an empty `tools:` line is a
+defect. The agent then fails to load, or gets every tool of the main
 session.
 
 ## After the run
 
 There is no clean-room dispatch for this task — the participant tests the
 subagent themselves, in their own session, exactly as the exercise
-describes. The debrief is: did it start on the trigger you coached, and
-does the report stay inside the tool scope? `/verify-exercise 5` checks
+describes. The debrief has two questions. Did the agent start on the
+trigger you coached? Does the report stay inside the tool scope? `/verify-exercise 5` checks
 the artifact itself, by observable state, after the fact.
 
 ## Held back
