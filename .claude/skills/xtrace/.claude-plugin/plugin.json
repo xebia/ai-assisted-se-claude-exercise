@@ -1,0 +1,6 @@
+{
+  "name": "xtrace",
+  "version": "0.1.0",
+  "description": "Records every tool, MCP, skill, hook, subagent, command and injected-context access and reports it with /xtrace.",
+  "types": "./types/index.d.ts"
+}
