@@ -113,9 +113,15 @@ The lead does not pass the messages on. A subagent is different: it
 reports back only to the session that started it.
 
 The reviewer also checks two **house rules**: rules your team agreed on
-that are not in the spec. Only the reviewer gets them. That is normal in
-a team: the spec says what to build, and the review checks how it is
-built.
+that are not in the spec.
+
+- Every page sets its own browser tab title.
+- Everything you can click is a real link or button, so it works with
+  the keyboard.
+
+Only the reviewer gets these rules, so it will likely find something to
+send back. That is normal in a team: the spec says what to build, and
+the review checks how it is built.
 
 Each user story in `tasks.md` has an **Independent Test**. It lists the
 steps from `quickstart.md` that must pass for that story. The example
@@ -188,7 +194,8 @@ browser.
 
 The teammates still exist after the run, each with its own memory of
 what it did. You follow one finding from the reviewer to the builder that
-fixed it. Then you check the result in the browser, which the reviewer
+fixed it. Most findings are about the two house rules from task 2: a tab
+title per page, and links and buttons that work with the keyboard. Then you check the result in the browser, which the reviewer
 did not open.
 
 1. **Bring back the reviewer.** When no teammate is working, their rows
