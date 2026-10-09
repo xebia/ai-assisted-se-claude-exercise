@@ -6,5 +6,8 @@
     "**/CLAUDE.md",
     "**/CLAUDE.local.md",
     "**/.claude/rules/**"
-  ]
+  ],
+  "worktree": {
+    "baseRef": "head"
+  }
 }
