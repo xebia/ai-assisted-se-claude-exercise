@@ -12,12 +12,19 @@ diagram, with the reviewer loop at the end) · *Who Starts the Team?*
 
 **The sheet's worked example** shows three things on purpose: the task
 list as source of work, a team with named builders and a reviewer, and
-the reviewer's three checks with the builder sending its file list to the
-reviewer. Three things are missing on purpose: file ownership, the
+the reviewer's checks (two house rules plus three checks) with the
+builder sending its file list to the reviewer. Three things are missing on purpose: file ownership, the
 closed review loop (findings go back to the builder, and a story is done
 only after the reviewer approves it), and the lead waiting. Do not point
 at the example as incomplete until they ask why the coach wants more than
 it shows. Then say that the example is a shape, not a full prompt.
+
+**The house rules** (a tab title per page, everything clickable works with
+the keyboard) go to the reviewer only, on purpose. They give the reviewer
+something real to send back, because the spec does not mention them. Do
+not suggest giving them to the builders. If the participant does that
+on their own, say what it costs in one line: the reviewer may approve
+everything at once, and the loop has nothing to carry.
 
 ## Technique applicability
 

@@ -56,11 +56,16 @@ Run these yourself. Do not take the participant's notes on trust.
    modules" in the report, never "fetched the page".
 6. Read the story files for `import` lines. Any import from
    `node_modules` or a CDN is a constitution I violation.
+7. House rules (task 2's worked example gives them to the reviewer): each
+   page module sets `document.title` for its own page, and every element
+   with a click handler is an `<a href>` or a `<button>`, not a `div` or
+   `span`. Grep for `document.title` and for `onclick` /
+   `addEventListener('click'` on other elements.
 
-7. Ask the participant what the reviewer sent back to a builder, and
-   what they found in the browser that the reviewer did not (task 4,
-   steps 2 and 4). Their answer is the only evidence of the loop: you cannot
-   read the teammates' transcripts. Compare it with steps 1, 4 and 5. A
+8. Ask the participant what the reviewer sent back to a builder, and what
+   the builder said it changed (task 4, steps 2 and 3). Their answer is
+   the only evidence of the loop: you cannot read the teammates'
+   transcripts. Compare it with steps 1, 4, 5 and 7. A
    defect that is still in the code after the reviewer approved the story
    means the reviewer missed it, or its finding never reached the builder.
 
@@ -75,8 +80,12 @@ Run these yourself. Do not take the participant's notes on trust.
   lead fixed it, or nobody did. Map it to Closed review loop. With
   subagents this is the normal route for a finding. In a team it means the
   prompt has a gap.
+- **House rule sent back, not fixed.** The reviewer reported a missing
+  tab title or a clickable `div`, but the code still has it. Ask whether
+  the builder got the message by name, and whether the prompt said a
+  story is done only after approval. Map it to Closed review loop.
 - **Approved but broken.** The reviewer approved a story that still shows
-  backend text or changed a foundation file. Say which check the prompt
+  backend text, breaks a house rule, or changed a foundation file. Say which check the prompt
   told the reviewer to run, or that it named none. Browser problems from
   task 4 are expected misses: the reviewer reads code and does not open
   the browser.
@@ -106,6 +115,7 @@ Run these yourself. Do not take the participant's notes on trust.
 - Every story task ticked, and both stories render in the browser
 - The participant can name one finding the reviewer sent to a builder
 - Grep clean; all four error paths render a fixed sentence
+- Both house rules hold in every story file
 - Partial is a normal result on a first attempt. Name which story or which
   boundary failed. Do not call a partial result a pass.
 

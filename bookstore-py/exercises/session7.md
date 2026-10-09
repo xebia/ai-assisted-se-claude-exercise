@@ -19,7 +19,8 @@ You do five things:
 2. Write one prompt that starts a team: one builder per user story and
    one reviewer. Improve that prompt with a coach.
 3. Start the team and watch it work.
-4. Question the team, and check what the reviewer cannot check.
+4. Follow one finding from the reviewer to the builder, and check the
+   result in the browser.
 5. Let three subagents design a new look for your frontend, each in its
    own worktree.
 
@@ -111,6 +112,11 @@ A builder and the reviewer send messages to each other directly, by name.
 The lead does not pass the messages on. A subagent is different: it
 reports back only to the session that started it.
 
+The reviewer also checks two **house rules**: rules your team agreed on
+that are not in the spec. Only the reviewer gets them. That is normal in
+a team: the spec says what to build, and the review checks how it is
+built.
+
 Each user story in `tasks.md` has an **Independent Test**. It lists the
 steps from `quickstart.md` that must pass for that story. The example
 prompt below uses this test.
@@ -129,10 +135,14 @@ prompt below uses this test.
    > its story. Also spawn a teammate named `reviewer` that writes no code.
    > When a builder's Independent Test in `tasks.md` passes against the
    > running backend, the builder sends `reviewer` the list of files it
-   > changed. The reviewer checks three things: no foundation file changed
-   > (`git diff --stat foundation`), no backend address is in the code
-   > (`grep -rn "8080\|localhost" src/ index.html`), and every error path
-   > shows a fixed sentence, as principle V in `.specify/memory/constitution.md` says.
+   > changed. The reviewer first checks our two house rules. One: every
+   > page sets its own browser tab title, such as "Book list · BookStore".
+   > Two: everything you can click is a real link or button, so it works
+   > with the keyboard. Then it checks three more things: no foundation
+   > file changed (`git diff --stat foundation`), no backend address is in
+   > the code (`grep -rn "8080\|localhost" src/ index.html`), and every
+   > error path shows a fixed sentence, as principle V in
+   > `.specify/memory/constitution.md` says.
    > Report per story: files changed, and what the reviewer found.
 
 2. **Coach and revise**. Run `/parallel-coach 2` and paste your draft as
@@ -174,11 +184,12 @@ You type something only in these two cases:
 every story task in `tasks.md` is ticked, and both stories show in the
 browser.
 
-### 4. Question the team, then check what the reviewer cannot
+### 4. Follow one finding, then check it yourself
 
 The teammates still exist after the run, each with its own memory of
-what it did. You ask the reviewer what happened. Then you check the
-result in the browser, which the reviewer did not open.
+what it did. You follow one finding from the reviewer to the builder that
+fixed it. Then you check the result in the browser, which the reviewer
+did not open.
 
 1. **Bring back the reviewer.** When no teammate is working, their rows
    disappear from the panel after a short time. They are not stopped.
@@ -191,37 +202,44 @@ result in the browser, which the reviewer did not open.
    transcript.
 2. **Read and ask.** Scroll up in the reviewer's transcript. Find a
    message from a builder: its list of files. Then find what the
-   reviewer sent back to that builder. Now ask the reviewer a question
-   yourself. Type, for example:
+   reviewer sent back to that builder, for example a page without its
+   own tab title. Now ask the reviewer a question yourself. Type:
 
-   > Did the builder fix what you found? How did you check?
+   > Which builder fixed what you sent back? How did you check the fix?
 
    This message goes to the reviewer only. The lead does not see it.
-   When you have the answer, select the lead's row again.
-3. **Does it do what the spec says?** Open `specs/001-*/quickstart.md`
-   and follow its steps in the browser. Then test the three gaps from
-   Exercise 6, task 1:
+   When you have the answer, select the lead's row again. Did the
+   reviewer approve every story the first time? Then ask it how it
+   checked the house rules, and skip step 3.
+3. **Ask the builder.** Tell the lead:
+
+   > Ask `<builder>` what it changed after the reviewer's message, and
+   > show me its answer.
+
+   The builder still knows the finding. The lead never saw it.
+4. **Check the house rules in the browser.** Click through each page
+   and look at the browser tab: does the title change per page? Then
+   click once in the page and press **Tab** a few times. You should reach
+   every link and button, and see which one is selected.
+5. **Quick check against the spec.** Follow the steps in
+   `specs/001-*/quickstart.md`. Then test the three gaps from Exercise 6:
    - Go to page 2 of the book list. Does it show different books?
    - Go past the last page. What does an empty page show?
-   - Open a book id that does not exist, such as `#/books/9999`. What do
-     you see? Is it the raw error text from the backend?
-4. **Compare with the reviewer.** Look at each problem you found in the
-   browser. Did the reviewer report it? Write down one problem the
-   reviewer missed, or write "none".
-5. **Run the check**: type `/verify-exercise 7`. Paste your team prompt
+   - Open a book id that does not exist, such as `#/books/9999`. Do you
+     see a fixed sentence, or raw error text from the backend?
+6. **Run the check**: type `/verify-exercise 7`. Paste your team prompt
    when it asks. It grades the prompt first. Then it checks the files,
-   including the three checks the reviewer did. Bring its report to the
+   including the checks the reviewer did. Bring its report to the
    closing round.
-6. **Commit.** Tell the lead:
+7. **Commit.** Tell the lead:
 
    > Commit everything with the message "feat: bookstore-web, built by
    > agent team".
 
 **Done when**:
 
-- you asked the reviewer one question
-- you followed the quickstart and compared your findings with the
-  reviewer's
+- you followed one finding from the reviewer to the builder
+- you checked the house rules and the quickstart in the browser
 - `/verify-exercise 7` has run, and the lead has committed
 
 ### 5. Three designs, three worktrees
@@ -277,10 +295,8 @@ The trainer asks people at random. Have answers ready:
 
 - What did the coach say was missing in your team prompt before it said
   the prompt was ready?
-- Find one message that went from one teammate to another. What did it
-  say? What did the builder do next?
-- What did you find in the browser that the reviewer did not find? Why
-  could the reviewer not find it?
+- What did the reviewer send back? What did the builder change? Did it
+  hold up in the browser?
 - In Exercise 6 you marked some answers as guesses. Find one in the running
   frontend. Does the code treat it as a fact?
 - Task 3 used an agent team. Task 5 used subagents in worktrees. Why the
