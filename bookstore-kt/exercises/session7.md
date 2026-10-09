@@ -82,10 +82,11 @@ foundation is done, so the lead builds it alone.
    Open http://localhost:5173. You should see the page shell, and no errors
    in the browser console.
 
-The prompt in step 3 fixes a shared file, such as the router, in the plan
-before any code exists. A defect in the plan is fixed in the plan, not by
-hand in the code. The tag marks where story work begins. The check in task 4
-uses it.
+Why step 3 asks for this: if two stories need the same file, such as the
+router, two builders would edit it at the same time. Step 3 moves that work
+into the foundation before any code exists. You solve the problem in the
+plan, not later in the code. The tag `foundation` marks where the story work
+starts. The reviewer and the check in task 4 compare against it.
 
 **Done when**: Phase 1 and 2 are ticked in `tasks.md`, the page shell loads
 on port 5173, and the lead reports the commit and the tag `foundation`.
