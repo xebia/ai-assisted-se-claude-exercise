@@ -27,25 +27,41 @@ not only what it says.
 - **Context**: everything Claude can see right now. Your messages, the code
   you selected, the files it read, the output of commands. `/clear` empties
   it.
-- **Trace**: the `/trace` command. It lists every tool call of the last
-  turn: what Claude looked at, why, and what it found. It ends with totals
-  per tool and one question for you. `/trace all` does the same for every
-  turn since the last `/clear`, one table per turn.
+- **Trace**: the live pane that `/xtrace tools model pane` opens next to
+  the conversation. It shows the current turn while it runs: one row per
+  tool call and one per cycle, with the name, what it looked at, how it
+  went, and how long it took. Under the rows it totals the turn. It keeps
+  every turn since the last `/clear`, one at a time.
 
 ## How every task works
+
+Open the trace once, before task 1:
+
+```
+/xtrace tools model pane
+```
+
+It opens next to the conversation, filtered to tool calls and cycles, and
+stays open through every task. `/clear` empties it; it does not close it.
 
 Same four steps every time:
 
 1. **Ask**. Send the prompt from the task. Select code first when the task
    says so.
-2. **Read**. Read the answer before you do anything else. Does it match
-   what you know?
-3. **Trace**. Run `/trace`. Did the task take more than one turn? Then run
-   `/trace all` instead. Read the table from top to bottom.
-4. **Note**. Write down the number the task asks for. You need these
-   numbers in the closing round at the end.
+2. **Watch**. While Claude works, the trace adds one row per tool call
+   and one `model` row per cycle, in order. Which file does Claude open
+   first? Does it run anything? How many cycles does it take?
+3. **Read**. Read the answer. Does it match what you know? Does it match
+   what you watched?
+4. **Note**. Write down the number the task asks for. The tool-call count
+   is the number of `tools` rows in the turn; the `model` rows are the
+   cycles. You need these numbers in the closing round at the end.
 
-> **The loop, in short: Ask → Read → `/trace` → Note.**
+Did the task take more than one turn? The trace shows one turn at a time.
+Press ctrl+x tab to give it your keys, then `p` for the previous turn,
+`n` for the next, `l` for the latest. Esc gives the keys back.
+
+> **The loop, in short: Ask → Watch → Read → Note.**
 > Every task below uses it. Come back here when you lose track.
 
 **About training mode**: `CLAUDE.md` keeps this project in training mode.
@@ -67,7 +83,7 @@ Explain what this function does step by step
 ```
 
 Read the answer. Did Claude say that the loop runs one extra query per
-book? Run `/trace` and note the number of tool calls.
+book? Note the number of tool calls the trace shows.
 
 Now predict, in writing, one sentence: how many tool calls will Claude need
 when it cannot see your selection?
@@ -79,7 +95,7 @@ Run `/clear`. Do not select anything. Ask:
 Explain step by step what search() in the book store does
 ```
 
-Run `/trace` again. Compare the two traces with your prediction.
+Compare the two counts with your prediction.
 
 Two notes. Your selection goes into the context directly, so Claude can
 answer without opening anything. Without it, Claude has to search the
@@ -90,7 +106,7 @@ prediction.
 
 ### 2. Find a bug
 
-Run `/clear`, so the trace at the end shows this task only.
+Run `/clear`, so the trace shows this task only.
 
 Open `src/handler/review.ts` and select `createReview()`. Before you ask,
 write one sentence: which other file will Claude open to answer?
@@ -102,9 +118,9 @@ Is there a bug in this function?
 ```
 
 Training mode applies here. Answer the leading question, then read the
-answer. That took more than one turn, and `/trace` shows only the last
-one. Run `/trace all`. Did Claude open the file you predicted? In which
-turn?
+answer. That took more than one turn, and the trace shows the last one.
+Press ctrl+x tab, then `p` to step back a turn. Did Claude open the file
+you predicted? In which turn?
 
 **Done when**: Claude named a bug, and you can say in one sentence what
 `createReview()` fails to check.
@@ -128,9 +144,10 @@ No, extract the validation into a separate validateReview() function instead
 Saying no is normal. Claude does not mind, and you decide what goes into
 your code.
 
-More than one turn again, so run `/trace all`. Three things to look for:
-which tool changed the file, in which turn, and what Claude ran to check
-its own change. If it ran nothing, note that. Nobody asked it to.
+More than one turn again, so step back through them with `p`. Three
+things to look for: which tool changed the file, in which turn, and what
+Claude ran to check its own change. If it ran nothing, note that. Nobody
+asked it to.
 
 **Done when**: `validateReview()` exists in `src/handler/review.ts`,
 `createReview()` calls it, and `bun test tests/handler/review.test.ts`
@@ -148,8 +165,8 @@ Run `bun test tests/handler/validate-review.test.ts` yourself. Other tests
 in this package fail on purpose. Session 2 deals with them. Look only at
 the five tests.
 
-Run `/trace`. Did Claude run the test itself, or did you? How many tool
-calls came before its first edit?
+Look at the trace. Did Claude run the test itself, or did you? How many
+tool calls came before its first edit?
 
 **Done when**: `bun test tests/handler/validate-review.test.ts` shows five
 passing tests.
@@ -166,7 +183,7 @@ Refactor src/server.ts to group route definitions by resource using helper funct
 Compare before and after with `git diff src/server.ts`. Then run
 `bun test tests/handler/review.test.ts`.
 
-Run `/trace`. How many files did Claude read before it edited `server.ts`?
+In the trace, how many files did Claude read before it edited `server.ts`?
 Which of those reads were needed for this change?
 
 **Done when**: `server.ts` has one helper per resource (books, reviews,
@@ -175,8 +192,8 @@ errors.
 
 ### 6. Reset, then ask a big question
 
-Run `/clear`. Then run `/trace`. It reports nothing: the context is empty.
-Everything from tasks 1 to 5 is gone for Claude, not for you.
+Run `/clear`. The trace empties: the context is empty. Everything from
+tasks 1 to 5 is gone for Claude, not for you.
 
 Now ask:
 
@@ -184,7 +201,7 @@ Now ask:
 What HTTP status codes does this API return, and which ones violate REST conventions?
 ```
 
-Run `/trace`. Claude started from nothing this time. Count the files it
+Claude started from nothing this time. Count in the trace the files it
 opened to answer.
 
 **Done when**: you noted two numbers: files opened, and status-code issues
@@ -193,7 +210,8 @@ found.
 ## Bonus (only if time remains)
 
 - Ask Claude the task 6 question again, in the same conversation. Then
-  run `/trace all`. You see two turns. Fewer tool calls the second time?
+  press `p` in the trace to see the earlier turn. Fewer tool calls the
+  second time?
   Say why in one sentence.
 - Run `/context`. How much of the context window did two questions cost?
 
