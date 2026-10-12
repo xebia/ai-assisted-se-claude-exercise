@@ -318,6 +318,11 @@ describe('/clear', () => {
     expect((await ui.find({ key: 'filter' }))?.props.value).toBe('kind:tools')
     expect((await ui.find({ key: 'nav-label' }))?.text).toBe('no turns yet')
     expect(opened).toEqual(['xtrace'])                   // reopened once, by the clear
+
+    await $.turn.start({ text: 'again', turnId: 't1' })
+    await $.turn.start({ text: 'and again', turnId: 't2' })
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 2/2')
+    expect((await ui.find({ key: 'prompt' }))?.text).toBe('prompt: "and again"')
   })
 
   test('ending for another reason keeps the record', async ($, on) => {
