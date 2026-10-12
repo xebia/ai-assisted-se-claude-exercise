@@ -9,3 +9,5 @@
 
 # Old Go build of the MCP server (replaced by mcp-sqlite/server.py, 2026-09-22)
 /mcp-sqlite-server
+
+/docs
