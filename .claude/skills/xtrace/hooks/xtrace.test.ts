@@ -296,6 +296,43 @@ describe('/clear', () => {
     expect((await ui.find({ key: 'nav-label' }))?.text).toBe('no turns yet')
     expect(await findRow(ui, /Bash\s+ls/)).toBeUndefined()
   })
+
+  test('a clear keeps the filter, follows the live turn again and reopens the pane', async ($, on) => {
+    answerTurns(on)
+    answerEnd(on)
+    mock.store(on, { pane: true })
+    const opened: string[] = []
+    answerUi(on, opened)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'list files', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    await $.turn.start({ text: 'read it', turnId: 't2' })
+    await $.tool.call({ tool: 'Read', file_path: 'a.go', tool_use_id: 'u2' })
+    const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+    await ui.input({ key: 'filter', text: 'kind:tools', kind: 'change' })
+    await ui.press({ key: 'nav-prev' })
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/2 · ● live: 2')
+
+    await clear($)
+
+    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('kind:tools')
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('no turns yet')
+    expect(opened).toEqual(['xtrace'])                   // reopened once, by the clear
+  })
+
+  test('ending for another reason keeps the record', async ($, on) => {
+    answerTurns(on)
+    answerEnd(on)
+    mock.store(on)
+    answerUi(on)
+    on('tool.call', { tool: 'Bash' }, () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'list files', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+
+    await $.session.end({ reason: 'prompt_input_exit', sessionId: 's1', resume: { id: 's1' } })
+
+    expect(await xtrace($, 'tools session')).toContain('| tools | Bash | ls | ok |')
+  })
 })
 
 describe('menu', () => {
