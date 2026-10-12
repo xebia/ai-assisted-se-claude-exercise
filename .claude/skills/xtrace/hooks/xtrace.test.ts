@@ -338,6 +338,31 @@ describe('/clear', () => {
 
     expect(await xtrace($, 'tools session')).toContain('| tools | Bash | ls | ok |')
   })
+
+  test('the first turn after a clear is turn 1/1 and lists only its own rows', async ($, on) => {
+    answerTurns(on)
+    answerEnd(on)
+    mock.store(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'list files', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    await $.turn.start({ text: 'read it', turnId: 't2' })
+    await $.tool.call({ tool: 'Read', file_path: 'a.go', tool_use_id: 'u2' })
+
+    await clear($)
+
+    await $.turn.start({ text: 'run tests', turnId: 't3' })
+    await $.tool.call({ tool: 'Bash', command: 'go test ./...', tool_use_id: 'u3' })
+    const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('turn 1/1')
+    expect((await ui.find({ key: 'prompt' }))?.text).toBe('prompt: "run tests"')
+    expect(await findRow(ui, /Bash\s+go test/)).toBeDefined()
+    expect(await findRow(ui, /Bash\s+ls/)).toBeUndefined()
+    expect(await findRow(ui, /Read\s+a\.go/)).toBeUndefined()
+    expect(await ui.find({ type: 'Text', text: /tools 1 · mcp 0/ })).toBeDefined()
+    expect(await xtrace($, 'tools session')).toContain('xtrace: 1 turn(s), 1 rows')
+  })
 })
 
 describe('menu', () => {
