@@ -96,7 +96,7 @@ Shapes are not uniform, which matters when you write the spec:
 | `index.html` | Deliberately empty shell. |
 | `specs/` | Created by Spec Kit in Exercise 6. **Commit this** — Exercise 7 needs it. |
 | `specs-reference/` | A finished spec in the same layout, for anyone who did not complete Exercise 6. Exercise 7 says when to copy it. |
-| `.claude/settings.json` | Turns on agent teams (experimental) for this project, and keeps the backend's `CLAUDE.md` and `CLAUDE.local.md` one folder up from loading here (`claudeMdExcludes`), so exercises 6 and 7 run without training mode. Committed; everything else under `.claude/` is generated. |
+| `.claude/settings.json` | Turns on agent teams (experimental) for this project, makes new worktrees branch from your current commit (`worktree.baseRef: head`, so the subagents in Exercise 7, task 5, start from your frontend and not from the remote), and keeps the backend's `CLAUDE.md` and `CLAUDE.local.md` one folder up from loading here (`claudeMdExcludes`), so exercises 6 and 7 run without training mode. Committed; everything else under `.claude/` is generated. |
 | `.specify/` (the rest) | Spec Kit tooling. Generated during setup, not committed. |
 
 ## Setup

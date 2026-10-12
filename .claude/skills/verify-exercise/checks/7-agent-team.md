@@ -5,9 +5,12 @@
 team's work started.
 
 **What the participant was asked to produce.** A team prompt: the lead
-reads `tasks.md`, spawns one teammate per user story, each teammate owns
-its story's file, the foundation stays untouched, each story is done when
-its Independent Test passes. The lead waits and reports.
+reads `tasks.md` and spawns one builder per user story plus a `reviewer`
+that writes no code. Each builder owns its story's file, and the
+foundation stays untouched. When a builder's Independent Test passes, it
+sends its file list to the reviewer. The reviewer sends its findings back
+to that builder, and a story is done only after the reviewer approves it.
+The lead waits and reports.
 
 **Under review: the team prompt.** Ask for it verbatim. The code is
 evidence about that prompt.
@@ -20,10 +23,10 @@ predicted defect.
 | Check | Present when the prompt… |
 | --- | --- |
 | **Source of work** | names `tasks.md` and that story tags decide who does what |
-| **Team, not subagents** | says agent team / teammates, one per story, named |
-| **File ownership** | names the foundation files as finished; each teammate edits only its story's file |
-| **Done per teammate** | the story's Independent Test passes, tasks ticked |
-| **Lead waits** | the lead does not implement stories and waits for all teammates |
+| **Team, not subagents** | says agent team / teammates: one named builder per story, and a `reviewer` that writes no code |
+| **File ownership** | names the foundation files as finished; each builder edits only its story's file |
+| **Closed review loop** | builder sends its files to the reviewer, the reviewer sends findings back to that builder by name, and a story is done only when its Independent Test passes and the reviewer approves it |
+| **Lead waits** | the lead does not implement stories, does not fix findings, and waits for all teammates |
 
 ## Establish ground truth
 
@@ -53,42 +56,80 @@ Run these yourself. Do not take the participant's notes on trust.
    modules" in the report, never "fetched the page".
 6. Read the story files for `import` lines. Any import from
    `node_modules` or a CDN is a constitution I violation.
+7. House rules (task 2's worked example gives them to the reviewer): each
+   page module sets `document.title` for its own page, and every element
+   with a click handler is an `<a href>` or a `<button>`, not a `div` or
+   `span`. Grep for `document.title` and for `onclick` /
+   `addEventListener('click'` on other elements.
+
+8. Ask the participant what the reviewer sent back to a builder, and what
+   the builder said it changed (task 4, steps 2 and 3). Their answer is
+   the only evidence of the loop: you cannot read the teammates'
+   transcripts. Compare it with steps 1, 4, 5 and 7. A
+   defect that is still in the code after the reviewer approved the story
+   means the reviewer missed it, or its finding never reached the builder.
 
 ## Known traps
 
 - **Foundation edited.** The most likely defect. A teammate wanted a helper
-  and put it in `api.js` or `ui.js`. Name the file and the teammate if the
-  diff or a commit shows it. Map it to the File ownership check.
+  and put it in `api.js` or `ui.js`. If the diff or a commit shows it, name
+  the file and the teammate. Map it to the File ownership check.
 - **Lead built a story.** The lead's transcript or a commit shows story
-  code written by the lead. Map it to Lead waits.
-- **Ticked but not tested.** Tasks ticked, but the browser shows "Not built
-  yet" or a console error for one story. Map it to Done per teammate.
+  code that the lead wrote. Map it to Lead waits.
+- **Finding went to the lead.** The reviewer reported to the lead. The
+  lead fixed it, or nobody did. Map it to Closed review loop. With
+  subagents this is the normal route for a finding. In a team it means the
+  prompt has a gap.
+- **House rule sent back, not fixed.** The reviewer reported a missing
+  tab title or a clickable `div`, but the code still has it. Ask whether
+  the builder got the message by name, and whether the prompt said a
+  story is done only after approval. Map it to Closed review loop.
+- **Approved but broken.** The reviewer approved a story that still shows
+  backend text, breaks a house rule, or changed a foundation file. Say which check the prompt
+  told the reviewer to run, or that it named none. Browser problems from
+  task 4 are expected misses: the reviewer reads code and does not open
+  the browser.
+- **Ticked but not tested.** Tasks are ticked, but the browser shows "Not
+  built yet" or a console error for one story. Map it to Closed review
+  loop. The prompt did not require the Independent Test before done.
 - **Backend error text on screen.** `#/books/abc` shows "invalid id", or
-  the list shows "db error". Constitution V. Usually the page module reads
-  `outcome.error` that the client was supposed to drop — check whether the
-  foundation client leaks it or the story re-fetches on its own.
-- **Page 0.** A page module that starts counting at 0 sends `page=0`. What
-  happens next depends on the participant's Session 2 fix: the API treats
-  it as page 1, so Next shows page 1 twice, or it returns an error the UI
-  shows. Both are a spec defect from Exercise 6 that became code. Mention
-  it as a finding either way — it is the point of the closing-round question about marked guesses.
-- **Subagents, not a team.** The participant reports no panel rows with
-  the teammate names from the prompt. Not a code defect, but a prompt one:
-  map it to Team, not subagents. An empty Ctrl+T task list is not evidence
-  either way: on current models the session has no Task tools, so that list
+  the list shows "db error". This breaks constitution V. Usually the page
+  module reads `outcome.error`, which the client should drop. Check
+  whether the foundation client passes it on, or the story fetches again
+  on its own.
+- **Page 0.** A page module that starts counting at 0 sends `page=0`. The
+  result depends on the participant's Session 2 fix. Either the API treats
+  it as page 1, so Next shows page 1 twice, or it returns an error that the
+  UI shows. Both come from a spec defect in Exercise 6 that became code.
+  Report it as a finding either way. It is the point of the closing-round
+  question about guesses.
+- **Subagents, not a team.** The participant sees no panel rows with the
+  teammate names from the prompt. This is a prompt defect, not a code
+  defect. Map it to Team, not subagents. An empty Ctrl+T task list proves
+  nothing. On current models the session has no Task tools, so that list
   stays empty for a real team too.
 
 ## Pass bar
 
 - No foundation file in `git diff --stat foundation`
 - Every story task ticked, and both stories render in the browser
+- The participant can name one finding the reviewer sent to a builder
 - Grep clean; all four error paths render a fixed sentence
-- Partial is a normal first-attempt outcome. Name which story or which
-  boundary failed; do not round up.
+- Both house rules hold in every story file
+- Partial is a normal result on a first attempt. Name which story or which
+  boundary failed. Do not call a partial result a pass.
+
+## No retry
+
+No retry. A second team run costs many minutes and tokens, and the
+exercise moves on to task 5. Do not offer to re-run the team. Name the
+smallest fix as the clause to take into their next team prompt.
 
 ## Held back
 
 None for the verifier. The held-back fact for this session lives in the
 `/parallel-coach` card for task 2 (nothing enforces file ownership except
 the prompt). By the time the verifier runs, the run has already taught it —
-say it plainly if the evidence shows it.
+say it plainly if the evidence shows it. Add the second half: the reviewer
+is the check behind the prompt, and it catches only what it was told to
+check.

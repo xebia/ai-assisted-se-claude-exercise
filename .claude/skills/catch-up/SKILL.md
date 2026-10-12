@@ -43,11 +43,11 @@ Look at the current folder, then use this table:
 | Marker file    | Test command               |
 | -------------- | -------------------------- |
 | `go.mod`       | `go test ./...`            |
-| `gradlew`      | `./gradlew runTests`       |
+| `gradlew`      | `./gradlew test`           |
 | `main.py`      | `python3 -m unittest`      |
 | `package.json` | `bun test`                 |
 
-On Windows, run `gradlew.bat runTests`. If the Kotlin project has no
+On Windows, run `gradlew.bat test`. If the Kotlin project has no
 Gradle wrapper, use `mvn test`. If none of the marker files is in the
 current folder, say the command must run from the bookstore project
 folder, and stop.

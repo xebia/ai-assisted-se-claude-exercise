@@ -146,13 +146,13 @@ Ask:
 Write a test class for validateReview() with one JUnit @Test per case covering: rating 0, rating 6, text of 9 characters, text of 501 characters, and one valid review. Put it in src/test/kotlin/bookstore/handler/ValidateReviewTest.kt, use kotlin.test assertions, and name the class ValidateReviewTest
 ```
 
-Run `./gradlew runTests` yourself. Other tests in this package fail on
+Run `./gradlew test` yourself. Other tests in this package fail on
 purpose. Session 2 deals with them. Look only at the five tests.
 
 Run `/trace`. Did Claude run the test itself, or did you? How many tool
 calls came before its first edit?
 
-**Done when**: `./gradlew runTests` shows five passing tests in
+**Done when**: `./gradlew test` shows five passing tests in
 `ValidateReviewTest`.
 
 ### 5. Refactor

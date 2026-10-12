@@ -13,7 +13,7 @@ Requires Java 17+ on the PATH. Use either Gradle or Maven to build and run.
 ./gradlew build             # compile main + tests
 ./gradlew run               # starts on :8080, seeds on first run
 ./gradlew run --args="--seed"  # wipes and reseeds
-./gradlew runTests          # runs the test suite
+./gradlew test              # runs the test suite
 ```
 
 **Maven** (requires `mvn` on the PATH):

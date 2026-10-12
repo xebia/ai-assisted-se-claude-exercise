@@ -188,7 +188,9 @@ invent findings to look thorough, and do not soften a weak grade either.
 and is more convincing than any rubric.
 
 Close by offering the retry: they add the clause, re-run their own prompt,
-compare. Do not run it for them.
+compare. Do not run it for them. When the check file has a **No retry**
+section, do not offer it: name the smallest fix as the clause to take into
+their next prompt, and stop.
 
 ## Adding a new exercise
 

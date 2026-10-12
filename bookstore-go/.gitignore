@@ -89,3 +89,6 @@ store.db
 
 # Participant MCP registration (Exercise 5) - written by `claude mcp add --scope project`
 .mcp.json
+
+# Worktrees Claude Code creates for subagents (Exercise 7, task 5)
+.claude/worktrees/
