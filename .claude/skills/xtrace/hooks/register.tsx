@@ -219,6 +219,23 @@ export const register: Register = on => {
     return next(e)
   })
 
+  // /clear ends the session but keeps the process and this plugin's state:
+  // empty the record so the pane and the report start from nothing. The
+  // filter bar, the help flag, the menu's ticks and the pane preference stay.
+  on('session.end', async ($, e, next) => {
+    if (e.reason === 'clear') {
+      runningAgents.length = 0
+      parentOfAgent.clear()
+      deniedCalls.clear()
+      try { await update($, ROWS, () => []) } catch {}
+      try { await update($, TURNS, () => []) } catch {}
+      try { await update($, COMPACTIONS, () => []) } catch {}
+      try { await update($, VIEW, v => ({ ...v, pinnedTurnId: undefined, rowStart: undefined, rowTurnId: undefined })) } catch {}
+      try { if (await isPanePreferred($)) await openPane($) } catch {}
+    }
+    return next(e)
+  })
+
   on('turn.start', async ($, e, next) => {
     try {
       await addTurn($, { turnId: e.turnId, text: firstWords(e.text), startedAt: await $.clock.now(), isComplete: false })
@@ -664,16 +681,14 @@ export const register: Register = on => {
         )}
         {turnRows.length > 0 && isFiltered && <Box key="shown"><Text dimColor>{`${shown.length} of ${turnRows.length} rows shown`}</Text></Box>}
         {turnRows.length > 0 && total !== undefined && rule('rule-nav')}
-        {turns.length > 0 && (
-          <Box key="nav" flexDirection="row" gap={1} width={ruleWidth} justifyContent="center">
-            {NAV.map(b => {
-              const can = canNav(turns, view.pinnedTurnId, b.to)
-              return <Button key={`nav-${b.to}`} hotkey={b.hotkey} plain label={b.label} dimColor={!can}
-                onPress={() => navigate($, b.to)} />
-            })}
-            <Box key="nav-label"><Text dimColor wrap="truncate-end">{navLabel(turns, view.pinnedTurnId)}</Text></Box>
-          </Box>
-        )}
+        <Box key="nav" flexDirection="row" gap={1} width={ruleWidth} justifyContent="center">
+          {NAV.map(b => {
+            const can = canNav(turns, view.pinnedTurnId, b.to)
+            return <Button key={`nav-${b.to}`} hotkey={b.hotkey} plain label={b.label} dimColor={!can}
+              onPress={() => navigate($, b.to)} />
+          })}
+          <Box key="nav-label"><Text dimColor wrap="truncate-end">{navLabel(turns, view.pinnedTurnId)}</Text></Box>
+        </Box>
       </Box>
     )
   })

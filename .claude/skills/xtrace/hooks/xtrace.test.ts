@@ -267,6 +267,37 @@ const paneProps = (bodyColumns: number) => ({
   scroll: { offset: 0, bodyRows: 20 }, view: {},
 })
 
+describe('/clear', () => {
+  const answerEnd = (on: On) => on('session.end', ($, e) => ({ sessionId: e.sessionId }))
+  const clear = ($: Engine) => $.session.end({ reason: 'clear', sessionId: 's1', resume: { id: 's1' } })
+
+  test('a clear empties rows, turns and counters', async ($, on) => {
+    answerTurns(on)
+    answerEnd(on)
+    answerUi(on)
+    mock.store(on)
+    on('tool.call', { tool: 'Bash' }, () => ({ result: {}, text: '' }))
+    on('turn.step', async function* ($, e) {
+      return {
+        turnId: e.turnId, index: e.index, answer: '', toolUses: [], stopReason: 'end_turn' as const,
+        usage: { model: 'claude-fable-5-1', input_tokens: 10, cache_read_input_tokens: 100, cache_creation_input_tokens: 5, output_tokens: 7 },
+      }
+    })
+    await $.turn.start({ text: 'list files', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    for await (const _ of $.turn.step({ turnId: 't1', index: 1, model: 'claude-fable-5-1', messageCount: 1 })) { /* drain */ }
+    expect(await xtrace($, 'all session')).toContain('xtrace: 1 turn(s)')
+
+    await clear($)
+
+    expect(await xtrace($, 'all session')).toBe('xtrace: nothing recorded for this session.')
+    const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+    expect(await ui.find({ type: 'Text', text: /tools 0 · mcp 0 · skills 0 · hooks 0 · agents 0 · commands 0 · context 0 · model 0/ })).toBeDefined()
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('no turns yet')
+    expect(await findRow(ui, /Bash\s+ls/)).toBeUndefined()
+  })
+})
+
 describe('menu', () => {
   test('/xtrace with no words opens the menu pane', async ($, on) => {
     const opened: string[] = []
