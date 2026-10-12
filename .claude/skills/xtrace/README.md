@@ -9,6 +9,9 @@ Records every external access Claude makes in this session and reports it.
     /xtrace pane [on|off]       live pane
     /xtrace tools mcp pane      live pane, filtered to these kinds
 
+`/clear` empties the record: counters, turns and rows start from zero; the
+filter bar and the pane preference stay, and an open pane is drawn afresh.
+
 Categories: tools, mcp, skills, hooks, agents, commands, context, model.
 
 Hooks rows show which commands are configured for the event in settings.json;
