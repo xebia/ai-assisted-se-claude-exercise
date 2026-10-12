@@ -358,7 +358,10 @@ export const register: Register = on => {
       await setPane($, 'on')
       return { text: `xtrace: live pane on, filter "${filter}".` }
     }
-    await update($, SELECTION, () => ({ ...parsed.selection, known: [...CATEGORIES] }))
+    // The save is for the menu's ticks; a refused write (the engine refuses
+    // one while a ui.render hook draws, e.g. with the menu open) must not
+    // cost the report.
+    try { await update($, SELECTION, () => ({ ...parsed.selection, known: [...CATEGORIES] })) } catch {}
     const [rows, turns, compactions] = await Promise.all([read($, ROWS), read($, TURNS), read($, COMPACTIONS)])
     return { text: buildReport({ rows, turns, compactions, selection: parsed.selection, now: await nowOrUndefined($) }) }
   })

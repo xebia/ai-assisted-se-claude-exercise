@@ -397,6 +397,21 @@ describe('menu', () => {
     expect(closed).toContain('xtrace-menu')
     expect(ran).toContain('tools mcp session')
   })
+
+  test('a typed report answers while the menu is open', async ($, on) => {
+    // The live engine refuses a state write while a ui.render hook draws; the
+    // kit does not, so this guards that the report never depends on the save.
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', { tool: 'Bash' }, () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'list files', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    expect(await xtrace($, '')).toBe('xtrace: pick what to show.')
+    await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace-menu', props: paneProps(60) })
+    const text = await xtrace($, 'all')
+    expect(text).toContain('xtrace: 1 turn(s)')
+    expect(text).toContain('| tools | Bash | ls |')
+  })
 })
 
 describe('live pane', () => {
