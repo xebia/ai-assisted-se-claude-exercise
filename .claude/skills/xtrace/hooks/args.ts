@@ -5,7 +5,7 @@ export const CATEGORIES: readonly Category[] = [
 ]
 
 export const USAGE =
-  'Usage: /xtrace [all | tools mcp skills hooks agents commands context model] [session] | /xtrace [categories] pane [on|off]'
+  'Usage: /xtrace [all | tools mcp skills hooks agents commands context model] [session] | /xtrace [categories] pane | /xtrace pane [on|off]'
 
 export type ParsedArgs =
   | { mode: 'menu' }
