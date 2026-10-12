@@ -388,6 +388,48 @@ describe('live pane', () => {
   })
 })
 
+describe('pane opened with categories', () => {
+  const mountPane = ($: Engine) =>
+    $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+
+  test('categories before pane open it with the kind term in the bar', async ($, on) => {
+    answerTurns(on)
+    mock.store(on)
+    const opened: string[] = []
+    answerUi(on, opened)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    await $.tool.call({ tool: 'mcp__sqlite-bookstore__query', sql: 'select 1', tool_use_id: 'u2' })
+    expect(await xtrace($, 'mcp pane')).toBe('xtrace: live pane on, filter "kind:mcp".')
+    expect(opened).toEqual(['xtrace'])
+    const ui = await mountPane($)
+    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('kind:mcp')
+    expect(await findRow(ui, /^mcp\s+sqlite-bookstore/)).toBeDefined()
+    expect(await findRow(ui, /Bash\s+ls/)).toBeUndefined()
+  })
+
+  test('the kind term is replaced, the rest of the bar kept; all clears it', async ($, on) => {
+    answerTurns(on)
+    mock.store(on)
+    answerUi(on)
+    const ui = await mountPane($)
+    await ui.input({ key: 'filter', text: 'kind:hooks sort:-ms', kind: 'change' })
+    expect(await xtrace($, 'tools mcp pane')).toBe('xtrace: live pane on, filter "kind:tools,mcp sort:-ms".')
+    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('kind:tools,mcp sort:-ms')
+    expect(await xtrace($, 'all pane')).toBe('xtrace: live pane on, filter "sort:-ms".')
+  })
+
+  test('nonsense combinations answer with usage and leave the pane alone', async ($, on) => {
+    mock.store(on)
+    const opened: string[] = []
+    answerUi(on, opened)
+    expect(await xtrace($, 'tools session pane')).toContain('Usage: /xtrace')
+    expect(await xtrace($, 'pane off tools')).toContain('Usage: /xtrace')
+    expect(opened).toEqual([])
+  })
+})
+
 describe('plugin hooks', () => {
   test('an enabled plugin with a hook for the event shows in its own column', async ($, on) => {
     answerTurns(on)

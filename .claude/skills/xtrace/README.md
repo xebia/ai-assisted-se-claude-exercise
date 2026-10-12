@@ -7,6 +7,7 @@ Records every external access Claude makes in this session and reports it.
     /xtrace tools mcp hooks     chosen categories, last turn
     /xtrace tools session       whole session
     /xtrace pane [on|off]       live pane
+    /xtrace tools mcp pane      live pane, filtered to these kinds
 
 Categories: tools, mcp, skills, hooks, agents, commands, context, model.
 
@@ -38,6 +39,11 @@ back). The cursor starts in the filter; Tab moves on to the buttons.
 On an older turn the pane stays there and shows `● live: N`; `l` follows
 the latest again. When a turn has more rows than fit, `↑ N earlier rows`
 says so; paging or scrolling back to the bottom follows the live turn.
+
+Categories named with `pane` lead the filter bar as one `kind:` term,
+replacing any there; `all pane` drops it. The rest of the bar stays. The
+pane filters by its bar only; the categories picked for the report do not
+narrow it.
 
 The filter takes `column:value` terms; every term must match:
 

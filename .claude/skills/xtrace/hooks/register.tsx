@@ -5,7 +5,7 @@ import { CATEGORIES, parseArgs, withNewCategories, wordsOf } from './args'
 import { attachHookContext, buildReport, counterSegments, denialCategory, firstWords, NAME_COLUMN, PANE_MARGIN, paletteFor, paneHeaderCells, paneHeaderWidths, paneRowCells, paneTotalRoom, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
 import { commandsFor, enabledInstalls, pluginsFor } from './hookmatch'
 import type { PluginHooks } from './hookmatch'
-import { applyView, canNav, canPage, EXAMPLES, navLabel, navTarget, parseFilter, pageRows, PLACEHOLDER, rowWindow, scrollRows, scrollStep, sortMark, turnTitle, viewedTurn, withSort } from './view'
+import { applyView, canNav, canPage, EXAMPLES, navLabel, navTarget, parseFilter, pageRows, PLACEHOLDER, rowWindow, scrollRows, scrollStep, sortMark, turnTitle, viewedTurn, withKinds, withSort } from './view'
 import type { Column, Nav, Page } from './view'
 
 // The engine follows `$` and the state atoms only within this file, never across
@@ -210,7 +210,7 @@ export const register: Register = on => {
       await $.command.register({
         name: 'xtrace',
         description: 'Trace every tool, MCP, skill, hook, subagent, command and context access',
-        argumentHint: '[all | tools mcp skills hooks agents commands context model] [session] | pane [on|off]',
+        argumentHint: '[all | tools mcp skills hooks agents commands context model] [session | pane] | pane [on|off]',
       })
     } catch {}
     try {
@@ -334,7 +334,13 @@ export const register: Register = on => {
       const opened = await $.ui.open({ id: MENU, title: 'xtrace', focus: true, closeOnEscape: true, rows: 14 })
       return { text: opened.isPlaced ? 'xtrace: pick what to show.' : `xtrace: ${opened.reason}` }
     }
-    if (parsed.mode === 'pane') return { text: `xtrace: live pane ${await setPane($, parsed.pane)}.` }
+    if (parsed.mode === 'pane') {
+      if (parsed.kinds === undefined) return { text: `xtrace: live pane ${await setPane($, parsed.pane)}.` }
+      const filter = withKinds((await read($, VIEW)).filter, parsed.kinds)
+      await setFilter($, filter)
+      await setPane($, 'on')
+      return { text: `xtrace: live pane on, filter "${filter}".` }
+    }
     await update($, SELECTION, () => ({ ...parsed.selection, known: [...CATEGORIES] }))
     const [rows, turns, compactions] = await Promise.all([read($, ROWS), read($, TURNS), read($, COMPACTIONS)])
     return { text: buildReport({ rows, turns, compactions, selection: parsed.selection, now: await nowOrUndefined($) }) }
