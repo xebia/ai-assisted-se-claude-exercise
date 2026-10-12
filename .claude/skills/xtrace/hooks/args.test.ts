@@ -45,7 +45,24 @@ describe('parseArgs', () => {
     expect(parseArgs('pane on')).toEqual({ mode: 'pane', pane: 'on' })
     expect(parseArgs('pane off')).toEqual({ mode: 'pane', pane: 'off' })
     expect(parseArgs('pane sideways').mode).toBe('error')
-    expect(parseArgs('tools pane').mode).toBe('error')
+  })
+  test('categories with pane open it filtered to those kinds, in canonical order', () => {
+    expect(parseArgs('model tools mcp pane')).toEqual({ mode: 'pane', pane: 'on', kinds: ['tools', 'mcp', 'model'] })
+    expect(parseArgs('pane tools mcp')).toEqual({ mode: 'pane', pane: 'on', kinds: ['tools', 'mcp'] })
+    expect(parseArgs('pane on tools')).toEqual({ mode: 'pane', pane: 'on', kinds: ['tools'] })
+    expect(parseArgs('  Tools  PANE ')).toEqual({ mode: 'pane', pane: 'on', kinds: ['tools'] })
+  })
+  test('all with pane clears the kind filter', () => {
+    expect(parseArgs('all pane')).toEqual({ mode: 'pane', pane: 'on', kinds: 'all' })
+    expect(parseArgs('tools all pane')).toEqual({ mode: 'pane', pane: 'on', kinds: 'all' })
+  })
+  test('pane combinations that make no sense are errors with usage', () => {
+    expect(messageOf('pane off tools')).toContain('pane off')
+    expect(messageOf('tools session pane')).toContain('session')
+    expect(messageOf('pane tools pane')).toContain('once')
+    expect(parseArgs('pane on off').mode).toBe('error')
+    expect(parseArgs('tools pane bananas').mode).toBe('error')
+    expect(messageOf('pane off tools')).toContain('/xtrace')
   })
   test('unknown word is an error with usage', () => {
     expect(parseArgs('tools bananas').mode).toBe('error')
