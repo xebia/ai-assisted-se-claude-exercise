@@ -488,21 +488,18 @@ export const register: Register = on => {
     const Svg = e.surface !== 'terminal' && 'Svg' in elements ? elements.Svg : undefined
     const rows: Row[] = await read($, ROWS)
     const turns: Turn[] = await read($, TURNS)
-    const selection: Selection = await read($, SELECTION)
     const view: View = await read($, VIEW)
     const pal = paletteFor((await $.config.list().catch(() => [])).find(row => row.key === 'theme')?.value)
     const counters = counterSegments(CATEGORIES.map(c => [c, rows.filter(r => r.kind === c).length]), pal)
     const { turn } = viewedTurn(turns, view.pinnedTurnId)
     const turnId = turn?.turnId
-    const picked = new Set(selection.categories)
     const turnRows = rows.filter(r => r.turnId === turnId)
     // An old turn with no rows left: the 2000-row buffer dropped them.
     const isEvicted = turn !== undefined && turn.turnId !== turns.at(-1)?.turnId && turnRows.length === 0 && rows.length >= ROW_CAP
     const tokens = tokensOf(turnRows)
     const counts = new Map([...tokenValues(turnRows)].map(([id, v]) => [id, v.n]))
     const parsed = parseFilter(view.filter)
-    const selected = turnRows.filter(r => picked.has(r.kind))
-    const shown = applyView(selected, parsed, counts)
+    const shown = applyView(turnRows, parsed, counts)
     const isFiltered = view.filter.trim() !== ''
     const now = await nowOrUndefined($)
     const total = turn !== undefined && now !== undefined ? turnTotalLines(turn, rows, now) : undefined
@@ -525,7 +522,7 @@ export const register: Register = on => {
           : <Text dimColor wrap="truncate-end">{char.repeat(w)}</Text>}
       </Box>
     )
-    const withPlugins = picked.has('hooks')
+    const withPlugins = shown.some(r => r.kind === 'hooks')
     const marks = parsed.sort !== undefined ? { [parsed.sort.column]: sortMark(parsed.sort, parsed.sort.column) } : {}
     const header = paneHeaderCells(width, withPlugins, marks)
     const columnWidths = paneHeaderWidths(width, withPlugins)
@@ -575,8 +572,8 @@ export const register: Register = on => {
         )}
         {turn !== undefined && rule('rule-prompt')}
         {isEvicted && <Box key="evicted"><Text dimColor>rows for this turn fell out of the 2000-row buffer</Text></Box>}
-        {!isEvicted && selected.length === 0 && <Text dimColor>No rows in this turn yet.</Text>}
-        {selected.length > 0 && (
+        {!isEvicted && turnRows.length === 0 && <Text dimColor>No rows in this turn yet.</Text>}
+        {turnRows.length > 0 && (
           // Each label in a box of its column's width, like the rows' cells, so they line up
           // on a surface that draws proportional text too.
           <Box flexDirection="row" gap={1}>
@@ -632,8 +629,8 @@ export const register: Register = on => {
         ))}
         {/* The free space: the totals and the nav row stay at the bottom of the pane. */}
         <Box key="footer-spacer" flexGrow={1} />
-        {selected.length > 0 && total !== undefined && rule('rule-total')}
-        {selected.length > 0 && total !== undefined && (
+        {turnRows.length > 0 && total !== undefined && rule('rule-total')}
+        {turnRows.length > 0 && total !== undefined && (
           <Box flexDirection="column">
             {total.flatMap((line, n) => [
               // A short rule sets the subagents' block apart from the main loop's.
@@ -659,8 +656,8 @@ export const register: Register = on => {
             ])}
           </Box>
         )}
-        {selected.length > 0 && isFiltered && <Box key="shown"><Text dimColor>{`${shown.length} of ${selected.length} rows shown`}</Text></Box>}
-        {selected.length > 0 && total !== undefined && rule('rule-nav')}
+        {turnRows.length > 0 && isFiltered && <Box key="shown"><Text dimColor>{`${shown.length} of ${turnRows.length} rows shown`}</Text></Box>}
+        {turnRows.length > 0 && total !== undefined && rule('rule-nav')}
         {turns.length > 0 && (
           <Box key="nav" flexDirection="row" gap={1} width={ruleWidth} justifyContent="center">
             {NAV.map(b => {

@@ -346,7 +346,7 @@ describe('live pane', () => {
   })
 
   for (const surface of ['terminal', 'desktop'] as const) {
-    test(`draws counters and the current turn's rows, filtered by the selection (${surface})`, async ($, on) => {
+    test(`draws counters and the current turn's rows, filtered by the kind term (${surface})`, async ($, on) => {
       answerTurns(on)
       answerUi(on)
       on('tool.call', { tool: 'Bash' }, () => ({ result: {}, text: '' }))
@@ -358,13 +358,13 @@ describe('live pane', () => {
       on('tool.call', { tool: 'Read' }, async () => {
         // Mounted while the Read is in flight, so its row is still running.
         const ui = await $.ui.mount({ plugin: 'xtrace', surface, component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+        await ui.input({ key: 'filter', text: 'kind:tools', kind: 'change' })
         sawRunning = await findRow(ui, /Read .*running/)
         sawBash = await findRow(ui, /Bash\s+ls\s+ok/)
         sawStop = await findRow(ui, /Stop/)
         counters = await ui.find({ type: 'Text', text: /tools 2 · mcp 0 · skills 0 · hooks 3/ })
         return { result: {}, text: '' }
       })
-      await xtrace($, 'tools')                       // selection: tools only
       await $.turn.start({ text: 'x', turnId: 't1' })
       await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
       await $.classic.Stop({ stop_hook_active: false })
@@ -372,9 +372,20 @@ describe('live pane', () => {
       expect(counters).toBeDefined()
       expect(sawBash).toBeDefined()
       expect(sawRunning).toBeDefined()
-      expect(sawStop).toBeUndefined()              // hooks not selected: counted, not listed
+      expect(sawStop).toBeUndefined()              // hooks filtered out: counted, not listed
     })
   }
+
+  test('the stored selection no longer narrows the pane', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await xtrace($, 'tools')                       // selection: tools only, for the report
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'mcp__sqlite-bookstore__query', sql: 'select 1', tool_use_id: 'u1' })
+    const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+    expect(await findRow(ui, /^mcp\s+sqlite-bookstore/)).toBeDefined()
+  })
 })
 
 describe('plugin hooks', () => {
@@ -479,10 +490,10 @@ describe('pane filter and sort', () => {
 
   test('typing a filter narrows the rows and shows the count', async ($, on) => {
     const ui = await twoRows($, on)
-    await ui.input({ key: 'filter', text: 'name:bash', kind: 'change' })
+    await ui.input({ key: 'filter', text: 'kind:tools name:bash', kind: 'change' })
     expect(await findRow(ui, /Bash\s+ls\s+ok/)).toBeDefined()
     expect(await findRow(ui, /Read\s+a\.go/)).toBeUndefined()
-    expect((await ui.find({ key: 'shown' }))?.text).toBe('1 of 2 rows shown')
+    expect((await ui.find({ key: 'shown' }))?.text).toMatch(/^1 of \d+ rows shown$/)
   })
 
   test('a mistake is named and the rest still filters', async ($, on) => {
@@ -495,15 +506,16 @@ describe('pane filter and sort', () => {
 
   test('pressing a header sorts and writes the sort into the bar', async ($, on) => {
     const ui = await twoRows($, on)
+    await ui.input({ key: 'filter', text: 'kind:tools', kind: 'change' })
     await ui.press({ key: 'sort-name' })
-    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('sort:name')
+    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('kind:tools sort:name')
     expect((await ui.find({ key: 'sort-name' }))?.props.label).toBe('name▲')
     const rows = await paneRows(ui)
     expect(rows).toEqual([expect.stringMatching(/Bash/), expect.stringMatching(/Read/)])
     await ui.press({ key: 'sort-name' })
-    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('sort:-name')
+    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('kind:tools sort:-name')
     await ui.press({ key: 'sort-name' })
-    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('')
+    expect((await ui.find({ key: 'filter' }))?.props.value).toBe('kind:tools')
   })
 
   test('help shows the examples', async ($, on) => {
@@ -523,9 +535,10 @@ describe('pane height', () => {
     await $.turn.start({ text: 'x', turnId: 't1' })
     for (let i = 0; i < 30; i++) await $.tool.call({ tool: 'Bash', command: `echo ${i}`, tool_use_id: `u${i}` })
     const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+    await ui.input({ key: 'filter', text: 'kind:tools', kind: 'change' })
     // 20 body rows less counters, filter, rule, prompt, rule, header, rule, total, rule, nav,
-    // and, as 30 rows overflow, the one paging line (earlier-rows hint and controls).
-    expect(await paneRows(ui).then(rs => rs.filter(t => /^tools\s+Bash\s/.test(t)))).toHaveLength(9)
+    // the `N of M rows shown` line, and, as 30 rows overflow, the one paging line.
+    expect(await paneRows(ui).then(rs => rs.filter(t => /^tools\s+Bash\s/.test(t)))).toHaveLength(8)
   })
 
   test('an overflowing turn says what is hidden and pages through it', async ($, on) => {
@@ -536,11 +549,12 @@ describe('pane height', () => {
     await $.turn.start({ text: 'x', turnId: 't1' })
     for (let i = 0; i < 30; i++) await $.tool.call({ tool: 'Bash', command: `echo ${i}`, tool_use_id: `u${i}` })
     const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
-    expect((await ui.find({ key: 'hidden' }))?.text).toBe('↑ 21 earlier rows')
-    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 22–30 of 30')
+    await ui.input({ key: 'filter', text: 'kind:tools', kind: 'change' })
+    expect((await ui.find({ key: 'hidden' }))?.text).toBe('↑ 22 earlier rows')
+    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 23–30 of 30')
     // One line: the hint at the left, the controls centred, the range and ↓ at the right.
     const line = await ui.find({ key: 'paging' })
-    expect(line?.text).toMatch(/^↑ 21 earlier rows.*▲.*▼.*rows 22–30 of 30.*↓$/)
+    expect(line?.text).toMatch(/^↑ 22 earlier rows.*▲.*▼.*rows 23–30 of 30.*↓$/)
     const parts = (line?.children ?? []) as { type?: string; props?: Record<string, unknown> }[]
     expect(parts.map(p => p.props?.justifyContent)).toEqual(['flex-start', 'center', 'flex-end'])
     // The sides are equal, so the controls sit in the middle; the right side ends with the ms column.
@@ -549,11 +563,11 @@ describe('pane height', () => {
     expect(widths.reduce((a, b) => a + b, 0)).toBe(98)
     expect(await findRow(ui, /echo 29/)).toBeDefined()
     await ui.press({ key: 'page-up' })
-    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 13–21 of 30')
+    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 15–22 of 30')
     expect(await findRow(ui, /echo 14/)).toBeDefined()
     expect(await findRow(ui, /echo 29/)).toBeUndefined()
     await ui.press({ key: 'page-down' })
-    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 22–30 of 30')
+    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 23–30 of 30')
   })
 
   test('a paged window stays with its turn: a new live turn shows its newest rows', async ($, on) => {
@@ -564,10 +578,11 @@ describe('pane height', () => {
     await $.turn.start({ text: 'a', turnId: 't1' })
     for (let i = 0; i < 30; i++) await $.tool.call({ tool: 'Bash', command: `echo a${i}`, tool_use_id: `a${i}` })
     const ui = await $.ui.mount({ plugin: 'xtrace', surface: 'terminal', component: 'Pane', requestId: 'xtrace', props: paneProps(100) })
+    await ui.input({ key: 'filter', text: 'kind:tools', kind: 'change' })
     await ui.press({ key: 'page-up' })
     await $.turn.start({ text: 'b', turnId: 't2' })
     for (let i = 0; i < 30; i++) await $.tool.call({ tool: 'Bash', command: `echo b${i}`, tool_use_id: `b${i}` })
-    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 22–30 of 30')
+    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 23–30 of 30')
     expect(await findRow(ui, /echo b29/)).toBeDefined()
   })
 
