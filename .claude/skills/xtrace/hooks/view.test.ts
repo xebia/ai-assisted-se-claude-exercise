@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { applyView, canNav, canPage, COLUMNS, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, pageRows, rowWindow, scrollRows, scrollStep, sortMark, turnTitle, viewedTurn, withSort } from './view'
+import { applyView, canNav, canPage, COLUMNS, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, pageRows, rowWindow, scrollRows, scrollStep, sortMark, turnTitle, viewedTurn, withKinds, withSort } from './view'
 import type { Row, Turn } from '../types'
 
 const row = (over: Partial<Row>): Row => ({
@@ -136,6 +136,26 @@ describe('withSort', () => {
   })
   test('the result parses to the sort it shows', () => {
     expect(parseFilter(withSort('sort:tokens', 'tokens')).sort).toEqual({ column: 'tokens', desc: true })
+  })
+})
+
+describe('withKinds', () => {
+  test('adds the kind term in front of the rest', () => {
+    expect(withKinds('', ['tools', 'mcp'])).toBe('kind:tools,mcp')
+    expect(withKinds('sort:-ms bash', ['tools', 'mcp'])).toBe('kind:tools,mcp sort:-ms bash')
+  })
+  test('replaces every kind term, negated or any case, keeping the other terms in order', () => {
+    expect(withKinds('KIND:hooks sort:-ms kind:!mcp  name:bash', ['model'])).toBe('kind:model sort:-ms name:bash')
+  })
+  test('all removes the kind term', () => {
+    expect(withKinds('kind:model sort:-ms', 'all')).toBe('sort:-ms')
+    expect(withKinds('', 'all')).toBe('')
+  })
+  test('the result parses to the kinds it shows', () => {
+    const parsed = parseFilter(withKinds('', ['tools', 'model']))
+    expect(parsed.errors).toEqual([])
+    expect(parsed.match(row({ kind: 'model' }), undefined)).toBe(true)
+    expect(parsed.match(row({ kind: 'mcp' }), undefined)).toBe(false)
   })
 })
 

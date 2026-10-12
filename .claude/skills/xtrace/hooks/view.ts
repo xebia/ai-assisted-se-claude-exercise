@@ -1,4 +1,4 @@
-import type { Row, Turn } from '../types'
+import type { Category, Row, Turn } from '../types'
 
 // The live pane's view: the filter bar's language and sorting (this task),
 // which turn is shown (the navigation helpers below). Pure, no `$`.
@@ -154,6 +154,14 @@ export function withSort(text: string, column: Column): string {
     kept.splice(place, 0, next)
   }
   return kept.join(' ')
+}
+
+const isKindTerm = (t: string) => t.toLowerCase().startsWith('kind:')
+
+// `/xtrace tools mcp pane`: the kinds lead the bar, replacing any kind term; `all` drops it.
+export function withKinds(text: string, kinds: readonly Category[] | 'all'): string {
+  const kept = text.trim().split(/\s+/).filter(t => t !== '' && !isKindTerm(t))
+  return (kinds === 'all' ? kept : [`kind:${kinds.join(',')}`, ...kept]).join(' ')
 }
 
 export const sortMark = (sort: Sort | undefined, column: Column): string =>
