@@ -9,17 +9,18 @@ with its `UserPromptSubmit` entry in `.claude/settings.json`, and the
 the participant wrote down by hand during the session: their three
 task-3 predictions, marked confirmed or wrong in task 4.
 
-**This check runs in two stages.** Participants may run it after Part 1,
-when only the two skills exist, and again at the end of task 4, before
-the closing round. Never refuse the first run because the guard is
-missing: in Part 1 the guard is not supposed to exist yet.
+**This check runs in two stages.** The sheet calls it at the end of task
+4, before the closing round. A fast participant may also run it after
+task 2, when only the two skills exist. Never refuse that early run
+because the guard is missing: before task 3 the guard is not supposed to
+exist yet.
 
 Pick the stage from disk, before anything else:
 
-- **Part 1 stage**: `.claude/hooks/guard-secrets.py` does not exist and
-  `.claude/settings.json` is missing or has no `UserPromptSubmit` entry.
-  Grade only the two skills. See *Part 1 stage* below.
-- **Part 2 stage**: the guard script or the `UserPromptSubmit` entry
+- **Skills-only stage**: `.claude/hooks/guard-secrets.py` does not exist
+  and `.claude/settings.json` is missing or has no `UserPromptSubmit`
+  entry. Grade only the two skills. See *Skills-only stage* below.
+- **Full stage**: the guard script or the `UserPromptSubmit` entry
   exists. Run the full check in this file. A rule that is still missing
   is a finding, not a reason to stop.
 
@@ -28,7 +29,7 @@ round; if the participant already did that, every artifact above lives
 in a gitignored path and survives.
 
 **Under review: the artifacts, not a prompt.** This is a Session 4
-exception to this skill's usual framing. In the Part 2 stage, in Step 0,
+exception to this skill's usual framing. In the full stage, in Step 0,
 instead of a prompt, ask for one thing word for word: the three written
 task-3 predictions, with the participant's confirmed-or-wrong mark on
 each. The sheet told them you would ask, so ask in one line and wait. If
@@ -48,7 +49,7 @@ you can.
 | the guard did not see it | the hook did not fire |
 
 **The guard sees what you type; the rule sees what Claude reads.** The
-sheet builds Part 2 on that difference. The guard runs on
+sheet builds tasks 3 and 4 on that difference. The guard runs on
 `UserPromptSubmit`, so it reads the text the participant sends and nothing
 else. A file Claude opens with its Read tool, or with `cat`, never passes
 through the guard. The `Read(.env)` rule covers those. Keep the two apart
@@ -60,7 +61,7 @@ training-mode defense line; Claude copied the file from a tagged prompt,
 so compare it with that starter, not with the sheet), a
 `/changelog` skill that Claude wrote from the sheet's rule list with a
 `description` the participant wrote by hand (auto-invocable,
-description-driven, backed by a fetched spec file, and tested in Part 1
+description-driven, backed by a fetched spec file, and tested in task 2
 with two plain-language requests: one that must start the skill, one
 that must not), a cross-platform `UserPromptSubmit` guard that blocks a
 prompt containing an ACME key (script created from a tagged prompt;
@@ -69,7 +70,7 @@ hand after the participant watched Claude read `.env` past the guard.
 That Claude typed the copied and pasted files is not a finding; the sheet
 asked for it.
 
-## Part 1 stage — the two skills only
+## Skills-only stage — the two skills only
 
 Read both SKILL.md files and `common-changelog-spec.md` from disk. Do
 not ask for a prompt and do not ask for predictions: the participant has
@@ -84,14 +85,14 @@ State the grade as *N of 2 dimensions sound*. Use *Establish ground
 truth* steps 1 and 2 only, and the Known traps that are about the two
 skills.
 
-Do not grade, mention or explain anything of Part 2. That means: no
-guard, no `settings.json`, no rule, no predictions, nothing about what a
-hook can or cannot see. Part 2 depends on the participant finding that
+Do not grade, mention or explain anything of tasks 3 and 4. That means:
+no guard, no `settings.json`, no rule, no predictions, nothing about what
+a hook can or cannot see. Task 4 depends on the participant finding that
 out by running it.
 
-Header of the report: `## Exercise 4, Part 1 — two skills`. Last line,
-in place of the retry offer: *Run `/verify-exercise 4` again at the end
-of Part 2. Then it grades the guard and the rule as well.*
+Header of the report: `## Exercise 4, after task 2 — two skills`. Last
+line, in place of the retry offer: *Run `/verify-exercise 4` again at the
+end of task 4. Then it grades the guard and the rule as well.*
 
 ## Rubric — replaces the Session 2 technique table
 
@@ -103,7 +104,7 @@ of Part 2. Then it grades the guard and the rule as well.*
 | **Read rule** | `settings.json` has `permissions.deny` containing `Read(.env)` (the forms `Read(./.env)` and `Read(**/.env)` pass too); it sits in the same file as the hook, both valid JSON |
 
 Grade each ✅ / ❌ / ⚠️ with the usual discipline: predictions before
-evidence, one specific expected defect per ❌. In the Part 2 stage, state
+evidence, one specific expected defect per ❌. In the full stage, state
 the grade as *N of 4 dimensions sound*.
 
 **Grading the description as a trigger** — do it the way the context
@@ -112,7 +113,7 @@ moment where Claude would rightly invoke the skill and one moment
 where it would fail to fire or would misfire. Then say which words
 cause each. A description that says only what the skill does, never
 *when it applies*, is the common defect. Then compare your prediction
-with the participant's own test result from Part 1: if their second
+with the participant's own test result from task 2: if their second
 request ("summarise the last three commits") started the skill, name the
 word that matched too widely.
 
@@ -195,8 +196,8 @@ word that matched too widely.
 
 ## Pass bar
 
-Part 1 stage: the two lines about the skills only (polarity with the
-execute-directly line, and the spec file). Part 2 stage: all five.
+Skills-only stage: the two lines about the skills only (polarity with
+the execute-directly line, and the spec file). Full stage: all five.
 
 - Invocation polarity correct on both skills, and the execute-directly
   line present in `/commit`
@@ -214,7 +215,7 @@ them fix it themselves.
 
 ## Close by arbitrating their predictions
 
-Part 2 stage only. In the Part 1 stage there are no predictions yet.
+Full stage only. In the skills-only stage there are no predictions yet.
 
 They marked their predictions first; you close. Never the other way
 around. For each of the three, say confirmed or wrong, and cite the
