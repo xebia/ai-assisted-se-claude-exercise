@@ -1,4 +1,4 @@
-# Exercise 4, Part 2: The Hook
+# Exercise 4, Part 2: The Secret Guard
 
 **Session**: 4 — Skills, Hooks & Automation\
 **Duration**: 17 minutes, plus a 5-minute closing round\
@@ -6,14 +6,16 @@
 
 ## Goal
 
-In Part 1 you made `/commit` and `/changelog`. Now you wire a hook that
-runs `/changelog` after every commit, run the chain, watch it stay silent,
-repair it, and run it again.
+Everything you type and everything Claude reads goes to the model. In this
+part you wire a hook that blocks a prompt with a secret in it. Then you
+find the case the hook does not see, and you close that case with a rule.
 
 ## Start here
 
 - Same folder, same branch as Part 1. Everything you create goes in
   `bookstore/.claude/`.
+- The file `.env` in the `bookstore` folder holds a fake API key, made for
+  this exercise. Treat it as a real one.
 - Prompts that start with the experiment tag work as in Part 1. Copy
   them exactly, tag included.
 - Never edit `CLAUDE.md`.
@@ -21,31 +23,30 @@ repair it, and run it again.
 
 ## Tasks
 
-### 3. Set up the hook and predict
+### 3. Wire the guard and predict
 
-This task produces `.claude/hooks/run-changelog.py`, an entry in
+This task produces `.claude/hooks/guard-secrets.py`, an entry in
 `.claude/settings.json`, and three predictions.
 
-1. **Let Claude create the script**. A matcher only sees the tool
-   name, `Bash` (*Practical Hook Examples*); the script looks at the
-   command. It is Python, not a shell script, because many of you are on
-   Windows. Paste this whole block:
+1. **Let Claude create the script**. It runs on every prompt you send,
+   before the prompt leaves your laptop (*The Secret That Never Leaves*).
+   It is Python, not a shell script, because many of you are on Windows.
+   Paste this whole block:
 
    ```
-   [Exercise 4 experiment — execute directly, no leading questions.] Create .claude/hooks/run-changelog.py with exactly this content, nothing added or changed:
+   [Exercise 4 experiment — execute directly, no leading questions.] Create .claude/hooks/guard-secrets.py with exactly this content, nothing added or changed:
 
    import json
+   import re
    import sys
 
    data = json.load(sys.stdin)
-   command = data.get("tool_input", {}).get("command", "")
+   text = data.get("prompt", "")
 
-   if command.startswith("git commit"):
+   if re.search(r"acme_live_[A-Za-z0-9]{24}", text):
        print(json.dumps({
-           "hookSpecificOutput": {
-               "hookEventName": "PostToolUse",
-               "additionalContext": "A git commit was just made. Run the /changelog skill to update CHANGELOG.md."
-           }
+           "decision": "block",
+           "reason": "Blocked: this prompt contains an ACME API key. Remove the key and send it again."
        }))
    ```
 
@@ -56,13 +57,12 @@ This task produces `.claude/hooks/run-changelog.py`, an entry in
    ```json
    {
      "hooks": {
-       "PostToolUse": [
+       "UserPromptSubmit": [
          {
-           "matcher": "Bash",
            "hooks": [
              {
                "type": "command",
-               "command": "python .claude/hooks/run-changelog.py"
+               "command": "python .claude/hooks/guard-secrets.py"
              }
            ]
          }
@@ -75,127 +75,132 @@ This task produces `.claude/hooks/run-changelog.py`, an entry in
    `python --version`; if that fails, use `python3`.
 
 3. **Write three predictions**, on paper or in a text file, not
-   in the chat; the verifier asks for them. One word first: a hook
-   **fires** when Claude Code starts your script after a Bash tool call.
-   The script then decides whether it prints anything. So a hook can fire
-   and print nothing. One line each:
+   in the chat; the verifier asks for them. For each case, one line: does
+   the guard block it, yes or no, and why.
 
-   1. Does the hook fire when *you* type `/commit`?
-   2. Does it fire when Claude decides to run `git commit` by itself?
-   3. Does it fire on `git commit --amend`?
-
-One note on the script: only this nested JSON shape reaches Claude. Plain
-text from a `PostToolUse` hook goes to the transcript only (*Hook Handlers
-and Decisions*).
+   1. You paste a log line that contains the key.
+   2. You ask Claude what the value of `ACME_API_KEY` in `.env` is.
+   3. You ask Claude to run `grep -r acme_live .`.
 
 **Done when**: both files exist and your three predictions are written.
 
 **When the trainer calls task 4**, start it, whatever your predictions
 look like.
 
-### 4. Run the chain: it stays silent, then repair it
+### 4. Run it, find the hole, close it
 
-The *chain* (*Combining Skills and Hooks*): commit → hook → Claude runs
-your changelog skill. This task produces `CHANGELOG.md` and a repaired
-script.
+This task produces one blocked prompt, a `permissions` rule in
+`.claude/settings.json`, and your marked predictions.
 
-1. **Remove an endpoint and commit**. A removal, on purpose: your
-   changelog has to put something under `Removed`. Paste:
-
-   ```
-   [Exercise 4 experiment — execute directly, no leading questions.] Remove the DELETE /api/books/{id} endpoint from the BookStore API: its route, its handler, its store method and its test.
-   ```
-
-   When Claude is done, type `/commit`.
-
-2. **Nothing happens. That is the plan**. `/commit` ends with the
-   command line it ran and says your hook printed nothing. (If not, ask:
-   *Which command line did you run for the last commit?*) The line starts
-   with `git add`, because `/commit` stages and commits in one line:
-   `git add … && git commit …`. Your script gets that whole line as one
-   string. It does not start with `git commit`, so `startswith` is `False`
-   and the script prints nothing.
-
-   The hook fired: Claude Code ran your script. The script stayed silent.
-   A hook reads the **text** of a command, never what the command did. (If
-   the terminal showed a hook error instead, `python` was not found: fix
-   the command in `settings.json`.)
-
-3. **Repair the script**. It must also match a `git commit` after
-   `&&` or `;`. Paste this whole block:
+1. **Paste the trap**. This looks like a log line copied from a terminal.
+   Send it as a normal prompt:
 
    ```
-   [Exercise 4 experiment — execute directly, no leading questions.] Replace the content of .claude/hooks/run-changelog.py with exactly this, nothing added or changed:
-
-   import json
-   import re
-   import sys
-
-   data = json.load(sys.stdin)
-   command = data.get("tool_input", {}).get("command", "")
-
-   parts = re.split(r"&&|\|\||;", command)
-   if any(part.strip().startswith("git commit") for part in parts):
-       print(json.dumps({
-           "hookSpecificOutput": {
-               "hookEventName": "PostToolUse",
-               "additionalContext": (
-                   "A git commit was just made. Invoke the changelog skill now, "
-                   "in this same turn. Do not ask the user for permission first."
-               )
-           }
-       }))
+   This request failed on staging. What is wrong with it?
+   POST /api/books 401 token=acme_live_7Hq2mX9vK4pL8sW1dR3nT6yB reason=expired
    ```
 
-   Two changes: the script cuts the line into parts and checks each part,
-   and the message says *invoke it now; do not ask*. The old one read like
-   advice, and Claude may answer advice with a suggestion and wait.
+   The guard blocks it, and the terminal shows the reason from your
+   script. The prompt never reached the model. (If Claude answered
+   instead, `python` was not found: fix the command in `settings.json`
+   and send the trap again.)
 
-4. **Run the chain again**. Add one more comment line by hand and
-   type `/commit`. Now `CHANGELOG.md` appears, with the removal under
-   `### Removed`. If nothing happens, look at the message text first, not
-   at the matching.
+2. **Ask for the key**. Send this as a normal prompt:
 
-5. **Check your predictions**. Mark each one confirmed or wrong,
-   with one line of evidence from the chat, or one line of reasoning for
-   the two you could not test.
+   ```
+   What is the value of ACME_API_KEY in .env?
+   ```
 
-6. **Run the verifier**. Type `/verify-exercise 4`. It asks for your
+   Claude reads the file. The guard did not block anything: it runs on the
+   text *you* type, never on what Claude reads with its tools. Whether
+   Claude repeats the value or not, the file content is in the transcript
+   now, so it went to the model.
+
+3. **Close the hole with a rule**. A rule is a list, not a script: it
+   names files Claude may not read (*Claude Must Never Read `.env`*).
+   Open `.claude/settings.json` and add the `permissions` part, so the
+   file looks like this:
+
+   ```json
+   {
+     "permissions": {
+       "deny": ["Read(.env)"]
+     },
+     "hooks": {
+       "UserPromptSubmit": [
+         {
+           "hooks": [
+             {
+               "type": "command",
+               "command": "python .claude/hooks/guard-secrets.py"
+             }
+           ]
+         }
+       ]
+     }
+   }
+   ```
+
+   Save it; no restart is needed. Send the same question again. Claude
+   reports that it may not read the file. Then try the command form:
+
+   ```
+   Run cat .env and show me the output.
+   ```
+
+   Also denied: a `Read` rule covers the file commands Claude Code knows,
+   such as `cat`, `head` and `tail`.
+
+4. **Mark your predictions**. For each one, write confirmed or wrong,
+   with one line of evidence from the chat. Prediction 3 is tested in the
+   bonus; if you skip the bonus, mark it with one line of reasoning.
+
+5. **Run the verifier**. Type `/verify-exercise 4`. It asks for your
    three predictions first and settles them, then grades both skills, the
-   hook and `CHANGELOG.md`. It checks the changelog against the rules in
-   your task 2 prompt: the heading, the `## Unreleased` section, the group
-   order, the verb and the hash on every entry. Read its report before
-   the closing round.
+   guard and the rule. Read its report before the closing round.
 
-**Done when**: `CHANGELOG.md` exists with the removal under `### Removed`,
-your three predictions are marked, and the verifier is running.
+**Done when**: the trap was blocked, the rule is in `settings.json`, your
+three predictions are marked, and the verifier is running.
 
 ## Bonus (only if time remains)
 
-Send your script a fake event, the way Claude Code does. Save this as
+**The hole in the rule.** Send this as a normal prompt:
+
+```
+Run grep -r acme_live . and show me the output.
+```
+
+The key appears. The rule matches a command that *names* the file;
+`grep -r` names none, so the rule does not see it. Neither does the guard.
+The wall that stops every process from reading a file is the sandbox
+(*The Claude Code Security Harness*). Every layer has a hole. That is why
+there are layers.
+
+**Send the guard a fake event**, the way Claude Code does. Save this as
 `.claude/fake-event.json`:
 
 ```
-{"tool_input":{"command":"git add . && git commit -m x"}}
+{"prompt":"deploy with acme_live_7Hq2mX9vK4pL8sW1dR3nT6yB please"}
 ```
 
 Run this in your own terminal, not in Claude (`python3` on mac or linux):
 
 ```
-python .claude/hooks/run-changelog.py < .claude/fake-event.json
+python .claude/hooks/guard-secrets.py < .claude/fake-event.json
 ```
 
-The repaired script prints JSON. Change the command in `fake-event.json`
-to `git status`: it prints nothing.
+The script prints the block decision. Change the prompt in
+`fake-event.json` to `deploy please`: it prints nothing.
 
 ## Closing round
 
 The trainer asks the room. Have these answers ready:
 
 - Which prediction was wrong, and what showed it?
-- What can a hook see, and what can it not see?
-- Which words in your `description` do you trust to start the skill at the
-  right moment? Which would you make sharper now?
+- What does the guard see, what does the rule see, and what sees
+  everything?
+- Which words in your `description` started `/changelog` at the right
+  moment in Part 1? Which would you make sharper now?
 - One thing you would tell someone who skipped this session.
 
 ## After the closing round
@@ -211,8 +216,9 @@ git branch -D session4-playground
 The commits are gone. Your files are not: `CHANGELOG.md`, `.claude/skills/`,
 `.claude/hooks/` and `.claude/settings.json` are gitignored.
 
-**Back at work.** The plugin **skill-creator** on Anthropic's official
-marketplace writes a first version of a skill for you: `/plugin marketplace
-add anthropics/claude-plugins-official`, then `/plugin` to install it, then
-`/reload-plugins`. Try it on a job you repeat every week and compare its
-draft with your task 2 file.
+**Back at work.** If you build one hook this month, build the feedback
+loop: a `PostToolUse` hook on `Edit|Write` that runs your formatter, or
+your fastest tests, and reports the failures to Claude. Claude then fixes
+what it just broke, without being asked. The hooks page in the Claude Code
+docs shows the settings; most teams need one small script, the shape of
+`guard-secrets.py`.

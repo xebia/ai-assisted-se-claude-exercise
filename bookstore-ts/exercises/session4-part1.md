@@ -8,10 +8,11 @@
 
 The commands you have used since session 2 are markdown files in this repo.
 Now you make two of your own: copy a ready-made `/commit` skill, then let
-Claude write a `/changelog` skill and write its `description` yourself.
+Claude write a `/changelog` skill, write its `description` yourself, and
+test whether that description starts the skill at the right moment.
 
-Part 2, after the slides on hooks, adds a hook that runs `/changelog` after
-every commit. It has its own sheet.
+Part 2, after the slides on hooks, adds a hook that keeps secrets out of
+your prompts. It has its own sheet.
 
 ## Start here
 
@@ -65,7 +66,7 @@ verb, and nothing was pushed.
 **When the trainer calls task 2**, start it, even if `/commit` has not run
 yet.
 
-### 2. Let Claude write `/changelog`, then write its description
+### 2. Let Claude write `/changelog`, then write and test its description
 
 This task produces `.claude/skills/changelog/SKILL.md` and, next to it,
 `common-changelog-spec.md`.
@@ -92,8 +93,7 @@ This task produces `.claude/skills/changelog/SKILL.md` and, next to it,
 2. **Check two things**. `common-changelog-spec.md` holds the group
    names and the rules, not an empty page. The `SKILL.md` frontmatter has
    **no** `disable-model-invocation` line: Claude must be able to start
-   this skill by itself. The hook in Part 2 only suggests it; Claude
-   decides.
+   this skill by itself. Step 4 tests that.
 
 3. **Write the `description`**. In your editor, replace
    `(I write this)`. Claude
@@ -110,13 +110,39 @@ This task produces `.claude/skills/changelog/SKILL.md` and, next to it,
    this skill right after a commit? Which words would start it at a moment
    you do not want?
 
+4. **Test the trigger**. Type two requests in plain words, without a
+   slash. Watch whether Claude starts the `/changelog` skill: the chat
+   shows the skill loading. First:
+
+   ```
+   I just committed. Bring the changelog up to date.
+   ```
+
+   Claude must start the skill, not write a changelog from memory. Now
+   the second request:
+
+   ```
+   Summarise the last three commits for me, in two sentences.
+   ```
+
+   Claude must **not** start the skill. If either request went wrong,
+   sharpen your description and send that request again. Keep the words
+   that did the work; change the words that misled.
+
 **Done when**: both files exist, the frontmatter has no
-`disable-model-invocation` line, and your description says when.
+`disable-model-invocation` line, the first request started the skill and
+the second did not.
 
 ## Time left?
 
 Type `/verify-exercise 4`. It grades your two skills now. At the end of
-Part 2 it grades the hook and `CHANGELOG.md` as well.
+Part 2 it grades the hook and the rule as well.
+
+**Back at work.** The plugin **skill-creator** on Anthropic's official
+marketplace writes a first version of a skill for you: `/plugin marketplace
+add anthropics/claude-plugins-official`, then `/plugin` to install it, then
+`/reload-plugins`. Try it on a job you repeat every week and compare its
+draft with your task 2 file.
 
 ## Stop here
 
