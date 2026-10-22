@@ -219,10 +219,15 @@ in one line. Never tell them to work around it. If they ask why there is
 no clean room here: some work needs the human in the middle, and knowing
 which work that is, is part of the skill.
 
+**Exception — card 4 is not dispatched either.** It checks a list of
+open decisions for a given prompt, not a draft. The participant runs the
+given prompt themselves in the next task, unchanged. The card replaces
+the *Ready to ship* line and the closing words. Follow the card.
+
 ## Adding a task
 
 Copy the structure of an existing card into `cards/<n>-<slug>.md`, where
-`<n>` is the task number on the sheet. The dispatcher discovers cards by
+`<n>` is the number the sheet types after `/prompt-coach`. The dispatcher discovers cards by
 listing the directory, so this file never changes. Cards are
 language-agnostic: they name behaviors and symbols, never a single
 language's file paths or test commands. Detect those from the project at

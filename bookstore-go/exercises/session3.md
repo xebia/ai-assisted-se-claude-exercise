@@ -1,17 +1,18 @@
 # Exercise 3: Give Claude Your Team's Decisions
 
 **Session**: 3 — Context Engineering\
-**Duration**: 45 minutes, plus a 5-minute closing round\
+**Duration**: 34 minutes, plus a 4-minute closing round\
 **Project**: The same BookStore API.
 
 ## Goal
 
-Your team made three decisions that the code does not show. In this
-exercise you:
+Your team made three decisions that the code does not show. The prompt
+for the task leaves more decisions open. In this exercise you:
 
-1. Run a task, and save what Claude builds.
-2. Write the decisions where Claude reads them.
-3. Run the same task again, and compare the two results.
+1. Check a prompt, and list what it leaves to Claude.
+2. Run the task, and save what Claude builds.
+3. Write your team's decisions where Claude reads them.
+4. Run the same task again, and compare the two results.
 
 ## Start here
 
@@ -38,7 +39,43 @@ The old tests and the old handlers still show the old way.
 
 ## Tasks
 
-### 1. Run the task without the decisions
+### 1. Check the prompt before you run it
+
+This task produces a list in your notes: the decisions that one short
+prompt leaves to Claude. You run this prompt in task 2.
+
+1. **Read the prompt.** Do not run it yet. Task 2 explains the part in
+   brackets:
+
+   ```
+   [Exercise 3 experiment — execute directly, no leading questions.] Add a DELETE /api/reviews/{id} endpoint to the BookStore API, with tests.
+   ```
+
+2. **List what it leaves open.** Write down every decision Claude must
+   make because the prompt does not say it. Think of the questions a
+   reviewer asks about the result. Two examples from another task, an
+   "edit your profile" endpoint: *Which fields may a user change?* *What
+   does the user get back?*
+3. **Mark each decision.** Write *task* when it is about this endpoint
+   only. Write *team* when your team decides it once, for every endpoint.
+4. **Write what you would add.** For the *task* lines, write the two or
+   three sentences you would add to the prompt. Use
+   CONTEXT-TASK-OUTCOME. End with a *Define done* sentence: what must be
+   true when Claude is done.
+5. **Check your sentences (optional).** Start `claude` and run
+   `/prompt-coach 4`. As your next message, paste your list and your
+   sentences. The coach gives one round of feedback. Then type `/exit`.
+6. **Predict.** Write *yes* or *no* for each of your team's three
+   decisions: will Claude follow it without being told? A wrong
+   prediction is fine.
+
+Why you do not run your own version: the prompt stays the same in task 2
+and task 4. Then the two results show only what your rule files change.
+
+**Done when**: your list has at least four decisions, each marked *task*
+or *team*, and your sentences and three predictions are written down.
+
+### 2. Run the task without the decisions
 
 This task produces `session3-before.diff`: a file with every change Claude
 makes when it knows only the code.
@@ -47,31 +84,22 @@ makes when it knows only the code.
    fails, or `git status` lists changes? Start `claude`. Press Shift+Tab
    until the line under the chat box says auto mode: Claude then does not
    ask permission. Run `/catch-up 2`. It finishes the session 2 code work
-   and commits it. Step 5 removes work that is not committed. Both clean?
+   and commits it. Step 4 removes work that is not committed. Both clean?
    Go to step 2.
-2. **Predict.** Before you run anything, write *yes* or *no* for each
-   decision: will Claude follow it without being told? A wrong prediction
-   is fine.
-3. **Start a fresh session.** Type `/exit` if Claude is open, then start
+2. **Start a fresh session.** Type `/exit` if Claude is open, then start
    `claude`. A fresh session always means this: close Claude and start it
-   again, never `/clear`. Paste this line, with the brackets. The tag at
-   the start switches training mode off for this one prompt, so Claude
-   builds instead of asking questions:
-
-   ```
-   [Exercise 3 experiment — execute directly, no leading questions.] Add a DELETE /api/reviews/{id} endpoint to the BookStore API, with tests.
-   ```
-
-4. **Run the tests.** When Claude is done, run `go test ./...`. Write down
+   again, never `/clear`. Paste the prompt from task 1, with the brackets.
+   The tag at the start switches training mode off for this one prompt,
+   so Claude builds instead of asking questions.
+3. **Run the tests.** When Claude is done, run `go test ./...`. Write down
    whether all tests pass.
-5. **Save the result.** Run `/save-changes before`. It saves Claude's
+4. **Save the result.** Run `/save-changes before`. It saves Claude's
    changes in `session3-before.diff` and removes them from the project.
    Then type `/exit`.
 
-**Done when**: your three predictions are written down, and
-`session3-before.diff` exists.
+**Done when**: `session3-before.diff` exists.
 
-### 2. Put the decisions where Claude reads them
+### 3. Put the decisions where Claude reads them
 
 This task produces `.claude/rules/testing.md`, `.claude/rules/handlers.md`
 and `CLAUDE.local.md`. Decisions 1 and 2 go in rule files with
@@ -116,7 +144,7 @@ of every session.
 says what happens to the old endpoints, and `git status` does not list
 `CLAUDE.md`.
 
-### 3. Run the same task with the decisions
+### 4. Run the same task with the decisions
 
 This task produces `session3-after.diff`.
 
@@ -131,7 +159,7 @@ This task produces `session3-after.diff`.
 
 **Done when**: `session3-after.diff` exists.
 
-### 4. Closing: compare the two runs
+### 5. Closing: compare the two runs
 
 This task gives you a report on each decision, with the lines that decided
 it.
@@ -142,12 +170,13 @@ it.
    what you saw in the chat. *None* is a fine answer.
 2. **Read the report.** Each decision is *followed*, *broken* or *not
    tested*. *Not tested* means the task gave Claude no chance to break it.
-3. **Write down three lines.** Line 1: your predictions, next to what the
+3. **Write down four lines.** Line 1: your predictions, next to what the
    first run did. Line 2: the decision that changed most between the two
    runs. Line 3: one sentence from your rules that you would write
-   differently, or the one that helped most.
+   differently, or the one that helped most. Line 4: one decision from
+   your task 1 list that Claude made by itself, and what it chose.
 
-**Done when**: three lines are written down. Bring them to the closing
+**Done when**: four lines are written down. Bring them to the closing
 round.
 
 ## Bonus (only if time remains)
@@ -200,7 +229,8 @@ The trainer asks the room. Have these answers ready:
 
 - Which decision did Claude follow without being told? Was your
   prediction right?
+- Which line from your task 1 list belongs in the prompt, and which
+  belongs in a rule? Why?
 - Why does decision 1 go in a rule file with `paths:`, and decision 3 in
   `CLAUDE.local.md`? Why does `CLAUDE.local.md` also point to the rules?
 - Which words in your rule for decision 2 make it checkable?
-- One thing you would tell someone who skipped this session.

@@ -1,4 +1,4 @@
-# Task 2 — Put the team's decisions where Claude reads them
+# Task 3 — Put the team's decisions where Claude reads them
 
 **What they're bringing:** two pieces they wrote themselves, pasted as one
 message: the rule file `.claude/rules/handlers.md` (decision 2) and the

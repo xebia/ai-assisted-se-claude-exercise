@@ -14,7 +14,7 @@ only `session3-before.diff` exists, the second run was skipped: grade
 the first run alone, say so in the first line, and stop after the
 decision table.
 
-**When this runs.** Task 4, the closing task, in a fresh session. Do not
+**When this runs.** Task 5, the closing task, in a fresh session. Do not
 ask for the files: read them from disk. Ask exactly one question first,
 and wait for the answer:
 
@@ -95,7 +95,16 @@ Make each part a heading the participant can find by scrolling.
    that one sentence. For a decision Claude *followed* in both runs, say it
    plainly: Claude followed it without being told this time, and nothing
    guarantees the next session does.
-4. **Your files** — three lines at most: does the `paths:` line in
+4. **What Claude decided by itself** — the decisions the prompt left
+   open, as Claude made them in the first run. Three to five bullets,
+   each with the deciding line: who may delete a review, what a missing
+   review returns, what a successful delete returns, whether the row is
+   deleted or only marked, which test cases exist. If the first run
+   copied the existing book delete endpoint (500 for a bad id, a body on
+   success), say so here. End with one line: these were guesses, because
+   the prompt did not say. The participant compares this part with their
+   task 1 list; do not ask for the list.
+5. **Your files** — three lines at most: does the `paths:` line in
    `handlers.md` match the real handler files? Does `CLAUDE.local.md` have
    the line that points to the rule files? Any dead test in either diff?
    Is `CLAUDE.md` unchanged (`git diff --stat CLAUDE.md`)? A changed `CLAUDE.md` is the most
