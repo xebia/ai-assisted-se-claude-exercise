@@ -34,10 +34,10 @@ belongs on each layer, and asks one question to help you score it.
 
 | Layer | What belongs here | Question |
 | --- | --- | --- |
-| 1. Ground rules | The team's own agreements on working with agents | Has the team agreed which files, which tools, and who reviews? |
+| 1. Ground rules | The team's own agreements on working with agents | Has the team agreed on:<br>• which coding agent(s) to use<br>• work procedures, like small steps and frequent commits, PR review<br>• you can explain what you commit (no blind commits)<br>• repeated corrections go on a shared list<br>• other rules? |
 | 2. Guides | What steers the agent before it acts: `CLAUDE.md` or `AGENTS.md`, specs and plans, MCP servers, skills | Does the agent find your build commands, conventions and specs before it starts? |
 | 3. Sensors | What checks the agent after it acts: hooks, tests, quality gates, review | Does the agent hear about a failure before a person finds it? |
-| 4. Distribution | How guides and sensors reach every teammate: a plugin or a marketplace | Does a new teammate get the same guides and sensors with one install? |
+| 4. Distribution | How guides and sensors reach every teammate: a plugin or a marketplace | Does a new teammate or project get the required guides and sensors with one install? |
 | 5. Proof | How you show that a harness change helped: a number you track, or a benchmark repo | Can you show that last month's harness change helped? |
 
 1. For each layer, write one of three scores:
