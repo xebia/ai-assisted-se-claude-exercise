@@ -57,7 +57,7 @@ def main():
     if not log_path.exists():
         stop(f"No such file: {log_path}")
     if not PROMPT_FILE.exists() or not PROMPT_FILE.read_text(encoding="utf-8").strip():
-        stop("Task 3, step 1: write your prompt in headless/brief-prompt.txt first.")
+        stop("Task 4, step 1: write your prompt in headless/brief-prompt.txt first.")
     claude = shutil.which("claude")
     if not claude:
         stop("Cannot find the claude command. Is Claude Code installed?")
