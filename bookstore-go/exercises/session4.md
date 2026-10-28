@@ -1,33 +1,29 @@
 # Exercise 4: Two Skills and a Secret Guard
 
-**Session**: 4 — Skills, Hooks & Automation\
+**Session**: 4 — Skills, Hooks & Guardrails\
 **Duration**: 40 minutes, plus a 5-minute closing round\
 **Project**: The same BookStore API.
 
 ## Goal
 
-The commands you have used since session 2 are markdown files in this repo.
-First you make two of your own: copy a ready-made `/commit` skill, then let
-Claude write a `/changelog` skill, write its `description` yourself, and
-test whether that description starts the skill at the right moment.
-
-Then the hook. Everything you type and everything Claude reads goes to the
-model. You wire a hook that blocks a prompt with a secret in it, find the
-case the hook does not see, and close that case with a rule.
+1. Copy a ready-made `/commit` skill and run it.
+2. Let Claude write a `/changelog` skill. Write its `description` yourself
+   and test it.
+3. Wire a hook that blocks a prompt with a secret key in it. Find what the
+   hook misses, and close that gap with a rule.
 
 ## Start here
 
-- Open a terminal in the `bookstore` folder and start `claude`.
-  Everything you create goes in `bookstore/.claude/`.
-- The file `.env` in the `bookstore` folder holds a fake API key, made for
-  this exercise. Treat it as a real one.
-- Training mode is on. Some prompts on this sheet start with an
-  experiment tag in square brackets. The tag switches training mode off
-  for that one prompt. Copy those prompts exactly, tag included.
-- Never edit `CLAUDE.md`. Sessions 5 to 8 need it.
-- No coach this session: the *Done when* lines are your checklist, and
-  `/verify-exercise 4` grades your files at the end. Stuck? Type *just
-  tell me*.
+- Open a terminal in the `bookstore` folder that you cloned, and start
+  `claude`. The skills, hook and settings you create go in its `.claude/`
+  folder.
+- The file `.env` holds a fake API key. In this exercise, treat it as a
+  secret.
+- Training mode is on. Copy tagged prompts exactly, tag included. Stuck?
+  Type *just tell me* in the chat.
+- Never edit `CLAUDE.md`.
+- The trainer says when to start each next task. Start it, even if you are
+  not done.
 
 ## Tasks
 
@@ -36,48 +32,43 @@ case the hook does not see, and close that case with a rule.
 This task produces a branch, the file `.claude/skills/commit/SKILL.md`, and
 one commit.
 
-1. **Create the branch**. Sessions 5 to 8 reuse this code. You
-   delete the branch after the closing round.
+1. **Create a branch.** Sessions 5 to 8 reuse this code. You delete the
+   branch after the closing round.
 
    ```
    git switch -c session4-playground
    ```
 
-2. **Let Claude copy the skill**. The skill is ready in
-   `exercises/starters/commit-skill.md`. Paste:
+2. **Let Claude copy the skill.** The package already holds the ready-made
+   skill: the file `exercises/starters/commit-skill.md` in the `bookstore`
+   folder. Paste:
 
    ```
    [Exercise 4 experiment — execute directly, no leading questions.] Copy exercises/starters/commit-skill.md to .claude/skills/commit/SKILL.md. Change nothing in the content.
    ```
 
-3. **Make a small change by hand**. Open any file in
-   `bookstore`, add one comment line, save it. Do not ask Claude.
+3. **Change a file by hand.** Add one comment line to any source file and
+   save it. Do not ask Claude.
+4. **Run the skill.** Type `/commit` and watch what it does.
+5. **Read three lines.** Open `.claude/skills/commit/SKILL.md` in your
+   editor and find these:
+   - `disable-model-invocation: true`: only you can start the skill, by
+     typing `/commit`.
+   - *Execute directly — no leading questions*: Claude commits and does not
+     ask you questions.
+   - *Imperative mood*: the commit message starts with a verb, such as "Add"
+     or "Fix". Task 2 builds the changelog from these messages.
 
-4. **Run the skill**. Type `/commit` and watch what it does.
+**Done when**: `git log -1` shows a new commit. Its message starts with a
+verb, such as "Add" or "Fix".
 
-5. **Read three lines of the skill**. Open
-   `.claude/skills/commit/SKILL.md` in your editor. Three lines in it
-   matter most. *"Execute directly — no leading questions"* switches
-   training mode off inside the skill; without it, Claude asks a question
-   instead of committing. `disable-model-invocation: true` means only
-   typing `/commit` runs it. *Imperative mood* means the message starts
-   with a present-tense verb: "Add", "Fix", "Remove". Task 2's changelog
-   is built from those messages.
-
-**Done when**: the commit exists, its message starts with a present-tense
-verb, and nothing was pushed.
-
-**When the trainer calls task 2**, start it, even if `/commit` has not run
-yet.
-
-### 2. Let Claude write `/changelog`, then write and test its description
+### 2. Let Claude write `/changelog`, then write its description
 
 This task produces `.claude/skills/changelog/SKILL.md` and, next to it,
-`common-changelog-spec.md`.
+`common-changelog-spec.md`. That file holds the rules of the Common
+Changelog format.
 
-1. **One prompt for both files**. A skill can carry extra files,
-   loaded only when it runs (*Anatomy of a Skill*). So the specification
-   lives next to the skill, not inside it. Paste:
+1. **Paste one prompt for both files.**
 
    ```
    [Exercise 4 experiment — execute directly, no leading questions.] Read https://common-changelog.org/ and save the whole specification as markdown to .claude/skills/changelog/common-changelog-spec.md. Keep the headings and the examples. Leave out the website menu and footer. Then create .claude/skills/changelog/SKILL.md. Frontmatter: the line `name: changelog` and the line `description: (I write this)`. No other frontmatter lines. Body: a numbered list of instructions that make you do all of the following.
@@ -91,64 +82,48 @@ This task produces `.claude/skills/changelog/SKILL.md` and, next to it,
    - Leave out changes a reader does not care about: files whose name starts with a dot, formatting-only changes, and developer tools.
    ```
 
-   If your network blocks the page, ask Claude to write the spec file
-   from what it knows about Common Changelog.
+   If your network blocks the page, ask Claude to write the spec file from
+   what it knows about Common Changelog.
 
-2. **Check two things**. `common-changelog-spec.md` holds the group
-   names and the rules, not an empty page. The `SKILL.md` frontmatter has
-   **no** `disable-model-invocation` line: Claude must be able to start
-   this skill by itself. Step 4 tests that.
-
-3. **Write the `description`**. In your editor, replace
-   `(I write this)`. Claude
-   reads only this line when it decides whether to start a skill on its
-   own (*Which Description Gets This Skill Invoked at the Right Moment?*).
-   For comparison, here's the start of a course skill's description. It
-   says *when* it applies, not only what it does:
-
-   > Coach a participant's context artifact or experiment during the
-   > Session 3 exercise. Usage: /context-coach <task number> — the
-   > participant shows their CLAUDE.local.md draft …
-
-   Two questions. Which words in your description make Claude reach for
-   this skill right after a commit? Which words would start it at a moment
-   you do not want?
-
-4. **Test the trigger**. Type two requests in plain words, without a
-   slash. Watch whether Claude starts the `/changelog` skill: the chat
-   shows the skill loading. First:
+2. **Check two things.** `common-changelog-spec.md` holds group names and
+   rules, not an empty page. The `SKILL.md` frontmatter has **no**
+   `disable-model-invocation` line. So Claude can start this skill by
+   itself.
+3. **Write the description.** In your editor, replace `(I write this)`.
+   Claude reads only this line when it decides to start a skill on its own.
+   A good description names the file, the format and the moment to act
+   (*Which Description Gets This Skill Invoked at the Right Moment?*).
+   Then answer two questions on paper. Which words make Claude start the
+   skill right after a commit? Which words would start it at the wrong
+   moment?
+4. **Test the description.** Type each request in plain words, without a
+   slash. The chat shows the skill loading when Claude starts it. First:
 
    ```
    I just committed. Bring the changelog up to date.
    ```
 
-   Claude must start the skill, not write a changelog from memory. Now
-   the second request:
+   Claude must start the skill. Now the second request:
 
    ```
    Summarise the last three commits for me, in two sentences.
    ```
 
-   Claude must **not** start the skill. If either request went wrong,
-   sharpen your description and send that request again. Keep the words
-   that did the work; change the words that misled.
+   Claude must **not** start the skill. If a request went wrong, change the
+   words in your description that caused it. Send the request again.
 
 **Done when**: both files exist, the frontmatter has no
-`disable-model-invocation` line, the first request started the skill and
-the second did not.
-
-**When the trainer calls task 3**, start it, even if a request still goes
-wrong.
+`disable-model-invocation` line, request 1 started the skill, and request 2
+did not.
 
 ### 3. Wire the guard and predict
 
 This task produces `.claude/hooks/guard-secrets.py`, an entry in
-`.claude/settings.json`, and three predictions.
+`.claude/settings.json`, and three written predictions.
 
-1. **Let Claude create the script**. It runs on every prompt you send,
-   before the prompt leaves your laptop (*The Secret That Never Leaves*).
-   It is Python, not a shell script, because many of you are on Windows.
-   Paste this whole block:
+1. **Let Claude create the script.** It runs on every prompt you send,
+   before the prompt leaves your laptop. It is Python because many of you
+   use Windows (*The Secret That Never Leaves*). Paste this whole block:
 
    ```
    [Exercise 4 experiment — execute directly, no leading questions.] Create .claude/hooks/guard-secrets.py with exactly this content, nothing added or changed:
@@ -167,9 +142,9 @@ This task produces `.claude/hooks/guard-secrets.py`, an entry in
        }))
    ```
 
-2. **Add the hook to your settings**. Create the file
-   `.claude/settings.json` yourself (it does not exist yet), with exactly
-   this content:
+2. **Add the hook to your settings.** In your editor, create the file
+   `.claude/settings.json`. It does not exist yet. Give it exactly this
+   content:
 
    ```json
    {
@@ -189,54 +164,48 @@ This task produces `.claude/hooks/guard-secrets.py`, an entry in
    ```
 
    On mac or linux, write `python3` instead of `python`. Not sure? Run
-   `python --version`; if that fails, use `python3`.
+   `python --version` in a terminal. If that fails, use `python3`.
 
-3. **Write three predictions**, on paper or in a text file, not
-   in the chat; the verifier asks for them. For each case, one line: does
-   the guard block it, yes or no, and why.
+3. **Write three predictions** on paper or in a text file. Write one line
+   for each case: does the guard block it, yes or no, and why. The check in
+   task 4 asks for them. Case 3 is tested in the bonus.
 
    1. You paste a log line that contains the key.
    2. You ask Claude what the value of `ACME_API_KEY` in `.env` is.
    3. You ask Claude to run `grep -r acme_live .`.
 
-**Done when**: both files exist and your three predictions are written.
+**Done when**: both files exist and your three predictions are written down.
 
-**When the trainer calls task 4**, start it, whatever your predictions
-look like.
-
-### 4. Run it, find the hole, close it
+### 4. Run the guard, find the gap, close it
 
 This task produces one blocked prompt, a `permissions` rule in
 `.claude/settings.json`, and your marked predictions.
 
-1. **Paste the trap**. This looks like a log line copied from a terminal.
-   Send it as a normal prompt:
+1. **Send a test prompt**, without a tag. It looks like a log line:
 
    ```
    This request failed on staging. What is wrong with it?
    POST /api/books 401 token=acme_live_7Hq2mX9vK4pL8sW1dR3nT6yB reason=expired
    ```
 
-   The guard blocks it, and the terminal shows the reason from your
-   script. The prompt never reached the model. (If Claude answered
-   instead, `python` was not found: fix the command in `settings.json`
-   and send the trap again.)
+   The guard blocks it and the terminal shows the reason. Did Claude answer
+   instead? Then the hook did not start. Fix the `command` in
+   `settings.json` (`python` or `python3`) and send the prompt again.
 
-2. **Ask for the key**. Send this as a normal prompt:
+2. **Ask for the key.** Send this without a tag:
 
    ```
    What is the value of ACME_API_KEY in .env?
    ```
 
-   Claude reads the file. The guard did not block anything: it runs on the
-   text *you* type, never on what Claude reads with its tools. Whether
-   Claude repeats the value or not, the file content is in the transcript
-   now, so it went to the model.
+   Claude reads the file. The guard did not block it: it checks only the
+   text you type, not what Claude reads. Whether Claude repeats the value or
+   not, the file content is now in the chat, so it went to the model. Did
+   Claude ask a question first? Type *just tell me*.
 
-3. **Close the hole with a rule**. A rule is a list, not a script: it
-   names files Claude may not read (*Claude Must Never Read `.env`*).
-   Open `.claude/settings.json` and add the `permissions` part, so the
-   file looks like this:
+3. **Close the gap with a rule.** A rule is a list of files Claude may not
+   read (*Claude Must Never Read `.env`*). Open `.claude/settings.json`.
+   Add the `permissions` part before `hooks`. It ends with a comma.
 
    ```json
    {
@@ -258,40 +227,37 @@ This task produces one blocked prompt, a `permissions` rule in
    }
    ```
 
-   Save it; no restart is needed. Send the same question again. Claude
-   reports that it may not read the file. Then try the command form:
+   Save the file. No restart is needed. Send the same question again.
+   Claude says it may not read the file. Then send:
 
    ```
    Run cat .env and show me the output.
    ```
 
-   Also denied: a `Read` rule covers the file commands Claude Code knows,
-   such as `cat`, `head` and `tail`.
+   This is denied too. The rule covers file commands such as `cat`, `head`
+   and `tail`.
 
-4. **Mark your predictions**. For each one, write confirmed or wrong,
-   with one line of evidence from the chat. Prediction 3 is tested in the
-   bonus; if you skip the bonus, mark it with one line of reasoning.
+4. **Mark your predictions** *confirmed* or *wrong*, each with one line
+   from the chat as evidence. For case 3, write one line of reasoning if you
+   skip the bonus.
+5. **Run the check.** Type `/verify-exercise 4`. It asks for your
+   predictions: type them in the chat. Then it grades both skills, the guard
+   and the rule. Read its report before the closing round.
 
-5. **Run the verifier**. Type `/verify-exercise 4`. It asks for your
-   three predictions first and settles them, then grades both skills, the
-   guard and the rule. Read its report before the closing round.
-
-**Done when**: the trap was blocked, the rule is in `settings.json`, your
-three predictions are marked, and the verifier is running.
+**Done when**: the test prompt was blocked, the rule is in `settings.json`,
+your predictions are marked, and `/verify-exercise 4` gave its report.
 
 ## Bonus (only if time remains)
 
-**The hole in the rule.** Send this as a normal prompt:
+**The gap in the rule.** Send this without a tag:
 
 ```
 Run grep -r acme_live . and show me the output.
 ```
 
-The key appears. The rule matches a command that *names* the file;
-`grep -r` names none, so the rule does not see it. Neither does the guard.
-The wall that stops every process from reading a file is the sandbox
-(*The Claude Code Security Harness*). Every layer has a hole. That is why
-there are layers.
+The key appears. The rule only sees commands that name the file, and
+`grep -r` names none. The guard does not see it either. Only the sandbox
+stops every process (*The Claude Code Security Harness*).
 
 **Send the guard a fake event**, the way Claude Code does. Save this as
 `.claude/fake-event.json`:
@@ -300,46 +266,58 @@ there are layers.
 {"prompt":"deploy with acme_live_7Hq2mX9vK4pL8sW1dR3nT6yB please"}
 ```
 
-Run this in your own terminal, not in Claude (`python3` on mac or linux):
+Run this in a second terminal, in the `bookstore` folder (`python3` on mac
+or linux):
 
 ```
-python .claude/hooks/guard-secrets.py < .claude/fake-event.json
+cat .claude/fake-event.json | python .claude/hooks/guard-secrets.py
 ```
 
-The script prints the block decision. Change the prompt in
-`fake-event.json` to `deploy please`: it prints nothing.
+The script prints the block decision. Change the prompt in `fake-event.json`
+to `deploy please`: it prints nothing.
 
 ## Closing round
 
 The trainer asks the room. Have these answers ready:
 
 - Which prediction was wrong, and what showed it?
-- What does the guard see, what does the rule see, and what sees
-  everything?
+- What does the guard see, what does the rule see, and what stops every
+  process?
 - Which words in your `description` started `/changelog` at the right
-  moment? Which would you make sharper now?
+  moment? Which would you change now?
 - One thing you would tell someone who skipped this session.
 
 ## After the closing round
 
-**Clean up the branch.** Two lines, one at a time (PowerShell 5.1 cannot
-join them with `&&`):
+**Delete the branch.** The first line goes back to your previous branch. The
+second line deletes the session branch. Run them one at a time.
 
 ```
 git switch -
 git branch -D session4-playground
 ```
 
-The commits are gone. Your files are not: `CHANGELOG.md`, `.claude/skills/`,
-`.claude/hooks/` and `.claude/settings.json` are gitignored.
+Your commits on that branch are deleted. Your files stay, because git does
+not track them:
+`CHANGELOG.md`, `.claude/skills/`, `.claude/hooks/` and
+`.claude/settings.json`.
 
-**Back at work, two things.** If you build one hook this month, build the
-feedback loop: a `PostToolUse` hook on `Edit|Write` that runs your
-formatter, or your fastest tests, and reports the failures to Claude.
-Claude then fixes what it just broke, without being asked. The hooks page
-in the Claude Code docs shows the settings; most teams need one small
-script, the shape of `guard-secrets.py`. And the plugin **skill-creator**
-on Anthropic's official marketplace writes a first version of a skill for
-you: `/plugin marketplace add anthropics/claude-plugins-official`, then
-`/plugin` to install it, then `/reload-plugins`. Try it on a job you repeat
-every week and compare its draft with your task 2 file.
+**Back at work, two things.** If you build one hook this month, build a
+`PostToolUse` hook on `Edit|Write`. It runs after Claude edits or writes a
+file, runs your formatter or your fastest tests, and reports the failures to
+Claude. Claude then fixes what it just
+broke, without being asked. The hooks page in the Claude Code docs shows the
+settings.
+
+The plugin **skill-creator** on Anthropic's official marketplace writes a
+first version of a skill for you. Install it with these commands, one at a
+time. `/plugin` opens a menu: install skill-creator there.
+
+```
+/plugin marketplace add anthropics/claude-plugins-official
+/plugin
+/reload-plugins
+```
+
+Try it on a job you repeat every week. Compare its draft with your task 2
+file.
