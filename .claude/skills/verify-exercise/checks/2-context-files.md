@@ -1,16 +1,16 @@
-# Exercise 3 — The team's decisions, before and after
+# Exercise 2 — The team's decisions, before and after
 
-**Artifacts:** two saved diffs at the project root, `session3-before.diff`
-(the task run without the decisions) and `session3-after.diff` (the same
+**Artifacts:** two saved diffs at the project root, `session2-before.diff`
+(the task run without the decisions) and `session2-after.diff` (the same
 task with the participant's context files), plus the context files
 themselves: `.claude/rules/testing.md` (given on the sheet),
 `.claude/rules/handlers.md` and `CLAUDE.local.md` (written by the
 participant). The exercise saves and resets in one move, so expect a
 clean working tree, not live changes.
 
-If `session3-bonus.diff` exists (a second, different task run with the
+If `session2-bonus.diff` exists (a second, different task run with the
 same files), grade it as a third column after the main comparison. If
-only `session3-before.diff` exists, the second run was skipped: grade
+only `session2-before.diff` exists, the second run was skipped: grade
 the first run alone, say so in the first line, and stop after the
 decision table.
 
@@ -29,7 +29,7 @@ at the end.
 
 **Words.** The sheet says: the first run, the second run, the test kit,
 the decisions (1, 2, 3), your rule files, *followed*, *broken*, *not
-tested*, `/verify-exercise 3` (that is you), the closing round, extra changes. Use those words.
+tested*, `/verify-exercise 2` (that is you), the closing round, extra changes. Use those words.
 The sheet never says grader; say "this report" or "the comparison".
 Never say baseline, harness, arm, treatment.
 

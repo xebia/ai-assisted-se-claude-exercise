@@ -17,14 +17,14 @@ If it fails and it's decoration, cut it or move it out of the way.
 Write every exercise for this person, and no one more experienced:
 
 - They heard the session's concepts ten minutes ago, for the first time.
-  Session 3 example: they have just learned that `CLAUDE.md` exists.
+  Session 2 example: they have just learned that `CLAUDE.md` exists.
 - They know only the words the slides used. Nothing from the trainer's
   design notes, nothing from earlier drafts, nothing from this repo.
 - Their English is B1. They read each sentence once.
 - They do not know what folder they are in, what a "fresh session" is, or
   where a file should go, unless the sheet says so.
 
-Added 2026-09-04 after lead-trainer feedback on the session 3 sheet
+Added 2026-09-04 after lead-trainer feedback on the session 2 sheet
 (Urs Peter): the sheet was written for someone who already knew the
 design. Concretely, it failed on all four points above.
 
@@ -233,7 +233,7 @@ Proven on Exercise 2; apply to every exercise document:
 
 ### Reference example
 
-A lead trainer rewrote task 1 of session 3 by hand (2026-09-04). It is the
+A lead trainer rewrote task 1 of session 2 by hand (2026-09-04). It is the
 register every task must hit. Before:
 
 > Open a fresh session and run `/context` before typing anything. Note what

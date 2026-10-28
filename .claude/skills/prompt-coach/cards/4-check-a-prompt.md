@@ -1,4 +1,4 @@
-# Card 4 — Check a given prompt (exercise 3, task 1)
+# Card 4 — Check a given prompt (exercise 2, task 1)
 
 **What they bring:** not a draft prompt. They bring a list of decisions
 that this given prompt leaves to Claude, each marked *task* or *team*,
@@ -7,7 +7,7 @@ plus the two or three sentences they would add for the *task* lines:
 > Add a DELETE /api/reviews/{id} endpoint to the BookStore API, with tests.
 
 They do not run their version. In task 2 they run the given prompt as it
-is, so the before-and-after comparison of exercise 3 stays fair. Your
+is, so the before-and-after comparison of exercise 2 stays fair. Your
 job is a sharper list and sharper sentences, in one round.
 
 **Slide anchors:** *The CONTEXT-TASK-OUTCOME Framework* (the four verbs:
@@ -40,7 +40,7 @@ Point at the kind of question instead (see *Nudge bank*).
 **Held back:** the existing book delete endpoint answers a bad id with
 500 and gives no 404 for a missing book (it answers 204 either way). Claude
 often copies it. Do not tell them. It shows in their task 2 diff, and
-`/verify-exercise 3` names it.
+`/verify-exercise 2` names it.
 
 ## Grading
 

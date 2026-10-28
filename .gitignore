@@ -1,7 +1,7 @@
 # macOS
 **/.DS_Store
 
-# Exercise 5: project-scope MCP registration (participants register from bookstore-<lang>; the file may land here). The old Go binary is no longer used.
+# Exercise 4: project-scope MCP registration (participants register from bookstore-<lang>; the file may land here). The old Go binary is no longer used.
 /.mcp.json
 
 # Output of scripts/package.sh

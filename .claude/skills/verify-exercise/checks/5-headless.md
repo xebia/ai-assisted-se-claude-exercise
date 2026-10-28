@@ -1,4 +1,4 @@
-# Exercise 10 — Claude Without You Watching
+# Exercise 5 — Claude Without You Watching
 
 **Under review: observable state, not a prompt.** The participant built a
 review gate and a morning-brief prompt and ran both. Everything is on

@@ -23,9 +23,9 @@ bookstore/                 <- bookstore-<lang>/: code, tests, CLAUDE.md, README.
   exercises/session1.pdf … session8.pdf, exercises/starters/
   preparation.pdf
   web/                     <- bookstore-web/ (sessions 6 and 7)
-  mcp-sqlite/server.py     <- mcp-sqlite/ (session 5)
-  bookstore-plugin/        <- bookstore-plugin/ (session 5 bonus)
-  headless/                <- headless/ (session 10: gate, brief, night logs)
+  mcp-sqlite/server.py     <- mcp-sqlite/ (session 4)
+  bookstore-plugin/        <- bookstore-plugin/ (session 4 bonus)
+  headless/                <- headless/ (session 5: gate, brief, night logs)
 ```
 
 Rules that follow from this:
@@ -58,20 +58,20 @@ Rules that follow from this:
   them with `claudeMdExcludes`, so sessions 6 and 7 stay in "training mode
   off" as their sheets say. Keep that setting when the file is regenerated.
 - **`bookstore-plugin/` sits inside the participant's project.** It holds
-  finished versions of what exercises 4 and 5 build. Each project's
+  finished versions of what exercises 3 and 4 build. Each project's
   `CLAUDE.md` tells Claude not to read it unless asked about the plugin.
 
 ## Naming: sessions, not blocks
 
 The teaching units are **sessions** (Session 1–8), in exercise headers, prose,
 skills, and slides — decided with the wider trainer group, 2026-09. "Block"
-is reserved for the commercial packaging. Artifact identifiers follow the same rule: `session3-*.diff`, the
-`session4-playground` branch, and the matching `.gitignore` entries.
+is reserved for the commercial packaging. Artifact identifiers follow the same rule: `session2-*.diff`, the
+`session3-playground` branch, and the matching `.gitignore` entries.
 
 ## File names
 
 Lowercase kebab-case for every file and folder (`conventions.md`,
-`session3.md`, `2-context-files.md`). The only exceptions are names that tools
+`session2.md`, `2-context-files.md`). The only exceptions are names that tools
 look up by convention: `README.md`, `CLAUDE.md`, `CLAUDE.local.md`, `SKILL.md`.
 Language-specific source files follow their language's convention.
 
@@ -88,7 +88,7 @@ word-for-word identical:
 - test-output command (`go test ./... -v` · `./mvnw test` ·
   `python3 -m unittest -v` · `bun test`)
 - the review handler path and the `paths:` glob for scoped rules
-- store-package path, and the test kit path (session 3)
+- store-package path, and the test kit path (session 2)
 - dependency rule suffix (kt adds "beyond sqlite-jdbc")
 
 Verify a port with a structural diff: every differing line must contain a
@@ -104,27 +104,27 @@ source of truth — when it changes there, copy it here again.
 
 ## Skills: coach, verifier, save-changes, pollute
 
-- `/prompt-coach` (session 2, plus card 4 for session 3 task 1) and
-  `/context-coach` (session 3): per-task cards in `cards/<n>-<slug>.md`,
+- `/prompt-coach` (card 4, session 2 task 1) and
+  `/context-coach` (session 2): per-task cards in `cards/<n>-<slug>.md`,
   where `<n>` is the number the sheet types after the command. It is no
-  longer always the task number: `/prompt-coach 4` is exercise 3 task 1,
-  `/context-coach 2` is exercise 3's bonus. Cards are language-agnostic — they name behaviors and
+  longer always the task number: `/prompt-coach 4` is exercise 2 task 1,
+  `/context-coach 2` is exercise 2's bonus. Cards are language-agnostic — they name behaviors and
   layers, never one language's paths. Coach rules (see each SKILL.md):
   never write the artifact for the participant, one nudge per turn, max
   three rounds, participants may overrule, and **held-back answers** (facts
   the run must teach) are marked per card — don't leak them into exercise
   docs or slides either.
 - `/verify-exercise <n>`: after-the-fact grading against a rubric in
-  `checks/<n>-….md`. Session 3's check runs as the closing task and compares
-  `session3-before.diff` with `session3-after.diff`, decision by decision.
-- `/save-changes <name>`: saves the working tree as `session3-<name>.diff`
+  `checks/<n>-….md`. Session 2's check runs as the closing task and compares
+  `session2-before.diff` with `session2-after.diff`, decision by decision.
+- `/save-changes <name>`: saves the working tree as `session2-<name>.diff`
   and resets, with preconditions (right cwd, non-empty status, no silent
   overwrite; never `git clean -x`). Windows-safe: writes the diff with
   `git diff --output=` (PowerShell 5.1's `>` produces UTF-16, which
   `git apply` rejects) and runs one git command per call (no `&&`). Reuse
   it for any exercise that needs evidence to survive a reset. Renamed from
   `/bank-diff` 2026-09-07 ("bank" failed the vocabulary rule).
-- **Session 3 test kit** (redesign 2026-10-06): each project ships a small
+- **Session 2 test kit** (redesign 2026-10-06): each project ships a small
   test kit for handler tests that no existing test uses
   (`internal/handler/testkit_test.go` · `src/test/kotlin/bookstore/testkit/TestKit.kt`
   · `tests/testkit.py` · `tests/testkit.ts`). Same API in every language:
@@ -165,7 +165,7 @@ source of truth — when it changes there, copy it here again.
   revert, and compared as artifacts, not from memory.
 - **Overlap waiting time — but never two sessions editing at once**: when
   a build takes several minutes, sequence tasks so the wait overlaps with
-  participant work. When a build is short (session 3's endpoint: ~1.5
+  participant work. When a build is short (session 2's endpoint: ~1.5
   min), run sessions one after the other instead; a second terminal that
   might edit the same tree is a bigger risk than a short wait (senior-
   trainer feedback, 2026-09-07).
@@ -174,11 +174,11 @@ source of truth — when it changes there, copy it here again.
   does not reliably reload a changed `CLAUDE.local.md`.
 - **Commit before the first reset**: any exercise that resets the tree
   tells participants to commit earlier sessions' work first (session 2's
-  closing and session 3's "Start here" both do). Otherwise the reset
+  closing and session 2's "Start here" both do). Otherwise the reset
   removes uncommitted fixes that later sessions build on.
-- **Timing**: budget ≈ expert dry-run × 1.3. Session 3 measured 30 min
+- **Timing**: budget ≈ expert dry-run × 1.3. Session 2 measured 30 min
   expert → 40 min box.
-- **Closing**: session 3 uses a single 5-min "Closing round" (popcorn, no
+- **Closing**: session 2 uses a single 5-min "Closing round" (popcorn, no
   pair share) per the course-wide no-pairs rule. Other sessions still end
   with the older Pair Discussion + Group Share pair — align them when
   their session gets a redesign pass.
@@ -189,7 +189,7 @@ source of truth — when it changes there, copy it here again.
 ## Participant artifacts stay out of git
 
 Every project's `.gitignore` ignores `CLAUDE.local.md`, `.claude/rules/`,
-`docs/orientation.md`, and `session3-*.diff` — so exercise resets
+`session2-*.diff` and `headless/out/` — so exercise resets
 (`/save-changes`, `git clean`) can never delete a participant's deliverables.
 Keep these entries if a `.gitignore` is ever regenerated, and add new
 participant-created files to the list when future exercises introduce them.
@@ -199,5 +199,5 @@ participant-created files to the list when future exercises introduce them.
 Each project's `CLAUDE.md` holds course-wide training behavior (teach,
 don't answer; investigate like a large codebase) and **must never gain
 project facts** — participants write those themselves into
-`CLAUDE.local.md` in session 3. Exercises and skills must never instruct
+`CLAUDE.local.md` in session 2. Exercises and skills must never instruct
 anyone to edit `CLAUDE.md`.

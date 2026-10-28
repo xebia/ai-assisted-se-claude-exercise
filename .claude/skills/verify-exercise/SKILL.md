@@ -77,10 +77,10 @@ Exercise-specific expectations live in `checks/<session>-<slug>.md` beside this 
    review — a context file, a configuration — and say so at the top. Then
    ask for *that*, verbatim, instead of a prompt. A check file may also
    say to read the artifact from disk and ask one other question instead
-   (session 3 does). Then ask only that question.
+   (session 2 does). Then ask only that question.
 3. Locate the artifact named in the check file. If it does not exist, say so
    and stop. Do not verify a different file instead. Exception: a check file
-   may grade in stages (session 4 grades after Part 1 and after Part 2).
+   may grade in stages (session 3 grades after Part 1 and after Part 2).
    Then it says which files each stage needs. Grade the stage that is on
    disk. Do not stop because the files of a later stage are missing.
 

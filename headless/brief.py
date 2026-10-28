@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.10"
 # ///
-"""Morning brief for exercise 10: a script collects the night, Claude writes the brief.
+"""Morning brief for exercise 5: a script collects the night, Claude writes the brief.
 
 Run it from the bookstore folder:
 

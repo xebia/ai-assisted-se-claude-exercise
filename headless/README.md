@@ -1,7 +1,7 @@
-# headless/ — exercise 10
+# headless/ — exercise 5
 
 Files for the exercise "Claude Without You Watching". The sheet
-(`exercises/session10.pdf`) tells you when to use each one.
+(`exercises/session5.pdf`) tells you when to use each one.
 
 | File | What it is |
 | --- | --- |

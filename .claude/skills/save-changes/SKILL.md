@@ -3,7 +3,7 @@ name: save-changes
 description: >-
   Save all uncommitted changes in the current project as a named diff file,
   then put the project back in a clean state. Usage: /save-changes <name> —
-  writes session3-<name>.diff. Used in the Session 3 exercise (names: before,
+  writes session2-<name>.diff. Used in the Session 2 exercise (names: before,
   after, bonus, probe) and reusable in any exercise that must keep evidence
   across a reset.
 disable-model-invocation: true
@@ -16,7 +16,7 @@ leading questions, no commentary beyond the report at the end. It is
 stateless — it only reads the working tree — so it works from any session,
 including one opened after the experiment session was closed.
 
-`$ARGUMENTS` holds the name. In session 3 expect `before`, `after`,
+`$ARGUMENTS` holds the name. In session 2 expect `before`, `after`,
 `bonus` or `probe`; any other single word is accepted. No argument: ask for the
 name in one line and wait.
 
@@ -47,7 +47,7 @@ chosen so they behave the same everywhere:
 - **Never use shell redirection (`>`) to write the diff file.** PowerShell
   5.1 writes `>` output as UTF-16 with a byte-order mark, and `git apply`
   cannot read that file. Use git's own `--output=` flag instead.
-- Paths: use forward slashes and relative paths only (`session3-<name>.diff`,
+- Paths: use forward slashes and relative paths only (`session2-<name>.diff`,
   `.`). Do not quote the dot.
 
 ## Preconditions — check all three before touching anything
@@ -57,14 +57,14 @@ Run these checks scoped to the current project directory (the participant's
 live inside it, so **every git command below must be scoped with `.` and run
 from the project folder**):
 
-1. **Right directory.** The cwd must contain `exercises/session3.md` (it is
+1. **Right directory.** The cwd must contain `exercises/session2.md` (it is
    the project root). If not: say where you are, say the command must run
    from the `bookstore` folder, and stop.
 2. **Something to save.** `git status --porcelain -- .` must be non-empty.
    If it is empty, there is nothing to save. Most likely the reset already
    ran, or the implementation never happened. Say so and stop. Do not
    create an empty file.
-3. **No accidental overwrite.** If `session3-<name>.diff` already exists,
+3. **No accidental overwrite.** If `session2-<name>.diff` already exists,
    ask in one line whether to overwrite it, and wait. (A leftover from an
    earlier failed attempt is the common case. Overwriting is usually right,
    but it is their evidence, so they decide.)
@@ -75,14 +75,14 @@ Run each line as its own command, in this order:
 
 ```
 git add -A .
-git diff --cached --output=session3-<name>.diff
+git diff --cached --output=session2-<name>.diff
 git reset -q .
 git checkout -- .
 git clean -fd .
 ```
 
 Never add `-x` to `git clean`. Ignored files include the participant's
-`CLAUDE.local.md`, their saved diffs, and session 2's `docs/orientation.md`.
+`CLAUDE.local.md`, `.claude/rules/` and their saved diffs.
 `-x` would destroy all of them. Never widen any command beyond `.`.
 
 ## Verify, then report
@@ -91,7 +91,7 @@ After the reset, confirm `git status --porcelain -- .` is empty and the
 diff file is non-empty. Then report in at most four lines:
 
 - the file written and its diffstat (files changed, insertions/deletions —
-  `git apply --stat session3-<name>.diff`)
+  `git apply --stat session2-<name>.diff`)
 - confirmation the project is clean again
 - if the name was `before` or `after`: a reminder to type `/exit`, as the
   sheet says

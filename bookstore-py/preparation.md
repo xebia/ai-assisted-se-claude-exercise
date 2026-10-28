@@ -81,14 +81,14 @@ cd bookstore
 python3 main.py
 ```
 
-### 6. uv, Spec Kit and Node (for Exercises 5 to 7)
+### 6. uv, Spec Kit and Node (for Exercises 4 to 7)
 
 In Exercise 6 we use [Spec Kit](https://github.com/github/spec-kit), GitHub's
 spec-driven development toolkit, to specify a frontend for the BookStore API.
 
 **Node.js 20+** — https://nodejs.org/ (the frontend's dev server runs on it)
 
-**uv** — Exercise 5 starts a small Python MCP server with `uv`, Exercise 10
+**uv** — Exercise 4 starts a small Python MCP server with `uv`, Exercise 5
 runs its gate and brief scripts with `uv`, and Spec Kit is a Python tool
 installed via `uv`:
 

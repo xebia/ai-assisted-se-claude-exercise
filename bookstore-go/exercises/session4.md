@@ -1,323 +1,245 @@
-# Exercise 4: Two Skills and a Secret Guard
+# Exercise 4: An MCP Server and a Subagent
 
-**Session**: 4 — Skills, Hooks & Guardrails\
-**Duration**: 40 minutes, plus a 5-minute closing round\
+**Session**: 4 — MCP Servers & External Tools\
+**Duration**: 30 minutes, plus a 5-minute closing round\
 **Project**: The same BookStore API.
 
 ## Goal
 
-1. Copy a ready-made `/commit` skill and run it.
-2. Let Claude write a `/changelog` skill. Write its `description` yourself
-   and test it.
-3. Wire a hook that blocks a prompt with a secret key in it. Find what the
-   hook misses, and close that gap with a rule.
+In this exercise you:
+
+1. Connect an MCP server that lets Claude read the bookstore database. You
+   ask one database question before and after, and compare the answers.
+2. Write an agent file for a subagent that checks the code for security
+   problems. You write two lines: when Claude uses it, and which tools it
+   may use.
 
 ## Start here
 
-- Open a terminal in the `bookstore` folder that you cloned, and start
-  `claude`. The skills, hook and settings you create go in its `.claude/`
-  folder.
-- The file `.env` holds a fake API key. In this exercise, treat it as a
-  secret.
-- Training mode is on. Copy tagged prompts exactly, tag included. Stuck?
-  Type *just tell me* in the chat.
-- Never edit `CLAUDE.md`.
-- The trainer says when to start each next task. Start it, even if you are
-  not done.
+- Open a terminal in the `bookstore` folder. Stay in this folder for the
+  whole exercise.
+- Training mode is on. Some prompts start with a tag in square brackets.
+  The tag switches training mode off for that one prompt. Copy those
+  prompts exactly, tag included. Never edit `CLAUDE.md`.
+- Write your notes on paper or in a text file, not in the chat.
+- Stuck? Type *just tell me*. The trainer tells you when to start task 4.
 
 ## Tasks
 
-### 1. Copy the `/commit` skill and run it
+### 1. Ask without the MCP server
 
-This task produces a branch, the file `.claude/skills/commit/SKILL.md`, and
-one commit.
+This task produces a `permissions.deny` rule in `.claude/settings.json`,
+a prediction and three notes. This is round one.
 
-1. **Create a branch.** Sessions 5 to 8 reuse this code. You delete the
-   branch after the closing round.
-
-   ```
-   git switch -c session4-playground
-   ```
-
-2. **Let Claude copy the skill.** The package already holds the ready-made
-   skill: the file `exercises/starters/commit-skill.md` in the `bookstore`
-   folder. Paste:
+1. **Add a deny rule**. Start `claude` and paste:
 
    ```
-   [Exercise 4 experiment — execute directly, no leading questions.] Copy exercises/starters/commit-skill.md to .claude/skills/commit/SKILL.md. Change nothing in the content.
+   [Exercise 4 experiment — execute directly, no leading questions.] Add the rule Bash(sqlite3 *) to the deny list under permissions in .claude/settings.json. Keep everything else in that file. Create the file if it does not exist.
    ```
 
-3. **Change a file by hand.** Add one comment line to any source file and
-   save it. Do not ask Claude.
-4. **Run the skill.** Type `/commit` and watch what it does.
-5. **Read three lines.** Open `.claude/skills/commit/SKILL.md` in your
-   editor and find these:
-   - `disable-model-invocation: true`: only you can start the skill, by
-     typing `/commit`.
-   - *Execute directly — no leading questions*: Claude commits and does not
-     ask you questions.
-   - *Imperative mood*: the commit message starts with a verb, such as "Add"
-     or "Fix". Task 2 builds the changelog from these messages.
+   Keep the hook from session 3 in the file.
 
-**Done when**: `git log -1` shows a new commit. Its message starts with a
-verb, such as "Add" or "Fix".
+2. **Write a prediction**. In the next step you ask three things: the
+   number of books, the author with the most books, and a SQL query.
+   Write one sentence. Which of the three can Claude get right from the
+   source code alone, and which will be a guess?
 
-### 2. Let Claude write `/changelog`, then write its description
-
-This task produces `.claude/skills/changelog/SKILL.md` and, next to it,
-`common-changelog-spec.md`. That file holds the rules of the Common
-Changelog format.
-
-1. **Paste one prompt for both files.**
+3. **Ask**. Paste:
 
    ```
-   [Exercise 4 experiment — execute directly, no leading questions.] Read https://common-changelog.org/ and save the whole specification as markdown to .claude/skills/changelog/common-changelog-spec.md. Keep the headings and the examples. Leave out the website menu and footer. Then create .claude/skills/changelog/SKILL.md. Frontmatter: the line `name: changelog` and the line `description: (I write this)`. No other frontmatter lines. Body: a numbered list of instructions that make you do all of the following.
-   - Read CHANGELOG.md in the project root. If the file does not exist, create it with the heading `# Changelog`.
-   - Read common-changelog-spec.md, next to this file, before changing the changelog.
-   - Look at the recent commits and at the existing version tags.
-   - Add only new commits. Entries that are already in the changelog stay as they are. New entries go in a `## Unreleased` section at the top.
-   - Sort entries under `### Changed`, `### Added`, `### Removed` and `### Fixed`, in that order.
-   - Write each entry as one sentence that starts with a present-tense verb. End it with the short commit hash in round brackets, like (a1b2c3d).
-   - A breaking change forces other people to change their own code. Put **Breaking:** in front of such an entry, and put those entries first inside their group.
-   - Leave out changes a reader does not care about: files whose name starts with a dot, formatting-only changes, and developer tools.
+   [Exercise 4 experiment — execute directly, no leading questions.] How many books are in the bookstore database? Which author has the most books? Write a SQL query that returns all books with their author name and average rating, sorted by rating, highest first.
    ```
 
-   If your network blocks the page, ask Claude to write the spec file from
-   what it knows about Common Changelog.
+   Write down three notes: the book count, the author, and how sure
+   Claude says it is (or "did not say"). Then check one more thing. Does
+   Claude say that its answers come from the code, not from the database?
 
-2. **Check two things.** `common-changelog-spec.md` holds group names and
-   rules, not an empty page. The `SKILL.md` frontmatter has **no**
-   `disable-model-invocation` line. So Claude can start this skill by
-   itself.
-3. **Write the description.** In your editor, replace `(I write this)`.
-   Claude reads only this line when it decides to start a skill on its own.
-   A good description names the file, the format and the moment to act
-   (*Which Description Gets This Skill Invoked at the Right Moment?*).
-   Then answer two questions on paper. Which words make Claude start the
-   skill right after a commit? Which words would start it at the wrong
-   moment?
-4. **Test the description.** Type each request in plain words, without a
-   slash. The chat shows the skill loading when Claude starts it. First:
+Why a deny rule. `CLAUDE.md` asks Claude not to open `store.db`, but Claude
+can still decide to do it. A `permissions.deny` rule makes Claude Code
+block the command before it runs (*MCP Permissions: Allow, Ask, Deny*).
 
-   ```
-   I just committed. Bring the changelog up to date.
-   ```
+**Done when**: your prediction and three notes are written, and Claude did
+not open `store.db`.
 
-   Claude must start the skill. Now the second request:
+### 2. Register the MCP server and approve it
 
-   ```
-   Summarise the last three commits for me, in two sentences.
-   ```
+This task produces `.mcp.json` and a connected server.
 
-   Claude must **not** start the skill. If a request went wrong, change the
-   words in your description that caused it. Send the request again.
+The server has two tools: `get_table_definitions` and `execute_query`. It
+only runs `SELECT` queries. It is one Python file, `mcp-sqlite/server.py`.
+It reads `store.db`, which the app creates the first time it runs.
 
-**Done when**: both files exist, the frontmatter has no
-`disable-model-invocation` line, request 1 started the skill, and request 2
-did not.
+1. **Leave Claude**. Type `/exit`. The next commands go to the terminal,
+   not to Claude. No `store.db` file in the folder? Run `go run .`,
+   wait for `listening on :8080`, and stop it with Ctrl+C.
 
-### 3. Wire the guard and predict
-
-This task produces `.claude/hooks/guard-secrets.py`, an entry in
-`.claude/settings.json`, and three written predictions.
-
-1. **Let Claude create the script.** It runs on every prompt you send,
-   before the prompt leaves your laptop. It is Python because many of you
-   use Windows (*The Secret That Never Leaves*). Paste this whole block:
+2. **Register the server**. Run this in the terminal, on one line:
 
    ```
-   [Exercise 4 experiment — execute directly, no leading questions.] Create .claude/hooks/guard-secrets.py with exactly this content, nothing added or changed:
-
-   import json
-   import re
-   import sys
-
-   data = json.load(sys.stdin)
-   text = data.get("prompt", "")
-
-   if re.search(r"acme_live_[A-Za-z0-9]{24}", text):
-       print(json.dumps({
-           "decision": "block",
-           "reason": "Blocked: this prompt contains an ACME API key. Remove the key and send it again."
-       }))
+   claude mcp add --scope project sqlite-bookstore -- uv run mcp-sqlite/server.py store.db
    ```
 
-2. **Add the hook to your settings.** In your editor, create the file
-   `.claude/settings.json`. It does not exist yet. Give it exactly this
-   content:
+   The part after `--` is the command that starts the server. It uses
+   `uv`, which you installed in the preparation. With `--scope project`,
+   Claude Code writes the command to `.mcp.json` in this folder
+   (*Configuring an MCP Server*). Open `.mcp.json` and find the command
+   you typed. Git ignores `.mcp.json` in this course, so the file stays on
+   your machine.
 
-   ```json
-   {
-     "hooks": {
-       "UserPromptSubmit": [
-         {
-           "hooks": [
-             {
-               "type": "command",
-               "command": "python .claude/hooks/guard-secrets.py"
-             }
-           ]
-         }
-       ]
-     }
-   }
-   ```
+   `uv` missing or failing? Run `claude mcp remove sqlite-bookstore`. Then
+   run the command above again, with `python3` (on Windows: `python`)
+   in place of `uv run`. The server needs only Python, no packages.
 
-   On mac or linux, write `python3` instead of `python`. Not sure? Run
-   `python --version` in a terminal. If that fails, use `python3`.
+3. **Restart and approve**. Start `claude`. Claude Code asks whether it may
+   use the server from `.mcp.json`. Answer yes. Did you answer no? Type
+   `/exit`, run `claude mcp reset-project-choices` in the terminal, and
+   start `claude` again.
 
-3. **Write three predictions** on paper or in a text file. Write one line
-   for each case: does the guard block it, yes or no, and why. The check in
-   task 4 asks for them. Case 3 is tested in the bonus.
+4. **Check**. Type `/mcp`. `sqlite-bookstore` shows as connected, with
+   both tools. Not connected? Type `/exit` and run `claude mcp list` in
+   the terminal. It shows the error. The usual causes: `store.db` is
+   missing (see step 1), or the command in `.mcp.json` has a typing error
+   (*"Claude Cannot See the Database"*).
 
-   1. You paste a log line that contains the key.
-   2. You ask Claude what the value of `ACME_API_KEY` in `.env` is.
-   3. You ask Claude to run `grep -r acme_live .`.
+Why the approval. A project file can start any program on your machine.
+So Claude Code asks you once per project, and saves your answer in
+`.claude/settings.local.json`.
 
-**Done when**: both files exist and your three predictions are written down.
+**Done when**: `/mcp` shows `sqlite-bookstore` connected, with two tools.
 
-### 4. Run the guard, find the gap, close it
+### 3. Ask again, with the MCP server
 
-This task produces one blocked prompt, a `permissions` rule in
-`.claude/settings.json`, and your marked predictions.
+This task is round two. It produces three more notes.
 
-1. **Send a test prompt**, without a tag. It looks like a log line:
+1. **Same question**. Paste the prompt from task 1, step 3 again, tag
+   included. Watch the tool calls: `get_table_definitions` first, then
+   `execute_query`. The names appear as
+   `mcp__sqlite-bookstore__execute_query` (*"Claude Cannot See the
+   Database"*).
 
-   ```
-   This request failed on staging. What is wrong with it?
-   POST /api/books 401 token=acme_live_7Hq2mX9vK4pL8sW1dR3nT6yB reason=expired
-   ```
+2. **Compare**. Write down the same three notes. Which answers changed?
+   Was your prediction right?
 
-   The guard blocks it and the terminal shows the reason. Did Claude answer
-   instead? Then the hook did not start. Fix the `command` in
-   `settings.json` (`python` or `python3`) and send the prompt again.
-
-2. **Ask for the key.** Send this without a tag:
+3. **Ask one thing the code cannot tell**. Paste this prompt and note the
+   title Claude finds:
 
    ```
-   What is the value of ACME_API_KEY in .env?
+   [Exercise 4 experiment — execute directly, no leading questions.] Which book has the highest average rating? Show its title, its author and the text of its three best reviews.
    ```
 
-   Claude reads the file. The guard did not block it: it checks only the
-   text you type, not what Claude reads. Whether Claude repeats the value or
-   not, the file content is now in the chat, so it went to the model. Did
-   Claude ask a question first? Type *just tell me*.
+Why the two rounds differ. Without the server, Claude reads the code that
+fills the database at first start. The column names come from that code,
+so they can be right. The numbers are a guess. With the server, Claude
+makes two read-only tool calls, and the answer comes from the real data.
 
-3. **Close the gap with a rule.** A rule is a list of files Claude may not
-   read (*Claude Must Never Read `.env`*). Open `.claude/settings.json`.
-   Add the `permissions` part before `hooks`. It ends with a comma.
+**Done when**: you have three notes per round, and you can say which
+answer in round one was a guess.
 
-   ```json
-   {
-     "permissions": {
-       "deny": ["Read(.env)"]
-     },
-     "hooks": {
-       "UserPromptSubmit": [
-         {
-           "hooks": [
-             {
-               "type": "command",
-               "command": "python .claude/hooks/guard-secrets.py"
-             }
-           ]
-         }
-       ]
-     }
-   }
-   ```
+### 4. Create the security-auditor subagent
 
-   Save the file. No restart is needed. Send the same question again.
-   Claude says it may not read the file. Then send:
+This task produces the agent file `.claude/agents/security-auditor.md` and
+the report `docs/security-audit.md`. A starter file holds the instructions
+for the check, so you write only the two frontmatter lines in step 2.
+
+The frontmatter is the first block of the agent file, between two `---`
+lines (*An Agent File Encodes a Task*).
+
+1. **Let Claude create the file**. Paste:
 
    ```
-   Run cat .env and show me the output.
+   [Exercise 4 experiment — execute directly, no leading questions.] Copy exercises/starters/security-auditor.md to .claude/agents/security-auditor.md. Change nothing in the content.
    ```
 
-   This is denied too. The rule covers file commands such as `cat`, `head`
-   and `tail`.
+2. **Write the two lines**. Open `.claude/agents/security-auditor.md`
+   in your editor. Replace the two `(I write this)` values.
 
-4. **Mark your predictions** *confirmed* or *wrong*, each with one line
-   from the chat as evidence. For case 3, write one line of reasoning if you
-   skip the bonus.
-5. **Run the check.** Type `/verify-exercise 4`. It asks for your
-   predictions: type them in the chat. Then it grades both skills, the guard
-   and the rule. Read its report before the closing round.
+   - `description`: Claude reads only this line when it decides whether to
+     start the agent (*How Agents Get Invoked*). Say what the agent
+     checks. Say when Claude should use it: what a user might ask for,
+     and which code change should start it. A weak version is `Reviews
+     code for security issues.` Write a better one, in your own words.
+     The rule from the slide *Which Subagent Description Invokes
+     Reliably?* applies: write the trigger, not just the job.
+   - `tools`: tool names, separated by commas, as in the agent file on the
+     slide *An Agent File Encodes a Task*. The agent must never change
+     code. Give it the smallest set that still lets it find and read
+     files.
 
-**Done when**: the test prompt was blocked, the rule is in `settings.json`,
-your predictions are marked, and `/verify-exercise 4` gave its report.
+   Optional, if you have time: run `/mcp-coach 4` (4 is the task number).
+   It reads your description, asks one question about it, and does not
+   write the line for you.
+
+3. **Test the trigger**. Type `/exit` and start `claude` again. Do not
+   use `/clear`: agents load only at start. Paste this prompt. It does
+   not name the agent:
+
+   ```
+   [Exercise 4 experiment — execute directly, no leading questions.] Do a security audit of the bookstore API. Save the full report, exactly as it was produced, to docs/security-audit.md.
+   ```
+
+   Watch the tool calls. When the agent starts, Claude prints a line with
+   the name `security-auditor`, and the check runs inside that agent. Then
+   your description works.
+
+   Do you only see Claude's own `Read` and `Grep` calls? Then Claude did
+   the check itself, and your description did not start the agent.
+   Improve the description, type `/exit`, start `claude`, and ask again.
+   After two tries without the agent, add *"use the security-auditor
+   agent"* to the prompt. Then you still get a report.
+
+4. **Check the report**. Open `docs/security-audit.md`. Near the top, find
+   the line `**Audited by**: security-auditor`.
+
+The starter file asks the agent to write that line. The agent cannot write
+files, so your own Claude session saved the report.
+
+**Done when**: both `(I write this)` values are replaced, and
+`docs/security-audit.md` has the `Audited by` line.
 
 ## Bonus (only if time remains)
 
-**The gap in the rule.** Send this without a tag:
+**Try to write through the server.** Paste:
 
 ```
-Run grep -r acme_live . and show me the output.
+[Exercise 4 experiment — execute directly, no leading questions.] Set the rating of review 1 to 5 in the database.
 ```
 
-The key appears. The rule only sees commands that name the file, and
-`grep -r` names none. The guard does not see it either. Only the sandbox
-stops every process (*The Claude Code Security Harness*).
+`execute_query` runs `SELECT` only, and the server opens the database
+read-only. Claude should tell you that it cannot do this. The server can
+read and nothing more. That is least privilege: the server gets only the
+rights it needs.
 
-**Send the guard a fake event**, the way Claude Code does. Save this as
-`.claude/fake-event.json`:
+**Read the server.** Open `mcp-sqlite/server.py`. You do not need to know
+Python. Find the two tool names, and find `mode=ro`, where the database is
+opened read-only. The whole server is one file of about 200 lines. Compare
+it with the example on the slide *Building a Custom MCP Server*.
 
-```
-{"prompt":"deploy with acme_live_7Hq2mX9vK4pL8sW1dR3nT6yB please"}
-```
+**Run the plugin.** The folder `bookstore-plugin`, inside `bookstore`,
+holds the skills from exercise 3, the hook, a finished security-auditor
+agent and the SQLite server, packaged as one plugin (*Plugins: Bundling It
+All Together*).
 
-Run this in a second terminal, in the `bookstore` folder (`python3` on mac
-or linux):
+1. Type `/exit`.
+2. Start Claude with `claude --plugin-dir bookstore-plugin`.
+3. Type `/help`. The skills now appear as `/bookstore-plugin:commit` and
+   `/bookstore-plugin:changelog`, next to your own.
+4. Type `/mcp`. The plugin's server is connected. Claude Code did not ask
+   for approval.
 
-```
-cat .claude/fake-event.json | python .claude/hooks/guard-secrets.py
-```
-
-The script prints the block decision. Change the prompt in `fake-event.json`
-to `deploy please`: it prints nothing.
+The `README.md` in `bookstore-plugin` explains what is different from your
+files.
 
 ## Closing round
 
-The trainer asks the room. Have these answers ready:
+First run `/verify-exercise 4` in Claude. It reads `.mcp.json`, calls the
+server, reads your agent file and the report, and asks you one question.
+Read its report while the trainer asks the room.
 
-- Which prediction was wrong, and what showed it?
-- What does the guard see, what does the rule see, and what stops every
-  process?
-- Which words in your `description` started `/changelog` at the right
-  moment? Which would you change now?
+Have these answers ready:
+
+- Which answer in round one was a guess, and how did round two show it?
+- Did Claude call `get_table_definitions` before every query, or only
+  once?
+- Did the subagent start by itself? Which words in your `description`
+  did that?
 - One thing you would tell someone who skipped this session.
-
-## After the closing round
-
-**Delete the branch.** The first line goes back to your previous branch. The
-second line deletes the session branch. Run them one at a time.
-
-```
-git switch -
-git branch -D session4-playground
-```
-
-Your commits on that branch are deleted. Your files stay, because git does
-not track them:
-`CHANGELOG.md`, `.claude/skills/`, `.claude/hooks/` and
-`.claude/settings.json`.
-
-**Back at work, two things.** If you build one hook this month, build a
-`PostToolUse` hook on `Edit|Write`. It runs after Claude edits or writes a
-file, runs your formatter or your fastest tests, and reports the failures to
-Claude. Claude then fixes what it just
-broke, without being asked. The hooks page in the Claude Code docs shows the
-settings.
-
-The plugin **skill-creator** on Anthropic's official marketplace writes a
-first version of a skill for you. Install it with these commands, one at a
-time. `/plugin` opens a menu: install skill-creator there.
-
-```
-/plugin marketplace add anthropics/claude-plugins-official
-/plugin
-/reload-plugins
-```
-
-Try it on a job you repeat every week. Compare its draft with your task 2
-file.

@@ -1,7 +1,7 @@
 # Exercise 6 — Spec vs. reality
 
 **Under review: what the plan says about the API, not a prompt.** This is a
-Session 6 exception to this skill's usual framing, like sessions 4 and 5.
+Session 6 exception to this skill's usual framing, like sessions 3 and 4.
 The participant wrote no prompt of their own: `/speckit-specify` ran a
 fixed sentence, and `/speckit-plan` did its own research. What they
 produced is a review: two predictions, a list of differences, and a

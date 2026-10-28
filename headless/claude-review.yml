@@ -1,4 +1,4 @@
-# Take-home for exercise 10: the same gate in GitHub Actions.
+# Take-home for exercise 5: the same gate in GitHub Actions.
 # Copy this file to .github/workflows/claude-review.yml in a repository of
 # your own. It needs one secret: CLAUDE_CODE_OAUTH_TOKEN (run
 # `claude setup-token` on your laptop; it uses your subscription), or

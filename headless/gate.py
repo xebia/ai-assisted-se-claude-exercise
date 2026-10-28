@@ -1,7 +1,7 @@
 # /// script
 # requires-python = ">=3.10"
 # ///
-"""Review gate for exercise 10: Claude checks your last commit, a script decides.
+"""Review gate for exercise 5: Claude checks your last commit, a script decides.
 
 Run it from the bookstore folder:
 
