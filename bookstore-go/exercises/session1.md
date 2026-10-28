@@ -1,223 +1,164 @@
 # Exercise 1: First Conversations
 
 **Session**: 1 — First Steps & Core Concepts\
-**Duration**: 30 minutes\
+**Duration**: 25 minutes\
 **Project**: "BookStore API" — a Go REST API using only `net/http`. Everyone
 clones the same repo.
 
 ## Goal
 
-You'll have your first conversations with Claude in the IDE: explain code,
-find a bug, change code, say no to a change, write a test, refactor.
+You have your first conversations with Claude in your editor. In this
+exercise you:
 
-After each task you check how Claude got to its answer. Which files did
-Claude open? Which tools did it use? How many steps did it take before it
-answered? That is the second goal of this exercise: seeing how Claude works,
-not only what it says.
+1. Ask Claude to explain code, and see how many steps one answer takes.
+2. Let Claude find a bug, add a check, and write a test.
+3. Read the trace after each task, and write down what Claude did.
 
-## A few words we'll use
+## Start here
 
-- **Turn**: one message from you, plus everything Claude does until it
-  answers.
-- **Cycle**: one call to the model inside a turn. One turn can contain
-  many cycles.
-- **Tool call**: one action Claude takes inside a turn. It searches the
-  project, reads a file, edits a file, or runs a command. You see each one
-  as a short line while Claude works.
-- **Context**: everything Claude can see right now. Your messages, the code
-  you selected, the files it read, the output of commands. `/clear` empties
-  it.
-- **Trace**: the live pane that `/xtrace tools model pane` opens next to
-  the conversation. It shows the current turn while it runs: one row per
-  tool call and one per cycle, with the name, what it looked at, how it
-  went, and how long it took. Under the rows it totals the turn. It keeps
-  every turn since the last `/clear`, one at a time.
-
-## How every task works
-
-Open the trace once, before task 1:
-
-```
-/xtrace tools model pane
-```
-
-It opens next to the conversation, filtered to tool calls and cycles, and
-stays open through every task. `/clear` empties it; it does not close it.
-
-Same four steps every time:
-
-1. **Ask**. Send the prompt from the task. Select code first when the task
-   says so.
-2. **Watch**. While Claude works, the trace adds one row per tool call
-   and one `model` row per cycle, in order. Which file does Claude open
-   first? Does it run anything? How many cycles does it take?
-3. **Read**. Read the answer. Does it match what you know? Does it match
-   what you watched?
-4. **Note**. Write down the number the task asks for. The tool-call count
-   is the number of `tools` rows in the turn; the `model` rows are the
-   cycles. You need these numbers in the closing round at the end.
-
-Did the task take more than one turn? The trace shows one turn at a time.
-Press ctrl+x tab to give it your keys, then `p` for the previous turn,
-`n` for the next, `l` for the latest. Esc gives the keys back.
-
-> **The loop, in short: Ask → Watch → Read → Note.**
-> Every task below uses it. Come back here when you lose track.
-
-**About training mode**: `CLAUDE.md` keeps this project in training mode.
-When you ask about a bug or a fix, Claude asks you one leading question
-before it answers. Answer it. That is part of the exercise. Stuck or short
-on time? Just say *"just tell me"*. That is allowed.
+- Open the `bookstore` folder in your editor. Start `claude` in its terminal.
+- Training mode is on. The file `CLAUDE.md` tells Claude to ask you a
+  question before it helps. Answer it. Stuck? Type *just tell me*.
+- Never edit `CLAUDE.md`.
+- Write your notes on paper or in a text file outside the project.
 
 ## Tasks
 
-### 1. Explain, with and without a selection
+### 1. Explain, and count the work behind the answer
 
-Open `internal/store/book.go` and select the whole `Search()` function.
-Ask the question below. Its first line is the experiment prefix: a fixed
-line that stops training mode from steering the run. Both prompts in this
-task start with it, so the two runs stay comparable.
+This task shows you how many steps one answer takes.
 
-```
-[Exercise 1 experiment — execute directly, no leading questions.]
-Explain what this function does step by step
-```
+1. **Open the trace.** `/xtrace` is a command that came with this
+   project. Run it:
 
-Read the answer. Did Claude say that the loop runs one extra query per
-book? Note the number of tool calls the trace shows.
+   ```
+   /xtrace tools model pane
+   ```
 
-Now predict, in writing, one sentence: how many tool calls will Claude need
-when it cannot see your selection?
+   A pane opens next to the chat. It adds one `tools` row for each tool
+   call: a search, a read, an edit or a command. A `model` row is one
+   cycle: one call to the model. A turn is your message and everything
+   Claude does until it answers. No pane opens? Then run `/trace` after
+   each answer. It lists the tool calls of the last turn.
+2. **Predict.** Write two numbers: how many tool calls and how many cycles
+   will Claude need to explain `Search()`?
+3. **Ask.** Paste both lines. The first line is a tag. It switches
+   training mode off, so Claude answers at once.
 
-Run `/clear`. Do not select anything. Ask:
+   ```
+   [Exercise 1 experiment — execute directly, no leading questions.]
+   Explain step by step what Search() in the book store does
+   ```
 
-```
-[Exercise 1 experiment — execute directly, no leading questions.]
-Explain step by step what Search() in the book store does
-```
+4. **Count.** Read the answer. Count the `tools` rows and the `model` rows
+   in the pane, and write both numbers down. Does the answer say the code
+   runs one extra database query for each book? Write down yes or no.
+5. **Look.** Which tool did Claude use first, and which file did it open?
 
-Compare the two counts with your prediction.
+Claude cannot see the code until a tool call opens it. Every round of
+tool calls is one more cycle.
 
-Two notes. Your selection goes into the context directly, so Claude can
-answer without opening anything. Without it, Claude has to search the
-project first, and the trace shows you how.
-
-**Done when**: you have both tool-call counts written next to your
-prediction.
+**Done when**: you wrote your prediction and both counts.
 
 ### 2. Find a bug
 
-Run `/clear`, so the trace shows this task only.
+This task shows you which files Claude opens to find a bug.
 
-Open `internal/handler/review.go` and select `CreateReview()`. Before you
-ask, write one sentence: which other file will Claude open to answer?
+1. **Clear.** Run `/clear`.
+2. **Predict.** Write one sentence: which other file will Claude open to
+   answer?
+3. **Ask.** Paste this prompt:
 
-Ask:
+   ```
+   Is there a bug in CreateReview() in internal/handler/review.go?
+   ```
 
-```
-Is there a bug in this function?
-```
-
-Training mode applies here. Answer the leading question, then read the
-answer. That took more than one turn, and the trace shows the last one.
-Press ctrl+x tab, then `p` to step back a turn. Did Claude open the file
-you predicted? In which turn?
+4. **Answer.** Training mode makes Claude ask you a question first. Answer
+   it. Then read Claude's answer.
+5. **Step back.** The pane shows the last turn. Press ctrl+x, then Tab,
+   so the pane reads your keys. Press `p` to see the turn before. Press
+   Esc to type in the chat again. With `/trace`, run `/trace all`
+   instead. Which file did Claude open, and in which turn? Was your
+   prediction right?
 
 **Done when**: Claude named a bug, and you can say in one sentence what
 `CreateReview()` fails to check.
 
-### 3. Add validation, then say no
+### 3. Add validation, say no, add a test
 
-Run `/clear` again, then ask:
+This task changes `internal/handler/review.go` and creates
+`internal/handler/validate_test.go`.
 
-```
-Add input validation to CreateReview: rating must be 1-5, reviewText must be between 10 and 500 characters
-```
+1. **Clear.** Run `/clear`. Then paste this prompt:
 
-Training mode may ask a leading question here too. Answer it, then look
-at where Claude put the checks. Inside the handler? In a separate
-function? In struct tags? Now say no:
+   ```
+   Add input validation to CreateReview: rating must be 1-5, review_text must be between 10 and 500 characters
+   ```
 
-```
-No, extract the validation into a separate validateReview() function instead
-```
+2. **Look.** Answer Claude's question, if it asks one. Then run
+   `git diff`. Where did Claude put the checks? In the handler, in a
+   separate function, or in struct tags?
+3. **Say no.** Paste this prompt:
 
-Saying no is normal. Claude does not mind, and you decide what goes into
-your code.
+   ```
+   No, extract the validation into a separate validateReview() function instead
+   ```
 
-More than one turn again, so step back through them with `p`. Three
-things to look for: which tool changed the file, in which turn, and what
-Claude ran to check its own change. If it ran nothing, note that. Nobody
-asked it to.
+4. **Add a test.** Paste this prompt:
+
+   ```
+   Write a table-driven test for validateReview() covering: rating 0, rating 6, text of 9 characters, text of 501 characters, and one valid review. Put it in internal/handler/validate_test.go, in package handler, and name it TestValidateReview
+   ```
+
+5. **Run the test.** Run this command yourself:
+
+   ```
+   go test ./internal/handler/ -run TestValidateReview -v
+   ```
+
+   Other tests in this package fail on purpose. Session 2 deals with them.
+   Look only at the five subtests.
+6. **Read the pane.** Step through the turns: ctrl+x, Tab, then `p`
+   (back) and `n` (forward). Which tool changed the file? Did Claude run
+   anything to check its change? Did Claude run the test, or only you?
+   If Claude ran nothing, write that down.
+
+Saying no is normal. You decide what goes into your code.
 
 **Done when**: `validateReview()` exists in `internal/handler/review.go`,
-`CreateReview()` calls it, and `go build ./...` reports no errors.
+`CreateReview()` calls it, and the test command shows five passing
+subtests.
 
-### 4. Write a test
+### 4. Closing: reset, then ask a big question
 
-Ask:
+This task gives you two numbers about the whole API.
 
-```
-Write a table-driven test for validateReview() covering: rating 0, rating 6, text of 9 characters, text of 501 characters, and one valid review. Put it in internal/handler/validate_test.go, in package handler, and name it TestValidateReview
-```
+1. **Clear.** Run `/clear`. Claude now has no memory of tasks 1 to 3. You
+   still have your notes.
+2. **Ask.** Paste this prompt:
 
-Run `go test ./internal/handler/ -run TestValidateReview -v` yourself.
-Other tests in this package fail on purpose. Session 2 deals with them.
-Look only at the five subtests.
+   ```
+   What HTTP status codes does this API return, and which ones violate REST conventions?
+   ```
 
-Look at the trace. Did Claude run the test itself, or did you? How many
-tool calls came before its first edit?
+3. **Count.** In the pane, count the files Claude opened. Count each
+   file once. In its answer, count the status-code problems. Count each
+   problem once.
 
-**Done when**: `go test ./internal/handler/ -run TestValidateReview -v`
-shows five passing subtests.
-
-### 5. Refactor
-
-Open `main.go`. The route list is flat and in no particular order. Ask:
-
-```
-Refactor main.go to group route registrations by resource using helper functions instead of one long list of HandleFunc calls
-```
-
-Compare before and after with `git diff main.go`. Then run
-`go build ./...`.
-
-In the trace, how many files did Claude read before it edited `main.go`?
-Which of those reads were needed for this change?
-
-**Done when**: `main.go` has one helper per resource (books, reviews,
-authors), and `go build ./...` reports no errors.
-
-### 6. Reset, then ask a big question
-
-Run `/clear`. The trace empties: the context is empty. Everything from
-tasks 1 to 5 is gone for Claude, not for you.
-
-Now ask:
-
-```
-What HTTP status codes does this API return, and which ones violate REST conventions?
-```
-
-Claude started from nothing this time. Count in the trace the files it
-opened to answer.
-
-**Done when**: you noted two numbers: files opened, and status-code issues
-found.
+**Done when**: you wrote two numbers: files opened, and status-code
+problems found.
 
 ## Bonus (only if time remains)
 
-- Ask Claude the task 6 question again, in the same conversation. Then
-  press `p` in the trace to see the earlier turn. Fewer tool calls the
-  second time?
-  Say why in one sentence.
-- Run `/context`. How much of the context window did two questions cost?
+Ask the question from task 4 again, in the same conversation. Press
+ctrl+x, Tab, then `p` to compare with the first turn. Did Claude need fewer
+tool calls? Say why in one sentence.
 
 ## Closing round
 
-The trainer calls on people at random. Have your numbers ready: how many
-tool calls with the selection, and how many without? Which file did Claude
-open first for the bug, and did your prediction hold? Did Claude run your
-test on its own, or did you have to? How many files for the status-code
-question, and how many issues came out? Close with **one take-away** you'd
-give someone who skipped this session.
+The trainer calls on people at random. Have your numbers ready:
+
+- How many tool calls and cycles for the `Search()` question?
+- Which file did Claude open first for the bug? Was your prediction right?
+- Did Claude run the test, or only you?
+- How many files for the status-code question, and how many problems?
