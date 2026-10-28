@@ -17,6 +17,8 @@ store.db-shm
 .env
 .env.local
 .env.*.local
+# Exercise 4 ships a fake .env (the secret guard); keep it tracked
+!.env
 
 # IDE - VSCode
 .vscode/*
