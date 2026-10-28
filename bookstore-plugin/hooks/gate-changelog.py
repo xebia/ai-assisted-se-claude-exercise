@@ -14,8 +14,9 @@ Commits that touch only CHANGELOG.md or dotfiles are not changelog
 material (the changelog skill skips them too), so they never block.
 
 Loop guard: Claude Code sets `stop_hook_active` to true when Claude is
-already continuing because of a stop hook. Exit 0 then, or a check that
-can never pass keeps Claude working forever."""
+already continuing because of a stop hook. Exit 0 then. Without it, a check that
+can never pass keeps Claude retrying until Claude Code's own cap of 8
+consecutive continuations ends the turn."""
 
 import json
 import os
