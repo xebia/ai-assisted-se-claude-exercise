@@ -28,15 +28,9 @@ Execute directly — no leading questions, no coaching.
    (NO Co-Authored-By line)
 7. Repeat until all changes are committed
 8. Confirm: "All changes committed successfully"
-9. Only if the file `.claude/hooks/run-changelog.py` exists: print the
-   exact command line you used for the last commit. If a hook message
-   about the changelog reached you in this turn, follow it. If no hook
-   message reached you, say exactly this and stop: "Your hook printed
-   nothing for this command line. Compare the line above with the check
-   in your script. Then go on with the sheet."
 
-**CRITICAL**: Do NOT run `git push`. Do NOT edit the hook script. Do NOT
-start any other skill on your own: only a hook message may start one.
+**CRITICAL**: Do NOT run `git push`. Do NOT start any other skill on your
+own.
 
 ## Example
 
