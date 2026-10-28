@@ -26,13 +26,13 @@ PROMPT = (
     "For every finding, name the rule and quote the line."
 )
 
-# Task 2, step 2: the shape of Claude's answer, as a JSON Schema.
+# Task 2, step 1: the shape of Claude's answer, as a JSON Schema.
 # It needs a "verdict" that is "pass" or "block", and "findings": a list of strings.
 SCHEMA = {
     # (I write this)
 }
 
-# Task 2, step 3: the file with your team rules, and the flag that gives it to Claude.
+# Task 2, step 2: the file with your team rules, and the flag that gives it to Claude.
 RULES = [
     # (I write this)
 ]
@@ -49,9 +49,9 @@ def stop(msg, code=2):
 
 def main():
     if not SCHEMA:
-        stop("Task 2, step 2: SCHEMA in headless/gate.py is still empty.")
+        stop("Task 2, step 1: SCHEMA in headless/gate.py is still empty.")
     if not RULES:
-        stop("Task 2, step 3: RULES in headless/gate.py is still empty.")
+        stop("Task 2, step 2: RULES in headless/gate.py is still empty.")
     claude = shutil.which("claude")
     if not claude:
         stop("Cannot find the claude command. Is Claude Code installed?")

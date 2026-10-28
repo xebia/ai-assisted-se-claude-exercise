@@ -4,7 +4,7 @@
 review gate and a morning-brief prompt and ran both. Everything is on
 disk. Grade the files and the saved answers, not the chat.
 
-**When this runs.** Task 5, in a fresh session. Do not ask for the files:
+**When this runs.** Task 4 (the closing task), in a fresh session. Do not ask for the files:
 read them from disk. Ask exactly one question first, and wait for the
 answer:
 
@@ -16,8 +16,7 @@ stand on its own: no question at the end.
 
 **Words.** The sheet says: the gate, the verdict (*pass* or *block*), the
 findings, the team rules (rule 1 bad input, rule 2 small changes), the
-answer shape (the schema), the full night, the second night (or the cut
-night), the brief, the time range. Never say harness, arm, baseline,
+answer shape (the schema), the full night, the second night (its log stops early), the brief, the time range. Never say harness, arm, baseline,
 structured output (say "the verdict Claude returned"), grader.
 
 ## What the participant produced
@@ -38,7 +37,7 @@ All paths are relative to the bookstore folder.
    `answer.total_cost_usd`, `answer.session_id`).
    Expected at least: one run on the README commit ("Gate test") with
    `pass`, and one or two runs on the "Add GET /api/reviews/{id}" commit
-   with `block`.
+   with `block`, or with `pass` if the new endpoint answers 400.
 3. `headless/brief-prompt.txt`: the participant's own prompt.
 4. `headless/out/brief-night-full.md` and `headless/out/brief-night-cut.md`
    (the latest run of each), with the input beside them in
@@ -87,8 +86,8 @@ No score, no question at the end.
   block. Name the effect: a clean change is blocked.
 - **Rules flag points at a missing file** — Claude reviews without the
   rules and blocks or passes on its own idea of quality.
-- **README commit included gate.py** — the participant skipped step 4 of
-  task 2, so the clean commit also carries their gate edits. Rule 2 may
+- **README commit included gate.py** — the participant skipped step 3 of
+  task 2 (commit your gate), so the clean commit also carries their gate edits. Rule 2 may
   block it. Explain, do not fault.
 - **No gate runs saved** — the gate stopped with a message (empty
   `SCHEMA` or `RULES`, or `claude` not found) before Claude ran.
