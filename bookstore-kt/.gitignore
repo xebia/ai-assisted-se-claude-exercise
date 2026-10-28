@@ -26,3 +26,7 @@ docs/security-audit.md
 
 # Worktrees Claude Code creates for subagents (Exercise 7, task 5)
 .claude/worktrees/
+
+# Participant output (Exercise 10): gate answers, briefs and the brief prompt
+headless/out/
+headless/brief-prompt.txt
