@@ -32,7 +32,7 @@ Grade the plan's files against these five. ✅ names what the plan got right.
 | Check | Passes when… |
 | --- | --- |
 | **Detail shape** | `research.md` or the contract says `GET /api/books/{id}` returns an envelope with a `book` object and an `author` object, not a bare book |
-| **Paging** | the files say pages start at 1, and they say what page 0 does in *this* backend (the participant fixed that in Session 2: page 1 again, or an error) |
+| **Paging** | the files say pages start at 1, and they say what page 0 does in *this* backend (page 1 again, as the backend ships since 2026-10; a participant who changed it to an error is also fine) |
 | **No inventions** | every endpoint, field and status code in the contract appears in a real response from the running backend |
 | **`[P]` collisions** | no two `[P]` tasks from different user stories name the same file |
 | **Foundation ownership** | no story task (`[US1]`, `[US2]`, …) writes a shared file: the API client, the stylesheet, `index.html`, the page shell. Constitution principle IV |
@@ -50,8 +50,8 @@ not trust the participant's notes or the plan's files without checking.
    shape of the list (bare array or wrapper), the field names, and the page
    size.
 2. `curl -s "http://localhost:8080/api/books?page=0&size=3"` — note what
-   page 0 does: the same as page 1, or an error body. Both are correct for
-   this course; what matters is whether the plan's files say the same.
+   page 0 does: the same as page 1 (the shipped behaviour), or an error body
+   if the participant changed it. Both are correct for this course; what matters is whether the plan's files say the same.
 3. `curl -s "http://localhost:8080/api/books/1"` — note the envelope:
    `{"book": {...}, "author": {...}}`.
 4. `curl -s -i "http://localhost:8080/api/books/999999"` — note the status

@@ -116,7 +116,6 @@ This task changes `internal/handler/review.go` and creates
    go test ./internal/handler/ -run TestValidateReview -v
    ```
 
-   Other tests in this package fail on purpose. Session 2 deals with them.
    Look only at the five subtests.
 6. **Read the pane.** Step through the turns: ctrl+x, Tab, then `p`
    (back) and `n` (forward). Which tool changed the file? Did Claude run

@@ -38,7 +38,7 @@ Point at the kind of question instead (see *Nudge bank*).
 - Possible extras: the shape of an error body, naming of handlers.
 
 **Held back:** the existing book delete endpoint answers a bad id with
-500, returns 200 with a body, and gives no 404 for a missing book. Claude
+500 and gives no 404 for a missing book (it answers 204 either way). Claude
 often copies it. Do not tell them. It shows in their task 2 diff, and
 `/verify-exercise 3` names it.
 

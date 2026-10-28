@@ -83,7 +83,7 @@ makes when it knows only the code.
 1. **Get a clean start.** Run `bun test` and `git status`. A test
    fails, or `git status` lists changes? Start `claude`. Press Shift+Tab
    until the line under the chat box says auto mode: Claude then does not
-   ask permission. Run `/catch-up 2`. It finishes the session 2 code work
+   ask permission. Run `/catch-up 1`. It finishes the session 1 code work
    and commits it. Step 4 removes work that is not committed. Both clean?
    Go to step 2.
 2. **Start a fresh session.** Type `/exit` if Claude is open, then start

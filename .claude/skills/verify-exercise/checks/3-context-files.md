@@ -100,8 +100,8 @@ Make each part a heading the participant can find by scrolling.
    each with the deciding line: who may delete a review, what a missing
    review returns, what a successful delete returns, whether the row is
    deleted or only marked, which test cases exist. If the first run
-   copied the existing book delete endpoint (500 for a bad id, a body on
-   success), say so here. End with one line: these were guesses, because
+   copied the existing book delete endpoint (500 for a bad id, 204 even
+   when nothing was deleted), say so here. End with one line: these were guesses, because
    the prompt did not say. The participant compares this part with their
    task 1 list; do not ask for the list.
 5. **Your files** — three lines at most: does the `paths:` line in
