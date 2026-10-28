@@ -47,6 +47,8 @@ you can.
 | the rule | the deny list, the permission |
 | the guard blocked the prompt | the hook triggered |
 | the guard did not see it | the hook did not fire |
+| the gap the guard does not see | the hole |
+| the test prompt | the trap |
 
 **The guard sees what you type; the rule sees what Claude reads.** The
 sheet builds tasks 3 and 4 on that difference. The guard runs on
@@ -135,7 +137,7 @@ word that matched too widely.
   guard can print something and still block nothing, because the shape
   is the one for another event.
 - The rule next to the hook, in the same file: the participant closed
-  the hole they saw in task 4 step 2, with the rule, not with a second
+  the gap they saw in task 4 step 2, with the rule, not with a second
   hook
 
 ## Establish ground truth
@@ -227,20 +229,21 @@ without arguing further.
 ## Held back — the task-3 prediction answers
 
 The sheet defines where the guard runs, but never says which of the
-three cases it blocks. The run teaches that, and no pre-run material may
-reveal it. This check runs after the run, so the answers are recorded
+three cases it blocks. The session 4 slides do show what the guard sees
+and what the rule covers (decision 2026-10-28), so the predictions are
+recall, and a wrong one is the lesson. The sheet itself still holds the
+answers back. This check runs after the run, so the answers are recorded
 here for arbitration:
 
 - **The pasted log line is blocked** — the key is in the text the
   participant typed, the guard runs on that text, the regex matches.
 - **Asking for the value in `.env` is not blocked** — the guard runs on
   the prompt, and the prompt holds no key. Claude reads the file with a
-  tool; the guard never sees tool calls. That is the hole the rule
+  tool; the guard never sees tool calls. That is the gap the rule
   closes in task 4 step 3.
 - **`grep -r acme_live .` is not blocked by the guard** — same reason.
   After the rule it still gets through (bonus): a `Read` rule matches a
   command that names the file, and `grep -r` names none. Only the
   sandbox stops every process; that is slide material, not a task.
 
-Use these only when grading. Never paste them into anything a
-participant reads before their task-4 run.
+Use these only when grading. Never paste them into the sheet.
