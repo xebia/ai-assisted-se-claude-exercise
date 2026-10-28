@@ -99,5 +99,8 @@ No score, no question at the end.
 
 ## Held back
 
-Why a brief fails quietly while a gate fails loudly is the closing
-round's question. Do not lecture it; answer only if asked directly.
+Why the gate treats "no verdict" as "block" is a closing-round question.
+Do not lecture it; answer only if asked directly: a gate that passes when
+Claude said nothing would let a change through without a review, and
+nobody would notice. That a gate fails loudly and a brief fails quietly
+is on the slides; you may name it in the report.

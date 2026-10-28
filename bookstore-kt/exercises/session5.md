@@ -32,13 +32,13 @@ result. You:
 This task gives you two answers to one question. You write down why they
 differ.
 
-1. **Predict.** In a chat, training mode makes Claude ask you a question
-   first. Write one line: what does Claude do in a headless run, where
-   nobody can answer?
+1. **Predict.** The first run starts in the `bookstore` folder, like a
+   chat does. The second run adds `--safe-mode`. Write one line: what
+   will the second run not list?
 2. **Run it in the project.**
 
    ```
-   claude -p "What does the reviews handler do? Three sentences." --output-format json
+   claude -p "List your skills, MCP tools and rules." --output-format json
    ```
 
    The answer is JSON. Read the `result` field. Write down
@@ -46,19 +46,19 @@ differ.
 3. **Run it again with `--safe-mode`.**
 
    ```
-   claude --safe-mode -p "What does the reviews handler do? Three sentences."
+   claude --safe-mode -p "List your skills, MCP tools and rules." --output-format json
    ```
 
-   This answer is not JSON. Compare it with the `result` of step 2:
-   did each run answer the question, or ask you one?
+   Read `result` and `total_cost_usd` again. Compare both with step 2.
 
 Why: without `--safe-mode`, a headless run loads everything in the
-folder, also `CLAUDE.md`. With `--safe-mode`, it loads nothing from the
-folder. It loads only what you name on the command line, and here that is
-nothing.
+folder: `CLAUDE.md`, the course skills, the MCP server from session 4,
+and the hooks from session 3. With `--safe-mode`, it loads nothing from
+the folder. It loads only what you name on the command line, and here
+that is nothing.
 
-**Done when**: your notes say in one sentence why the two answers differ
-(or that they did not), and give the cost of the first run.
+**Done when**: your notes say in one sentence what the second run did not
+list, and give the cost of both runs.
 
 ### 2. The review gate
 
@@ -161,12 +161,14 @@ a night where the log stops at 01:40.
    stops at 01:40, add one sentence to your prompt. For example: ask for
    the time range the log covers. Then run the command of step 3 again.
 
-**Done when**: the full-night brief names the endpoint with the errors
-and quotes a log line. The second brief says which time range it covers.
+**Done when**: the full-night brief names the endpoint with the errors,
+gives the count and quotes a log line. The second brief says which time
+range it covers.
 
 ### 4. Closing: check your work
 
-1. **Start the check.** Start `claude` and run `/verify-exercise 5`. This
+1. **Start the check.** Close Claude if it is open. Start `claude` again,
+   and run `/verify-exercise 5`. This
    course command came with the project. It reads your gate, the files
    `gate.py` saved in `headless/out/`, and both briefs.
    First it asks if your second brief noticed that the log stops at
@@ -214,7 +216,8 @@ repository.
 ## Appendix: the gate in GitHub Actions
 
 `headless/claude-review.yml` is the same gate as a workflow that runs on
-every pull request. Copy it to `.github/workflows/` in a repository of
+every pull request. It posts what it finds as one comment on the pull
+request. Copy it to `.github/workflows/` in a repository of
 your own. Run `claude setup-token`: it prints a token for your Claude
 subscription. In GitHub, save it under *Settings → Secrets and variables
 → Actions* as `CLAUDE_CODE_OAUTH_TOKEN`. The workflow reads the team
