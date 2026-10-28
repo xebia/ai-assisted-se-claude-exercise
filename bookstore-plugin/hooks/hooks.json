@@ -1,13 +1,22 @@
 {
-  "description": "After a git commit, ask Claude to bring CHANGELOG.md up to date with the plugin's changelog skill.",
+  "description": "Two hooks from session 4: the secret guard blocks a prompt that contains an ACME API key; the changelog gate refuses to let Claude finish while commits are missing from CHANGELOG.md.",
   "hooks": {
-    "PostToolUse": [
+    "UserPromptSubmit": [
       {
-        "matcher": "Bash",
         "hooks": [
           {
             "type": "command",
-            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/run-changelog.py\""
+            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/guard-secrets.py\""
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "uv run --script \"${CLAUDE_PLUGIN_ROOT}/hooks/gate-changelog.py\""
           }
         ]
       }
