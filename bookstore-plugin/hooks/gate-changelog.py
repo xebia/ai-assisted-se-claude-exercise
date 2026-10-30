@@ -5,7 +5,7 @@
 """Stop hook: refuse "done" while commits since the last tag are missing
 from CHANGELOG.md.
 
-The slide *Done Means Done* (session 4) walks this script. It never starts
+The slide *Done Means Done* (session 3) walks this script. It never starts
 the changelog skill. It blocks the stop and names the missing commits;
 Claude then picks /bookstore-plugin:changelog by its description, or
 writes the entries itself. Either way the gate passes on the next stop.

@@ -5,7 +5,7 @@
 """UserPromptSubmit hook: block a prompt that contains an ACME API key,
 before the prompt leaves the laptop.
 
-Same script as exercise 4, task 3. The hook runs on the text the user
+Same script as exercise 3, task 3. The hook runs on the text the user
 types, never on what Claude reads with its tools; the `Read(.env)` rule
 in the exercise covers that side."""
 

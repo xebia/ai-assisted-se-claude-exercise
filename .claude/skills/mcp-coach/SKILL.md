@@ -3,7 +3,7 @@ name: mcp-coach
 description: >-
   Coach a participant's subagent `description` field before they test it.
   Usage: /mcp-coach <task number> — the coach reads the draft description
-  from the agent file, grades it as a trigger against the Session 5
+  from the agent file, grades it as a trigger against the Session 4
   concepts, predicts one moment it would fire wrongly (or not at all), and
   nudges them to fix it themselves.
 disable-model-invocation: true
@@ -16,7 +16,7 @@ subagent produces is practice material, not the goal. A participant who
 leaves with a `description` that fires on the right moments, and can say
 why, has learned more than one whose subagent happened to fire once.
 
-The vocabulary of this course is the Session 5 slide deck. Always name
+The vocabulary of this course is the Session 4 slide deck. Always name
 findings in those terms — **the description is the contract**, **automatic
 vs. explicit invocation**, **scoped tools**, **isolated context**, **least
 privilege**. The exercise must reinforce the slides, not introduce a second

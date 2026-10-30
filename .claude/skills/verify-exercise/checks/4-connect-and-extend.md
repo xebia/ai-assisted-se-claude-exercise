@@ -1,7 +1,7 @@
-# Exercise 5 — An MCP Server and a Subagent
+# Exercise 4 — An MCP Server and a Subagent
 
-**Under review: observable state, not a prompt.** This is a Session 5
-exception to this skill's usual framing, the same kind session 4 uses.
+**Under review: observable state, not a prompt.** This is a Session 4
+exception to this skill's usual framing, the same kind session 3 uses.
 Tasks 1, 2 and 4 are mechanics and delegation, not composed prompts — there
 is nothing to grade against a prompting-technique table.
 
@@ -42,7 +42,7 @@ Python, or TypeScript) from the working directory at hand.
 
 | Dimension | Passes when… |
 | --- | --- |
-| **Deny rule** | `.claude/settings.json` in the project folder has `Bash(sqlite3 *)` under `permissions.deny`, and the session 4 `hooks` entry is still there |
+| **Deny rule** | `.claude/settings.json` in the project folder has `Bash(sqlite3 *)` under `permissions.deny`, and the session 3 `hooks` entry is still there |
 | **MCP registration** | `.mcp.json` (project folder, or its parent) has `sqlite-bookstore` with `"type": "stdio"`, a command that runs `server.py` from `mcp-sqlite`, and a last argument that resolves to an existing `store.db` in the project folder |
 | **MCP approval** | the server is not in `disabledMcpjsonServers` in `.claude/settings.local.json` (project folder or its parent); `enabledMcpjsonServers` lists it, or `/mcp` output the participant reports shows it connected |
 | **MCP connection** | a live call works: `get_table_definitions` is in your own tool list and returns the bookstore schema. Fallback when the tools are not in this session: `claude mcp list` reports `sqlite-bookstore` as connected |
@@ -89,7 +89,7 @@ look.
 
 1. Read `.claude/settings.json` in the project folder. Look for
    `permissions.deny` with `Bash(sqlite3 *)`. Presence and absence are
-   both findings. Note whether the `hooks` block from session 4 survived.
+   both findings. Note whether the `hooks` block from session 3 survived.
 2. Read the project's `.claude/agents/security-auditor.md` in full. Check
    the frontmatter keys mechanically: `name`, `description`, `tools`,
    `model`. A value that still reads `(I write this)` is an empty field.
@@ -144,7 +144,7 @@ look.
   `.claude/settings.json` in the project folder. A rule in
   `settings.local.json` also works; say it works and where it is.
 - **Hook lost** — the deny-rule prompt asked Claude to keep everything
-  else in `settings.json`. If the `hooks` block is gone, say so; session 4's
+  else in `settings.json`. If the `hooks` block is gone, say so; session 3's
   chain no longer runs.
 - **Generic description** ("Reviews code for security issues") — passed
   the file-exists check but fails the trigger-quality dimension. It is the
@@ -178,7 +178,7 @@ look.
 
 ## Pass bar
 
-- The deny rule is in place and the session 4 hook survived
+- The deny rule is in place and the session 3 hook survived
 - `sqlite-bookstore` registered, approved and confirmed connected with
   both tools
 - The subagent file exists with both values replaced and read-only tools

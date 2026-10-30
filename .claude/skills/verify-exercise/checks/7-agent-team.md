@@ -98,9 +98,8 @@ Run these yourself. Do not take the participant's notes on trust.
   whether the foundation client passes it on, or the story fetches again
   on its own.
 - **Page 0.** A page module that starts counting at 0 sends `page=0`. The
-  result depends on the participant's Session 2 fix. Either the API treats
-  it as page 1, so Next shows page 1 twice, or it returns an error that the
-  UI shows. Both come from a spec defect in Exercise 6 that became code.
+  shipped API treats it as page 1, so Next shows page 1 twice (or, if the
+  participant changed the backend, it returns an error that the UI shows). Both come from a spec defect in Exercise 6 that became code.
   Report it as a finding either way. It is the point of the closing-round
   question about guesses.
 - **Subagents, not a team.** The participant sees no panel rows with the

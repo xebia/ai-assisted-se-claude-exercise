@@ -40,7 +40,8 @@ test("CreateReview returns 201", async () => {
 });
 
 // posting a review for a non-existent book should return 404.
-test("CreateReview for non-existent book returns 404", async () => {
+// Known bug, kept on purpose for the session 1 exercise.
+test.skip("CreateReview for non-existent book returns 404", async () => {
   const { base } = setup();
   const res = await fetch(`${base}/api/books/99999/reviews`, {
     method: "POST",

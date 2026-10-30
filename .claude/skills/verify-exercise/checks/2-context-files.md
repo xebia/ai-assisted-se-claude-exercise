@@ -1,20 +1,20 @@
-# Exercise 3 — The team's decisions, before and after
+# Exercise 2 — The team's decisions, before and after
 
-**Artifacts:** two saved diffs at the project root, `session3-before.diff`
-(the task run without the decisions) and `session3-after.diff` (the same
+**Artifacts:** two saved diffs at the project root, `session2-before.diff`
+(the task run without the decisions) and `session2-after.diff` (the same
 task with the participant's context files), plus the context files
 themselves: `.claude/rules/testing.md` (given on the sheet),
 `.claude/rules/handlers.md` and `CLAUDE.local.md` (written by the
 participant). The exercise saves and resets in one move, so expect a
 clean working tree, not live changes.
 
-If `session3-bonus.diff` exists (a second, different task run with the
+If `session2-bonus.diff` exists (a second, different task run with the
 same files), grade it as a third column after the main comparison. If
-only `session3-before.diff` exists, the second run was skipped: grade
+only `session2-before.diff` exists, the second run was skipped: grade
 the first run alone, say so in the first line, and stop after the
 decision table.
 
-**When this runs.** Task 4, the closing task, in a fresh session. Do not
+**When this runs.** Task 5, the closing task, in a fresh session. Do not
 ask for the files: read them from disk. Ask exactly one question first,
 and wait for the answer:
 
@@ -29,7 +29,7 @@ at the end.
 
 **Words.** The sheet says: the first run, the second run, the test kit,
 the decisions (1, 2, 3), your rule files, *followed*, *broken*, *not
-tested*, `/verify-exercise 3` (that is you), the closing round, extra changes. Use those words.
+tested*, `/verify-exercise 2` (that is you), the closing round, extra changes. Use those words.
 The sheet never says grader; say "this report" or "the comparison".
 Never say baseline, harness, arm, treatment.
 
@@ -95,7 +95,16 @@ Make each part a heading the participant can find by scrolling.
    that one sentence. For a decision Claude *followed* in both runs, say it
    plainly: Claude followed it without being told this time, and nothing
    guarantees the next session does.
-4. **Your files** — three lines at most: does the `paths:` line in
+4. **What Claude decided by itself** — the decisions the prompt left
+   open, as Claude made them in the first run. Three to five bullets,
+   each with the deciding line: who may delete a review, what a missing
+   review returns, what a successful delete returns, whether the row is
+   deleted or only marked, which test cases exist. If the first run
+   copied the existing book delete endpoint (500 for a bad id, 204 even
+   when nothing was deleted), say so here. End with one line: these were guesses, because
+   the prompt did not say. The participant compares this part with their
+   task 1 list; do not ask for the list.
+5. **Your files** — three lines at most: does the `paths:` line in
    `handlers.md` match the real handler files? Does `CLAUDE.local.md` have
    the line that points to the rule files? Any dead test in either diff?
    Is `CLAUDE.md` unchanged (`git diff --stat CLAUDE.md`)? A changed `CLAUDE.md` is the most
