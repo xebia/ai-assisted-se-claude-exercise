@@ -1,245 +1,287 @@
-# Exercise 5: An MCP Server and a Subagent
+# Exercise 5: Claude Without You Watching
 
-**Session**: 5 — MCP Servers & External Tools\
-**Duration**: 30 minutes, plus a 5-minute closing round\
-**Project**: The same BookStore API.
+**Session**: 5 — Headless & Automation\
+**Duration**: 35 minutes, plus a 4-minute closing round\
+**Project**: The same BookStore API, and the `headless` folder in it.
 
 ## Goal
 
-In this exercise you:
+You run Claude without a chat, and you check if you can trust the
+result. You:
 
-1. Connect an MCP server that lets Claude read the bookstore database. You
-   ask one database question before and after, and compare the answers.
-2. Write an agent file for a subagent that checks the code for security
-   problems. You write two lines: when Claude uses it, and which tools it
-   may use.
+1. Run one prompt headless, twice, and see what loads.
+2. Build a review gate, and watch it pass one commit and block another.
+3. Let a second run fix what the gate found, and check the fix yourself.
+4. Write the prompt for a morning brief, and test it on two nights.
 
 ## Start here
 
-- Open a terminal in the `bookstore` folder. Stay in this folder for the
-  whole exercise.
-- Training mode is on. Some prompts start with a tag in square brackets.
-  The tag switches training mode off for that one prompt. Copy those
-  prompts exactly, tag included. Never edit `CLAUDE.md`.
-- Write your notes on paper or in a text file, not in the chat.
-- Stuck? Type *just tell me*. The trainer tells you when to start task 4.
+- Open a terminal in the `bookstore` folder you cloned. Run every command
+  there.
+- Run `uv --version`. uv runs the scripts in `headless`. No version? Ask
+  the trainer.
+- Training mode is on: `CLAUDE.md` makes Claude ask you a question
+  first. Never edit `CLAUDE.md`. To get a direct answer in a chat, type
+  *just tell me*.
+- Write notes on paper or in a file outside the project.
+- The trainer tells you when to start each task.
 
 ## Tasks
 
-### 1. Ask without the MCP server
+### 1. One prompt, two runs
 
-This task produces a `permissions.deny` rule in `.claude/settings.json`,
-a prediction and three notes. This is round one.
+This task gives you two answers to one question. You write down why they
+differ.
 
-1. **Add a deny rule**. Start `claude` and paste:
-
-   ```
-   [Exercise 5 experiment — execute directly, no leading questions.] Add the rule Bash(sqlite3 *) to the deny list under permissions in .claude/settings.json. Keep everything else in that file. Create the file if it does not exist.
-   ```
-
-   Keep the hook from session 4 in the file.
-
-2. **Write a prediction**. In the next step you ask three things: the
-   number of books, the author with the most books, and a SQL query.
-   Write one sentence. Which of the three can Claude get right from the
-   source code alone, and which will be a guess?
-
-3. **Ask**. Paste:
+1. **Predict.** The first run starts in the `bookstore` folder, like a
+   chat does. The second run adds `--safe-mode`. Write one line: what
+   will the second run not list?
+2. **Run it in the project.**
 
    ```
-   [Exercise 5 experiment — execute directly, no leading questions.] How many books are in the bookstore database? Which author has the most books? Write a SQL query that returns all books with their author name and average rating, sorted by rating, highest first.
+   claude -p "List your skills, MCP tools and rules." --output-format json
    ```
 
-   Write down three notes: the book count, the author, and how sure
-   Claude says it is (or "did not say"). Then check one more thing. Does
-   Claude say that its answers come from the code, not from the database?
-
-Why a deny rule. `CLAUDE.md` asks Claude not to open `store.db`, but Claude
-can still decide to do it. A `permissions.deny` rule makes Claude Code
-block the command before it runs (*MCP Permissions: Allow, Ask, Deny*).
-
-**Done when**: your prediction and three notes are written, and Claude did
-not open `store.db`.
-
-### 2. Register the MCP server and approve it
-
-This task produces `.mcp.json` and a connected server.
-
-The server has two tools: `get_table_definitions` and `execute_query`. It
-only runs `SELECT` queries. It is one Python file, `mcp-sqlite/server.py`.
-It reads `store.db`, which the app creates the first time it runs.
-
-1. **Leave Claude**. Type `/exit`. The next commands go to the terminal,
-   not to Claude. No `store.db` file in the folder? Run `python3 main.py`,
-   wait for `listening on :8080`, and stop it with Ctrl+C.
-
-2. **Register the server**. Run this in the terminal, on one line:
+   The answer is JSON. Read the `result` field. Write down
+   `total_cost_usd`.
+3. **Run it again with `--safe-mode`.**
 
    ```
-   claude mcp add --scope project sqlite-bookstore -- uv run mcp-sqlite/server.py store.db
+   claude --safe-mode -p "List your skills, MCP tools and rules." --output-format json
    ```
 
-   The part after `--` is the command that starts the server. It uses
-   `uv`, which you installed in the preparation. With `--scope project`,
-   Claude Code writes the command to `.mcp.json` in this folder
-   (*Configuring an MCP Server*). Open `.mcp.json` and find the command
-   you typed. Git ignores `.mcp.json` in this course, so the file stays on
-   your machine.
+   Read `result` and `total_cost_usd` again. Compare both with step 2.
 
-   `uv` missing or failing? Run `claude mcp remove sqlite-bookstore`. Then
-   run the command above again, with `python3` (on Windows: `python`)
-   in place of `uv run`. The server needs only Python, no packages.
+Why: without `--safe-mode`, a headless run loads everything in the
+folder: `CLAUDE.md`, the course skills, the MCP server from session 4,
+and the hooks from session 3. With `--safe-mode`, it loads nothing from
+the folder. It loads only what you name on the command line, and here
+that is nothing.
 
-3. **Restart and approve**. Start `claude`. Claude Code asks whether it may
-   use the server from `.mcp.json`. Answer yes. Did you answer no? Type
-   `/exit`, run `claude mcp reset-project-choices` in the terminal, and
-   start `claude` again.
+**Done when**: your notes say in one sentence what the second run did not
+list, and give the cost of both runs.
 
-4. **Check**. Type `/mcp`. `sqlite-bookstore` shows as connected, with
-   both tools. Not connected? Type `/exit` and run `claude mcp list` in
-   the terminal. It shows the error. The usual causes: `store.db` is
-   missing (see step 1), or the command in `.mcp.json` has a typing error
-   (*"Claude Cannot See the Database"*).
+### 2. The review gate
 
-Why the approval. A project file can start any program on your machine.
-So Claude Code asks you once per project, and saves your answer in
-`.claude/settings.local.json`.
+The gate is the script `headless/gate.py`. It sends your newest commit to
+Claude, and stops on any verdict but `pass`.
 
-**Done when**: `/mcp` shows `sqlite-bookstore` connected, with two tools.
+1. **Write the answer shape.** In `headless/gate.py`, replace
+   `# (I write this)` under `SCHEMA` with the lines below, inside the
+   braces. Then write down which line allows only two verdicts, and
+   which line makes both fields required.
 
-### 3. Ask again, with the MCP server
-
-This task is round two. It produces three more notes.
-
-1. **Same question**. Paste the prompt from task 1, step 3 again, tag
-   included. Watch the tool calls: `get_table_definitions` first, then
-   `execute_query`. The names appear as
-   `mcp__sqlite-bookstore__execute_query` (*"Claude Cannot See the
-   Database"*).
-
-2. **Compare**. Write down the same three notes. Which answers changed?
-   Was your prediction right?
-
-3. **Ask one thing the code cannot tell**. Paste this prompt and note the
-   title Claude finds:
-
-   ```
-   [Exercise 5 experiment — execute directly, no leading questions.] Which book has the highest average rating? Show its title, its author and the text of its three best reviews.
+   ```python
+   "type": "object",
+   "required": ["verdict", "findings"],
+   "properties": {
+       "verdict": {"enum": ["pass", "block"]},
+       "findings": {"type": "array", "items": {"type": "string"}},
+   },
    ```
 
-Why the two rounds differ. Without the server, Claude reads the code that
-fills the database at first start. The column names come from that code,
-so they can be right. The numbers are a guess. With the server, Claude
-makes two read-only tool calls, and the answer comes from the real data.
-
-**Done when**: you have three notes per round, and you can say which
-answer in round one was a guess.
-
-### 4. Create the security-auditor subagent
-
-This task produces the agent file `.claude/agents/security-auditor.md` and
-the report `docs/security-audit.md`. A starter file holds the instructions
-for the check, so you write only the two frontmatter lines in step 2.
-
-The frontmatter is the first block of the agent file, between two `---`
-lines (*An Agent File Encodes a Task*).
-
-1. **Let Claude create the file**. Paste:
+2. **Add the team rules.** Read `headless/team-rules.md`. In `gate.py`,
+   replace `# (I write this)` under `RULES` with two strings. The first
+   is the flag that adds a file to Claude's instructions (slide *The
+   Gate: A Review Before Every Push*). The shape is
+   `"<the flag>", "headless/team-rules.md",`.
+3. **Commit your gate.**
 
    ```
-   [Exercise 5 experiment — execute directly, no leading questions.] Copy exercises/starters/security-auditor.md to .claude/agents/security-auditor.md. Change nothing in the content.
+   git add -A .
+   git commit -m "Add the review gate"
    ```
 
-2. **Write the two lines**. Open `.claude/agents/security-auditor.md`
-   in your editor. Replace the two `(I write this)` values.
-
-   - `description`: Claude reads only this line when it decides whether to
-     start the agent (*How Agents Get Invoked*). Say what the agent
-     checks. Say when Claude should use it: what a user might ask for,
-     and which code change should start it. A weak version is `Reviews
-     code for security issues.` Write a better one, in your own words.
-     The rule from the slide *Which Subagent Description Invokes
-     Reliably?* applies: write the trigger, not just the job.
-   - `tools`: tool names, separated by commas, as in the agent file on the
-     slide *An Agent File Encodes a Task*. The agent must never change
-     code. Give it the smallest set that still lets it find and read
-     files.
-
-   Optional, if you have time: run `/mcp-coach 4` (4 is the task number).
-   It reads your description, asks one question about it, and does not
-   write the line for you.
-
-3. **Test the trigger**. Type `/exit` and start `claude` again. Do not
-   use `/clear`: agents load only at start. Paste this prompt. It does
-   not name the agent:
+4. **Run the gate on a clean change.** Add the line `Gate test.` at the end
+   of `README.md`. Then:
 
    ```
-   [Exercise 5 experiment — execute directly, no leading questions.] Do a security audit of the bookstore API. Save the full report, exactly as it was produced, to docs/security-audit.md.
+   git commit -am "Gate test"
+   uv run headless/gate.py
    ```
 
-   Watch the tool calls. When the agent starts, Claude prints a line with
-   the name `security-auditor`, and the check runs inside that agent. Then
-   your description works.
+5. **Predict.** Rule 1 says: a new endpoint answers an id that is not a
+   number with 400. The next step adds an endpoint that answers
+   with 500. Will the gate block it? Write *yes* or *no*.
+6. **Let Claude break rule 1.** `--safe-mode` keeps your rule files from
+   session 2 (in `.claude/rules/`) out. Those rules would make Claude
+   answer 400. `acceptEdits` lets Claude edit files without asking.
 
-   Do you only see Claude's own `Read` and `Grep` calls? Then Claude did
-   the check itself, and your description did not start the agent.
-   Improve the description, type `/exit`, start `claude`, and ask again.
-   After two tries without the agent, add *"use the security-auditor
-   agent"* to the prompt. Then you still get a report.
+   ```
+   claude --safe-mode -p "Do the task in headless/break.txt" --permission-mode acceptEdits
+   ```
 
-4. **Check the report**. Open `docs/security-audit.md`. Near the top, find
-   the line `**Audited by**: security-auditor`.
+7. **Check the diff.** Run `git diff`. Note what the new endpoint
+   answers for an id that is not a number.
+8. **Commit, and run the gate twice.** Note if both runs give the same
+   verdict and findings. They can differ: the verdict is Claude's
+   judgment.
 
-The starter file asks the agent to write that line. The agent cannot write
-files, so your own Claude session saved the report.
+   ```
+   git add -A .
+   git commit -m "Add GET /api/reviews/{id}"
+   uv run headless/gate.py
+   uv run headless/gate.py
+   ```
 
-**Done when**: both `(I write this)` values are replaced, and
-`docs/security-audit.md` has the `Audited by` line.
+Why: Claude only gives a verdict. The script decides what happens, and a
+missing verdict counts as `block`.
 
-## Bonus (only if time remains)
+**Done when**: the README change got `Verdict: pass`. The endpoint got
+`Verdict: block` with a finding on rule 1, or `pass` if Claude wrote 400.
 
-**Try to write through the server.** Paste:
+### 3. The fix run
 
-```
-[Exercise 5 experiment — execute directly, no leading questions.] Set the rating of review 1 to 5 in the database.
-```
+The gate blocked a commit. A second headless run can fix it, but a person
+still decides. If the gate passed the endpoint in task 2, skip this task.
 
-`execute_query` runs `SELECT` only, and the server opens the database
-read-only. Claude should tell you that it cannot do this. The server can
-read and nothing more. That is least privilege: the server gets only the
-rights it needs.
+1. **Read the command.** Open `headless/fix.py` and find the `claude`
+   command. Write down its permission mode, and the one in `gate.py`.
+   `dontAsk` means: Claude may not use a tool that would ask you.
+   `acceptEdits` means: Claude may edit files without asking. Why does the
+   fix run get a different mode?
+2. **Predict.** The fix run gets only the gate's verdict and findings.
+   Claude fixes the code, and you commit it. Will the gate say `pass`?
+   Write *yes* or *no*.
+3. **Run the fix.** The script sends the gate's last answer to Claude.
+   Claude edits the code. It does not commit.
 
-**Read the server.** Open `mcp-sqlite/server.py`. You do not need to know
-Python. Find the two tool names, and find `mode=ro`, where the database is
-opened read-only. The whole server is one file of about 200 lines. Compare
-it with the example on the slide *Building a Custom MCP Server*.
+   ```
+   uv run headless/fix.py
+   ```
 
-**Run the plugin.** The folder `bookstore-plugin`, inside `bookstore`,
-holds the skills from exercise 4, the hook, a finished security-auditor
-agent and the SQLite server, packaged as one plugin (*Plugins: Bundling It
-All Together*).
+4. **Check the fix.** Run `git diff`. Does it change only what the finding
+   asks for? You decide. If not, undo it with `git restore .` and run
+   step 3 again.
+5. **Commit, and run the gate.**
 
-1. Type `/exit`.
-2. Start Claude with `claude --plugin-dir bookstore-plugin`.
-3. Type `/help`. The skills now appear as `/bookstore-plugin:commit` and
-   `/bookstore-plugin:changelog`, next to your own.
-4. Type `/mcp`. The plugin's server is connected. Claude Code did not ask
-   for approval.
+   ```
+   git commit -am "Fix the gate findings"
+   uv run headless/gate.py
+   ```
 
-The `README.md` in `bookstore-plugin` explains what is different from your
-files.
+   If it says `block` again, read the new finding and do steps 3 to 5
+   again. `fix.py` reads the newest gate answer.
+
+Why: the gate only reads, so it cannot break anything. The fix run may
+edit files, so a person reads the diff before it is committed. This is the
+responder from the slides, on your laptop.
+
+**Done when**: the gate gave `Verdict: pass` on your fix commit. Your notes
+say why the fix run may edit files and the gate may not.
+
+### 4. The morning brief
+
+This task produces two briefs: one for a night with errors, and one for
+a night where the log stops at 01:40.
+
+1. **Write the prompt.** Create `headless/brief-prompt.txt`. The script
+   `headless/brief.py` sends this file to Claude, with the night's log (an
+   export from a logging platform). Ask
+   for four things in your own words. The first: *Write at most 10 lines.* Then: the worst
+   problem first; every number with the log line it came from; one line
+   when nothing went wrong.
+2. **Run it on the full night.**
+
+   ```
+   uv run headless/brief.py headless/night-full.txt
+   ```
+
+   The script prints the brief and saves it in `headless/out/`, next to
+   the input Claude got. Does the brief name the endpoint with the
+   errors, give the count, and quote a line? If not, improve your prompt
+   and run again.
+3. **Predict, then run it on the second night.** This log stops at 01:40,
+   because the log file was replaced by a new one (log rotation). Will your brief say that the night
+   is not complete? Write *yes* or *no*. Then run:
+
+   ```
+   uv run headless/brief.py headless/night-cut.txt
+   ```
+
+4. **Improve one sentence.** If your brief does not say that the log
+   stops at 01:40, add one sentence to your prompt. For example: ask for
+   the time range the log covers. Then run the command of step 3 again.
+
+**Done when**: the full-night brief names the endpoint with the errors,
+gives the count and quotes a log line. The second brief says which time
+range it covers.
+
+### 5. Closing: check your work
+
+1. **Start the check.** Close Claude if it is open. Start `claude` again,
+   and run `/verify-exercise 5`. This
+   course command came with the project. It reads your gate, the files
+   `gate.py` and `fix.py` saved in `headless/out/`, and both briefs.
+   First it asks if your second brief noticed that the log stops at
+   01:40. Answer in one line.
+2. **Read the report.** Write down one line from it.
+
+**Done when**: one line from the report is in your notes. Bring it to the
+closing round.
+
+## Bonus: the gate before every push
+
+A git `pre-push` hook runs the gate before every `git push`.
+
+1. Create the file `.git/hooks/pre-push`, with no extension, with these
+   two lines:
+
+   ```
+   #!/bin/sh
+   exec uv run headless/gate.py
+   ```
+
+2. On macOS or Linux, make it executable. On Windows, Git runs it
+   without this step.
+
+   ```
+   chmod +x .git/hooks/pre-push
+   ```
+
+3. Make a repository on your disk to push to, and push. Here `--bare` is
+   a git option, not the Claude flag.
+
+   ```
+   git init --bare ../gate-target.git
+   git push ../gate-target.git HEAD
+   ```
+
+The gate checks your last commit. If it says `pass`, the push goes
+through. If it says `block`, the push stops.
+
+## Back at work
+
+Pick one check you do by hand before every push. Write it as a rule in
+the style of `headless/team-rules.md`, and run the gate on your own
+repository.
+
+## Appendix: the gate in GitHub Actions
+
+`headless/claude-review.yml` is the same gate as a workflow that runs on
+every pull request. It posts what it finds as one comment on the pull
+request. Copy it to `.github/workflows/` in a repository of
+your own. Run `claude setup-token`: it prints a token for your Claude
+subscription. In GitHub, save it under *Settings → Secrets and variables
+→ Actions* as `CLAUDE_CODE_OAUTH_TOKEN`. The workflow reads the team
+rules from the branch you merge into, not from the pull request.
+
+## Appendix: who runs it, and who pays
+
+| Where it runs | Logs in with | Who acted | Who pays |
+| --- | --- | --- | --- |
+| `claude -p` or `claude --safe-mode -p` on your laptop | your login | you | your plan |
+| `claude --bare -p` in a script | an API key | the API key | API billing |
+| GitHub Actions | a token from `claude setup-token`, or an API key | the Claude GitHub App | the token owner's plan, or API billing, plus GitHub Actions time |
+| A cloud scheduled task | your claude.ai account | you | your plan |
 
 ## Closing round
 
-First run `/verify-exercise 5` in Claude. It reads `.mcp.json`, calls the
-server, reads your agent file and the report, and asks you one question.
-Read its report while the trainer asks the room.
+The trainer asks the room. Have these answers ready:
 
-Have these answers ready:
-
-- Which answer in round one was a guess, and how did round two show it?
-- Did Claude call `get_table_definitions` before every query, or only
-  once?
-- Did the subagent start by itself? Which words in your `description`
-  did that?
-- One thing you would tell someone who skipped this session.
+- Why did the two runs in task 1 answer differently?
+- In the gate, what does Claude decide, and what does the script decide?
+- Why may the fix run edit files, while the gate may not?
+- Did your brief notice that the log stops at 01:40? Which sentence in
+  your prompt made the difference?
+- The gate treats "no verdict" as "block". Why is that the safe choice?

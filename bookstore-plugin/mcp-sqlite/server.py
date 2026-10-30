@@ -2,7 +2,7 @@
 # requires-python = ">=3.10"
 # dependencies = []
 # ///
-"""SQLite MCP server for the BookStore exercise (Session 5).
+"""SQLite MCP server for the BookStore exercise (Session 4).
 
 One file, standard library only. Claude Code starts it as a subprocess and
 talks JSON-RPC over stdin/stdout, one JSON object per line.

@@ -60,7 +60,7 @@ class BookHandler:
         except Exception:
             write_error(h, 500, "failed to create book")
             return
-        write_json(h, 200, book)
+        write_json(h, 201, book)
 
     def delete_book(self, h: BaseHTTPRequestHandler, params: dict[str, str], query: dict[str, str]) -> None:
         try:
@@ -73,4 +73,5 @@ class BookHandler:
         except Exception:
             write_error(h, 500, "failed to delete book")
             return
-        write_json(h, 200, {"status": "deleted"})
+        h.send_response(204)
+        h.end_headers()

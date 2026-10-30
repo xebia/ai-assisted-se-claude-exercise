@@ -1,214 +1,236 @@
-# Exercise 2: Write Better Prompts
+# Exercise 2: Give Claude Your Team's Decisions
 
-**Session**: 2 — Bug Fixing & Effective Prompting\
-**Duration**: 35 minutes, plus a 5-minute closing round\
-**Project**: The same BookStore API. Some of its tests fail on purpose.
+**Session**: 2 — Steering Claude\
+**Duration**: 34 minutes, plus a 4-minute closing round\
+**Project**: The same BookStore API.
 
 ## Goal
 
-You write three prompts with the techniques from the slides. A coach
-checks each prompt before it runs. Then you compare the result with what
-the coach predicted.
+Your team made three decisions that the code does not show. The prompt
+for the task leaves more decisions open. In this exercise you:
 
-The goal is a better prompt, not a fixed bug. If a bug stays unfixed but
-you can name what was missing from your prompt, you have learned more than
-someone who got lucky.
+1. Check a prompt, and list what it leaves to Claude.
+2. Run the task, and save what Claude builds.
+3. Write your team's decisions where Claude reads them.
+4. Run the same task again, and compare the two results.
 
 ## Start here
 
-- Open a terminal in the `bookstore` folder and start `claude`. Keep
-  this one session for tasks 1 and 2. Task 3 tells you when to restart.
-- Keep an empty text file open for your notes, outside `bookstore`.
-- Training mode is on: before Claude explains or fixes a bug, it asks
-  you one question. Never edit `CLAUDE.md`. Sessions 3 to 8 need it.
-- Stuck, or out of time? Type *just tell me*.
+- Open a terminal in the `bookstore` folder that you cloned.
+- Training mode is on: Claude asks you questions before it helps. Stuck?
+  Type *just tell me* in the chat.
+- Never edit `CLAUDE.md`.
+- Write your notes on paper or in a text file outside the project.
+- The trainer tells you when to start each next task.
+
+## Your team's decisions
+
+Your team agreed on these three decisions in a meeting. They are not in
+the repo, so Claude cannot read them.
+
+1. **Test kit.** "We built a test kit: `tests/testkit.ts`.
+   New handler tests use it. We do not rewrite the old tests."
+2. **Bad input.** "Bad input gives a 400, not a 500. New endpoints do
+   this. We fix the old endpoints later, in a separate change."
+3. **Small changes.** "A change touches only the files the task needs. No
+   extra changes."
+
+The old tests and the old handlers still show the old way.
 
 ## Tasks
 
-### 1. A prompt that writes `docs/orientation.md`
+### 1. Check the prompt before you run it
 
-You produce the file `docs/orientation.md`, next to `package.json`. The `docs/`
-folder does not exist yet.
+This task produces a list in your notes: the decisions that one short
+prompt leaves to Claude. You run this prompt in task 2.
 
-Write one prompt that produces a short guide for a new developer, in two
-parts:
-
-1. **Folder tree**: one line per folder, saying what that folder is
-   responsible for.
-2. **Request flow**: the path of one request, from `src/main.ts` to the
-   database and back. One line per step, each with a `file:line`
-   reference, written like `src/handler/book.ts:42`.
-
-Tasks 1 and 2 follow the coach loop from the slides: **Draft → Coach →
-Revise → Ship → Debrief.**
-
-Steps:
-
-1. **Draft your prompt**. Use these techniques:
-   CONTEXT-TASK-OUTCOME, role framing, Scope it, Direct it, Define done,
-   `@file`, and examples. One of the seven adds nothing here; the closing
-   round asks which one. **Your prompt must say: write the result to
-   `docs/orientation.md`, and create the folder.** Without that line, the
-   sub-agent only reports in the chat.
-2. **Coach and revise**. Run `/prompt-coach 1` (1 is the task number),
-   then paste your draft as your next message. The coach checks it and
-   asks one question. Revise until it says the prompt is ready: at most
-   two rounds. Disagree with the coach? Type *run it anyway*, without
-   quotes.
-3. **Save your prompt, then ship**. Copy your final prompt into
-   your notes. Then type *ship it*. The coach sends your prompt, word for
-   word, to a sub-agent: a second Claude session that knows only your
-   prompt. Read task 2 while the sub-agent works.
-4. **Debrief**. The sub-agent's report comes back into your chat. Read it
-   with the coach: did its predictions come true? Then open
-   `docs/orientation.md` and check two `file:line` references. Do they
-   point at the line they name?
-
-The prompt on the slide *Let's do a Prompt Analysis* has the same four
-parts: the technology, where to start, what to deliver, and proof for
-every statement.
-
-**Done when**: `docs/orientation.md` exists, and every step in the request
-flow has a `file:line` reference.
-
-### 2. A prompt that asks for failing tests first
-
-You produce two new test cases in `tests/util/pagination.test.ts` and a
-fix in `src/util/pagination.ts`.
-
-`paginate()` breaks when `page` is `0` or negative. No test covers those
-cases yet. Decide first: what *should* happen when `page` is `0`? Page 1
-again, or an error: both are fine. Write your choice into your prompt.
-You decide this, not Claude. Session 6 builds on your choice.
-
-Steps:
-
-1. **Draft your prompt**. Techniques you need here: Scope it,
-   Direct it (say "tests first" in those words), Examples, Constrain it,
-   Define done. For Examples, point at the existing test block
-   `describe("paginate")` in `tests/util/pagination.test.ts`. Your new cases
-   belong in that same style. Ask for both test runs in the report:
-   before the fix and after.
-2. **Coach and revise**. Run `/prompt-coach 2` and paste your
-   draft.
-3. **Ship and test**. Type *ship it*. Then run
-   `bun test tests/util/` yourself. The sub-agent reports only
-   what your prompt asked for.
-
-The better prompt on the slide *Which Prompt is More Effective?* named
-the function, said no mocks, and asked for a failing test before the fix.
-
-**When the trainer calls task 3, move to task 3, even if this task is not
-finished.**
-
-**Done when**: the report shows the new tests failing *before* the fix
-and passing *after*, and `bun test tests/util/` passes.
-
-### 3. A prompt for plan mode
-
-You fix `CreateReview for non-existent book returns 404` in
-`tests/handler/review.test.ts`. It expects `404` but gets `201`. The
-review flow runs from `src/handler/review.ts` to
-`src/store/review.ts`, and the fix can go in more than one place.
-That makes it a job for plan mode: Claude proposes a plan, you approve it,
-then it writes code (*Plan Mode: Explore Before Editing*).
-
-This time you do not type *ship it*. You run the prompt yourself, in a
-fresh session that has not seen the coach's advice.
-
-Steps:
-
-1. **Copy the error**. Run `bun test tests/handler/review.test.ts`. Copy
-   the output of `CreateReview for non-existent book returns 404` into your notes,
-   exactly as printed.
-2. **Draft your planning prompt**. Techniques you need here:
-   error context (the paste from step 1), plan mode, directed thinking,
-   Scope it, Define done. Directed thinking means: write in the prompt
-   what the plan must think about (*Prompting & Extended Thinking*). Ask
-   for one recommendation with reasons, not a list of options. Do not
-   start this prompt with the experiment prefix.
-3. **Coach and revise**. Run `/prompt-coach 3` and paste your
-   draft. When the coach says it is ready, copy the prompt into your
-   notes.
-4. **Run it in plan mode**. Close Claude and start it again with
-   `claude`. The coach is gone now; you do not need it again. Press
-   Shift+Tab until the screen says plan mode. Paste your prompt and read
-   the plan. Training mode is on, so Claude may ask one question before
-   it plans. Answer it in one line.
-5. **Question one step, then approve**. Pick one step. Ask Claude
-   why that step, and what breaks if it is wrong. Write the step and the
-   answer in your notes. When Claude asks whether to go ahead, choose the
-   *Yes* answer that accepts the edits automatically. Claude leaves plan
-   mode and writes the code. Run `bun test tests/handler/review.test.ts`.
-
-**Done when**: your notes hold the plan step you questioned and Claude's
-answer, and `CreateReview for non-existent book returns 404` passes.
-
-### 4. Closing: make the tests pass, then commit
-
-Sessions 3 to 8 build on this code, so every test should pass at the end.
-
-1. **Fix the two book tests**. `CreateBook returns 201` and
-   `DeleteBook returns 204` still fail. The prompt below is written for
-   you. Run `bun test tests/handler/book.test.ts`, paste the output of those
-   two tests at the marked place, and send the whole text to Claude. The
-   first line is an experiment prefix, like in session 1.
+1. **Read the prompt.** Do not run it yet. Task 2 explains the part in
+   brackets:
 
    ```
-   [Exercise 2 experiment — execute directly, no leading questions.]
-   Two tests in tests/handler/book.test.ts fail. The bug is in src/handler/book.ts. Fix the handlers. Do not change any test file. This is the exact test output:
-
-   <paste the output of the two failing tests here>
-
-   Done when `bun test tests/handler/book.test.ts` passes. Show me that test run.
+   [Exercise 2 experiment — execute directly, no leading questions.] Add a DELETE /api/reviews/{id} endpoint to the BookStore API, with tests.
    ```
 
-   Read the prompt once more. The paste is error context (*Providing
-   Error Context*). The file name is Scope it. "Do not change any test
-   file" is Constrain it. The last line is Define done.
-2. **Check the validation test**. If a `CreateReview validation`
-   test fails too, send this:
+2. **List what it leaves open.** Write down every decision Claude must
+   make because the prompt does not say it. Think of the questions a
+   reviewer asks about the result. Two examples from another task, an
+   "edit your profile" endpoint: *Which fields may a user change?* *What
+   does the user get back?*
+3. **Mark each decision.** Write *task* when it is about this endpoint
+   only. Write *team* when your team decides it once, for every endpoint.
+4. **Write what you would add.** For the *task* lines, write the two or
+   three sentences you would add to the prompt. Use
+   CONTEXT-TASK-OUTCOME. End with a *Define done* sentence: what must be
+   true when Claude is done.
+5. **Check your sentences (optional).** Start `claude` and run
+   `/prompt-coach 4`. As your next message, paste your list and your
+   sentences. The coach gives one round of feedback. Then type `/exit`.
+6. **Predict.** Write *yes* or *no* for each of your team's three
+   decisions: will Claude follow it without being told? A wrong
+   prediction is fine.
+
+Why you do not run your own version: the prompt stays the same in task 2
+and task 4. Then the two results show only what your rule files change.
+
+**Done when**: your list has at least four decisions, each marked *task*
+or *team*, and your sentences and three predictions are written down.
+
+### 2. Run the task without the decisions
+
+This task produces `session2-before.diff`: a file with every change Claude
+makes when it knows only the code.
+
+1. **Get a clean start.** Run `bun test` and `git status`. A test
+   fails, or `git status` lists changes? Start `claude`. Press Shift+Tab
+   until the line under the chat box says auto mode: Claude then does not
+   ask permission. Run `/catch-up 1`. It finishes the session 1 code work
+   and commits it. Step 4 removes work that is not committed. Both clean?
+   Go to step 2.
+2. **Start a fresh session.** Type `/exit` if Claude is open, then start
+   `claude`. A fresh session always means this: close Claude and start it
+   again, never `/clear`. Paste the prompt from task 1, with the brackets.
+   The tag at the start switches training mode off for this one prompt,
+   so Claude builds instead of asking questions.
+3. **Run the tests.** When Claude is done, run `bun test`. Write down
+   whether all tests pass.
+4. **Save the result.** Run `/save-changes before`. It saves Claude's
+   changes in `session2-before.diff` and removes them from the project.
+   Then type `/exit`.
+
+**Done when**: `session2-before.diff` exists.
+
+### 3. Put the decisions where Claude reads them
+
+This task produces `.claude/rules/testing.md`, `.claude/rules/handlers.md`
+and `CLAUDE.local.md`. Decisions 1 and 2 go in rule files with
+`paths:`. Decision 3 goes in `CLAUDE.local.md`
+(*Rule Discovery: With or Without Paths*).
+
+1. **Decision 1.** Start `claude` and paste this block. Claude creates the
+   rule file:
 
    ```
-   [Exercise 2 experiment — execute directly, no leading questions.]
-   Add input validation to createReview in src/handler/review.ts: rating must be 1-5, review_text must be between 10 and 500 characters
-   ```
-3. **Catch up and commit**. Whatever state you are in: press
-   Shift+Tab until the screen says auto mode, then run `/catch-up 2`. It
-   fixes the tests that still fail, in the project's own style, and
-   commits. Leave it running while the trainer starts session 3. If its
-   report says it took a decision for you, write that decision down.
+   [Exercise 2 experiment — execute directly, no leading questions.] Create .claude/rules/testing.md with exactly this content, nothing added or changed:
 
-**Done when**: `/catch-up 2` is running, and your notes name every failing
-test and the technique your prompt was missing.
+   ---
+   description: How we write new handler tests
+   paths:
+     - "tests/handler/**/*.ts"
+   ---
+   New handler tests use the test kit in tests/testkit.ts.
+   Read that file before you write a test. Use this shape: one describe block per endpoint, every case in apiTest(...).
+   A new test never calls newTestServer() or fetch() directly, even when the tests around it do.
+   Never convert an existing test to the kit, also not in a file you edit.
+   ```
+
+2. **Decision 2.** In your editor, create `.claude/rules/handlers.md`. Copy
+   the shape of `testing.md`, with `"src/handler/**/*.ts"` in `paths:`.
+   Write two sentences. First: *New endpoints answer bad input, such as an
+   id that is not a number, with 400.* Second: what happens to the old
+   endpoints for now. They are in the `src/handler/` folder. A rule is checkable when a reader of a diff can say "this breaks
+   the rule".
+3. **Decision 3.** In your editor, create `CLAUDE.local.md` in the
+   `bookstore` folder, or add to it if it exists. Write two lines. First, copy this line exactly:
+   *"Before you write or edit a file under tests/handler/ or src/handler/, read the
+   matching file in .claude/rules/."* Second, decision 3 as a checkable
+   rule: name what a change may touch. An example about another
+subject: *"A bug fix may touch only the file with the bug and its test."*
+
+Why the first line: a `paths:` rule loads when Claude opens a matching
+file. A new file, or an edit through a script, may not load it. Claude reads `CLAUDE.local.md` at the start
+of every session.
+
+**Done when**: the three files exist, `handlers.md` has a `paths:` line and
+says what happens to the old endpoints, and `git status` does not list
+`CLAUDE.md`.
+
+### 4. Run the same task with the decisions
+
+This task produces `session2-after.diff`.
+
+1. **Start a fresh session.** Type `/exit` and start `claude` again. Claude
+   now reads your new files at the start.
+2. **Paste the prompt from task 1 again**, tag included. In the chat, watch
+   which files Claude reads before it writes a test. Write down whether it
+   reads the test kit.
+3. **Run the tests.** When Claude is done, run `bun test`. Write down
+   whether all tests pass.
+4. **Save the result.** Run `/save-changes after`. Then type `/exit`.
+
+**Done when**: `session2-after.diff` exists.
+
+### 5. Closing: compare the two runs
+
+This task gives you a report on each decision, with the lines that decided
+it.
+
+1. **Run the comparison.** Start `claude` and run `/verify-exercise 2`. It
+   compares your two diffs with the three decisions. First it asks which
+   decision Claude still broke in the second run. Answer in one line, from
+   what you saw in the chat. *None* is a fine answer.
+2. **Read the report.** Each decision is *followed*, *broken* or *not
+   tested*. *Not tested* means the task gave Claude no chance to break it.
+3. **Write down four lines.** Line 1: your predictions, next to what the
+   first run did. Line 2: the decision that changed most between the two
+   runs. Line 3: one sentence from your rules that you would write
+   differently, or the one that helped most. Line 4: one decision from
+   your task 1 list that Claude made by itself, and what it chose.
+
+**Done when**: four lines are written down. Bring them to the closing
+round.
 
 ## Bonus (only if time remains)
 
-**The same review, with and without a role.** Send these two prompts, with
-`/clear` before each one. Does the role change what Claude finds (*Role
-Framing*)?
+**Check your rules, then try a new task.** Run `/context-coach 2`. As your
+next message, paste your `handlers.md` and your decision 3 line. Improve the one thing it
+names. Then start a fresh session and paste:
 
 ```
-[Exercise 2 experiment — execute directly, no leading questions.]
-Review src/store/book.ts.
+[Exercise 2 experiment — execute directly, no leading questions.] Add a GET /api/authors/{id}/books endpoint to the BookStore API, with tests.
 ```
 
+Run `/save-changes bonus`, then `/verify-exercise 2` in a fresh session.
+
+**Change an old test.** Start a fresh session and paste:
+
 ```
-[Exercise 2 experiment — execute directly, no leading questions.]
-Review src/store/book.ts as a database performance specialist. Focus on the number of queries.
+[Exercise 2 experiment — execute directly, no leading questions.] In the existing review tests, make the test for listing reviews also check that the first review has rating 5.
 ```
+
+Run `git diff`. Did Claude change only that test, or did it convert it to
+the kit? Then run `/save-changes probe` to remove the changes.
+
+## Back at work: try this on your own project
+
+Pick one review comment that you write often. Write it as a rule with a
+`paths:` line. In a real team, `.claude/rules/` is committed, so every
+teammate gets the same rules. In this course, git ignores it.
+
+## Appendix: `/save-changes` by hand
+
+If the command stops, it says why. Or run these from the project folder,
+one per line. The first two save your changes. The last three remove them:
+
+```
+git add -A .
+git diff --cached --output=session2-before.diff
+git reset -q .
+git checkout -- .
+git clean -fd .
+```
+
+Replace `before` with `after`, `bonus` or `probe`. The last command deletes
+new files that git does not track yet. Your rule files, `CLAUDE.local.md`
+and the saved diffs stay: `git clean` skips files that git ignores.
 
 ## Closing round
 
-The trainer asks the group. Have these answers ready:
+The trainer asks the room. Have these answers ready:
 
-- Task 1 listed seven techniques. Which one added nothing there, and why?
-- Which single sentence in one of your prompts helped the most?
-- Which missing technique cost you something? Did the coach predict it?
-- Where did you disagree with the coach, and were you right?
-
-## After the closing round
-
-Run `/verify-exercise 2` in any Claude session. It asks for your task 1
-prompt from your notes and checks `docs/orientation.md` against it, one
-line at a time.
+- Which decision did Claude follow without being told? Was your
+  prediction right?
+- Which line from your task 1 list belongs in the prompt, and which
+  belongs in a rule? Why?
+- Why does decision 1 go in a rule file with `paths:`, and decision 3 in
+  `CLAUDE.local.md`? Why does `CLAUDE.local.md` also point to the rules?
+- Which words in your rule for decision 2 make it checkable?

@@ -116,7 +116,6 @@ This task changes `bookstore/handler/review.py` and creates
    python3 -m unittest tests.handler.test_validate_review -v
    ```
 
-   Other tests in this package fail on purpose. Session 2 deals with them.
    Look only at the five tests.
 6. **Read the pane.** Step through the turns: ctrl+x, Tab, then `p`
    (back) and `n` (forward). Which tool changed the file? Did Claude run

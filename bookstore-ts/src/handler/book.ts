@@ -43,7 +43,7 @@ export class BookHandler {
     }
     try {
       const book = this.books.create(body.title, body.author_id, body.isbn, body.year);
-      return writeJSON(200, book);
+      return writeJSON(201, book);
     } catch {
       return writeError(500, "failed to create book");
     }
@@ -57,6 +57,6 @@ export class BookHandler {
     } catch {
       return writeError(500, "failed to delete book");
     }
-    return writeJSON(200, { status: "deleted" });
+    return new Response(null, { status: 204 });
   };
 }

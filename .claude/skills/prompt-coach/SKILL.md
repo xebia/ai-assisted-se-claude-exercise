@@ -48,7 +48,7 @@ Translate before you speak.
 | n/a, not applicable | "not needed here" |
 | verbatim | "word for word" |
 | clean room, dispatch | "a fresh sub-agent, which has not seen your chat" |
-| the artifact | name the file, e.g. `docs/orientation.md` |
+| the artifact | name the file the card names |
 | CONTEXT-TASK-FORMAT | CONTEXT-TASK-OUTCOME (the slide's name) |
 
 *Ship it*, *run it anyway* and *just tell me* stay as they are. The exercise
@@ -191,38 +191,27 @@ When the participant confirms ("ship it"):
 
 ### Deliverable guard
 
-Some cards name a file the task must produce (card 1: `docs/orientation.md`).
+Some cards name a file the task must produce (for example `docs/<name>.md`).
 A sub-agent writes that file only if the prompt asks for it. When the
 report is back, check whether the file exists.
 
 If it does not: save the sub-agent's report to that file yourself, word for
 word, creating the folder if needed. Then say, in this order and nothing
 more: "Your prompt did not ask for the file. The sub-agent reported in the
-chat and wrote nothing. I saved its report to `docs/orientation.md` so you
+chat and wrote nothing. I saved its report to `<that file>` so you
 can go on. Which line in your prompt would have made the sub-agent write
 it?" The consequence stays visible; the participant is not stuck; later
 sessions that read the file still work.
 
-**Exception — the plan-mode task (card 3) is not dispatched.** Reviewing
-and pushing back on the plan requires the participant in the loop, and a
-sub-agent cannot pause for approval. The participant runs that prompt
-themselves, in plan mode, in a fresh session.
-
-Two consequences, both of which the sheet states and you must not
-contradict. Do **not** tell them to type *ship it* for this task. Say the
-prompt is ready, and tell them to copy it into their notes, close Claude,
-start it again, and send the prompt in plan mode. The fresh session is what
-keeps your advice out of the run. And training mode is still on there,
-because no sub-agent runs it and nothing adds the prefix line. Claude may
-ask one leading question before it plans. The sheet tells them to answer it
-in one line. Never tell them to work around it. If they ask why there is
-no clean room here: some work needs the human in the middle, and knowing
-which work that is, is part of the skill.
+**Exception — card 4 is not dispatched.** It checks a list of
+open decisions for a given prompt, not a draft. The participant runs the
+given prompt themselves in the next task, unchanged. The card replaces
+the *Ready to ship* line and the closing words. Follow the card.
 
 ## Adding a task
 
 Copy the structure of an existing card into `cards/<n>-<slug>.md`, where
-`<n>` is the task number on the sheet. The dispatcher discovers cards by
+`<n>` is the number the sheet types after `/prompt-coach`. The dispatcher discovers cards by
 listing the directory, so this file never changes. Cards are
 language-agnostic: they name behaviors and symbols, never a single
 language's file paths or test commands. Detect those from the project at

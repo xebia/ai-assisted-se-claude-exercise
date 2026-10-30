@@ -19,7 +19,7 @@ git clone -b ts https://github.com/xebia/ai-assisted-se-claude-exercise bookstor
 That folder is everything you need for the whole course: the API, the eight
 exercise sheets as PDFs in `exercises/`, `preparation.pdf` (what to install
 before the session; read it first), the coach skills, the frontend for
-exercises 6 and 7 in `web/`, the MCP server for exercise 5 in `mcp-sqlite/`,
+exercises 6 and 7 in `web/`, the MCP server for exercise 4 in `mcp-sqlite/`,
 and the finished plugin in `bookstore-plugin/`.
 
 Did the trainer fix a sheet on the morning of the training? `git pull` in that
@@ -49,10 +49,10 @@ how to test a sheet.
   ports; `bookstore-go` is the reference version for exercise text
 - `.claude/skills/` — the coach, verifier and helper skills, shipped in every package
 - `bookstore-web/` — the frontend project, shipped as `web/`
-- `mcp-sqlite/` — the MCP server for exercise 5: one Python file, standard
+- `mcp-sqlite/` — the MCP server for exercise 4: one Python file, standard
   library only, started with `uv run --script`. Read-only: two tools,
   `get_table_definitions` and `execute_query`
-- `bookstore-plugin/` — everything from exercises 4 and 5 as one Claude Code
-  plugin, shown live in session 5 and available to participants as a bonus
+- `bookstore-plugin/` — everything from exercises 3 and 4 as one Claude Code
+  plugin, shown live in session 4 and available to participants as a bonus
 - `scripts/` and `justfile` — `just package py` builds `dist/bookstore-py`,
   the same package CI publishes

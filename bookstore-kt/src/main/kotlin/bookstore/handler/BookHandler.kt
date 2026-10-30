@@ -50,7 +50,7 @@ class BookHandler(private val books: BookStore, private val authors: AuthorStore
         } catch (_: Exception) {
             return writeError(ex, 500, "failed to create book")
         }
-        writeJson(ex, 200, book)
+        writeJson(ex, 201, book)
     }
 
     fun deleteBook(ex: HttpExchange, params: Map<String, String>, query: Map<String, String>) {
@@ -60,6 +60,7 @@ class BookHandler(private val books: BookStore, private val authors: AuthorStore
         } catch (_: Exception) {
             return writeError(ex, 500, "failed to delete book")
         }
-        writeJson(ex, 200, mapOf("status" to "deleted"))
+        ex.sendResponseHeaders(204, -1)
+        ex.close()
     }
 }
