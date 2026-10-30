@@ -1,4 +1,4 @@
-# Exercise 4 — Two skills, a guard, and a rule
+# Exercise 3 — Two skills, a guard, and a rule
 
 **Artifact:** four files in the participant's project folder, all in
 gitignored paths — `.claude/skills/commit/SKILL.md`,
@@ -24,11 +24,11 @@ Pick the stage from disk, before anything else:
   exists. Run the full check in this file. A rule that is still missing
   is a finding, not a reason to stop.
 
-The `session4-playground` branch is deleted after the closing
+The `session3-playground` branch is deleted after the closing
 round; if the participant already did that, every artifact above lives
 in a gitignored path and survives.
 
-**Under review: the artifacts, not a prompt.** This is a Session 4
+**Under review: the artifacts, not a prompt.** This is a Session 3
 exception to this skill's usual framing. In the full stage, in Step 0,
 instead of a prompt, ask for one thing word for word: the three written
 task-3 predictions, with the participant's confirmed-or-wrong mark on
@@ -92,8 +92,8 @@ no guard, no `settings.json`, no rule, no predictions, nothing about what
 a hook can or cannot see. Task 4 depends on the participant finding that
 out by running it.
 
-Header of the report: `## Exercise 4, after task 2 — two skills`. Last
-line, in place of the retry offer: *Run `/verify-exercise 4` again at the
+Header of the report: `## Exercise 3, after task 2 — two skills`. Last
+line, in place of the retry offer: *Run `/verify-exercise 3` again at the
 end of task 4. Then it grades the guard and the rule as well.*
 
 ## Rubric — replaces the Session 2 technique table
