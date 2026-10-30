@@ -5,7 +5,7 @@ description: >-
   Usage: /catch-up <session number> — finishes the named session's code
   work (fixes the code until the tests pass, never the tests), takes the
   default for any decision the participant did not make, and commits.
-  Used at the end of exercise 2 and at the start of exercise 3.
+  Used at the start of the steering exercise (exercise 2).
 disable-model-invocation: true
 ---
 

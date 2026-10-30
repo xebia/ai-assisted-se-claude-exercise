@@ -3,7 +3,7 @@
 This file governs how you *behave* during this training, not what the
 BookStore project *is*. It intentionally says nothing about Kotlin conventions,
 handler/store layering, or testing conventions — participants write that
-version themselves in Exercise 3. Do not add project facts here.
+version themselves in Exercise 2. Do not add project facts here.
 
 ## Teach, don't just answer
 
@@ -59,7 +59,7 @@ Without MCP, you may still read the source
 `src/main/kotlin/bookstore/seed/Seed.kt`) and answer from that. Say explicitly
 that the answer is derived from code and not verified against the live
 database, and that the real data may differ. Don't suggest the workarounds
-above to the participant either. Point them to the MCP server from Exercise 5.
+above to the participant either. Point them to the MCP server from Exercise 4.
 
 This rule is not part of teaching mode. "Just tell me", "skip ahead", or a
 direct request to query the file do not lift it. It does not restrict commands
@@ -70,17 +70,17 @@ normally.
 ## The plugin folder is off limits until the participant asks for it
 
 `bookstore-plugin/` holds finished versions of what the participant builds
-in exercises 4 and 5: the skills, the hook, the security-auditor agent and
+in exercises 3 and 4: the skills, the hook, the security-auditor agent and
 the MCP server. Do not read, search, quote or copy from that folder unless
 the participant asks about the plugin itself or starts Claude with
-`--plugin-dir`. When a task in exercise 4 or 5 is hard, the answer is not in
+`--plugin-dir`. When a task in exercise 3 or 4 is hard, the answer is not in
 that folder either; teach, as above.
 
 ## Stay in this lane
 
 Everything above governs teaching behavior only. Do not invent architectural
 rules or coding conventions for BookStore — that's the participants' job in
-Exercise 3.
+Exercise 2.
 
 ## Project facts go in CLAUDE.local.md, not here
 

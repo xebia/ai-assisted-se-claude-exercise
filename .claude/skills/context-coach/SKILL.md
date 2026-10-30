@@ -1,10 +1,10 @@
 ---
 name: context-coach
 description: >-
-  Coach a participant's context files during the Session 3 exercise.
+  Coach a participant's context files during the Session 2 exercise.
   Usage: /context-coach <task number> — in task 2 the participant shows the
   rule file and the CLAUDE.local.md line they wrote for the team's
-  decisions; the coach grades them against the Session 3 concepts, predicts
+  decisions; the coach grades them against the Session 2 concepts, predicts
   what each weakness will cost, and nudges them to fix it themselves.
 disable-model-invocation: true
 ---
@@ -16,7 +16,7 @@ practice material, not the goal. A participant who leaves with a short,
 specific rule they can defend has learned more than one whose run
 happened to go well.
 
-The vocabulary of this course is the Session 3 slide deck. Always name findings
+The vocabulary of this course is the Session 2 slide deck. Always name findings
 in those terms — the **four dimensions** (**Correctness**, **Completeness**,
 **Relevance**, **Trajectory**), the **anti-patterns** (**kitchen sink session**,
 **over-correcting**, **context hoarding**), **context rot**, **earns its
@@ -44,11 +44,11 @@ these words, so never use them in a reply. Translate:
 | --- | --- |
 | baseline, harness run | the first run, the second run |
 | freeloader | a line that changes nothing, a line not worth its tokens |
-| bank, banked diff | save the diff, the saved diff (`session3-before.diff`, `session3-after.diff`) |
+| bank, banked diff | save the diff, the saved diff (`session2-before.diff`, `session2-after.diff`) |
 | scope, boundary | the limit: what the rule does not cover |
 | prefix, experiment prefix | the experiment tag, the first line of the prompt |
 | MVP | the line that helped the most |
-| verifier, grader | the comparison, or `/verify-exercise 3` |
+| verifier, grader | the comparison, or `/verify-exercise 2` |
 | bait run | the first run |
 | retro, retrospective | the team meeting |
 | tidying up on the side, drive-by change | extra clean-up, a change the task did not ask for |
@@ -79,7 +79,7 @@ Right:
 - **Predict the behavioral effect of every finding.** "❌ vague" is a grade.
   "Claude already does this, so the line changes nothing and costs tokens in
   every future session" is coaching. For a missing rule: name the concrete
-  wrong behavior you expect in the first run. `/verify-exercise 3` checks
+  wrong behavior you expect in the first run. `/verify-exercise 2` checks
   these predictions.
 - **The freeloader test decides.** For every line in a context file ask:
   *what would Claude do differently because this line exists?* No answer:
@@ -174,10 +174,10 @@ rather not.
 ## Training mode and experiments
 
 The project `CLAUDE.md` keeps sessions in teach-first training mode. The
-Session 3 experiments need runs that are *not* steered by leading questions.
+Session 2 experiments need runs that are *not* steered by leading questions.
 Participants prefix experiment prompts with the fixed line their exercise
 sheet gives them:
-`[Exercise 3 experiment — execute directly, no leading questions.]`
+`[Exercise 2 experiment — execute directly, no leading questions.]`
 Both runs of the task must carry the same prefix, or the comparison is
 invalid. If a participant forgot it on one run, that is a Correctness
 finding about their own experiment. Say so.

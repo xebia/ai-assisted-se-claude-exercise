@@ -92,7 +92,7 @@ session.
 There is no clean-room dispatch for this task — the participant tests the
 subagent themselves, in their own session, exactly as the exercise
 describes. The debrief has two questions. Did the agent start on the
-trigger you coached? Does the report stay inside the tool scope? `/verify-exercise 5` checks
+trigger you coached? Does the report stay inside the tool scope? `/verify-exercise 4` checks
 the artifact itself, by observable state, after the fact.
 
 ## Held back

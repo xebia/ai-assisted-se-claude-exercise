@@ -1,19 +1,19 @@
 # bookstore-plugin
 
-Everything from exercises 4 and 5, packaged as one Claude Code plugin. The
-session 5 slide *Everything You Built, as One Plugin* shows it live; you can
+Everything from exercises 3 and 4, packaged as one Claude Code plugin. The
+session 4 slide *Everything You Built, as One Plugin* shows it live; you can
 run it yourself.
 
 ```
 bookstore-plugin/
 ├── .claude-plugin/plugin.json   manifest: the name is the prefix of every skill
-├── skills/commit/SKILL.md       exercise 4, task 1
-├── skills/changelog/SKILL.md    exercise 4, task 2 (+ the Common Changelog spec)
-├── agents/security-auditor.md   exercise 5, task 4, with both lines written
+├── skills/commit/SKILL.md       exercise 3, task 1
+├── skills/changelog/SKILL.md    exercise 3, task 2 (+ the Common Changelog spec)
+├── agents/security-auditor.md   exercise 4, task 4, with both lines written
 ├── hooks/hooks.json             two hooks, as plugin hooks
-├── hooks/guard-secrets.py       exercise 4, task 3: the secret guard
-├── hooks/gate-changelog.py      the session 4 slide "Done Means Done": the changelog gate
-├── .mcp.json                    exercise 5, task 2, pointing at the server below
+├── hooks/guard-secrets.py       exercise 3, task 3: the secret guard
+├── hooks/gate-changelog.py      the session 3 slide "Done Means Done": the changelog gate
+├── .mcp.json                    exercise 4, task 2, pointing at the server below
 └── mcp-sqlite/server.py         copy of mcp-sqlite/server.py in the project
 ```
 
@@ -45,7 +45,7 @@ claude --plugin-dir bookstore-plugin
 marketplace and install it (*Your Own Marketplace: a Git Repo*).
 
 Hooks and an MCP server from this folder ran with your rights, and the
-plugin skipped the approval prompt you saw in exercise 5. Audit a plugin
+plugin skipped the approval prompt you saw in exercise 4. Audit a plugin
 like any dependency.
 
 ## What is different from your own files
@@ -62,7 +62,7 @@ like any dependency.
 - The agent body names no language paths, so it runs from any language
   folder. Its `description` is the strong version from the slide *Which
   Subagent Description Invokes Reliably?*; `tools` is `Read, Grep, Glob`.
-  If you have not done exercise 5 task 4 yet, write your own first.
+  If you have not done exercise 4 task 4 yet, write your own first.
 - `mcp-sqlite/server.py` is a copy of the project's `mcp-sqlite/server.py`. A plugin
   ships its own server. When the original changes, copy it again.
 

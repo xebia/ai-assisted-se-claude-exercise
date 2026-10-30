@@ -1,0 +1,3 @@
+Add a GET /api/reviews/{id} endpoint that returns one review. Follow the
+style of the existing handlers exactly, also for an id that is not a
+number. Do not write tests. Do not change other endpoints.
