@@ -27,7 +27,7 @@ vendor/
 .env
 .env.local
 .env.*.local
-# Exercise 4 ships a fake .env (the secret guard); keep it tracked
+# Exercise 3 ships a fake .env (the secret guard); keep it tracked
 !.env
 
 # IDE - VSCode
@@ -69,28 +69,32 @@ temp/
 /dist/
 /build/
 
-# Participant context files (Exercise 3) - keep out of git so experiment resets cannot delete them
+# Participant context files (Exercise 2) - keep out of git so experiment resets cannot delete them
 CLAUDE.local.md
 .claude/rules/
 docs/orientation.md
-session3-*.diff
+session2-*.diff
 
-# Participant skills, hooks and changelog (Exercise 4) - keep out of git so branch cleanup cannot delete them
+# Participant skills, hooks and changelog (Exercise 3) - keep out of git so branch cleanup cannot delete them
 CHANGELOG.md
 .claude/skills/
 .claude/hooks/
 .claude/settings.json
 .claude/settings.local.json
 
-# Participant subagent (Exercise 5)
+# Participant subagent (Exercise 4)
 .claude/agents/
 docs/security-audit.md
 
 # Seeded database (created by `go run .`, same pattern as the other three ports)
 store.db
 
-# Participant MCP registration (Exercise 5) - written by `claude mcp add --scope project`
+# Participant MCP registration (Exercise 4) - written by `claude mcp add --scope project`
 .mcp.json
 
 # Worktrees Claude Code creates for subagents (Exercise 7, task 5)
 .claude/worktrees/
+
+# Participant output (Exercise 5): gate answers, briefs and the brief prompt
+headless/out/
+headless/brief-prompt.txt

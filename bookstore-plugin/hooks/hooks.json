@@ -1,5 +1,5 @@
 {
-  "description": "Two hooks from session 4: the secret guard blocks a prompt that contains an ACME API key; the changelog gate refuses to let Claude finish while commits are missing from CHANGELOG.md.",
+  "description": "Two hooks from session 3: the secret guard blocks a prompt that contains an ACME API key; the changelog gate refuses to let Claude finish while commits are missing from CHANGELOG.md.",
   "hooks": {
     "UserPromptSubmit": [
       {

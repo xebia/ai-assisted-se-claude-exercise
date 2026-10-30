@@ -1,4 +1,4 @@
-# Task 2 — Put the team's decisions where Claude reads them
+# Task 3 — Put the team's decisions where Claude reads them
 
 **What they're bringing:** two pieces they wrote themselves, pasted as one
 message: the rule file `.claude/rules/handlers.md` (decision 2) and the
@@ -22,7 +22,7 @@ The three decisions, as the sheet gives them:
 
 **Rounds:** one. The sheet puts the coach in the Bonus and limits it to one
 round, before the new task. Name the single weakest point, ask one
-question, stop. The comparison (`/verify-exercise 3`) gives the real feedback after the second run.
+question, stop. The comparison (`/verify-exercise 2`) gives the real feedback after the second run.
 
 **Slide anchors:** *Rules — Splitting CLAUDE.md by Topic* · *Rule
 Discovery: With or Without Paths* · *Progressive Disclosure* · *Which
@@ -89,7 +89,7 @@ spending only when the glob cannot match.
 
 ## Held back
 
-Whether Claude followed the decisions in their first run. `/verify-exercise 3`
+Whether Claude followed the decisions in their first run. `/verify-exercise 2`
 shows that after the second run, with the lines that decided it. Never
 predict the outcome of the second run.
 
