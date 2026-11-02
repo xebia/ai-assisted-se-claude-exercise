@@ -47,7 +47,8 @@ how to test a sheet.
 
 - `bookstore-go`, `bookstore-kt`, `bookstore-py`, `bookstore-ts` — the four
   ports; `bookstore-go` is the reference version for exercise text
-- `.claude/skills/` — the coach, verifier and helper skills, shipped in every package
+- `.claude/skills/` — the coach, verifier and helper skills, and the `xtrace` and
+  `cache-timer` mods, shipped in every package
 - `bookstore-web/` — the frontend project, shipped as `web/`
 - `mcp-sqlite/` — the MCP server for exercise 4: one Python file, standard
   library only, started with `uv run --script`. Read-only: two tools,
