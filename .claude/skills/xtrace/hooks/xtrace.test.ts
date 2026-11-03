@@ -267,6 +267,14 @@ const paneProps = (bodyColumns: number) => ({
   scroll: { offset: 0, bodyRows: 20 }, view: {},
 })
 
+// The detail view's lines as text: label and value joined by a space, trimmed.
+const detailText = async (ui: Parameters<typeof paneRows>[0]) =>
+  (await ui.findAll({ type: 'Box' })).filter(b => b.key?.startsWith('detail-line-')).map(b => b.children.map(textOf).join(' ').trim())
+const mountPane = ($: Engine, surface: 'terminal' | 'desktop' = 'terminal', bodyRows = 20) => {
+  const props = paneProps(100)
+  return $.ui.mount({ plugin: 'xtrace', surface, component: 'Pane', requestId: 'xtrace', props: { ...props, scroll: { ...props.scroll, bodyRows } } })
+}
+
 describe('/clear', () => {
   const answerEnd = (on: On) => on('session.end', ($, e) => ({ sessionId: e.sessionId }))
   const clear = ($: Engine) => $.session.end({ reason: 'clear', sessionId: 's1', resume: { id: 's1' } })
@@ -787,6 +795,7 @@ describe('pane columns', () => {
       if (surface === 'desktop') {
         expect(kids[0]).toMatchObject({ type: 'Text' })
         expect(textOf(kids[0])).toBe('outcome')
+        expect(kids[0]).toMatchObject({ hover: { color: 'inverseText' } })   // hidden under the button
         expect(kids[1]).toMatchObject({ props: { position: 'absolute', display: 'none' }, hover: { display: 'flex' } })
       } else {
         expect(kids).toHaveLength(1)
@@ -944,5 +953,218 @@ describe('pane turn navigation', () => {
     await ui.press({ key: 'nav-first' })
     expect(await ui.find({ key: 'evicted' })).toBeDefined()
     expect(await ui.find({ type: 'Text', text: /No rows in this turn yet/ })).toBeUndefined()
+  })
+})
+
+describe('row details', () => {
+  test('pressing a tool row shows its fields and its whole input', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', { tool: 'Bash' }, () => ({ result: {}, text: 'out' }))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    const long = `echo ${'y'.repeat(150)}`
+    await $.tool.call({ tool: 'Bash', command: long, description: 'say y', tool_use_id: 'u1' })
+    const ui = await mountPane($, 'terminal', 60)             // tall enough to draw every detail line
+    await ui.press({ key: 'open-u1' })
+    const lines = await detailText(ui)
+    expect(lines).toContain('kind tools')
+    expect(lines).toContain('name Bash')
+    expect(lines).toContain('outcome ok')
+    expect(lines).toContain('id u1')
+    expect(lines).toContain('input')
+    const all = lines.join('').replace(/\s/g, '')
+    expect(all).toContain(`"command":"${long}"`.replace(/\s/g, ''))
+    expect(all).toContain('"description":"sayy"')
+    expect((await ui.find({ key: 'detail-pos' }))?.text).toBe('row 1 of 2')      // the engine's own PreToolUse hooks row is the second
+    expect(await findRow(ui, /Bash/)).toBeUndefined()          // the list is replaced
+  })
+
+  test('back returns to the same rows', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    for (let i = 0; i < 30; i++) await $.tool.call({ tool: 'Bash', command: `echo ${i}`, tool_use_id: `u${i}` })
+    const ui = await mountPane($)
+    await ui.input({ key: 'filter', text: 'kind:tools', kind: 'change' })
+    await ui.press({ key: 'page-up' })
+    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 15–22 of 30')
+    await ui.press({ key: 'open-u15' })
+    expect((await ui.find({ key: 'detail-pos' }))?.text).toMatch(/^row 16 of 30/)
+    await ui.press({ key: 'detail-back' })
+    expect(await ui.find({ key: 'detail-back' })).toBeUndefined()
+    expect((await ui.find({ key: 'page-label' }))?.text).toBe('rows 15–22 of 30')
+    expect(await findRow(ui, /echo 15/)).toBeDefined()
+  })
+
+  test('a hooks row shows the event payload as its input', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('classic.PostToolUse', () => ({}))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.classic.PostToolUse({ tool_name: 'Grep', tool_input: { pattern: 'TODO' }, tool_response: {}, tool_use_id: 'u9' })
+    const ui = await mountPane($, 'terminal', 60)
+    const open = (await ui.findAll({ type: 'Button' })).find(b => b.key?.startsWith('open-hook-'))
+    expect(open).toBeDefined()
+    await ui.press({ key: open!.key! })
+    const all = (await detailText(ui)).join('').replace(/\s/g, '')
+    expect(all).toContain('"pattern":"TODO"')
+    expect(all).not.toContain('"tool_name"')                  // the name already says Grep
+  })
+
+  test('a hooks row does not record what the tool returned', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('classic.PostToolUse', () => ({}))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.classic.PostToolUse({ tool_name: 'Grep', tool_input: { pattern: 'TODO' }, tool_response: { stdout: 'SECRET-RESULT' }, tool_use_id: 'u9' })
+    const ui = await mountPane($, 'terminal', 60)
+    const open = (await ui.findAll({ type: 'Button' })).find(b => b.key?.startsWith('open-hook-'))
+    await ui.press({ key: open!.key! })
+    const all = (await detailText(ui)).join('').replace(/\s/g, '')
+    expect(all).toContain('"pattern":"TODO"')
+    expect(all).not.toContain('SECRET-RESULT')
+    expect(all).not.toContain('tool_response')
+  })
+
+  test('a Stop row does not record Claude\'s last reply', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('classic.Stop', () => ({}))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.classic.Stop({ stop_hook_active: false, last_assistant_message: 'REPLY-TEXT' })
+    const ui = await mountPane($, 'terminal', 60)
+    const open = (await ui.findAll({ type: 'Button' })).find(b => b.key?.startsWith('open-hook-'))
+    await ui.press({ key: open!.key! })
+    const all = (await detailText(ui)).join('').replace(/\s/g, '')
+    expect(all).toContain('"stop_hook_active":false')
+    expect(all).not.toContain('REPLY-TEXT')
+    expect(all).not.toContain('last_assistant_message')
+  })
+
+  test('a commands row shows its args as input', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('command.run', { command: 'compact' }, () => ({ text: 'ok' }))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await run($, 'compact', 'keep the plan')
+    const ui = await mountPane($)
+    const open = (await ui.findAll({ type: 'Button' })).find(b => b.key?.startsWith('open-cmd-'))
+    await ui.press({ key: open!.key! })
+    expect(await detailText(ui)).toContain('keep the plan')
+  })
+
+  test('on the terminal a row is one button holding its colored cells', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    const ui = await mountPane($)
+    const row = await ui.find({ key: 'row-u1' })
+    const kids = (row?.children ?? []) as { type?: string; key?: string }[]
+    expect(kids).toHaveLength(1)
+    expect(kids[0]).toMatchObject({ type: 'Button' })
+    expect(row?.props).toMatchObject({ height: 1, overflow: 'hidden' })   // one line, never wrapped
+    expect(await findRow(ui, /^tools\s+Bash\s+ls/)).toBeDefined()
+  })
+
+  test('on the desktop a row keeps its cell boxes and opens through its own button', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    const ui = await mountPane($, 'desktop')
+    const cells = ((await ui.find({ key: 'row-u1' }))?.children ?? []) as { props?: { width?: unknown } }[]
+    expect(cells.length).toBeGreaterThan(0)
+    expect(cells.every(c => typeof c.props?.width === 'number')).toBe(true)
+    // The row leads with a visible `›` button; the header leads with a cell as wide.
+    const line = ((await ui.find({ key: 'line-u1' }))?.children ?? []) as { props?: { width?: unknown } }[]
+    expect(line[0]?.props?.width).toBe(2)
+    expect((await ui.find({ key: 'open-u1' }))?.props).toMatchObject({ label: '›' })
+    expect((await ui.find({ key: 'hcell-open' }))?.props).toMatchObject({ width: 2 })
+    await ui.press({ key: 'open-u1' })
+    expect(await detailText(ui)).toContain('name Bash')
+  })
+
+  test('a detail taller than the pane shows its first lines and says how many there are', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'z'.repeat(3000), tool_use_id: 'u1' })
+    const ui = await mountPane($)
+    await ui.press({ key: 'open-u1' })
+    const lines = await detailText(ui)
+    expect(lines[0]).toBe('kind tools')
+    expect((await ui.find({ key: 'detail-pos' }))?.text).toMatch(new RegExp(`^row 1 of 2 · lines 1–${lines.length} of \\d+$`))
+  })
+
+  test('moving to another turn shows that turn\'s list', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'list files', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    await $.turn.start({ text: 'read it', turnId: 't2' })
+    await $.tool.call({ tool: 'Read', file_path: 'a.go', tool_use_id: 'u2' })
+    const ui = await mountPane($)
+    await ui.press({ key: 'open-u2' })
+    await ui.press({ key: 'nav-prev' })
+    expect(await ui.find({ key: 'detail-back' })).toBeUndefined()
+    expect(await findRow(ui, /Bash\s+ls/)).toBeDefined()
+    await ui.press({ key: 'nav-latest' })
+    expect(await ui.find({ key: 'detail-back' })).toBeUndefined()   // not reopened on the way back
+  })
+
+  test('a clear while in detail shows the empty list', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    mock.store(on)
+    on('session.end', ($, e) => ({ sessionId: e.sessionId }))
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    const ui = await mountPane($)
+    await ui.press({ key: 'open-u1' })
+    await $.session.end({ reason: 'clear', sessionId: 's1', resume: { id: 's1' } })
+    expect(await ui.find({ key: 'detail-back' })).toBeUndefined()
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('no turns yet')
+  })
+
+  test('a running row updates while shown', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    let ui: Awaited<ReturnType<typeof mountPane>> | undefined
+    let whileRunning: string[] = []
+    on('tool.call', { tool: 'Bash' }, async () => {
+      await ui!.press({ key: 'open-u1' })
+      whileRunning = await detailText(ui!)
+      return { result: {}, text: '' }
+    })
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    ui = await mountPane($)
+    await $.tool.call({ tool: 'Bash', command: 'sleep 1', tool_use_id: 'u1' })
+    expect(whileRunning).toContain('outcome running')
+    expect(await detailText(ui)).toContain('outcome ok')
+  })
+
+  test('a shown row that falls out of the buffer gives way to the list', { timeoutMs: 120_000 }, async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await xtrace($, 'tools')
+    await $.turn.start({ text: 'old turn', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u0' })
+    await $.turn.start({ text: 'busy turn', turnId: 't2' })
+    const ui = await mountPane($)
+    await ui.press({ key: 'nav-prev' })
+    await ui.press({ key: 'open-u0' })
+    expect(await ui.find({ key: 'detail-back' })).toBeDefined()
+    // Each call is two rows (tools and hooks): 1001 calls overflow the 2000-row buffer.
+    for (let i = 1; i <= 1001; i++) await $.tool.call({ tool: 'Read', file_path: `f${i}.go`, tool_use_id: `u${i}` })
+    expect(await ui.find({ key: 'detail-back' })).toBeUndefined()
+    expect(await ui.find({ key: 'evicted' })).toBeDefined()
   })
 })

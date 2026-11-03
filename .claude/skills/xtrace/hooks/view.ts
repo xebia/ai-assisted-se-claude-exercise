@@ -1,4 +1,6 @@
 import type { Category, Row, Turn } from '../types'
+import { costOf, fmtCost, fmtTokens, outcomeStyle, PANE_MARGIN } from './report'
+import type { Palette } from './report'
 
 // The live pane's view: the filter bar's language and sorting (this task),
 // which turn is shown (the navigation helpers below). Pure, no `$`.
@@ -253,4 +255,71 @@ export const scrollStep = (by: number, bodyRows: number): number | Page =>
 export function canPage(count: number, room: number, start: number | undefined, sorted: boolean, dir: Page): boolean {
   const { from } = rowWindow(count, room, start, sorted)
   return dir === 'up' ? from > 0 : from < Math.max(0, count - room)
+}
+
+// --- Row details: the fields of one row, as label/value lines for the pane.
+
+export const DETAIL_LABEL = 10   // the label column, in cells
+
+export type DetailLine = { label: string; value: string; color?: string; bold?: boolean }
+
+const pad = (n: number, w = 2) => String(n).padStart(w, '0')
+
+// Local wall-clock time of an engine timestamp, to the millisecond.
+export function clockTime(ms: number): string {
+  const d = new Date(ms)
+  return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad(d.getMilliseconds(), 3)}`
+}
+
+// A value cut into pieces of `room` characters, its own line breaks kept:
+// each piece is one drawn line, so the detail window counts lines exactly.
+export function wrapValue(text: string, room: number): string[] {
+  const out: string[] = []
+  for (const line of text.split('\n')) {
+    if (line.length === 0) { out.push(''); continue }
+    for (let i = 0; i < line.length; i += room) out.push(line.slice(i, i + room))
+  }
+  return out
+}
+
+// Every field the row has, in a fixed order; an empty one is left out.
+export function detailFields(row: Row, tokens: string | undefined, pal: Palette): DetailLine[] {
+  const out: DetailLine[] = []
+  const add = (label: string, value: string | undefined, style: Omit<DetailLine, 'label' | 'value'> = { color: pal.value }) => {
+    if (value !== undefined && value !== '') out.push({ label, value, ...style })
+  }
+  add('kind', row.kind, { color: pal.kind[row.kind], bold: true })
+  add('name', row.name, { color: pal.kind[row.kind] })
+  add('outcome', row.outcome, outcomeStyle(row.outcome, pal))
+  add('started', clockTime(row.startedAt))
+  add('duration', row.ms === undefined ? undefined : `${row.ms} ms`)
+  add('tokens', tokens)
+  add('chars', row.chars === undefined ? undefined : String(row.chars))
+  add('agent', row.agentId)
+  add('parent', row.parentId)
+  if (row.kind === 'hooks') {
+    add('commands', row.target)
+    add('plugins', row.plugins)
+  } else if (row.kind === 'model' && row.usage !== undefined) {
+    const u = row.usage
+    add('model', u.model)
+    add('usage', `in ${fmtTokens(u.input)} · cache ${fmtTokens(u.cacheRead)} · write ${fmtTokens(u.cacheWrite)} · out ${fmtTokens(u.output)}`)
+    const cost = costOf(u)
+    add('cost', cost === undefined ? undefined : fmtCost(cost))
+  } else {
+    add('target', row.target)
+  }
+  if (row.kind === 'agents') add('model', row.detail)
+  add('id', row.id)
+  add('input', row.input)
+  return out
+}
+
+// The fields as drawn lines, each at most the value room wide: a long value
+// continues on lines with no label; the input starts on a line of its own.
+export function detailLines(row: Row, tokens: string | undefined, pal: Palette, width: number): DetailLine[] {
+  const room = Math.max(1, width - PANE_MARGIN - DETAIL_LABEL)
+  return detailFields(row, tokens, pal).flatMap(f => f.label === 'input'
+    ? [{ label: 'input', value: '' }, ...wrapValue(f.value, Math.max(1, room - 2)).map(v => ({ label: '', value: `  ${v}`, color: pal.value }))]
+    : wrapValue(f.value, room).map((v, i) => ({ ...f, label: i === 0 ? f.label : '', value: v })))
 }
