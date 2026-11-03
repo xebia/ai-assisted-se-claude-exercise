@@ -2,10 +2,10 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 import type { Category, Compaction, Row, Selection, Turn, View } from '../types'
 import { CATEGORIES, parseArgs, withNewCategories, wordsOf } from './args'
-import { attachHookContext, buildReport, counterSegments, denialCategory, firstWords, NAME_COLUMN, PANE_MARGIN, paletteFor, paneHeaderCells, paneHeaderWidths, paneRowCells, paneTotalRoom, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
+import { attachHookContext, buildReport, counterSegments, denialCategory, firstWords, inputText, paneSegments, NAME_COLUMN, PANE_MARGIN, paletteFor, paneHeaderCells, paneHeaderWidths, paneRowCells, paneTotalRoom, paneTotalSegments, turnTotalLines, targetOf, tokensOf, tokenValues, usageText } from './report'
 import { commandsFor, enabledInstalls, pluginsFor } from './hookmatch'
 import type { PluginHooks } from './hookmatch'
-import { applyView, canNav, canPage, EXAMPLES, navLabel, navTarget, parseFilter, pageRows, PLACEHOLDER, rowWindow, scrollRows, scrollStep, sortMark, turnTitle, viewedTurn, withKinds, withSort } from './view'
+import { applyView, canNav, DETAIL_LABEL, detailLines, canPage, EXAMPLES, navLabel, navTarget, parseFilter, pageRows, PLACEHOLDER, rowWindow, scrollRows, scrollStep, sortMark, turnTitle, viewedTurn, withKinds, withSort } from './view'
 import type { Column, Nav, Page } from './view'
 
 // The engine follows `$` and the state atoms only within this file, never across
@@ -95,6 +95,7 @@ async function recordHook(event: string, $: EngineInterface, e: any, next: (e: a
       target: commandsFor(settings, event, toolName).join(', '),
       plugins: pluginsFor(pluginHooks, event, toolName).join(', '),
       outcome: 'running', startedAt,
+      input: inputText((({ tool_name: _n, tool: _t, ...payload }) => payload)((e ?? {}) as Record<string, unknown>)),
     })
   } catch {}
   const ran = await next(e)
@@ -179,6 +180,19 @@ async function moveRows($: EngineInterface, by: number | Page): Promise<void> {
     })
   } catch {}
 }
+
+// The detail view of one row. Opening keeps the list's filter and row window,
+// so back returns to the same rows.
+async function openDetail($: EngineInterface, id: string): Promise<void> {
+  try { await update($, VIEW, v => ({ ...v, detailRowId: id, detailStart: undefined })) } catch {}
+}
+
+async function closeDetail($: EngineInterface): Promise<void> {
+  try { await update($, VIEW, v => ({ ...v, detailRowId: undefined, detailStart: undefined })) } catch {}
+}
+
+// The detail lines as last drawn, for the wheel (Task 4).
+let drawnDetail = { isShown: false, count: 0, room: 1 }
 
 // A one-pixel line as wide as its box; dashed for the subagents' rule.
 const ruleSvg = (color: string, isDashed: boolean) =>
@@ -277,6 +291,7 @@ export const register: Register = on => {
         target: tool === 'Agent' ? String(args.description ?? '') : targetOf(tool, args),
         outcome: 'running',
         startedAt,
+        input: inputText(args),
       }
       await addRow($, row)
       if (tool === 'Agent') runningAgents.push(id)
@@ -372,7 +387,7 @@ export const register: Register = on => {
     let startedAt = 0
     try {
       startedAt = await $.clock.now()
-      await addRow($, { id, turnId: await currentTurnId($), kind: 'commands', name: e.command, target: e.args, outcome: 'running', startedAt })
+      await addRow($, { id, turnId: await currentTurnId($), kind: 'commands', name: e.command, target: e.args, outcome: 'running', startedAt, input: inputText(e.args) })
     } catch {}
     try {
       const ran = await next(e)
@@ -560,6 +575,14 @@ export const register: Register = on => {
     const rowStart = startFor(view, turnId)
     const win = rowWindow(shown.length, room, rowStart, sorted)
     const visible = shown.slice(win.from, win.to)
+    // The row shown in detail, if it is still among the turn's rows; else the list.
+    const detail = view.detailRowId !== undefined ? turnRows.find(r => r.id === view.detailRowId) : undefined
+    const detailAll = detail !== undefined ? detailLines(detail, tokens.get(detail.id), pal, width) : []
+    // The back line and its rule take the header's line and one more.
+    const detailRoom = Math.max(1, base - 1)
+    const dwin = rowWindow(detailAll.length, detailRoom, view.detailStart, true)
+    drawnDetail = { isShown: detail !== undefined, count: detailAll.length, room: detailRoom }
+    const detailPos = detail !== undefined ? shown.findIndex(r => r.id === detail.id) : -1
     drawnWindow = { count: shown.length, room, sorted, turnId }
     // The paging line spans the rows (they end PANE_MARGIN short of the pane's edge);
     // its controls, `u: ▲ d: ▼`, take 9 columns in the middle.
@@ -599,7 +622,7 @@ export const register: Register = on => {
         {turn !== undefined && rule('rule-prompt')}
         {isEvicted && <Box key="evicted"><Text dimColor>rows for this turn fell out of the 2000-row buffer</Text></Box>}
         {!isEvicted && turnRows.length === 0 && <Text dimColor>No rows in this turn yet.</Text>}
-        {turnRows.length > 0 && (
+        {turnRows.length > 0 && detail === undefined && (
           // Each label in a box of its column's width, like the rows' cells, so they line up
           // on a surface that draws proportional text too.
           <Box flexDirection="row" gap={1}>
@@ -625,7 +648,7 @@ export const register: Register = on => {
             })}
           </Box>
         )}
-        {overflows && (
+        {overflows && detail === undefined && (
           // Three parts: the hint at the left, the controls in the middle, the range and ↓ at
           // the right edge of the rows (the ms column's end). Equal sides keep the middle centred.
           <Box key="paging" flexDirection="row" width={pagingWidth}>
@@ -644,15 +667,47 @@ export const register: Register = on => {
             </Box>
           </Box>
         )}
-        {visible.map(r => (
-          <Box key={`row-${r.id}`} flexDirection="row" gap={1}>
-            {paneRowCells(r, width, withPlugins, tokens.get(r.id), pal).map((c, i) => (
-              <Box key={`${r.id}-${i}`} width={c.width} flexShrink={0} justifyContent={c.isRight ? 'flex-end' : 'flex-start'}>
-                <Text color={c.color} bold={c.bold} wrap="truncate-end">{c.text}</Text>
-              </Box>
-            ))}
-          </Box>
-        ))}
+        {detail === undefined && visible.map(r => e.surface === 'terminal'
+          // The terminal: the row is one button, its cells colored text inside it,
+          // so a click anywhere on it or Enter under the focus opens it.
+          ? (
+            <Box key={`row-${r.id}`} flexDirection="row">
+              <Button key={`open-${r.id}`} plain onPress={() => openDetail($, r.id)}>
+                {paneSegments(r, width, withPlugins, tokens.get(r.id), pal).map((s, i) => (
+                  <Text key={`${r.id}-${i}`} color={s.color} bold={s.bold}>{s.text}</Text>
+                ))}
+              </Button>
+            </Box>
+          )
+          : (
+            <Box key={`row-${r.id}`} flexDirection="row" gap={1}>
+              {paneRowCells(r, width, withPlugins, tokens.get(r.id), pal).map((c, i) => (
+                <Box key={`${r.id}-${i}`} width={c.width} flexShrink={0} justifyContent={c.isRight ? 'flex-end' : 'flex-start'}>
+                  <Text color={c.color} bold={c.bold} wrap="truncate-end">{c.text}</Text>
+                </Box>
+              ))}
+            </Box>
+          ))}
+        {detail !== undefined && [
+          <Box key="detail-head" flexDirection="row" width={pagingWidth} justifyContent="space-between">
+            <Button key="detail-back" plain label="‹ back" onPress={() => closeDetail($)} />
+            <Box key="detail-pos">
+              <Text dimColor wrap="truncate-end">
+                {[
+                  detailPos >= 0 ? `row ${detailPos + 1} of ${shown.length}` : 'not in the filtered rows',
+                  ...(detailAll.length > detailRoom ? [`lines ${dwin.from + 1}–${dwin.to} of ${detailAll.length}`] : []),
+                ].join(' · ')}
+              </Text>
+            </Box>
+          </Box>,
+          rule('rule-detail'),
+          ...detailAll.slice(dwin.from, dwin.to).map((l, n) => (
+            <Box key={`detail-line-${dwin.from + n}`} flexDirection="row">
+              <Box width={DETAIL_LABEL} flexShrink={0}><Text color={pal.label}>{l.label}</Text></Box>
+              <Box flexShrink={1}><Text color={l.color} bold={l.bold} wrap="truncate-end">{l.value}</Text></Box>
+            </Box>
+          )),
+        ]}
         {/* The free space: the totals and the nav row stay at the bottom of the pane. */}
         <Box key="footer-spacer" flexGrow={1} />
         {turnRows.length > 0 && total !== undefined && rule('rule-total')}

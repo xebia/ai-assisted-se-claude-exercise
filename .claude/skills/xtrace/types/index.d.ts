@@ -53,6 +53,8 @@ export type View = {
   rowStart?: number          // first row in view when paged or scrolled; undefined: newest (sorted: top)
   rowTurnId?: string         // the turn rowStart belongs to; on any other turn it is ignored
   help: boolean              // the filter cheat sheet is shown
+  detailRowId?: string       // the row shown in detail; undefined shows the row list
+  detailStart?: number       // first detail line in view when scrolled; undefined: the top
 }
 
 // The keys are spelled inline: `claude plugin validate` reads them from this literal.
