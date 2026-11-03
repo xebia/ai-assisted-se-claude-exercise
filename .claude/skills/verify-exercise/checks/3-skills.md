@@ -102,7 +102,7 @@ end of task 4. Then it grades the guard and the rule as well.*
 | --- | --- |
 | **/commit skill** | frontmatter has `name`, `description`, and `disable-model-invocation: true`; the body carries an "execute directly — no leading questions" line near the top; imperative-mood commit-message rules with examples; stages and commits each group in one command line (`git add … && git commit …`); explicit no-`git push` and no-co-author rules |
 | **/changelog skill** | frontmatter has **no** `disable-model-invocation` (auto-invocability is the point); the `description` works as a trigger (see below); the body requires reading `common-changelog-spec.md` before editing, and that file exists with real spec content; the must-do behaviors are all present |
-| **Guard wiring** | `settings.json` has a `UserPromptSubmit` entry (no matcher needed); the command runs a Python script (no bash/`jq`/`chmod` dependencies — participants are on Windows); the script reads JSON from stdin, tests the `prompt` field with the regex `acme_live_[A-Za-z0-9]{24}`, and prints the top-level `{"decision": "block", "reason": ...}` shape; it prints nothing for a clean prompt |
+| **Guard wiring** | `settings.json` has a `UserPromptSubmit` entry (no matcher needed); the command runs a Python script (no bash/`jq`/`chmod` dependencies — participants are on Windows); the script reads JSON from stdin, tests the `prompt` field with the regex `acme-live-[A-Za-z0-9]{24}`, and prints the top-level `{"decision": "block", "reason": ...}` shape; it prints nothing for a clean prompt |
 | **Read rule** | `settings.json` has `permissions.deny` containing `Read(.env)` (the forms `Read(./.env)` and `Read(**/.env)` pass too); it sits in the same file as the hook, both valid JSON |
 
 Grade each ✅ / ❌ / ⚠️ with the usual discipline: predictions before
@@ -152,7 +152,7 @@ word that matched too widely.
    on your own command line would sit in the transcript, and the
    participant's guard does not run on your tool calls anyway, so a
    file is the honest test. Write
-   `{"prompt": "deploy with acme_live_7Hq2mX9vK4pL8sW1dR3nT6yB please"}`
+   `{"prompt": "deploy with acme-live-7Hq2mX9vK4pL8sW1dR3nT6yB please"}`
    to `verify-event.json`, run
    `python .claude/hooks/guard-secrets.py < verify-event.json`
    (`python3` on mac/linux), confirm the top-level block shape, then
@@ -241,7 +241,7 @@ here for arbitration:
   the prompt, and the prompt holds no key. Claude reads the file with a
   tool; the guard never sees tool calls. That is the gap the rule
   closes in task 4 step 3.
-- **`grep -r acme_live .` is not blocked by the guard** — same reason.
+- **`grep -r acme-live .` is not blocked by the guard** — same reason.
   After the rule it still gets through (bonus): a `Read` rule matches a
   command that names the file, and `grep -r` names none. Only the
   sandbox stops every process; that is slide material, not a task.
