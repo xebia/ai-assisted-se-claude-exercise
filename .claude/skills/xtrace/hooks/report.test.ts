@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { attachHookContext, costOf, counterSegments, denialCategory, fmtCost, DARK, LIGHT, msStyle, paletteFor, buildReport, firstWords, fmtDuration, fmtTokens, outcomeStyle, paneHeader, paneHeaderCells, paneLine, paneSegments, paneTotalSegments, scopedTurns, targetOf, tokenStyle, tokenTotals, tokenValues, tokensOf, turnTotal, turnTotalLines } from './report'
+import { attachHookContext, costOf, counterSegments, denialCategory, fmtCost, DARK, inputText, INPUT_CAP, LIGHT, msStyle, paletteFor, buildReport, firstWords, fmtDuration, fmtTokens, outcomeStyle, paneHeader, paneHeaderCells, paneLine, paneSegments, paneTotalSegments, scopedTurns, targetOf, tokenStyle, tokenTotals, tokenValues, tokensOf, turnTotal, turnTotalLines } from './report'
 import type { Row, Turn } from '../types'
 
 const turn1: Turn = { turnId: 't1', text: 'find the n plus one', startedAt: 1000, isComplete: true }
@@ -422,5 +422,31 @@ describe('denialCategory', () => {
   test('no category: the reason, trimmed', () => {
     expect(denialCategory('Auto mode could not determine the safety of this action')).toBe('Auto mode could not determine the safety…')
     expect(denialCategory('')).toBeUndefined()
+  })
+})
+
+describe('inputText', () => {
+  test('nothing to show gives undefined', () => {
+    expect(inputText(undefined)).toBeUndefined()
+    expect(inputText(null)).toBeUndefined()
+    expect(inputText('')).toBeUndefined()
+    expect(inputText({})).toBeUndefined()
+    expect(inputText([])).toBeUndefined()
+  })
+  test('a string stays as it is', () => {
+    expect(inputText('keep the plan')).toBe('keep the plan')
+  })
+  test('an object is pretty JSON', () => {
+    expect(inputText({ command: 'ls', timeout: 5 })).toBe('{\n  "command": "ls",\n  "timeout": 5\n}')
+  })
+  test('over the cap it is cut and says how much is left', () => {
+    const text = inputText('x'.repeat(INPUT_CAP + 10))
+    expect(text).toBe(`${'x'.repeat(INPUT_CAP)}… (10 more chars)`)
+    expect(inputText('abcdef', 4)).toBe('abcd… (2 more chars)')
+  })
+  test('a value JSON cannot write falls back to String', () => {
+    const cyclic: Record<string, unknown> = { a: 1 }
+    cyclic.self = cyclic
+    expect(inputText(cyclic)).toBe('[object Object]')
   })
 })

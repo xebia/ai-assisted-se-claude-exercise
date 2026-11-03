@@ -17,6 +17,7 @@ export type Row = {
   chars?: number             // characters this row added to the conversation (tool result, hook or attachment text)
   usage?: Usage              // model: what the request cost, as the API reported it
   detail?: string
+  input?: string             // the row's input as pretty JSON (commands: the args), at most INPUT_CAP chars
   outcome: Outcome
   startedAt: number
   ms?: number
