@@ -47,6 +47,21 @@ export function targetOf(tool: string, args: Record<string, unknown>): string {
   return ''
 }
 
+// A row's input, as the detail view shows it: strings as they are, anything
+// else pretty JSON; empty values are left out, long ones cut at the cap.
+export const INPUT_CAP = 4096
+
+export function inputText(value: unknown, cap = INPUT_CAP): string | undefined {
+  if (value === undefined || value === null) return undefined
+  let text: string
+  if (typeof value === 'string') text = value
+  else {
+    try { text = JSON.stringify(value, null, 2) ?? String(value) } catch { text = String(value) }
+  }
+  if (text === '' || text === '{}' || text === '[]') return undefined
+  return text.length > cap ? `${text.slice(0, cap)}… (${text.length - cap} more chars)` : text
+}
+
 // --- Tokens -----------------------------------------------------------------
 
 export function fmtTokens(n: number): string {

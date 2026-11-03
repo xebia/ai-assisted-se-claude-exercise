@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'claude-code/testing'
-import { applyView, canNav, canPage, COLUMNS, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, pageRows, rowWindow, scrollRows, scrollStep, sortMark, turnTitle, viewedTurn, withKinds, withSort } from './view'
+import { applyView, canNav, canPage, clockTime, COLUMNS, DETAIL_LABEL, detailFields, detailLines, EXAMPLES, navLabel, navTarget, parseFilter, PLACEHOLDER, pageRows, rowWindow, scrollRows, scrollStep, sortMark, turnTitle, viewedTurn, withKinds, withSort, wrapValue } from './view'
+import { DARK } from './report'
 import type { Row, Turn } from '../types'
 
 const row = (over: Partial<Row>): Row => ({
@@ -305,5 +306,67 @@ describe('scroll steps', () => {
     expect(scrollStep(40, 20)).toBe('down')
     expect(scrollStep(-1, 20)).toBe(-1)
     expect(scrollStep(3, 20)).toBe(3)
+  })
+})
+
+describe('row details', () => {
+  const labels = (r: Row, tokens?: string) => detailFields(r, tokens, DARK).map(l => l.label)
+
+  test('a tool row: its fields in order, empty ones left out, input last', () => {
+    const r = row({ id: 'u1', name: 'Bash', target: 'ls', ms: 12, chars: 40, input: '{\n  "command": "ls"\n}' })
+    expect(labels(r, '~10')).toEqual(['kind', 'name', 'outcome', 'started', 'duration', 'tokens', 'chars', 'target', 'id', 'input'])
+    const f = detailFields(r, '~10', DARK)
+    expect(f.find(l => l.label === 'duration')?.value).toBe('12 ms')
+    expect(f.find(l => l.label === 'started')?.value).toBe(clockTime(1))
+    expect(f.at(-1)).toMatchObject({ label: 'input', value: '{\n  "command": "ls"\n}' })
+  })
+
+  test('a subagent call names its agent and parent', () => {
+    expect(labels(row({ agentId: 'a1', parentId: 'p1' }))).toEqual(expect.arrayContaining(['agent', 'parent']))
+  })
+
+  test('a hooks row shows commands and plugins, not target', () => {
+    const r = row({ kind: 'hooks', name: 'PreToolUse Bash', target: 'node pre.mjs', plugins: 'superpowers' })
+    const ls = labels(r)
+    expect(ls).toEqual(expect.arrayContaining(['commands', 'plugins']))
+    expect(ls).not.toContain('target')
+    expect(detailFields(r, undefined, DARK).find(l => l.label === 'commands')?.value).toBe('node pre.mjs')
+  })
+
+  test('an agents row shows its model', () => {
+    const r = row({ kind: 'agents', name: 'Explore', target: 'find it', detail: 'haiku' })
+    expect(detailFields(r, undefined, DARK).find(l => l.label === 'model')?.value).toBe('haiku')
+  })
+
+  test('only a model row shows usage and cost', () => {
+    const usage = { model: 'claude-opus-5-5', input: 1200, cacheRead: 45100, cacheWrite: 2000, output: 310 }
+    const m = detailFields(row({ kind: 'model', name: 'step 1', usage }), '+310', DARK)
+    expect(m.find(l => l.label === 'usage')?.value).toBe('in 1.2k · cache 45.1k · write 2.0k · out 310')
+    expect(m.map(l => l.label)).toContain('model')
+    expect(m.map(l => l.label)).not.toContain('target')
+    expect(labels(row({}))).not.toContain('usage')
+  })
+
+  test('wrapValue cuts at the room and keeps line breaks', () => {
+    expect(wrapValue('abcdefg', 3)).toEqual(['abc', 'def', 'g'])
+    expect(wrapValue('ab\n\ncd', 3)).toEqual(['ab', '', 'cd'])
+  })
+
+  test('detailLines: one entry per drawn line; continuations have no label; input indented under its label', () => {
+    const width = DETAIL_LABEL + 2 + 10              // room for 10 characters of value
+    const r = row({ target: 'x'.repeat(15), input: 'abc' })
+    const lines = detailLines(r, undefined, DARK, width)
+    const target = lines.findIndex(l => l.label === 'target')
+    expect(lines[target]?.value).toBe('x'.repeat(10))
+    expect(lines[target + 1]).toMatchObject({ label: '', value: 'xxxxx' })
+    const input = lines.findIndex(l => l.label === 'input')
+    expect(lines[input]?.value).toBe('')
+    expect(lines[input + 1]).toMatchObject({ label: '', value: '  abc' })
+    expect(lines.every(l => l.value.length <= 10)).toBe(true)
+  })
+
+  test('clockTime is the local time with milliseconds', () => {
+    const d = new Date(2026, 10, 3, 14, 2, 11, 384)
+    expect(clockTime(d.getTime())).toBe('14:02:11.384')
   })
 })
