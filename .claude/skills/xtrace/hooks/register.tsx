@@ -686,9 +686,10 @@ export const register: Register = on => {
         )}
         {detail === undefined && visible.map(r => e.surface === 'terminal'
           // The terminal: the row is one button, its cells colored text inside it,
-          // so a click anywhere on it or Enter under the focus opens it.
+          // so a click anywhere on it or Enter under the focus opens it. One line, clipped:
+          // where the pane draws narrower than it reports, the end is cut, never wrapped.
           ? (
-            <Box key={`row-${r.id}`} flexDirection="row">
+            <Box key={`row-${r.id}`} flexDirection="row" height={1} overflow="hidden">
               <Button key={`open-${r.id}`} plain onPress={() => openDetail($, r.id)}>
                 {paneSegments(r, width, withPlugins, tokens.get(r.id), pal).map((s, i) => (
                   <Text key={`${r.id}-${i}`} color={s.color} bold={s.bold}>{s.text}</Text>
@@ -699,7 +700,7 @@ export const register: Register = on => {
           : (
             // The desktop: the cells keep their fixed-width boxes (proportional text lines
             // up only so); a button laid over the whole row takes the click and the focus.
-            <Box key={`line-${r.id}`} position="relative" hover={{ backgroundColor: pal.separator }}>
+            <Box key={`line-${r.id}`} position="relative">
               <Box key={`row-${r.id}`} flexDirection="row" gap={1}>
                 {paneRowCells(r, width, withPlugins, tokens.get(r.id), pal).map((c, i) => (
                   <Box key={`${r.id}-${i}`} width={c.width} flexShrink={0} justifyContent={c.isRight ? 'flex-end' : 'flex-start'}>

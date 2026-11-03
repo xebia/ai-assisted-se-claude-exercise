@@ -1064,6 +1064,7 @@ describe('row details', () => {
     const kids = (row?.children ?? []) as { type?: string; key?: string }[]
     expect(kids).toHaveLength(1)
     expect(kids[0]).toMatchObject({ type: 'Button' })
+    expect(row?.props).toMatchObject({ height: 1, overflow: 'hidden' })   // one line, never wrapped
     expect(await findRow(ui, /^tools\s+Bash\s+ls/)).toBeDefined()
   })
 
