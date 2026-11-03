@@ -135,7 +135,7 @@ This task produces `.claude/hooks/guard-secrets.py`, an entry in
    data = json.load(sys.stdin)
    text = data.get("prompt", "")
 
-   if re.search(r"acme_live_[A-Za-z0-9]{24}", text):
+   if re.search(r"acme-live-[A-Za-z0-9]{24}", text):
        print(json.dumps({
            "decision": "block",
            "reason": "Blocked: this prompt contains an ACME API key. Remove the key and send it again."
@@ -172,7 +172,7 @@ This task produces `.claude/hooks/guard-secrets.py`, an entry in
 
    1. You paste a log line that contains the key.
    2. You ask Claude what the value of `ACME_API_KEY` in `.env` is.
-   3. You ask Claude to run `grep -r acme_live .`.
+   3. You ask Claude to run `grep -r acme-live .`.
 
 **Done when**: both files exist and your three predictions are written down.
 
@@ -185,7 +185,7 @@ This task produces one blocked prompt, a `permissions` rule in
 
    ```
    This request failed on staging. What is wrong with it?
-   POST /api/books 401 token=acme_live_7Hq2mX9vK4pL8sW1dR3nT6yB reason=expired
+   POST /api/books 401 token=acme-live-7Hq2mX9vK4pL8sW1dR3nT6yB reason=expired
    ```
 
    The guard blocks it and the terminal shows the reason. Did Claude answer
@@ -252,7 +252,7 @@ your predictions are marked, and `/verify-exercise 3` gave its report.
 **The gap in the rule.** Send this without a tag:
 
 ```
-Run grep -r acme_live . and show me the output.
+Run grep -r acme-live . and show me the output.
 ```
 
 The key appears. The rule only sees commands that name the file, and
@@ -263,7 +263,7 @@ stops every process (*The Claude Code Security Harness*).
 `.claude/fake-event.json`:
 
 ```
-{"prompt":"deploy with acme_live_7Hq2mX9vK4pL8sW1dR3nT6yB please"}
+{"prompt":"deploy with acme-live-7Hq2mX9vK4pL8sW1dR3nT6yB please"}
 ```
 
 Run this in a second terminal, in the `bookstore` folder (`python3` on mac
