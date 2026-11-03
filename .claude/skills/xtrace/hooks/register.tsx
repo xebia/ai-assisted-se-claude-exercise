@@ -127,6 +127,7 @@ async function recordHook(event: string, $: EngineInterface, e: any, next: (e: a
 const MENU = 'xtrace-menu'
 const PANE = 'xtrace'
 const PANE_PREF = 'pane'
+const OPEN_COLUMN = 2           // the desktop rows' leading `›` button, in cells
 const NARROW = 'xtrace: widen the terminal to 144 columns to see the pane'
 
 function toggleCategory(s: Selection, c: Category): Selection {
@@ -641,8 +642,11 @@ export const register: Register = on => {
         {!isEvicted && turnRows.length === 0 && <Text dimColor>No rows in this turn yet.</Text>}
         {turnRows.length > 0 && detail === undefined && (
           // Each label in a box of its column's width, like the rows' cells, so they line up
-          // on a surface that draws proportional text too.
+          // on a surface that draws proportional text too. Off the terminal the rows lead
+          // with their `›` button, so the header leads with a cell as wide.
           <Box flexDirection="row" gap={1}>
+            {e.surface !== 'terminal' && <Box key="hcell-open" width={OPEN_COLUMN} flexShrink={0} />}
+            <Box flexDirection="row" gap={1}>
             {header.map((c, i) => {
               const label = c.text.trim()
               const isLast = i === header.length - 1
@@ -663,6 +667,7 @@ export const register: Register = on => {
                 </Box>
               )
             })}
+            </Box>
           </Box>
         )}
         {overflows && detail === undefined && (
@@ -699,17 +704,18 @@ export const register: Register = on => {
           )
           : (
             // The desktop: the cells keep their fixed-width boxes (proportional text lines
-            // up only so); a button laid over the whole row takes the click and the focus.
-            <Box key={`line-${r.id}`} position="relative">
+            // up only so); a `›` button leads the row and takes the click and the focus.
+            // (A button laid over the cells takes no clicks there.)
+            <Box key={`line-${r.id}`} flexDirection="row" gap={1}>
+              <Box width={OPEN_COLUMN} flexShrink={0}>
+                <Button key={`open-${r.id}`} plain dimColor label="›" onPress={() => openDetail($, r.id)} />
+              </Box>
               <Box key={`row-${r.id}`} flexDirection="row" gap={1}>
                 {paneRowCells(r, width, withPlugins, tokens.get(r.id), pal).map((c, i) => (
                   <Box key={`${r.id}-${i}`} width={c.width} flexShrink={0} justifyContent={c.isRight ? 'flex-end' : 'flex-start'}>
                     <Text color={c.color} bold={c.bold} wrap="truncate-end">{c.text}</Text>
                   </Box>
                 ))}
-              </Box>
-              <Box position="absolute" top={0} left={0} right={0} height={1}>
-                <Button key={`open-${r.id}`} plain label=" " onPress={() => openDetail($, r.id)} />
               </Box>
             </Box>
           ))}

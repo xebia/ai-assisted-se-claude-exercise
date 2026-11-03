@@ -1078,7 +1078,11 @@ describe('row details', () => {
     const cells = ((await ui.find({ key: 'row-u1' }))?.children ?? []) as { props?: { width?: unknown } }[]
     expect(cells.length).toBeGreaterThan(0)
     expect(cells.every(c => typeof c.props?.width === 'number')).toBe(true)
-    expect(await ui.find({ key: 'line-u1' })).toBeDefined()
+    // The row leads with a visible `›` button; the header leads with a cell as wide.
+    const line = ((await ui.find({ key: 'line-u1' }))?.children ?? []) as { props?: { width?: unknown } }[]
+    expect(line[0]?.props?.width).toBe(2)
+    expect((await ui.find({ key: 'open-u1' }))?.props).toMatchObject({ label: '›' })
+    expect((await ui.find({ key: 'hcell-open' }))?.props).toMatchObject({ width: 2 })
     await ui.press({ key: 'open-u1' })
     expect(await detailText(ui)).toContain('name Bash')
   })
