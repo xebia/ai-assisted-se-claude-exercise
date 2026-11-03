@@ -476,6 +476,14 @@ export const register: Register = on => {
   // scroll key moves the row window instead, and the window stays undrawn.
   // Rows that fit leave the scroll to the engine, so a pane too short for its fixed lines still scrolls.
   on('ui.scroll', { requestId: PANE }, async ($, e, next) => {
+    if (drawnDetail.isShown) {
+      const { count, room } = drawnDetail
+      if (count <= room) return next(e)
+      const step = scrollStep(e.by, e.bodyRows)
+      const by = typeof step === 'number' ? step : step === 'up' ? -room : room
+      try { await update($, VIEW, v => ({ ...v, detailStart: scrollRows(count, room, v.detailStart, true, by) })) } catch {}
+      return {}
+    }
     if (drawnWindow.count <= drawnWindow.room) return next(e)
     await moveRows($, scrollStep(e.by, e.bodyRows))
     return {}

@@ -1065,4 +1065,17 @@ describe('row details', () => {
     await ui.press({ key: 'open-u1' })
     expect(await detailText(ui)).toContain('name Bash')
   })
+
+  test('a detail taller than the pane shows its first lines and says how many there are', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'z'.repeat(3000), tool_use_id: 'u1' })
+    const ui = await mountPane($)
+    await ui.press({ key: 'open-u1' })
+    const lines = await detailText(ui)
+    expect(lines[0]).toBe('kind tools')
+    expect((await ui.find({ key: 'detail-pos' }))?.text).toMatch(new RegExp(`^row 1 of 2 · lines 1–${lines.length} of \\d+$`))
+  })
 })
