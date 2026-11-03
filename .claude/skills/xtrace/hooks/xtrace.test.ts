@@ -795,6 +795,7 @@ describe('pane columns', () => {
       if (surface === 'desktop') {
         expect(kids[0]).toMatchObject({ type: 'Text' })
         expect(textOf(kids[0])).toBe('outcome')
+        expect(kids[0]).toMatchObject({ hover: { color: 'inverseText' } })   // hidden under the button
         expect(kids[1]).toMatchObject({ props: { position: 'absolute', display: 'none' }, hover: { display: 'flex' } })
       } else {
         expect(kids).toHaveLength(1)

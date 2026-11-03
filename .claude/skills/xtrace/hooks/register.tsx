@@ -657,7 +657,9 @@ export const register: Register = on => {
                   {e.surface === 'terminal' ? sort : [
                     // The desktop draws a native button, padded: at rest the label is text, lined
                     // up with the cells below; under the pointer the button shows over it.
-                    <Text key={`hlabel-${c.column}`} dimColor wrap="truncate-end">{label}</Text>,
+                    // Under the pointer the label takes the background's color (inverseText), so
+                    // only the button's own label shows, not both side by side.
+                    <Text key={`hlabel-${c.column}`} dimColor wrap="truncate-end" hover={{ color: 'inverseText' }}>{label}</Text>,
                     // Unkeyed: the keyed cell is the hover scope, a keyed Box would be its own.
                     <Box position="absolute" top={0} {...(isLast ? { right: 0 } : { left: 0 })}
                       display="none" hover={{ display: 'flex' }}>
