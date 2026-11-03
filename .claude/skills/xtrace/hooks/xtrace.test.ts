@@ -1078,4 +1078,71 @@ describe('row details', () => {
     expect(lines[0]).toBe('kind tools')
     expect((await ui.find({ key: 'detail-pos' }))?.text).toMatch(new RegExp(`^row 1 of 2 · lines 1–${lines.length} of \\d+$`))
   })
+
+  test('moving to another turn shows that turn\'s list', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'list files', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    await $.turn.start({ text: 'read it', turnId: 't2' })
+    await $.tool.call({ tool: 'Read', file_path: 'a.go', tool_use_id: 'u2' })
+    const ui = await mountPane($)
+    await ui.press({ key: 'open-u2' })
+    await ui.press({ key: 'nav-prev' })
+    expect(await ui.find({ key: 'detail-back' })).toBeUndefined()
+    expect(await findRow(ui, /Bash\s+ls/)).toBeDefined()
+    await ui.press({ key: 'nav-latest' })
+    expect(await ui.find({ key: 'detail-back' })).toBeUndefined()   // not reopened on the way back
+  })
+
+  test('a clear while in detail shows the empty list', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    mock.store(on)
+    on('session.end', ($, e) => ({ sessionId: e.sessionId }))
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    const ui = await mountPane($)
+    await ui.press({ key: 'open-u1' })
+    await $.session.end({ reason: 'clear', sessionId: 's1', resume: { id: 's1' } })
+    expect(await ui.find({ key: 'detail-back' })).toBeUndefined()
+    expect((await ui.find({ key: 'nav-label' }))?.text).toBe('no turns yet')
+  })
+
+  test('a running row updates while shown', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    let ui: Awaited<ReturnType<typeof mountPane>> | undefined
+    let whileRunning: string[] = []
+    on('tool.call', { tool: 'Bash' }, async () => {
+      await ui!.press({ key: 'open-u1' })
+      whileRunning = await detailText(ui!)
+      return { result: {}, text: '' }
+    })
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    ui = await mountPane($)
+    await $.tool.call({ tool: 'Bash', command: 'sleep 1', tool_use_id: 'u1' })
+    expect(whileRunning).toContain('outcome running')
+    expect(await detailText(ui)).toContain('outcome ok')
+  })
+
+  test('a shown row that falls out of the buffer gives way to the list', { timeoutMs: 120_000 }, async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await xtrace($, 'tools')
+    await $.turn.start({ text: 'old turn', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u0' })
+    await $.turn.start({ text: 'busy turn', turnId: 't2' })
+    const ui = await mountPane($)
+    await ui.press({ key: 'nav-prev' })
+    await ui.press({ key: 'open-u0' })
+    expect(await ui.find({ key: 'detail-back' })).toBeDefined()
+    // Each call is two rows (tools and hooks): 1001 calls overflow the 2000-row buffer.
+    for (let i = 1; i <= 1001; i++) await $.tool.call({ tool: 'Read', file_path: `f${i}.go`, tool_use_id: `u${i}` })
+    expect(await ui.find({ key: 'detail-back' })).toBeUndefined()
+    expect(await ui.find({ key: 'evicted' })).toBeDefined()
+  })
 })

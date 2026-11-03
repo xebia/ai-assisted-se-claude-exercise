@@ -167,7 +167,7 @@ async function navigate($: EngineInterface, to: Nav): Promise<void> {
     const turns = await read($, TURNS)
     const { pinnedTurnId } = await read($, VIEW)
     if (!canNav(turns, pinnedTurnId, to)) return
-    await update($, VIEW, v => ({ ...v, pinnedTurnId: navTarget(turns, v.pinnedTurnId, to), rowStart: undefined }))
+    await update($, VIEW, v => ({ ...v, pinnedTurnId: navTarget(turns, v.pinnedTurnId, to), rowStart: undefined, detailRowId: undefined, detailStart: undefined }))
   } catch {}
 }
 
@@ -251,7 +251,7 @@ export const register: Register = on => {
       try { await update($, ROWS, () => []) } catch {}
       try { await update($, TURNS, () => []) } catch {}
       try { await update($, COMPACTIONS, () => []) } catch {}
-      try { await update($, VIEW, v => ({ ...v, pinnedTurnId: undefined, rowStart: undefined, rowTurnId: undefined })) } catch {}
+      try { await update($, VIEW, v => ({ ...v, pinnedTurnId: undefined, rowStart: undefined, rowTurnId: undefined, detailRowId: undefined, detailStart: undefined })) } catch {}
       try { if (await isPanePreferred($)) await openPane($) } catch {}
     }
     return next(e)
