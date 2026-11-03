@@ -2,7 +2,7 @@ import { expect, test } from 'claude-code/testing'
 
 import {
   formatSides, formatStatus, inputPrice, mergeInfo, missCostUsd, parseLastStep, parseOffset, parseSharedTokens, parseTranscript,
-  blocks, shouldWarn, stepFromUsage, tone, TTL_1H, TTL_5M, usd,
+  blocks, shouldWarn, stepFromUsage, tokenCount, tone, TTL_1H, TTL_5M, usd,
 } from './cache'
 
 const row = (ts: string, h1: number, m5: number, extra: object = {}) =>
@@ -171,4 +171,14 @@ test('two sides: countdown left, session figures right', () => {
   })
   expect(sides).toEqual({ left: 'cache 13:41 · 60m left (1h)', right: 'ctx ▰▱▱▱▱▱▱▱▱▱ 9% · $0.20 (miss ≈ $0.19)' })
   expect(formatSides(null, lastAt, 0).right).toBe('')
+})
+
+test('context tokens follow the bar when known', () => {
+  expect(tokenCount(850)).toBe('850')
+  expect(tokenCount(18_400)).toBe('18k')
+  expect(tokenCount(200_000)).toBe('200k')
+  expect(tokenCount(999_700)).toBe('1M')
+  expect(tokenCount(1_250_000)).toBe('1.3M')
+  const sides = formatSides(null, 0, 0, { totals: { usd: 0.2, ctxPct: 9.2, ctxTokens: 18_400, ctxWindow: 200_000 } })
+  expect(sides.right).toBe('ctx ▰▱▱▱▱▱▱▱▱▱ 9% 18k/200k · $0.20')
 })
