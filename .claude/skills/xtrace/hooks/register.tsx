@@ -82,6 +82,13 @@ async function loadPluginHooks($: EngineInterface, cwd: string | undefined): Pro
   return out
 }
 
+// A hook row's input: the event payload without the name (the row shows it) and
+// without what the tool returned (`tool_response`, `error`): results are not recorded.
+function hookInput(e: unknown): string | undefined {
+  const { tool_name: _n, tool: _t, tool_response: _r, error: _e, ...payload } = (e ?? {}) as Record<string, unknown>
+  return inputText(payload)
+}
+
 // One helper for every classic event; each registration names its event literally.
 async function recordHook(event: string, $: EngineInterface, e: any, next: (e: any) => Promise<any>) {
   const toolName: string | undefined = typeof e.tool_name === 'string' ? e.tool_name : typeof e.tool === 'string' ? e.tool : undefined
@@ -95,7 +102,7 @@ async function recordHook(event: string, $: EngineInterface, e: any, next: (e: a
       target: commandsFor(settings, event, toolName).join(', '),
       plugins: pluginsFor(pluginHooks, event, toolName).join(', '),
       outcome: 'running', startedAt,
-      input: inputText((({ tool_name: _n, tool: _t, ...payload }) => payload)((e ?? {}) as Record<string, unknown>)),
+      input: hookInput(e),
     })
   } catch {}
   const ran = await next(e)

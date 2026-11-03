@@ -1011,6 +1011,21 @@ describe('row details', () => {
     expect(all).not.toContain('"tool_name"')                  // the name already says Grep
   })
 
+  test('a hooks row does not record what the tool returned', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('classic.PostToolUse', () => ({}))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.classic.PostToolUse({ tool_name: 'Grep', tool_input: { pattern: 'TODO' }, tool_response: { stdout: 'SECRET-RESULT' }, tool_use_id: 'u9' })
+    const ui = await mountPane($, 'terminal', 60)
+    const open = (await ui.findAll({ type: 'Button' })).find(b => b.key?.startsWith('open-hook-'))
+    await ui.press({ key: open!.key! })
+    const all = (await detailText(ui)).join('').replace(/\s/g, '')
+    expect(all).toContain('"pattern":"TODO"')
+    expect(all).not.toContain('SECRET-RESULT')
+    expect(all).not.toContain('tool_response')
+  })
+
   test('a commands row shows its args as input', async ($, on) => {
     answerTurns(on)
     answerUi(on)
