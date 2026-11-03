@@ -43,6 +43,19 @@ On an older turn the pane stays there and shows `● live: N`; `l` follows
 the latest again. When a turn has more rows than fit, `↑ N earlier rows`
 says so; paging or scrolling back to the bottom follows the live turn.
 
+### Row details
+
+Click a row, or Tab to it and press Enter, to see all of it in the pane:
+kind, name, outcome, start time, duration, tokens, characters, agent and
+parent, target (hooks: the configured commands and plugins), the usage and
+cost of a model request, the row's id and its input: the tool's arguments,
+a hook's event payload (without any output: tool results, Claude's last
+message or a compaction summary) or a command's arguments, as JSON. `‹ back` returns to the same rows. The wheel scrolls a long detail.
+Moving to another turn or `/clear` goes back to the list.
+
+The input is kept up to 4 KB per row. No output is recorded: not what a
+tool returned, not Claude's replies.
+
 Categories named with `pane` lead the filter bar as one `kind:` term,
 replacing any there; `all pane` drops it. The rest of the bar stays. The
 pane filters by its bar only; the categories picked for the report do not
@@ -69,8 +82,8 @@ does not parse is named under the bar and left out; the rest still filters.
   The engine follows `$` and the state atoms only within the hooks module's
   own file, so everything that touches `$` lives here.
 - `hooks/args.ts`, `hooks/report.ts`, `hooks/hookmatch.ts`: pure, unit-tested.
-- `hooks/view.ts`: the pane's filter language, sorting, turn navigation and
-  row window; pure, unit-tested.
+- `hooks/view.ts`: the pane's filter language, sorting, turn navigation,
+  row window and the row-detail lines; pure, unit-tested.
 - `hooks/xtrace.test.ts`: engine tests. A test cannot read plugin state, so
   they assert through the `/xtrace` report and the drawn pane.
 
