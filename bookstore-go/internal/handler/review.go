@@ -2,6 +2,7 @@ package handler
 
 import (
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
 
@@ -45,6 +46,10 @@ func (h *ReviewHandler) CreateReview(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	review, err := h.reviews.Create(bookID, body.Rating, body.ReviewText)
+	if errors.Is(err, store.ErrBookNotFound) {
+		writeError(w, http.StatusNotFound, "book not found")
+		return
+	}
 	if err != nil {
 		writeError(w, http.StatusInternalServerError, err.Error())
 		return

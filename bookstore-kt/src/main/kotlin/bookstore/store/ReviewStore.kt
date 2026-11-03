@@ -3,6 +3,8 @@ package bookstore.store
 import bookstore.model.Review
 import java.sql.Connection
 
+class BookNotFoundException : Exception("book not found")
+
 class ReviewStore(private val db: Connection) {
     fun listByBook(bookID: Int): List<Review> {
         val out = mutableListOf<Review>()
@@ -23,6 +25,10 @@ class ReviewStore(private val db: Connection) {
     }
 
     fun create(bookID: Int, rating: Int, reviewText: String): Review {
+        db.prepareStatement("SELECT 1 FROM books WHERE id = ?").use { ps ->
+            ps.setInt(1, bookID)
+            ps.executeQuery().use { rs -> if (!rs.next()) throw BookNotFoundException() }
+        }
         db.prepareStatement(
             "INSERT INTO reviews (book_id, rating, review_text) VALUES (?, ?, ?)",
             java.sql.Statement.RETURN_GENERATED_KEYS,

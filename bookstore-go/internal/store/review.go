@@ -2,9 +2,13 @@ package store
 
 import (
 	"database/sql"
+	"errors"
 
 	"github.com/xebia/ai-assisted-se-claude-exercise/internal/model"
 )
+
+// ErrBookNotFound is returned when a review is created for a book that does not exist.
+var ErrBookNotFound = errors.New("book not found")
 
 type ReviewStore struct {
 	db *sql.DB
@@ -35,6 +39,13 @@ func (s *ReviewStore) ListByBook(bookID int) ([]model.Review, error) {
 }
 
 func (s *ReviewStore) Create(bookID, rating int, reviewText string) (*model.Review, error) {
+	var exists bool
+	if err := s.db.QueryRow(`SELECT EXISTS(SELECT 1 FROM books WHERE id = ?)`, bookID).Scan(&exists); err != nil {
+		return nil, err
+	}
+	if !exists {
+		return nil, ErrBookNotFound
+	}
 	res, err := s.db.Exec(
 		`INSERT INTO reviews (book_id, rating, review_text) VALUES (?, ?, ?)`,
 		bookID, rating, reviewText,
