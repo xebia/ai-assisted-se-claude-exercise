@@ -91,6 +91,13 @@ export function blocks(pct: number, cells = 10): string {
   return '▰'.repeat(filled) + '▱'.repeat(cells - filled)
 }
 
+// 850 -> "850", 18_400 -> "18k", 200_000 -> "200k", 1_000_000 -> "1M", 1_250_000 -> "1.3M"
+export function tokenCount(n: number): string {
+  if (n < 1000) return String(Math.round(n))
+  if (n < 999_500) return `${Math.round(n / 1000)}k`
+  return `${Number((n / 1_000_000).toFixed(1))}M`
+}
+
 export type Extras = { step?: StepInfo | null; sharedTokens?: number | null; totals?: Totals | null }
 
 // The band's two halves: the cache countdown (left) and the session figures (right).
@@ -108,7 +115,12 @@ export function formatStatus(info: CacheInfo | null, now: number, offsetMin: num
 function statsText(info: CacheInfo | null, extras: Extras): string {
   const parts: string[] = []
   const pct = extras.totals?.ctxPct
-  if (pct != null) parts.push(`ctx ${blocks(pct)} ${Math.round(pct)}%`)
+  if (pct != null) {
+    const used = extras.totals?.ctxTokens
+    const size = extras.totals?.ctxWindow
+    const tokens = used != null && size ? ` ${tokenCount(used)}/${tokenCount(size)}` : ''
+    parts.push(`ctx ${blocks(pct)} ${Math.round(pct)}%${tokens}`)
+  }
   // session cost, then the miss cost in brackets: "$4.12 (miss ≈ $0.38)"
   const total = extras.totals?.usd
   const miss = extras.step && info ? missCostUsd(extras.step, info.ttlMs, extras.sharedTokens ?? 0) : null
