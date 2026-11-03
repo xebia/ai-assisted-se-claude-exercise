@@ -687,12 +687,19 @@ export const register: Register = on => {
             </Box>
           )
           : (
-            <Box key={`row-${r.id}`} flexDirection="row" gap={1}>
-              {paneRowCells(r, width, withPlugins, tokens.get(r.id), pal).map((c, i) => (
-                <Box key={`${r.id}-${i}`} width={c.width} flexShrink={0} justifyContent={c.isRight ? 'flex-end' : 'flex-start'}>
-                  <Text color={c.color} bold={c.bold} wrap="truncate-end">{c.text}</Text>
-                </Box>
-              ))}
+            // The desktop: the cells keep their fixed-width boxes (proportional text lines
+            // up only so); a button laid over the whole row takes the click and the focus.
+            <Box key={`line-${r.id}`} position="relative" hover={{ backgroundColor: pal.separator }}>
+              <Box key={`row-${r.id}`} flexDirection="row" gap={1}>
+                {paneRowCells(r, width, withPlugins, tokens.get(r.id), pal).map((c, i) => (
+                  <Box key={`${r.id}-${i}`} width={c.width} flexShrink={0} justifyContent={c.isRight ? 'flex-end' : 'flex-start'}>
+                    <Text color={c.color} bold={c.bold} wrap="truncate-end">{c.text}</Text>
+                  </Box>
+                ))}
+              </Box>
+              <Box position="absolute" top={0} left={0} right={0} height={1}>
+                <Button key={`open-${r.id}`} plain label=" " onPress={() => openDetail($, r.id)} />
+              </Box>
             </Box>
           ))}
         {detail !== undefined && [

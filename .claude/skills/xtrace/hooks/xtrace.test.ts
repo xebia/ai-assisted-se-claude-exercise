@@ -1051,4 +1051,18 @@ describe('row details', () => {
     expect(kids[0]).toMatchObject({ type: 'Button' })
     expect(await findRow(ui, /^tools\s+Bash\s+ls/)).toBeDefined()
   })
+
+  test('on the desktop a row keeps its cell boxes and opens through its own button', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('tool.call', () => ({ result: {}, text: '' }))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
+    const ui = await mountPane($, 'desktop')
+    const cells = ((await ui.find({ key: 'row-u1' }))?.children ?? []) as { props?: { width?: unknown } }[]
+    expect(cells.every(c => typeof c.props?.width === 'number')).toBe(true)
+    expect(await ui.find({ key: 'line-u1' })).toBeDefined()
+    await ui.press({ key: 'open-u1' })
+    expect(await detailText(ui)).toContain('name Bash')
+  })
 })
