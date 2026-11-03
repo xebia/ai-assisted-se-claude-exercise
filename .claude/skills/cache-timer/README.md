@@ -3,14 +3,15 @@
 A Claude Code mod that shows one line above the prompt:
 
 ```
-cache 14:31 · 60m left (1h)                ctx ▰▱▱▱▱▱▱▱▱▱ 9% · $0.20 (miss ≈ $0.19)
+cache 14:31 · 60m left (1h)       ctx ▰▱▱▱▱▱▱▱▱▱ 9% 18k/200k · $0.20 (miss ≈ $0.19)
 ```
 
 - **Left**: when the prompt cache of this session expires, and how long is
   left. The TTL (1h or 5m) comes from the last cache write in the transcript.
   The line is grey for the first 45 minutes, yellow after, and red in the last
   5 minutes. A toast warns once, 5 minutes before a 1h cache expires.
-- **Right**: how full the context window is, what the session has cost so far
+- **Right**: how full the context window is (as a bar, a percent, and
+  tokens used out of the window's size), what the session has cost so far
   (as `/cost` shows it), and in brackets what a cache miss would cost.
 
 ## The miss cost
