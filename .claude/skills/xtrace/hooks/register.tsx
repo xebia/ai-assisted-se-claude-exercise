@@ -85,7 +85,9 @@ async function loadPluginHooks($: EngineInterface, cwd: string | undefined): Pro
 // A hook row's input: the event payload without the name (the row shows it) and
 // without what the tool returned (`tool_response`, `error`): results are not recorded.
 function hookInput(e: unknown): string | undefined {
-  const { tool_name: _n, tool: _t, tool_response: _r, error: _e, ...payload } = (e ?? {}) as Record<string, unknown>
+  // The name already says the tool; the rest is output (a tool's result or error,
+  // Claude's last reply, a compaction summary), and no output is recorded.
+  const { tool_name: _n, tool: _t, tool_response: _r, error: _e, last_assistant_message: _m, compact_summary: _s, ...payload } = (e ?? {}) as Record<string, unknown>
   return inputText(payload)
 }
 

@@ -1026,6 +1026,21 @@ describe('row details', () => {
     expect(all).not.toContain('tool_response')
   })
 
+  test('a Stop row does not record Claude\'s last reply', async ($, on) => {
+    answerTurns(on)
+    answerUi(on)
+    on('classic.Stop', () => ({}))
+    await $.turn.start({ text: 'x', turnId: 't1' })
+    await $.classic.Stop({ stop_hook_active: false, last_assistant_message: 'REPLY-TEXT' })
+    const ui = await mountPane($, 'terminal', 60)
+    const open = (await ui.findAll({ type: 'Button' })).find(b => b.key?.startsWith('open-hook-'))
+    await ui.press({ key: open!.key! })
+    const all = (await detailText(ui)).join('').replace(/\s/g, '')
+    expect(all).toContain('"stop_hook_active":false')
+    expect(all).not.toContain('REPLY-TEXT')
+    expect(all).not.toContain('last_assistant_message')
+  })
+
   test('a commands row shows its args as input', async ($, on) => {
     answerTurns(on)
     answerUi(on)
@@ -1060,6 +1075,7 @@ describe('row details', () => {
     await $.tool.call({ tool: 'Bash', command: 'ls', tool_use_id: 'u1' })
     const ui = await mountPane($, 'desktop')
     const cells = ((await ui.find({ key: 'row-u1' }))?.children ?? []) as { props?: { width?: unknown } }[]
+    expect(cells.length).toBeGreaterThan(0)
     expect(cells.every(c => typeof c.props?.width === 'number')).toBe(true)
     expect(await ui.find({ key: 'line-u1' })).toBeDefined()
     await ui.press({ key: 'open-u1' })

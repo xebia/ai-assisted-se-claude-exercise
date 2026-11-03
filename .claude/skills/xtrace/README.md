@@ -49,11 +49,12 @@ Click a row, or Tab to it and press Enter, to see all of it in the pane:
 kind, name, outcome, start time, duration, tokens, characters, agent and
 parent, target (hooks: the configured commands and plugins), the usage and
 cost of a model request, the row's id and its input: the tool's arguments,
-a hook's event payload (without the tool's result) or a command's arguments,
-as JSON. `‹ back` returns to the same rows. The wheel scrolls a long detail.
+a hook's event payload (without any output: tool results, Claude's last
+message or a compaction summary) or a command's arguments, as JSON. `‹ back` returns to the same rows. The wheel scrolls a long detail.
 Moving to another turn or `/clear` goes back to the list.
 
-The input is kept up to 4 KB per row. What a tool returned is not recorded.
+The input is kept up to 4 KB per row. No output is recorded: not what a
+tool returned, not Claude's replies.
 
 Categories named with `pane` lead the filter bar as one `kind:` term,
 replacing any there; `all pane` drops it. The rest of the bar stays. The
