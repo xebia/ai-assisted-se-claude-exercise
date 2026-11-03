@@ -61,14 +61,18 @@ in every sentence you say about predictions 2 and 3.
 from `exercises/starters/commit-skill.md` (manual-only, with a
 training-mode defense line; Claude copied the file from a tagged prompt,
 so compare it with that starter, not with the sheet), a
-`/changelog` skill that Claude wrote from the sheet's rule list with a
+`/changelog` skill that Claude wrote from the sheet's short prompt (eight
+rules in four sentences) with a
 `description` the participant wrote by hand (auto-invocable,
 description-driven, backed by a fetched spec file, and tested in task 2
 with two plain-language requests: one that must start the skill, one
 that must not), a cross-platform `UserPromptSubmit` guard that blocks a
-prompt containing an ACME key (script created from a tagged prompt;
-`settings.json` written by hand), and a `Read(.env)` deny rule added by
-hand after the participant watched Claude read `.env` past the guard.
+prompt containing an ACME key (script and `settings.json` both copied by
+Claude from `exercises/starters/guard-secrets.py` and
+`guard-settings.json` with a tagged prompt, so compare them with those
+starters; `python3` instead of `python` is fine), and a `Read(.env)` deny
+rule that Claude added to `settings.json` from a tagged prompt after the
+participant watched Claude read `.env` past the guard.
 That Claude typed the copied and pasted files is not a finding; the sheet
 asked for it.
 
@@ -125,10 +129,12 @@ word that matched too widely.
   `/changelog` open to the model. The most-copied mistake is pasting
   `disable-model-invocation: true` into both.
 - The changelog skill's must-do behaviors: read-or-create
-  `CHANGELOG.md` · read the spec file first · inspect recent commits
-  and tags · add only NEW commits to Unreleased · four groups in order
+  `CHANGELOG.md` · read the spec file first · add only NEW commits to
+  Unreleased · four groups in order
   · imperative entries ending in a bracketed commit hash · **Breaking:**
-  first inside its group · skip noise
+  first inside its group. The sheet's short prompt does not ask for
+  commit and tag inspection or for skipping noise: do not mark those
+  missing
 - A guard script that runs on Windows and mac/linux alike, reads
   `prompt` (not `tool_input`), and stays silent on a clean prompt
 - Exactly the honored JSON shape for this event — a **top-level**
@@ -161,7 +167,7 @@ word that matched too widely.
    applies to you too: do not try to open `.env`; the rule's presence in
    the file is the evidence.
 4. Only then look at the rule: `permissions.deny` holds `Read(.env)`,
-   and the file is still valid JSON after the hand edit (a missing comma
+   and the file is still valid JSON after Claude's edit (a missing comma
    between `permissions` and `hooks` is the usual break; Claude Code
    then loads neither).
 
@@ -190,7 +196,7 @@ word that matched too widely.
   that denies `.env`. It works, and it is more code than the rule for
   the same effect; the sheet asked for the rule to show that a list is
   enough when the file is known. ⚠️, with the one-line rule shown.
-- **Invalid JSON after the hand edit** — the rule and the hook are both
+- **Invalid JSON after the edit** — the rule and the hook are both
   gone, and Claude Code says nothing about it. The fake-event test still
   passes, because it runs the script directly. Check the file.
 - **No written predictions** — the participant judged nothing before
