@@ -6,7 +6,8 @@ export type CacheInfo = { lastAt: number; ttlMs: number | null }
 export type StepInfo = { model: string; contextTokens: number }
 
 // Session figures as /cost and the status line have them.
-export type Totals = { usd: number | null; ctxPct: number | null }
+// ctxTokens/ctxWindow: tokens in the context window now, and its size (absent in values stored before they existed).
+export type Totals = { usd: number | null; ctxPct: number | null; ctxTokens?: number | null; ctxWindow?: number | null }
 
 declare module 'claude-code' {
   interface PluginState {

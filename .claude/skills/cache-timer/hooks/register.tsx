@@ -52,8 +52,15 @@ async function syncFromTranscript($: EngineInterface) {
 // Session cost and context fill, as /cost and the status line have them.
 async function syncTotals($: EngineInterface) {
   const u = await $.session.usage()
-  const next = { usd: u.cost?.usd ?? null, ctxPct: u.context.percent ?? null }
-  await update($, totals, prev => (prev.usd === next.usd && prev.ctxPct === next.ctxPct ? prev : next))
+  const next = {
+    usd: u.cost?.usd ?? null,
+    ctxPct: u.context.percent ?? null,
+    ctxTokens: u.context.tokens ?? null,
+    ctxWindow: u.context.window ?? null,
+  }
+  await update($, totals, prev =>
+    prev.usd === next.usd && prev.ctxPct === next.ctxPct &&
+    prev.ctxTokens === next.ctxTokens && prev.ctxWindow === next.ctxWindow ? prev : next)
 }
 
 // One toast per cache entry, 5 minutes before a 1h cache expires.
