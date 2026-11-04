@@ -14,4 +14,4 @@ bun run start --seed   # wipes and reseeds
 bun test               # runs the test suite
 ```
 
-Please read [preparation.pdf](preparation.pdf)
+Please read [preparation.html](preparation.html)
