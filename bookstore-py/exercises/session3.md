@@ -130,7 +130,7 @@ runs on Windows too.
 
    1. You paste a log line that contains the key.
    2. You ask Claude what the value of `ACME_API_KEY` in `.env` is.
-   3. You ask Claude to run `grep -r acme_live .`.
+   3. You ask Claude to run `grep -r acme-live .`.
 
 **Done when**: both files exist and your three predictions are written down.
 
@@ -143,7 +143,7 @@ and your marked predictions.
 
    ```
    This request failed on staging. What is wrong with it?
-   POST /api/books 401 token=acme_live_7Hq2mX9vK4pL8sW1dR3nT6yB reason=expired
+   POST /api/books 401 token=acme-live-7Hq2mX9vK4pL8sW1dR3nT6yB reason=expired
    ```
 
    The guard blocks it and the terminal shows the reason. Did Claude answer
@@ -192,7 +192,7 @@ your predictions are marked, and `/verify-exercise 3` gave its report.
 **A command the rule does not see.** Send this without a tag:
 
 ```
-Run grep -r acme_live . and show me the output.
+Run grep -r acme-live . and show me the output.
 ```
 
 The key appears. The rule only sees commands that name the file, and

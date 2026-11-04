@@ -12,6 +12,9 @@ answer its questions, and check what they claim against the running API.
 You will **not** write any application code. Exercise 7 builds what you specify here, with a team of
 agents working in parallel.
 
+Spec Kit is a practice tool here: it shows every step of a good spec. It is
+not a recommendation. Your team's version can be much lighter.
+
 ## Why a frontend
 
 The BookStore API has no user interface. So nothing tells you what an empty
@@ -214,7 +217,7 @@ order, for building the frontend.
    constitution (principle IV) says these belong to the foundation phase,
    not to a story. If a story task writes one of them, two agents will edit
    the same file at the same time. One of them loses its work without an
-   error (*tasks.md: A Schedule, Not a Checklist*). Write down:
+   error (*Can These Run at the Same Time?*). Write down:
    *collision: yes or no*, and the file name if yes.
 
 **Done when**: you wrote down *collision: yes* with a file name, or
@@ -260,6 +263,8 @@ The trainer asks the room. Have these answers ready:
 - Everyone started from the same sentence. Where does your spec differ from
   the spec of the person next to you? Would you have seen that difference
   without a spec?
+- A year from now, a colleague changes the book list. Which file in
+  `web/specs/001-*/` should they update, and which files are history?
 
 ## What you should have
 
