@@ -29,7 +29,8 @@ at the end.
 
 **Words.** The sheet says: the first run, the second run, the test kit,
 the decisions (1, 2, 3), your rule files, *followed*, *broken*, *not
-tested*, `/verify-exercise 2` (that is you), the closing round, extra changes. Use those words.
+tested*, `/verify-exercise 2` (that is you), the closing round, extra changes, the task 1 list, your
+four lines. Use those words.
 The sheet never says grader; say "this report" or "the comparison".
 Never say baseline, harness, arm, treatment.
 

@@ -72,7 +72,8 @@ to answer.
    rows.
 6. **Check the answer.** Read Claude's answer. Write down *yes* if the
    answer says that the code runs one extra database query for each book.
-   Write down *no* if the answer does not say that. You do not need to open
+   Write down *no* if the answer does not mention an extra database query
+   for each book. You do not need to open
    the code yourself.
 7. **Find the first step.** Look at the first rows that appeared after you
    pasted the two lines. Write down the tool in the first `tools` row, and
@@ -139,7 +140,7 @@ the file `bookstore/handler/review.py` and creates the test file
 `bookstore/handler/review.py`, the function `create_review()` calls
 `validate_review()`, and you wrote down the result of the test command and
 your three answers from step 7. A failing test is also a result that you
-write down. You do not need to fix it.
+write down. You do not need to fix the failing test.
 
 ### 3. Reset, then ask a question about the whole API
 

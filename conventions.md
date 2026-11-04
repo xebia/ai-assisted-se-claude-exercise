@@ -104,11 +104,11 @@ source of truth — when it changes there, copy it here again.
 
 ## Skills: coach, verifier, save-changes, pollute
 
-- `/prompt-coach` (card 4, session 2 task 1) and
+- `/prompt-coach` (card 1, session 2 task 1) and
   `/context-coach` (session 2): per-task cards in `cards/<n>-<slug>.md`,
-  where `<n>` is the number the sheet types after the command. It is no
-  longer always the task number: `/prompt-coach 4` is exercise 2 task 1,
-  `/context-coach 2` is exercise 2's bonus. Cards are language-agnostic — they name behaviors and
+  where `<n>` is the number the sheet types after the command. Keep it the
+  task number: `/prompt-coach 1` is exercise 2 task 1. The one exception
+  is `/context-coach 2`, which is exercise 2's bonus. Cards are language-agnostic — they name behaviors and
   layers, never one language's paths. Coach rules (see each SKILL.md):
   never write the artifact for the participant, one nudge per turn, max
   three rounds, participants may overrule, and **held-back answers** (facts
