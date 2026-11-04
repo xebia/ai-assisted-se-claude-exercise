@@ -101,7 +101,7 @@ Shapes are not uniform, which matters when you write the spec:
 
 ## Setup
 
-See `preparation.pdf` in the `bookstore` folder, one up. In short:
+See `preparation.html` in the `bookstore` folder, one up. In short:
 
 ```bash
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git

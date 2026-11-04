@@ -1,5 +1,6 @@
 package bookstore.handler
 
+import bookstore.store.BookNotFoundException
 import bookstore.store.ReviewStore
 import bookstore.util.Json
 import com.sun.net.httpserver.HttpExchange
@@ -30,6 +31,8 @@ class ReviewHandler(private val reviews: ReviewStore) {
                 (parsed["rating"] as? Number)?.toInt() ?: 0,
                 (parsed["review_text"] as? String) ?: "",
             )
+        } catch (_: BookNotFoundException) {
+            return writeError(ex, 404, "book not found")
         } catch (e: Exception) {
             return writeError(ex, 500, e.message ?: "failed to create review")
         }

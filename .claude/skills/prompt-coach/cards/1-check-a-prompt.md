@@ -1,14 +1,17 @@
-# Card 4 — Check a given prompt (exercise 2, task 1)
+# Card 1 — Check a given prompt (exercise 2, task 1)
 
 **What they bring:** not a draft prompt. They bring a list of decisions
 that this given prompt leaves to Claude, each marked *task* or *team*,
-plus the two or three sentences they would add for the *task* lines:
+plus one sentence per *task* decision and a *Define done* sentence,
+which they would add to this prompt. The sheet says the number 1 in
+`/prompt-coach 1` is the number of this task; do not explain it again.
+This is the prompt:
 
 > Add a DELETE /api/reviews/{id} endpoint to the BookStore API, with tests.
 
 They do not run their version. In task 2 they run the given prompt as it
 is, so the before-and-after comparison of exercise 2 stays fair. Your
-job is a sharper list and sharper sentences, in one round.
+job is a sharper list and sharper sentences, in one round. Say "your additions" for the sentences, as the sheet does.
 
 **Slide anchors:** *The CONTEXT-TASK-OUTCOME Framework* (the four verbs:
 Scope it, Constrain it, Direct it, Define done) · *Green Tests. What Could

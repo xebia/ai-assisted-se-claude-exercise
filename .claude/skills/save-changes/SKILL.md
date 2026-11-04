@@ -57,7 +57,7 @@ Run these checks scoped to the current project directory (the participant's
 live inside it, so **every git command below must be scoped with `.` and run
 from the project folder**):
 
-1. **Right directory.** The cwd must contain `exercises/session2.pdf` (it is
+1. **Right directory.** The cwd must contain `exercises/session2.html` (it is
    the project root). If not: say where you are, say the command must run
    from the `bookstore` folder, and stop.
 2. **Something to save.** `git status --porcelain -- .` must be non-empty.

@@ -203,7 +203,7 @@ can go on. Which line in your prompt would have made the sub-agent write
 it?" The consequence stays visible; the participant is not stuck; later
 sessions that read the file still work.
 
-**Exception — card 4 is not dispatched.** It checks a list of
+**Exception — card 1 is not dispatched.** It checks a list of
 open decisions for a given prompt, not a draft. The participant runs the
 given prompt themselves in the next task, unchanged. The card replaces
 the *Ready to ship* line and the closing words. Follow the card.

@@ -28,4 +28,4 @@ mvn test                                             # runs the test suite
 The custom test runner in `src/test/kotlin/TestRunner.kt` discovers `@Test`
 annotated methods via reflection and reports pass/fail counts.
 
-Please read [preparation.pdf](preparation.pdf)
+Please read [preparation.html](preparation.html)
