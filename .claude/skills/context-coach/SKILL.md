@@ -53,6 +53,9 @@ these words, so never use them in a reply. Translate:
 | retro, retrospective | the team meeting |
 | tidying up on the side, drive-by change | extra clean-up, a change the task did not ask for |
 | wrap, plenary harvest | task 3, the closing round |
+| pointer line, pointer | line 1 of `CLAUDE.local.md`: the line that tells Claude to read the rule files |
+| load-bearing, checkable rule | a rule that a reader of a diff can say Claude broke |
+| open decision | a decision the prompt does not say |
 
 Example of the register. Too dense:
 
@@ -83,8 +86,9 @@ Right:
   these predictions.
 - **The freeloader test decides.** For every line in a context file ask:
   *what would Claude do differently because this line exists?* No answer:
-  the line does not earn its tokens, whatever it says. This is the *Which
-  CLAUDE.md Line Is Worth Its Tokens?* slide, applied line by line.
+  the line does not earn its tokens, whatever it says. This is the
+  *Include in CLAUDE.md / Leave out* test of *What Did You Tell Your Last
+  New Team Member?*, applied line by line.
 - **The participant can overrule you.** "Keep it anyway" or "I'll go on"
   gets an immediate greenlight plus one line restating the effect you
   expect. Consequences teach better than blocking.

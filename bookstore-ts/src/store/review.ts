@@ -1,6 +1,12 @@
 import type { Database } from "bun:sqlite";
 import type { Review } from "../model/review";
 
+export class BookNotFoundError extends Error {
+  constructor() {
+    super("book not found");
+  }
+}
+
 export class ReviewStore {
   constructor(private db: Database) {}
 
@@ -13,6 +19,9 @@ export class ReviewStore {
   }
 
   create(bookID: number, rating: number, reviewText: string): Review {
+    if (!this.db.query(`SELECT 1 FROM books WHERE id = ?`).get(bookID)) {
+      throw new BookNotFoundError();
+    }
     const res = this.db
       .query(`INSERT INTO reviews (book_id, rating, review_text) VALUES (?, ?, ?)`)
       .run(bookID, rating, reviewText);

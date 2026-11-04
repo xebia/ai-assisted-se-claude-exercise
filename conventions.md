@@ -20,8 +20,8 @@ branch into a folder named `bookstore`:
 ```
 bookstore/                 <- bookstore-<lang>/: code, tests, CLAUDE.md, README.md
   .claude/skills/          <- the root .claude/skills/ (coaches, verifier, helpers)
-  exercises/session1.pdf … session8.pdf, exercises/starters/
-  preparation.pdf
+  exercises/session1.html … session8.html, exercises/starters/
+  preparation.html
   web/                     <- bookstore-web/ (sessions 6 and 7)
   mcp-sqlite/server.py     <- mcp-sqlite/ (session 4)
   bookstore-plugin/        <- bookstore-plugin/ (session 4 bonus)
@@ -35,21 +35,22 @@ Rules that follow from this:
   `mcp-sqlite/server.py`, the plugin is `bookstore-plugin`. Never write
   `bookstore-go/...` or `../bookstore-web` in participant-facing text; the
   package build (`STRICT=1`) fails on such paths.
-- **Sheets ship as PDF only.** The Markdown is the source; the package
-  renders it (`scripts/render-sheets.sh`, styled by `scripts/sheet.css`)
-  and rewrites `preparation.md` / `exercises/sessionN.md` mentions to `.pdf`.
-  Do not commit PDFs. **A shell command in a code block is at most 90
-  characters** (after the list indentation): the PDF line fits 92, and a
-  command that wraps in the PDF is pasted as two lines, which runs half a
-  command. Drop optional flags (`--transport stdio` is the default, `-b` is
-  `--branch`) before splitting a command with `\`, which PowerShell does not
-  accept. Prompts pasted into Claude may wrap; a newline in the chat box is
-  harmless.
+- **Sheets ship as HTML pages only.** The Markdown is the source; the
+  package renders each sheet to one self-contained page in the Xebia style
+  (`scripts/render-sheets.sh` with `scripts/sheet-template.html`,
+  `sheet.css`, `sheet-copy.js`, `sheet-logo.svg` and the Inter font in
+  `scripts/fonts/`) and rewrites `preparation.md` / `exercises/sessionN.md`
+  mentions to `.html`. Participants open a sheet with a double-click; it
+  works offline. Do not commit rendered sheets.
+- **Every code block gets a Copy button**, and copying from the page keeps
+  a long command or prompt on one line however it wraps on screen, so there
+  is no line-length limit for copying. Keep a shell command on one line
+  anyway: never split it with `\`, which PowerShell does not accept.
+  Indentation in YAML or Python blocks survives the copy.
 - **The header block** (`**Session**`, `**Duration**`, `**Project**`) ends
-  the first two lines with `\`, otherwise the three run together in the PDF.
+  the first two lines with `\`, otherwise the three run together on the page.
 - **Dry-run in a package, not in the source folder.** `just package go`
-  (needs pandoc and Chrome; `PDF=skip just package go` on a machine without
-  them) writes `dist/bookstore-go`; walk the sheet there, because that is
+  (needs pandoc; `HTML=skip just package go` on a machine without it) writes `dist/bookstore-go`; walk the sheet there, because that is
   the tree participants have. The trainer's plugin demo runs from a package
   too, so the room sees the same paths.
 - **`web/` sits inside the backend project.** Claude Code would load the
@@ -104,11 +105,11 @@ source of truth — when it changes there, copy it here again.
 
 ## Skills: coach, verifier, save-changes, pollute
 
-- `/prompt-coach` (card 4, session 2 task 1) and
+- `/prompt-coach` (card 1, session 2 task 1) and
   `/context-coach` (session 2): per-task cards in `cards/<n>-<slug>.md`,
-  where `<n>` is the number the sheet types after the command. It is no
-  longer always the task number: `/prompt-coach 4` is exercise 2 task 1,
-  `/context-coach 2` is exercise 2's bonus. Cards are language-agnostic — they name behaviors and
+  where `<n>` is the number the sheet types after the command. Keep it the
+  task number: `/prompt-coach 1` is exercise 2 task 1. The one exception
+  is `/context-coach 2`, which is exercise 2's bonus. Cards are language-agnostic — they name behaviors and
   layers, never one language's paths. Coach rules (see each SKILL.md):
   never write the artifact for the participant, one nudge per turn, max
   three rounds, participants may overrule, and **held-back answers** (facts

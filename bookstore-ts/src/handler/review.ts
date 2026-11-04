@@ -1,4 +1,4 @@
-import type { ReviewStore } from "../store/review";
+import { BookNotFoundError, type ReviewStore } from "../store/review";
 import { writeError, writeJSON } from "./response";
 
 export class ReviewHandler {
@@ -28,6 +28,7 @@ export class ReviewHandler {
       const review = this.reviews.create(bookID, body.rating, body.review_text);
       return writeJSON(201, review);
     } catch (e: any) {
+      if (e instanceof BookNotFoundError) return writeError(404, "book not found");
       return writeError(500, e?.message ?? "failed to create review");
     }
   };
