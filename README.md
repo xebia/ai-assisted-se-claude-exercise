@@ -13,4 +13,4 @@ go run . --seed       # wipes and reseeds
 go test ./...         # runs the test suite
 ```
 
-Please read [preparation.pdf](preparation.pdf)
+Please read [preparation.html](preparation.html)

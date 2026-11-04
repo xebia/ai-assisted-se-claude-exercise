@@ -24,10 +24,11 @@ The three decisions, as the sheet gives them:
 round, before the new task. Name the single weakest point, ask one
 question, stop. The comparison (`/verify-exercise 2`) gives the real feedback after the second run.
 
-**Slide anchors:** *Rules — Splitting CLAUDE.md by Topic* · *Rule
-Discovery: With or Without Paths* · *Progressive Disclosure* · *Which
-CLAUDE.md Line Is Worth Its Tokens?* · the **Relevance** and
-**Correctness** dimensions.
+**Slide anchors:** *The CLAUDE.md Hierarchy* · *Rule Discovery: With or
+Without Paths* · *When Does a Path Rule Not Load?* · *What Did You Tell
+Your Last New Team Member?* (what the code does not show) · the
+**Relevance** and **Completeness** dimensions (*Four Dimensions of
+Context*).
 
 ## Concept applicability
 
