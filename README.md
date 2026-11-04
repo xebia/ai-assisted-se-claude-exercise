@@ -15,4 +15,4 @@ python3 main.py --seed     # wipes and reseeds
 python3 -m unittest        # runs the test suite
 ```
 
-Please read [preparation.pdf](preparation.pdf)
+Please read [preparation.html](preparation.html)

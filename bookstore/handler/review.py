@@ -2,7 +2,7 @@ import json
 from http.server import BaseHTTPRequestHandler
 
 from bookstore.handler.response import write_error, write_json
-from bookstore.store.review import ReviewStore
+from bookstore.store.review import BookNotFoundError, ReviewStore
 
 
 class ReviewHandler:
@@ -41,6 +41,9 @@ class ReviewHandler:
                 int(body.get("rating", 0)),
                 body.get("review_text", ""),
             )
+        except BookNotFoundError:
+            write_error(h, 404, "book not found")
+            return
         except Exception as e:
             write_error(h, 500, str(e))
             return

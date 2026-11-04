@@ -4,6 +4,10 @@ from typing import Optional
 from bookstore.model.review import Review
 
 
+class BookNotFoundError(Exception):
+    pass
+
+
 class ReviewStore:
     def __init__(self, db: sqlite3.Connection):
         self.db = db
@@ -16,6 +20,8 @@ class ReviewStore:
         return [Review(**dict(r)) for r in rows]
 
     def create(self, book_id: int, rating: int, review_text: str) -> Review:
+        if self.db.execute("SELECT 1 FROM books WHERE id = ?", (book_id,)).fetchone() is None:
+            raise BookNotFoundError("book not found")
         cur = self.db.execute(
             "INSERT INTO reviews (book_id, rating, review_text) VALUES (?, ?, ?)",
             (book_id, rating, review_text),
