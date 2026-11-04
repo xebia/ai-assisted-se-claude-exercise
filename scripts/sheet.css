@@ -1,27 +1,122 @@
-/* Print stylesheet for exercise sheets (scripts/render-sheets.sh). */
-@page {
-  size: A4;
-  margin: 18mm 14mm 20mm;
-  @bottom-right { content: counter(page) " / " counter(pages); font: 9pt system-ui, sans-serif; color: #666; }
+/* Exercise sheets (scripts/render-sheets.sh): Xebia 2026 styling for the browser, plus print rules
+   so a participant can print a sheet from the browser.
+   Colours, font, logo and bullet come from @xebia/slidev-theme-xebia-2026 (the slide theme). */
+:root {
+  --xb-ink: #000000;
+  --xb-aubergine: #150027;   /* secondary-color, logo */
+  --xb-purple: #831b84;      /* primary-accent-color */
+  --xb-cta: #621563;         /* cta-color, links and buttons */
+  --xb-lilac: #b75eb8;       /* cta-accent-color */
+  --xb-magenta: #e331d0;     /* secondary-accent-color */
+  --xb-grey1: #f5f5f5;
+  --xb-grey2: #e3e3e5;
+  --xb-grey3: #c8c8cd;
+  --xb-grey4: #78787d;
+  --xb-table-head: #91759e;  /* chart8 */
+  --xb-table-line: #d3ccec;  /* chart11 */
+  --mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 }
-html { font: 10.5pt/1.5 system-ui, -apple-system, "Segoe UI", Helvetica, Arial, sans-serif; color: #1a1a1a; }
-body { max-width: 46rem; margin: 0 auto; padding: 0 1rem; }
-@media print { body { max-width: none; padding: 0; } }
-h1 { font-size: 1.9em; margin: 0 0 .4em; }
-h2 { font-size: 1.35em; margin: 1.4em 0 .4em; border-bottom: 1px solid #ddd; padding-bottom: .15em; }
-h3 { font-size: 1.12em; margin: 1.3em 0 .3em; }
-h1, h2, h3, h4 { break-after: avoid; line-height: 1.25; }
-p, li { orphans: 3; widows: 3; }
-hr { border: 0; border-top: 1px solid #ddd; margin: 1.2em 0; }
-code { font: .9em ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: #f3f4f6; padding: .1em .3em; border-radius: 3px; }
-/* Commands must stay copyable and complete: wrap long lines, never clip, never split over pages. */
-/* 8pt code and 14mm side margins fit 92 characters on one line (measured); conventions.md caps shell commands at 90. */
-pre { background: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 5px; padding: .6em .6em; white-space: pre-wrap; overflow-wrap: anywhere; break-inside: avoid; }
-pre code { background: none; padding: 0; font-size: .76em; }
-li > pre { margin-left: -1.5em; }
-blockquote { margin: .8em 0; padding: .1em 1em; border-left: 4px solid #c8ccd1; color: #333; }
-table { border-collapse: collapse; margin: .8em 0; break-inside: avoid; }
-th, td { border: 1px solid #d0d4d9; padding: .3em .6em; text-align: left; }
-th { background: #f3f4f6; }
-a { color: #0b5cad; }
+
+/* ---------- Page ---------- */
+html { font: 16px/1.6 "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif; color: var(--xb-ink); background: #fff;
+  -webkit-text-size-adjust: 100%; font-feature-settings: "cv11", "ss01"; }
+body { max-width: 50rem; margin: 0 auto; padding: 0 1.5rem 4rem; }
+
+.xb-masthead { display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+  padding: 1.5rem 0 1.1rem; margin-bottom: 2.5rem; border-bottom: 1px solid var(--xb-grey2); position: relative; }
+.xb-masthead::after { content: ""; position: absolute; left: 0; bottom: -1px; width: 6rem; height: 3px;
+  background: linear-gradient(90deg, var(--xb-aubergine), var(--xb-purple) 55%, var(--xb-magenta)); }
+.xb-logo { height: 26px; width: auto; display: block; }
+.xb-course { font-size: .8rem; color: var(--xb-grey4); text-align: right; line-height: 1.35; }
+.xb-course b { display: block; color: var(--xb-ink); font-weight: 600; }
+
+/* ---------- Headings ---------- */
+h1 { font-size: 2.6rem; line-height: 1.12; font-weight: 400; letter-spacing: -.02em; margin: 0 0 1.2rem; text-wrap: balance; }
+h2 { font-size: 1.35rem; line-height: 1.3; font-weight: 600; color: var(--xb-purple); margin: 3rem 0 .7rem; }
+h3 { font-size: 1.08rem; line-height: 1.35; font-weight: 600; margin: 2.2rem 0 .5rem; }
+h4 { font-size: 1rem; font-weight: 600; margin: 1.6rem 0 .4rem; }
+h2, h3, h4 { scroll-margin-top: 1rem; }
+
+/* The Session / Duration / Project block that opens every sheet */
+h1 + p { margin: 0 0 2rem; line-height: 1.75; padding: .9rem 1.1rem;
+  background: var(--xb-grey1); border-radius: .5rem; font-size: .9rem; color: #333; }
+h1 + p strong { color: var(--xb-purple); font-weight: 600; }
+
+p { margin: .7rem 0; }
+strong { font-weight: 600; }
+a { color: var(--xb-cta); text-decoration: underline; text-decoration-color: var(--xb-lilac); text-underline-offset: 2px; }
+a:hover { text-decoration-color: var(--xb-cta); }
+hr { border: 0; border-top: 1px solid var(--xb-grey2); margin: 2.2rem 0; }
+
+/* ---------- Lists: Xebia ring bullet ---------- */
+ul, ol { padding-left: 1.6rem; margin: .7rem 0; }
+li { margin: .35rem 0; }
+li > ul, li > ol { margin: .3rem 0; }
+ul { list-style: none; }
+ul > li { position: relative; }
+ul > li::before { content: ""; position: absolute; left: -1.15rem; top: .5em; width: 9px; height: 9px;
+  background: var(--xb-purple);
+  -webkit-mask: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14"%3E%3Cpath d="M7,0C10.885,0 14,3.115 14,7C14,10.885 10.885,14 7,14C3.115,14 0,10.885 0,7C0,3.115 3.115,0 7,0zM7,10.395C8.89,10.395 10.395,8.89 10.395,7C10.395,5.11 8.89,3.605 7,3.605C5.11,3.605 3.605,5.11 3.605,7C3.605,8.89 5.11,10.395 7,10.395z"/%3E%3C/svg%3E') center / contain no-repeat;
+          mask: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 14 14"%3E%3Cpath d="M7,0C10.885,0 14,3.115 14,7C14,10.885 10.885,14 7,14C3.115,14 0,10.885 0,7C0,3.115 3.115,0 7,0zM7,10.395C8.89,10.395 10.395,8.89 10.395,7C10.395,5.11 8.89,3.605 7,3.605C5.11,3.605 3.605,5.11 3.605,7C3.605,8.89 5.11,10.395 7,10.395z"/%3E%3C/svg%3E') center / contain no-repeat; }
+ol > li::marker { color: var(--xb-purple); font-weight: 600; }
+
+/* ---------- Code ---------- */
+code { font-family: var(--mono); font-size: .86em; background: var(--xb-grey1); border: 1px solid var(--xb-grey2);
+  padding: .05em .35em; border-radius: .25rem; }
 :not(pre) > code { white-space: nowrap; }
+pre { position: relative; margin: .9rem 0; padding: .85rem 1rem; padding-right: 5.5rem;
+  background: var(--xb-grey1); border: 1px solid var(--xb-grey2); border-left: 3px solid var(--xb-purple);
+  border-radius: .5rem; font-size: .84rem; line-height: 1.6;
+  white-space: pre-wrap; overflow-wrap: anywhere; } /* wraps on screen only; a copy still gets one line */
+pre code { background: none; border: 0; padding: 0; font-size: inherit; white-space: inherit; }
+
+.xb-copy { position: absolute; top: .5rem; right: .5rem; display: inline-flex; align-items: center; gap: .35rem;
+  font: 600 .75rem/1 "Inter", sans-serif; color: var(--xb-cta); background: #fff;
+  border: 1px solid var(--xb-grey3); border-radius: 999px; padding: .4rem .7rem; cursor: pointer;
+  transition: background .15s, color .15s, border-color .15s; }
+.xb-copy:hover { border-color: var(--xb-cta); }
+.xb-copy:focus-visible { outline: 2px solid var(--xb-purple); outline-offset: 2px; }
+.xb-copy svg { width: 13px; height: 13px; }
+.xb-copy.is-done { background: var(--xb-cta); border-color: var(--xb-cta); color: #fff; }
+
+/* ---------- Quotes and tables ---------- */
+blockquote { margin: 1.1rem 0; padding: .7rem 1.1rem; border-left: 3px solid var(--xb-lilac);
+  background: #faf6fa; border-radius: 0 .5rem .5rem 0; color: #222; }
+blockquote > :first-child { margin-top: 0; }
+blockquote > .xb-callout { margin: 0 0 .3rem; font-size: .75rem; font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--xb-purple); }
+blockquote > :last-child { margin-bottom: 0; }
+table { border-collapse: collapse; margin: 1.1rem 0; font-size: .92rem; width: 100%; }
+th, td { border: 1px solid var(--xb-table-line); padding: .45rem .7rem; text-align: left; vertical-align: top; }
+th { background: var(--xb-table-head); color: #fff; font-weight: 600; }
+tr:nth-child(even) td { background: #fbfafd; }
+
+.xb-footer { margin-top: 4rem; padding-top: 1rem; border-top: 1px solid var(--xb-grey2);
+  font-size: .78rem; color: var(--xb-grey4); display: flex; justify-content: space-between; gap: 1rem; }
+
+@media (max-width: 600px) {
+  html { font-size: 15px; }
+  body { padding: 0 1rem 3rem; }
+  h1 { font-size: 2rem; }
+  .xb-course { display: none; }
+  pre { padding-right: 1rem; padding-top: 2.6rem; }
+}
+
+/* ---------- Print (browser print / save as PDF) ---------- */
+@page { size: A4; margin: 16mm 14mm 18mm;
+  @bottom-right { content: counter(page) " / " counter(pages); font: 8pt "Inter", sans-serif; color: #78787d; } }
+@media print {
+  html { font-size: 10pt; }
+  body { max-width: none; padding: 0; }
+  .xb-masthead { padding-top: 0; margin-bottom: 1.6rem; }
+  .xb-copy { display: none; }
+  h1 { font-size: 2rem; }
+  h2 { margin-top: 1.8rem; }
+  h1, h2, h3, h4 { break-after: avoid; }
+  p, li { orphans: 3; widows: 3; }
+  pre { padding-right: 1rem; break-inside: avoid; }
+  pre { font-size: 7.6pt; }
+  li > pre { margin-left: -1.5em; }
+  table, blockquote { break-inside: avoid; }
+  .xb-footer { display: none; }
+}
