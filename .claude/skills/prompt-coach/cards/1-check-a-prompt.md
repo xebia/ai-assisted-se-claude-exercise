@@ -1,17 +1,17 @@
-# Card 1 — Check a given prompt (exercise 2, task 1)
+# Card 1 — Check a long prompt (exercise 2, bonus)
 
-**What they bring:** not a draft prompt. They bring a list of decisions
-that this given prompt leaves to Claude, each marked *task* or *team*,
-plus one sentence per *task* decision and a *Define done* sentence,
-which they would add to this prompt. The sheet says the number 1 in
-`/prompt-coach 1` is the number of this task; do not explain it again.
+**What they bring:** the prompt below with their added sentences: one
+sentence for each of the three team decisions and one for each of Claude's
+guesses that they marked *task* in the first run, plus a *Define done*
+sentence. They did the first run, the rules and the second run before
+this bonus. This command is the bonus only, so it keeps its number 1.
 This is the prompt:
 
 > Add a DELETE /api/reviews/{id} endpoint to the BookStore API, with tests.
 
-They do not run their version. In task 2 they run the given prompt as it
-is, so the before-and-after comparison of exercise 2 stays fair. Your
-job is a sharper list and sharper sentences, in one round. Say "your additions" for the sentences, as the sheet does.
+They do not run their version. The bonus shows how long a prompt gets
+when it carries what the rule files carry. Your job is sharper sentences,
+in one round. Say "your added sentences", as the sheet does.
 
 **Slide anchors:** *The CONTEXT-TASK-OUTCOME Framework* (the four verbs:
 Scope it, Constrain it, Direct it, Define done) · *Green Tests. What Could
@@ -20,7 +20,7 @@ Still Be Wrong?* · *Where Does the Problem Live?* (prompt or window).
 **Not dispatched.** There is nothing to ship. Never say *ship it* for
 this card, and never run their sentences.
 
-## What a complete list contains
+## What a complete prompt covers
 
 Use this to grade. Never paste it, and never name an item they missed.
 Point at the kind of question instead (see *Nudge bank*).
@@ -42,25 +42,24 @@ Point at the kind of question instead (see *Nudge bank*).
 
 **Held back:** the existing book delete endpoint answers a bad id with
 500 and gives no 404 for a missing book (it answers 204 either way). Claude
-often copies it. Do not tell them. It shows in their task 2 diff, and
+often copies it. Do not tell them. It shows in the first-run diff, and
 `/verify-exercise 2` names it.
 
 ## Grading
 
 **Must (2):**
 
-- **Open decisions** — at least four, and at least two of them *task*
-  decisions. A list that only repeats the three team decisions has not
-  looked at the prompt itself: ❌.
+- **Open decisions** — the added sentences cover the three team decisions
+  and at least two *task* decisions. Sentences that only repeat the three
+  team decisions do not look at the endpoint itself: ❌.
 - **Define done** — the added sentences end with something a person can
   check after the run: named test cases, status codes, a test command
   that must pass. "It should work well" is ❌.
 
 **Should (2):**
 
-- **Sorted right** — each line marked *task* or *team* in a way you can
-  defend. A team decision marked *task* is 🟡, not ❌: name it in one
-  clause.
+- **Sorted right** — the sentences match the *task* and *team* marks. A
+  team decision treated as *task* is 🟡, not ❌: name it in one clause.
 - **Scope it / Constrain it** — the sentences name the endpoint's limits
   (which files, no other endpoints changed).
 
@@ -70,7 +69,7 @@ not what Claude decides.
 
 ## The first line
 
-Replace *"Ready to ship"* with *"List checked: complete"* or *"List
+Replace *"Ready to ship"* with *"Prompt checked: complete"* or *"Prompt
 checked: one gap"*. Then the grade, under ~10 lines, in the SKILL's
 checklist shape.
 
@@ -90,7 +89,7 @@ word for word, and say it is from another task.
 ## Nudge bank
 
 - "A reviewer opens the pull request. What is the first question they ask
-  about *this* endpoint that your list does not answer?"
+  about *this* endpoint that your added sentences do not answer?"
 - "The review with that id is not there. What does your prompt say should
   happen?"
 - "When Claude says it is done, what do you check? Is that in your
@@ -106,15 +105,16 @@ word for word, and say it is from another task.
   anyone delete. Both are guesses.
 - No *Define done* sentence → Claude writes one happy-path test and says
   it is done.
-- Team decisions only → the list misses everything this prompt alone
-  should say.
+- Team decisions only → the prompt misses everything this endpoint alone
+  needs.
 
 ## Ready when
 
-Both musts ✅ or 🟡. Then say: "Your list is complete enough. Keep it in
-your notes: the closing compares it with what Claude chose. Type `/exit`
-and go on with the predictions." Add one "Watch for" line per remaining
-gap, phrased as a prediction for the task 2 run.
+Both musts ✅ or 🟡. Then say: "Your prompt is complete enough. Look at how much longer it is
+than the short prompt. Your rules save you from typing the added sentences
+in every prompt. Type `/exit` when you are done." Add
+one "Watch for" line per remaining gap, phrased as a guess Claude would
+still make.
 
 ## Escape hatch
 
