@@ -207,8 +207,9 @@ closing round.
 **Write the long prompt.** Your rules replace sentences that you would
 otherwise type in every prompt. To see how many, write the DELETE prompt
 again. Add one sentence for each team decision and one for each guess you
-marked *task*. Then run `/prompt-coach 1`, paste your prompt as your next
-message, and count the words of your prompt and of your rule files.
+marked *task*. Then run `/prompt-coach 1` and paste your prompt as your next
+message. Last, look at how much longer your prompt is than the short one.
+Your rules save you from typing those added sentences in every prompt.
 
 **Change an old test.** This part checks decision 1, which says that your
 team does not rewrite the old tests. Start a fresh session and paste this

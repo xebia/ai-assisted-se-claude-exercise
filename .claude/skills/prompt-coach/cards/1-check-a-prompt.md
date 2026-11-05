@@ -110,8 +110,9 @@ word for word, and say it is from another task.
 
 ## Ready when
 
-Both musts ✅ or 🟡. Then say: "Your prompt is complete enough. Count its words and
-compare them with your rule files. Type `/exit` when you are done." Add
+Both musts ✅ or 🟡. Then say: "Your prompt is complete enough. Look at how much longer it is
+than the short prompt. Your rules save you from typing the added sentences
+in every prompt. Type `/exit` when you are done." Add
 one "Watch for" line per remaining gap, phrased as a guess Claude would
 still make.
 
