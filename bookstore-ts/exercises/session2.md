@@ -18,8 +18,8 @@ in a diff whether Claude followed a decision.
 - The commands in this sheet, such as `/save-changes`, came with the project.
 - Training mode is on: Claude asks you questions before it helps. Stuck?
   Type *just tell me* in the chat.
-- Never edit `CLAUDE.md`.
-- Write notes on paper or in a text file outside the project.
+- Never edit `CLAUDE.md`. Write your notes on paper or in a text file
+  outside the project.
 - The trainer tells you when to start each next task.
 
 ## Your team's decisions
@@ -94,11 +94,12 @@ Nothing told Claude your team's decisions, so it chose alone. Now you
 write them down in three files: `.claude/rules/testing.md`,
 `.claude/rules/handlers.md` and `CLAUDE.local.md`. Decisions 1 and 2 go in
 rule files with a `paths:` line (slide *Rule Discovery: With or Without
-Paths*), and decision 3 goes in `CLAUDE.local.md`, your private version of
+Paths*). Decision 3 goes in `CLAUDE.local.md`, your private version of
 `CLAUDE.md`.
 
-1. **Create the rule for decision 1.** Start `claude` and paste this block.
-   Claude creates the rule file:
+1. **Create the rule for decision 1.** Start `claude`. This task needs no
+   fresh session, because Claude only creates a file, and task 3 restarts
+   Claude anyway. Paste this block, and Claude creates the rule file:
 
    ```
    [Exercise 2 experiment — execute directly, no leading questions.] Create .claude/rules/testing.md with exactly this content, nothing added or changed:
@@ -130,21 +131,19 @@ Paths*), and decision 3 goes in `CLAUDE.local.md`, your private version of
 
 3. **Create `CLAUDE.local.md`.** In your editor, create the file
    `CLAUDE.local.md` in the `bookstore` folder next to `CLAUDE.md`. If it
-   exists already, keep its text below your new lines. Copy this text to
-   the top of the file, as line 1:
+   exists already, keep its text below your new lines. Copy these two
+   lines to the top of the file, as line 1 and line 2. Line 2 is the rule
+   for decision 3, and it is checkable too.
 
    ```
    Before you write or edit a file under tests/handler/ or src/handler/, read .claude/rules/handlers.md. Before you write a test, read .claude/rules/testing.md.
+   A change may touch only the files of the endpoint it adds, the file that registers its route, and their tests.
    ```
 
-4. **Write the rule for decision 3.** Write line 2, directly below line 1:
-   decision 3 as a checkable rule that names the files a change may touch.
-   Example for another subject: *"A bug fix may touch only the file with
-   the bug and its test."*
-
-A `paths:` rule may not load when Claude creates a new file or edits
-through a script. Claude reads `CLAUDE.local.md` at every session start,
-so line 1 makes sure that Claude reads both rule files.
+A `paths:` rule may not load when Claude creates a new file, or when it
+edits a file through a script. Claude reads `CLAUDE.local.md` at every
+session start. So line 1 makes sure that Claude reads both rule files
+anyway.
 
 **Done when**: the three files exist, line 1 of `CLAUDE.local.md` names
 both rule files, and `git status` does not list `CLAUDE.md`.
@@ -154,8 +153,8 @@ both rule files, and `git status` does not list `CLAUDE.md`.
 Your three files now hold the decisions. You run the same prompt again, so
 every difference to the first run comes from the files.
 
-1. **Start a fresh session.** Run `/exit` and start `claude` again. Never
-   use `/clear`: it does not reliably reload `CLAUDE.local.md`.
+1. **Start a fresh session.** Run `/exit` and start `claude` again. Do not
+   use `/clear`, because it does not reliably reload `CLAUDE.local.md`.
 2. **Ask which rule files Claude will read.** Paste this message. It checks
    line 1 before the run, and the answer must name `.claude/rules/testing.md`.
 
@@ -167,8 +166,8 @@ every difference to the first run comes from the files.
    `CLAUDE.local.md`. Then run `/exit` and start `claude` again, so that
    this question is not part of the run.
 3. **Run the prompt.** Paste the same prompt as in task 1, with the tag.
-   While Claude works, watch the chat for the files that Claude reads
-   before it writes a test. Write down whether Claude reads the test kit
+   Claude shows each file it opens as a line in the chat. While it works,
+   watch for the files that Claude reads before it writes a test. Write down whether Claude reads the test kit
    file `tests/testkit.ts`.
 
    ```
@@ -207,9 +206,9 @@ closing round.
 
 **Write the long prompt.** Your rules replace sentences that you would
 otherwise type in every prompt. To see how many, write the DELETE prompt
-again, with one added sentence for each team decision and for each guess
-you marked *task*. Run `/prompt-coach 1` and paste your prompt as your next
-message. Then count the words of your prompt and of your rule files.
+again. Add one sentence for each team decision and one for each guess you
+marked *task*. Then run `/prompt-coach 1`, paste your prompt as your next
+message, and count the words of your prompt and of your rule files.
 
 **Change an old test.** This part checks decision 1, which says that your
 team does not rewrite the old tests. Start a fresh session and paste this
