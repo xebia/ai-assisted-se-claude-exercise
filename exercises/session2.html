@@ -154,7 +154,7 @@ tr:nth-child(even) td { background: #fbfafd; }
 <li>The trainer tells you when to start each next task.</li>
 </ul>
 <h2 id="your-teams-decisions">Your team's decisions</h2>
-<p>Your team agreed on these decisions in a meeting, but nobody wrote them in the project, and the old code does not follow them yet. A 400 answer means the request was wrong, and a 500 answer means the server failed.</p>
+<p>Your team agreed on these decisions in a meeting, but nobody wrote them in the project, and the old code does not follow them yet. The test kit from decision 1 is already in the project. A 400 answer means the request was wrong, and a 500 answer means the server failed.</p>
 <ol type="1">
 <li><strong>Test kit.</strong> "We built a test kit: <code>internal/handler/testkit_test.go</code>. New handler tests use the test kit. We do not rewrite the old tests."</li>
 <li><strong>Bad input.</strong> "Bad input gives a 400, not a 500. New endpoints do this. We fix the old endpoints later, in a separate change."</li>
@@ -168,19 +168,19 @@ tr:nth-child(even) td { background: #fbfafd; }
 <pre><code>git add -A .
 git -c user.name=student -c user.email=student@example.com commit -m &quot;start of session 2&quot;</code></pre></li>
 <li><p><strong>Predict each decision.</strong> For each of the three team decisions, write <em>yes</em> in your notes if you think Claude follows it without being told, and <em>no</em> if you think it does not.</p></li>
-<li><p><strong>Run the prompt in a fresh session.</strong> A fresh session means: close Claude with <code>/exit</code> if it is open, then run <code>claude</code>. Never use <code>/clear</code>. The text in square brackets is a tag. It switches training mode off for this one prompt, so Claude does not ask questions. Paste the prompt with the tag, and wait until Claude is done.</p>
+<li><p><strong>Run the prompt in a fresh session.</strong> A fresh session means: close Claude with <code>/exit</code> if it is open, then run <code>claude</code>. Never use <code>/clear</code>. The text in square brackets is a tag. It switches training mode off for this one prompt, so Claude does not ask questions. Paste the prompt with the tag. Allow the file changes that Claude asks for, and wait until Claude is done.</p>
 <pre><code>[Exercise 2 experiment — execute directly, no leading questions.] Add a DELETE /api/reviews/{id} endpoint to the BookStore API, with tests.</code></pre></li>
 <li><p><strong>Ask for Claude's guesses.</strong> In the same session, paste this message. Claude lists the choices it made because the prompt did not say.</p>
 <pre><code>[Exercise 2 experiment — execute directly, no leading questions.] List the choices you made that my prompt did not state. One line each, five lines at most.</code></pre></li>
 <li><p><strong>Sort the guesses.</strong> In your notes, write <em>task</em> next to a choice that matters for this endpoint only, and <em>team</em> next to a choice that every endpoint needs. Example for an "edit your profile" endpoint: <em>Which fields may a user change?</em> is <em>task</em>, and <em>Do we log every change?</em> is <em>team</em>.</p></li>
-<li><p><strong>Save the result.</strong> Run <code>/save-changes before</code>. The command saves Claude's changes in <code>session2-before.diff</code> and removes the changes from the project. Then type <code>/exit</code>.</p></li>
+<li><p><strong>Save the result.</strong> Run <code>/save-changes before</code>. The command saves Claude's changes in <code>session2-before.diff</code> and removes the changes from the project. Your rule files, <code>CLAUDE.local.md</code> and the saved diffs stay, because git ignores them. Then type <code>/exit</code>.</p></li>
 </ol>
 <p>If git says there is nothing to commit in step 1, go on to step 2. A failing test or a messy endpoint is also a result, so you do not need to fix it.</p>
 <p><strong>Done when</strong>: <code>session2-before.diff</code> exists, your notes hold a <em>yes</em> or <em>no</em> per decision, and each of Claude's guesses is marked <em>task</em> or <em>team</em>.</p>
 <h3 id="2-write-the-rules">2. Write the rules</h3>
 <p>Nothing told Claude your team's decisions, so it chose alone. Now you write them down in three files: <code>.claude/rules/testing.md</code>, <code>.claude/rules/handlers.md</code> and <code>CLAUDE.local.md</code>. Decisions 1 and 2 go in rule files with a <code>paths:</code> line (slide <em>Rule Discovery: With or Without Paths</em>). Decision 3 goes in <code>CLAUDE.local.md</code>, your private version of <code>CLAUDE.md</code>.</p>
 <ol type="1">
-<li><p><strong>Create the rule for decision 1.</strong> Start <code>claude</code>. This task needs no fresh session, because Claude only creates a file, and task 3 restarts Claude anyway. Paste this block, and Claude creates the rule file:</p>
+<li><p><strong>Create the rule for decision 1.</strong> Start <code>claude</code>. This task needs no fresh session, because Claude only creates a file, and task 3 restarts Claude anyway. Claude creates this long file, and you create the two short ones in your editor. Paste this block. The lines with three dashes are part of the file:</p>
 <pre><code>[Exercise 2 experiment — execute directly, no leading questions.] Create .claude/rules/testing.md with exactly this content, nothing added or changed:
 
 ---
@@ -212,7 +212,7 @@ A change may touch only the files of the endpoint it adds, the file that registe
 <li><p><strong>Start a fresh session.</strong> Run <code>/exit</code> and start <code>claude</code> again. Do not use <code>/clear</code>, because it does not reliably reload <code>CLAUDE.local.md</code>.</p></li>
 <li><p><strong>Ask which rule files Claude will read.</strong> Paste this message. It checks line 1 before the run, and the answer must name <code>.claude/rules/testing.md</code>.</p>
 <pre><code>[Exercise 2 experiment — execute directly, no leading questions.] Which files in .claude/rules will you read before you write a handler test? Answer in one line and change nothing.</code></pre>
-<p>If <code>testing.md</code> is missing from the answer, fix line 1 of <code>CLAUDE.local.md</code>. Then run <code>/exit</code> and start <code>claude</code> again, so that this question is not part of the run.</p></li>
+<p>If <code>testing.md</code> is missing from the answer, fix line 1 of <code>CLAUDE.local.md</code>. Either way, run <code>/exit</code> and start <code>claude</code> again, so that this question is not part of the run.</p></li>
 <li><p><strong>Run the prompt.</strong> Paste the same prompt as in task 1, with the tag. Claude shows each file it opens as a line in the chat. While it works, watch for the files that Claude reads before it writes a test. Write down whether Claude reads the test kit file <code>internal/handler/testkit_test.go</code>.</p>
 <pre><code>[Exercise 2 experiment — execute directly, no leading questions.] Add a DELETE /api/reviews/{id} endpoint to the BookStore API, with tests.</code></pre></li>
 <li><p><strong>Save the result.</strong> Run <code>/save-changes after</code>. Then type <code>/exit</code>.</p></li>
@@ -226,9 +226,9 @@ A change may touch only the files of the endpoint it adds, the file that registe
 <li><strong>Write four lines.</strong>
 <ul>
 <li>Line 1: your three <em>yes</em> or <em>no</em> predictions from task 1, and what the report says for the first run.</li>
-<li>Line 2: the decision that changed most between the two runs.</li>
+<li>Line 2: the decision that changed most between the two runs, and whether Claude read the test kit file in the second run.</li>
 <li>Line 3: one sentence of your rules that helped most.</li>
-<li>Line 4: one guess you marked <em>team</em> in task 1, and the sentence of your rules that now covers the guess.</li>
+<li>Line 4: one guess you marked <em>team</em> in task 1, and the sentence of your rules that now covers the guess, or a note that none does.</li>
 </ul></li>
 </ol>
 <p><strong>Done when</strong>: you wrote the four lines. Bring the four lines to the closing round.</p>
