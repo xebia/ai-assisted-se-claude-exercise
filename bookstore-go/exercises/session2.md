@@ -25,7 +25,8 @@ in a diff whether Claude followed a decision.
 ## Your team's decisions
 
 Your team agreed on these decisions in a meeting, but nobody wrote them in
-the project, and the old code does not follow them yet. A 400 answer means
+the project, and the old code does not follow them yet. The test kit from
+decision 1 is already in the project. A 400 answer means
 the request was wrong, and a 500 answer means the server failed.
 
 1. **Test kit.** "We built a test kit: `internal/handler/testkit_test.go`.
@@ -58,7 +59,8 @@ those choices Claude makes alone.
    Claude with `/exit` if it is open, then run `claude`. Never use `/clear`.
    The text in square brackets is a tag. It switches training mode off for
    this one prompt, so Claude does not ask questions. Paste the prompt with
-   the tag, and wait until Claude is done.
+   the tag. Allow the file changes that Claude asks for, and wait until
+   Claude is done.
 
    ```
    [Exercise 2 experiment — execute directly, no leading questions.] Add a DELETE /api/reviews/{id} endpoint to the BookStore API, with tests.
@@ -78,7 +80,8 @@ those choices Claude makes alone.
    *team*.
 6. **Save the result.** Run `/save-changes before`. The command saves
    Claude's changes in `session2-before.diff` and removes the changes from
-   the project. Then type `/exit`.
+   the project. Your rule files, `CLAUDE.local.md` and the saved diffs stay,
+   because git ignores them. Then type `/exit`.
 
 If git says there is nothing to commit in step 1, go on to step 2. A
 failing test or a messy endpoint is also a result, so you do not need to
@@ -99,7 +102,9 @@ Paths*). Decision 3 goes in `CLAUDE.local.md`, your private version of
 
 1. **Create the rule for decision 1.** Start `claude`. This task needs no
    fresh session, because Claude only creates a file, and task 3 restarts
-   Claude anyway. Paste this block, and Claude creates the rule file:
+   Claude anyway. Claude creates this long file, and you create the two short ones in your
+   editor. Paste this block. The lines with three dashes are part of the
+   file:
 
    ```
    [Exercise 2 experiment — execute directly, no leading questions.] Create .claude/rules/testing.md with exactly this content, nothing added or changed:
@@ -163,8 +168,8 @@ every difference to the first run comes from the files.
    ```
 
    If `testing.md` is missing from the answer, fix line 1 of
-   `CLAUDE.local.md`. Then run `/exit` and start `claude` again, so that
-   this question is not part of the run.
+   `CLAUDE.local.md`. Either way, run `/exit` and start `claude` again, so
+   that this question is not part of the run.
 3. **Run the prompt.** Paste the same prompt as in task 1, with the tag.
    Claude shows each file it opens as a line in the chat. While it works,
    watch for the files that Claude reads before it writes a test. Write down whether Claude reads the test kit
@@ -194,10 +199,11 @@ decision, for the first run and the second run.
 3. **Write four lines.**
    - Line 1: your three *yes* or *no* predictions from task 1, and what
      the report says for the first run.
-   - Line 2: the decision that changed most between the two runs.
+   - Line 2: the decision that changed most between the two runs, and
+     whether Claude read the test kit file in the second run.
    - Line 3: one sentence of your rules that helped most.
    - Line 4: one guess you marked *team* in task 1, and the sentence of
-     your rules that now covers the guess.
+     your rules that now covers the guess, or a note that none does.
 
 **Done when**: you wrote the four lines. Bring the four lines to the
 closing round.
