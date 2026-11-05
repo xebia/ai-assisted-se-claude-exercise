@@ -8,8 +8,9 @@
 
 You learn context engineering: how to get your team's decisions into
 Claude's context, so that Claude follows them without being told each
-time. You learn what belongs in a task prompt and what in a rule file, and how
-to check in a diff whether Claude followed a decision.
+time. You see which choices Claude makes alone when a prompt is short, and
+which of them belong in a prompt and which in a rule file. You also check
+in a diff whether Claude followed a decision.
 
 ## Start here
 
@@ -23,8 +24,9 @@ to check in a diff whether Claude followed a decision.
 
 ## Your team's decisions
 
-Your team agreed on these decisions in a meeting. They are not written in
-the project. The old code still follows the old way.
+Your team agreed on these decisions in a meeting, but nobody wrote them in
+the project, and the old code does not follow them yet. A 400 answer means
+the request was wrong, and a 500 answer means the server failed.
 
 1. **Test kit.** "We built a test kit: `internal/handler/testkit_test.go`.
    New handler tests use the test kit. We do not rewrite the old tests."
@@ -35,73 +37,65 @@ the project. The old code still follows the old way.
 
 ## Tasks
 
-### 1. Check the prompt before you run it
+### 1. Run a short prompt and read Claude's guesses
 
-Before the first run, you check the prompt. This task answers one
-question: which decisions does Claude make by
-itself when a short prompt leaves them open? Tasks 2 and 4 run the prompt
-unchanged, so the two results can be compared.
+A short prompt leaves many choices open. You run one, and you see which of
+those choices Claude makes alone.
 
-1. **Read the prompt.** Do not run it yet. The text in square brackets is a
-   tag. It switches training mode off for this one prompt, so Claude builds
-   the endpoint and does not ask questions. Keep the tag.
+1. **Commit your work so far.** Run the two commands below, one after the
+   other. Later steps remove Claude's changes from the project, and this
+   commit keeps your own work safe. Do it before you paste any prompt.
+
+   ```
+   git add -A .
+   git -c user.name=student -c user.email=student@example.com commit -m "start of session 2"
+   ```
+
+2. **Predict each decision.** For each of the three team decisions, write
+   *yes* in your notes if you think Claude follows it without being told,
+   and *no* if you think it does not.
+3. **Run the prompt in a fresh session.** A fresh session means: close
+   Claude with `/exit` if it is open, then run `claude`. Never use `/clear`.
+   The text in square brackets is a tag. It switches training mode off for
+   this one prompt, so Claude does not ask questions. Paste the prompt with
+   the tag, and wait until Claude is done.
 
    ```
    [Exercise 2 experiment — execute directly, no leading questions.] Add a DELETE /api/reviews/{id} endpoint to the BookStore API, with tests.
    ```
 
-2. **List the open decisions.** Write down every decision that Claude must
-   make because the prompt does not say it. You do not need to read the code. Example for an "edit your profile"
-   endpoint: *Which fields may a user change?*
-3. **Mark each decision.** Write *task* next to a decision that is about
-   this endpoint only. Write *team* next to a decision that your team makes
-   once for every endpoint.
-4. **Write your additions.** For each *task* decision, write one sentence
-   to add to the prompt, in CONTEXT-TASK-OUTCOME style. Last, write a
-   *Define done* sentence: what must be true when Claude is finished.
-5. **Check your list (optional).** Start `claude` and run
-   `/prompt-coach 1`. The 1 is the number of this task. Paste
-   your list and sentences as your next message. The coach gives one round
-   of feedback. Then type `/exit` to close Claude.
+4. **Ask for Claude's guesses.** In the same session, paste this message.
+   Claude lists the choices it made because the prompt did not say.
 
-**Done when**: your list has at least four decisions, each marked *task*
-or *team*, and you wrote your added sentences.
+   ```
+   [Exercise 2 experiment — execute directly, no leading questions.] List the choices you made that my prompt did not state. One line each, five lines at most.
+   ```
 
-### 2. Run the prompt without the decisions
-
-In task 1 you listed what the prompt leaves open. Now you run the prompt
-while Claude knows only the code, and you save the result as
-`session2-before.diff`.
-
-1. **Predict the three decisions.** For each of your team's three
-   decisions, write *yes* if you think Claude follows it without being
-   told, and *no* if not.
-2. **Check the project is clean.** Run `go test ./...` and `git status`.
-   Go to step 4 when all tests pass and `git status` lists nothing.
-3. **Finish your session 1 work.** Do this step only if step 2 found a
-   problem. Start `claude`. Press Shift+Tab until the
-   line under the chat box says auto mode: Claude then does not ask
-   permission. Run `/catch-up 1`. The command completes the session 1
-   code work and commits it. Type `/exit`. Step 6 removes work that is not
-   committed, so the project must be clean first.
-4. **Start a fresh session.** A fresh session means: close Claude with
-   `/exit`, then start `claude` again. Never use `/clear`. Paste the
-   prompt from task 1 with the tag.
-5. **Run the tests.** When Claude is done, run `go test ./...`. Write down
-   whether all tests pass.
+5. **Sort the guesses.** In your notes, write *task* next to a choice that
+   matters for this endpoint only, and *team* next to a choice that every
+   endpoint needs. Example for an "edit your profile" endpoint: *Which
+   fields may a user change?* is *task*, and *Do we log every change?* is
+   *team*.
 6. **Save the result.** Run `/save-changes before`. The command saves
    Claude's changes in `session2-before.diff` and removes the changes from
    the project. Then type `/exit`.
 
-**Done when**: the file `session2-before.diff` exists, and you wrote down your predictions and the test result.
+If git says there is nothing to commit in step 1, go on to step 2. A
+failing test or a messy endpoint is also a result, so you do not need to
+fix it.
 
-### 3. Put the decisions where Claude reads them
+**Done when**: `session2-before.diff` exists, your notes hold a *yes* or
+*no* per decision, and each of Claude's guesses is marked *task* or
+*team*.
 
-The first run showed what Claude decides when nobody tells it. Now you
-write your team's decisions in three files: `.claude/rules/testing.md`,
-`.claude/rules/handlers.md` and `CLAUDE.local.md`. Decisions 1 and 2 go in rule files with a `paths:` line
-(*Rule Discovery: With or Without Paths*). Decision 3 goes in
-`CLAUDE.local.md`, your private version of `CLAUDE.md`.
+### 2. Write the rules
+
+Nothing told Claude your team's decisions, so it chose alone. Now you
+write them down in three files: `.claude/rules/testing.md`,
+`.claude/rules/handlers.md` and `CLAUDE.local.md`. Decisions 1 and 2 go in
+rule files with a `paths:` line (slide *Rule Discovery: With or Without
+Paths*), and decision 3 goes in `CLAUDE.local.md`, your private version of
+`CLAUDE.md`.
 
 1. **Create the rule for decision 1.** Start `claude` and paste this block.
    Claude creates the rule file:
@@ -120,88 +114,106 @@ write your team's decisions in three files: `.claude/rules/testing.md`,
    Never convert an existing test to the kit, also not in a file you edit.
    ```
 
-2. **Write the rule for decision 2.** In your editor, create the file
-   `.claude/rules/handlers.md`. Start the file with the same three-dash block as `testing.md`, with the
-   description *Bad input in handlers* and
-   `"internal/handler/**/*.go"` in the `paths:` line. Below the block,
-   write two sentences:
-   - Sentence 1: *New endpoints answer bad input, such as an id that is
-     not a number, with 400.*
-   - Sentence 2: what Claude does for now with the old endpoints in the
-     `internal/handler/` folder. Your team fixes them later, in a separate change.
+2. **Create the rule for decision 2.** In your editor, create the file
+   `.claude/rules/handlers.md` with this content. The second sentence is
+   checkable: a reader of a diff can say "this breaks the rule".
 
-   Sentence 2 must be checkable: a reader of a diff can say "this
-   breaks the rule".
-3. **Write the rule for decision 3.** In your editor, create
-   `CLAUDE.local.md` in the `bookstore` folder, or open it if it exists and keep its text. It sits next to `CLAUDE.md`.
-   Write two lines:
-   - Line 1, copy exactly: *"Before you write or edit a file under
-     internal/handler/, read the matching file in .claude/rules/."*
-   - Line 2: decision 3 as a checkable rule that names which kinds of files a change
-     may touch, for example the files of the endpoint and its tests. Example for another subject: *"A bug fix may touch only the
-     file with the bug and its test."*
+   ```
+   ---
+   description: Bad input in handlers
+   paths:
+     - "internal/handler/**/*.go"
+   ---
+   New endpoints answer bad input, such as an id that is not a number, with 400.
+   Do not change an existing handler function, even when it answers bad input with 500.
+   ```
+
+3. **Create `CLAUDE.local.md`.** In your editor, create the file
+   `CLAUDE.local.md` in the `bookstore` folder next to `CLAUDE.md`. If it
+   exists already, keep its text below your new lines. Copy this text to
+   the top of the file, as line 1:
+
+   ```
+   Before you write or edit a file under internal/handler/, read .claude/rules/handlers.md. Before you write a test, read .claude/rules/testing.md.
+   ```
+
+4. **Write the rule for decision 3.** Write line 2, directly below line 1:
+   decision 3 as a checkable rule that names the files a change may touch.
+   Example for another subject: *"A bug fix may touch only the file with
+   the bug and its test."*
 
 A `paths:` rule may not load when Claude creates a new file or edits
 through a script. Claude reads `CLAUDE.local.md` at every session start,
-so line 1 makes sure Claude reads the rule files.
+so line 1 makes sure that Claude reads both rule files.
 
-**Done when**: the three files exist, `handlers.md` has a `paths:` line and
-a sentence about the old endpoints, and `git status` does not list
-`CLAUDE.md`.
+**Done when**: the three files exist, line 1 of `CLAUDE.local.md` names
+both rule files, and `git status` does not list `CLAUDE.md`.
 
-### 4. Run the prompt with the decisions
+### 3. Run the prompt with the decisions
 
-You run the same prompt again. The prompt is unchanged, so every difference
-to the first result comes from your three files. You save the result as
-`session2-after.diff`.
+Your three files now hold the decisions. You run the same prompt again, so
+every difference to the first run comes from the files.
 
-1. **Start a fresh session.** Run `/exit` and start `claude` again. Claude
-   reads your three new files when the session starts.
-2. **Paste the prompt from task 1** with the tag. While Claude works,
-   watch the chat for the files that Claude reads before it writes a test.
-   Write down whether Claude reads the test kit file.
-3. **Run the tests.** When Claude is done, run `go test ./...`. Write down
-   whether all tests pass.
+1. **Start a fresh session.** Run `/exit` and start `claude` again. Never
+   use `/clear`: it does not reliably reload `CLAUDE.local.md`.
+2. **Ask which rule files Claude will read.** Paste this message. It checks
+   line 1 before the run, and the answer must name `.claude/rules/testing.md`.
+
+   ```
+   [Exercise 2 experiment — execute directly, no leading questions.] Which files in .claude/rules will you read before you write a handler test? Answer in one line and change nothing.
+   ```
+
+   If `testing.md` is missing from the answer, fix line 1 of
+   `CLAUDE.local.md`. Then run `/exit` and start `claude` again, so that
+   this question is not part of the run.
+3. **Run the prompt.** Paste the same prompt as in task 1, with the tag.
+   While Claude works, watch the chat for the files that Claude reads
+   before it writes a test. Write down whether Claude reads the test kit
+   file `internal/handler/testkit_test.go`.
+
+   ```
+   [Exercise 2 experiment — execute directly, no leading questions.] Add a DELETE /api/reviews/{id} endpoint to the BookStore API, with tests.
+   ```
+
 4. **Save the result.** Run `/save-changes after`. Then type `/exit`.
 
-**Done when**: the file `session2-after.diff` exists, and you wrote down whether Claude read the test kit file and the test result.
+**Done when**: the file `session2-after.diff` exists, and you wrote down
+whether Claude read the test kit file.
 
-### 5. Closing: compare the two runs
+### 4. Compare the two runs
 
 Did your rules change what Claude did? You get a report on each team
-decision, for the first run (task 2) and the second run (task 4).
+decision, for the first run and the second run.
 
 1. **Start the comparison.** Start `claude` and run `/verify-exercise 2`.
-   The command reads your two diff files. It first asks which decision
-   Claude still broke in the second run. Answer in one line, from what you
-   saw in the chat. *None* is a fine answer.
+   The command reads `session2-before.diff` and `session2-after.diff`. It
+   first asks which decision Claude still broke in the second run. Answer
+   in one line, from what you saw in the chat. *None* is a fine answer.
 2. **Read the report.** Each decision is *followed*, *broken* or *not
-   tested*. *Not tested* means the prompt gave no chance to break it.
+   tested*. *Not tested* means that the prompt gave no chance to break the
+   decision.
 3. **Write four lines.**
-   - Line 1: your three predictions, and what Claude did in the first run.
+   - Line 1: your three *yes* or *no* predictions from task 1, and what
+     the report says for the first run.
    - Line 2: the decision that changed most between the two runs.
-   - Line 3: one sentence of your rules that you would write differently,
-     or that helped most.
-   - Line 4: one decision from your task 1 list that Claude made by itself
-     in the first run, and what Claude chose.
+   - Line 3: one sentence of your rules that helped most.
+   - Line 4: one guess you marked *team* in task 1, and the sentence of
+     your rules that now covers the guess.
 
-**Done when**: you wrote the four lines. Bring the four lines to the closing round.
+**Done when**: you wrote the four lines. Bring the four lines to the
+closing round.
 
 ## Bonus (only if time remains)
 
-**Check your rules, then try a new prompt.** Run `/context-coach 2` and
-paste your `handlers.md` and line 2 of your `CLAUDE.local.md`. Improve the one thing
-that the coach names. Then start a fresh session and paste:
-
-```
-[Exercise 2 experiment — execute directly, no leading questions.] Add a GET /api/authors/{id}/books endpoint to the BookStore API, with tests.
-```
-
-Run `/save-changes bonus`.
+**Write the long prompt.** Your rules replace sentences that you would
+otherwise type in every prompt. To see how many, write the DELETE prompt
+again, with one added sentence for each team decision and for each guess
+you marked *task*. Run `/prompt-coach 1` and paste your prompt as your next
+message. Then count the words of your prompt and of your rule files.
 
 **Change an old test.** This part checks decision 1, which says that your
-team does not rewrite the old tests. Start a fresh
-session and paste this prompt:
+team does not rewrite the old tests. Start a fresh session and paste this
+prompt:
 
 ```
 [Exercise 2 experiment — execute directly, no leading questions.] In the existing review tests, make the test for listing reviews also check that the first review has rating 5.
@@ -209,14 +221,13 @@ session and paste this prompt:
 
 Run `git diff` in your own terminal. Write down one of two answers. Either
 Claude only added the rating check, or Claude also rewrote that test to
-use the test kit. Then run `/save-changes probe`. This command saves the changes
-in a file and puts the project back in its clean state.
+use the test kit. Then run `/save-changes probe`.
 
 ## Appendix: `/save-changes` by hand
 
-If `/save-changes` stops, it says why. Or run these commands in the
-`bookstore` folder. The first two save your changes. The last three remove
-the changes:
+If `/save-changes` stops, run these five commands in the `bookstore`
+folder, one after the other. The first two save your changes, and the last
+three remove them:
 
 ```
 git add -A .
@@ -226,21 +237,18 @@ git checkout -- .
 git clean -fd .
 ```
 
-Replace `before` with `after` or `bonus` in the file name of the second command.
-The last command deletes new files that git does not track. Your rule
-files, `CLAUDE.local.md` and the saved diffs stay, because git ignores them.
+In the second command, replace `before` with `after` or `probe` in the
+file name.
 
 ## Closing round
 
-Claude follows a decision only when the decision is in its context. The
-diff shows whether Claude followed it. Passing tests do not.
+Claude follows a decision only when the decision is in its context. A
+prompt carries the decision for one run, and a rule file carries it for
+every run. The diff shows whether Claude followed it, and passing tests do not.
 
 The trainer asks these questions to the room:
 
-- Which decision did Claude follow without being told? Was your
-  prediction right?
-- Which line from your task 1 list belongs in the prompt, and which
-  belongs in a rule? Why?
-- Why does decision 1 go in a rule file with `paths:`, and decision 3 in
-  `CLAUDE.local.md`?
-- Which words in your rule for decision 2 make the rule checkable?
+- Which decision did Claude follow in the first run without being told? Was
+  your prediction right?
+- Which of Claude's guesses did you mark *task*, and which *team*? Why?
+- Why does line 1 of `CLAUDE.local.md` name both rule files?
