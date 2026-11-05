@@ -105,11 +105,13 @@ source of truth — when it changes there, copy it here again.
 
 ## Skills: coach, verifier, save-changes, pollute
 
-- `/prompt-coach` (card 1, session 2 task 1) and
-  `/context-coach` (session 2): per-task cards in `cards/<n>-<slug>.md`,
-  where `<n>` is the number the sheet types after the command. Keep it the
-  task number: `/prompt-coach 1` is exercise 2 task 1. The one exception
-  is `/context-coach 2`, which is exercise 2's bonus. Cards are language-agnostic — they name behaviors and
+- `/prompt-coach` (card 1) and `/context-coach` (card 2): per-task cards
+  in `cards/<n>-<slug>.md`, where `<n>` is the number the sheet types
+  after the command. Keep it the task number. The exception is a
+  bonus-only command, which keeps its own number: since 2026-11-05
+  `/prompt-coach 1` is exercise 2's bonus ("write the long prompt"), and
+  `/context-coach 2` is no longer on the sheet (the card stays; put the
+  command back in the bonus or delete the card). Cards are language-agnostic — they name behaviors and
   layers, never one language's paths. Coach rules (see each SKILL.md):
   never write the artifact for the participant, one nudge per turn, max
   three rounds, participants may overrule, and **held-back answers** (facts
@@ -174,12 +176,18 @@ source of truth — when it changes there, copy it here again.
   as closing Claude and starting it again, never as `/clear`. `/clear`
   does not reliably reload a changed `CLAUDE.local.md`.
 - **Commit before the first reset**: any exercise that resets the tree
-  tells participants to commit earlier sessions' work first (session 2's
-  closing and session 2's "Start here" both do). Otherwise the reset
-  removes uncommitted fixes that later sessions build on.
+  tells participants to commit what the project holds first. Session 2 does
+  this in task 1, step 1, with a plain `git commit` (author set with `-c`,
+  so a machine without a git identity does not stall). `/catch-up` did the
+  same unattended and was removed 2026-11-05: it needed session 1 finished
+  and broke when the prompt had already run. Otherwise the reset removes
+  uncommitted fixes that later sessions build on.
 - **Timing**: budget ≈ expert dry-run × 1.3. Session 2 measured 30 min
   expert → 40 min box.
-- **Closing**: session 2 uses a single 5-min "Closing round" (popcorn, no
+- **Sheet length**: a word target per box, about 44 words per box minute
+  (34 minutes: 1,500), 10% more or less when it reads smoother. Rule and
+  reasons: the `review-exercise` skill in the course repo.
+- **Closing**: session 2 uses a single 4-min "Closing round" (popcorn, no
   pair share) per the course-wide no-pairs rule. Other sessions still end
   with the older Pair Discussion + Group Share pair — align them when
   their session gets a redesign pass.
