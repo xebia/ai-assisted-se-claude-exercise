@@ -35,20 +35,26 @@ go into the run log; copy them from there into later calls.
 
 ## Hard rules
 
-- Read only `SHEET`, files inside `WORKSPACE`, your own run log, the
-  `LOGDIR/transcripts/` files and the R2/R3 copies. Never read anything
-  else on this machine: no slides, no other repository, no trainer files.
+- Read only `SHEET`, files inside `WORKSPACE`, your own run log and the
+  R2/R3 copies. Never read anything else on this machine: no slides, no
+  other repository, no trainer files.
+- Never open a raw transcript (`LOGDIR/transcripts/*.jsonl`) with Read,
+  cat, head or similar. It holds every tool result the nested Claude saw,
+  including trainer material. Use transcripts only through the extraction
+  snippet below, or through Grep for one file name or command.
 - Inside `WORKSPACE`, open a file only when a participant would: because
   the sheet names it, or because a step needs it. Never open files under
   `.claude/skills/*/cards/`, `.claude/skills/*/checks/`,
   `.claude/skills/*/sessions/` or `bookstore-plugin/`, unless a sheet step
   tells the participant to open that file.
 - Write only to: `WORKSPACE`, `RUN_LOG`, `LOGDIR/transcripts/`, the R2/R3
-  copies, and scratch files under `$TMPDIR`.
+  copies, and scratch files under `${TMPDIR:-/tmp}`.
 - You edit project files yourself only when the sheet says to type or
   edit by hand. Everything the sheet asks Claude to do goes to the nested
   Claude (below).
-- Never guess an outcome. A step you did not run is `not exercised`.
+- Never guess an outcome. A step the sheet's own condition says to skip is
+  `skipped by the sheet`. A step you could not or did not run is
+  `not exercised`.
 - A tool on this machine may write `.session-overview-diag.json` into a
   workspace. It is not part of the exercise. Your first action hides it
   from git. If you still see it, ignore it: do not log it as a change, and
@@ -68,6 +74,8 @@ mkdir -p "$W/.git/info" "$L/transcripts" && echo '.session-overview-diag.json' >
 Read the sheet in order, and only as far as you need it. Find the heading
 line numbers with Grep (pattern `^#`) on `SHEET`. Then read by line range:
 first everything before the first task heading, then one task at a time.
+A match inside a code block (for example a shell comment) is not a
+heading; confirm by reading the line's surroundings.
 
 Write everything a step asks you to write (predictions, lists, verdicts)
 into the run log before you read the next step where you can, and always
@@ -81,7 +89,12 @@ trainer to start a task; go on.
   false: status `skipped by the sheet`.
 - **A Bonus section (or "only if time remains"), and appendices:** do not
   do them; read only the heading. One entry for the whole section, status
-  `skipped by the sheet`. If a step sends you to an appendix, use it then.
+  `skipped by the sheet`. If a step sends you to an appendix, read and
+  follow it then. So does a command or skill that stops and tells you to
+  act by hand, when the sheet has an appendix for that case. Log it in
+  the same step entry.
+- **A step that depends on a failed step:** status `not exercised`; name
+  the failed step as the reason.
 - **Other sections after the last task** (for example a closing round):
   read them. If they need the trainer or other people, one entry, status
   `not exercised`.
@@ -120,11 +133,16 @@ goes between the heredoc lines exactly as printed; the quoted
 command such as `/save-changes before` is the whole prompt.
 
 ```bash
-W='/abs/WORKSPACE'; T='/abs/LOGDIR/transcripts/NN-taskT-stepS.jsonl'; P="$TMPDIR/prompt-NN.txt"
+W='/abs/WORKSPACE'; T='/abs/LOGDIR/transcripts/NN-taskT-stepS.jsonl'; P="${TMPDIR:-/tmp}/prompt-NN.txt"
 cat > "$P" <<'PROMPT_EOF'
 <the prompt, exactly as printed>
 PROMPT_EOF
-cd "$W" && claude -p --output-format stream-json --verbose --permission-mode bypassPermissions --setting-sources project,local --strict-mcp-config < "$P" > "$T"
+cd "$W" || exit 1
+if [ -f .mcp.json ]; then
+  claude -p --output-format stream-json --verbose --permission-mode bypassPermissions --setting-sources project,local --strict-mcp-config --mcp-config .mcp.json < "$P" > "$T"
+else
+  claude -p --output-format stream-json --verbose --permission-mode bypassPermissions --setting-sources project,local --strict-mcp-config < "$P" > "$T"
+fi
 python3 - "$T" <<'PY'
 import json, sys
 res, calls = {}, []
@@ -138,7 +156,7 @@ for line in open(sys.argv[1]):
             i = c.get("input") or {}
             k = next((k for k in ("file_path", "command", "pattern", "skill", "path", "prompt") if k in i), None)
             sub = " [in subagent]" if e.get("parent_tool_use_id") else ""
-            calls.append("%s %s%s" % (c.get("name"), str(i[k])[:200] if k else "", sub))
+            calls.append("%s %s%s" % (c.get("name"), " ".join(str(i[k]).split())[:200] if k else "", sub))
 print("session_id:", res.get("session_id", "MISSING (no result event)"))
 print("is_error:", res.get("is_error", True), "| duration_ms:", res.get("duration_ms"))
 print("tool calls:\n" + "\n".join("  %d. %s" % (n, c) for n, c in enumerate(calls, 1)))
@@ -146,17 +164,26 @@ print("result:\n" + str(res.get("result", "")))
 PY
 ```
 
+The prompt is the text inside the code block. If the block sits in a list
+item, every line carries the list's indentation: remove the common
+leading indentation from all lines, and change nothing else.
+
+The `if` adds `--mcp-config .mcp.json` when the workspace root has that
+file at call time. If a step registers an MCP server another way (for
+example `claude mcp add`), run the step as printed; if the nested Claude
+then cannot see the server, note it in Confusion.
+
 To continue a session, add `--resume '<session id from the run log>'`
-after `--strict-mcp-config`; change nothing else. Type the flags out in
-every call; in a shell variable they fail with `unknown option`. If
-`claude` is not found, run `source ~/.bash_profile` at the start of the
-same Bash call.
+after `--strict-mcp-config` (after `.mcp.json` in the first line); change
+nothing else. Type the flags out in every call; in a shell variable they
+fail with `unknown option`. If `claude` is not found, run
+`source ~/.bash_profile` at the start of the same Bash call.
 
 The extraction prints the session id, `is_error`, `duration_ms`, the
 ordered tool calls and Claude's final answer. The tool-call list is how
 you "watch the chat": which files Claude read, which commands it ran. You
-may grep a transcript for a tool or file name, but do not read the content
-of files the hard rules forbid. `is_error: True`, a missing result event
+may grep a transcript for one file name or command when a step asks what
+Claude did; never open it otherwise (hard rules). `is_error: True`, a missing result event
 or a timeout: status `failed`; continue with the next step that does not
 depend on it.
 
@@ -164,7 +191,10 @@ depend on it.
 participant you are: in your own words, in one or two sentences, with what
 you really know at that point. Send the answer with `--resume`. Log each
 exchange. If after three answers from you Claude has still not done what
-the step asks for, send `just tell me`. Status: `escape hatch`.
+the step asks for, send the escape phrase the sheet names (sheets in
+this course name one in their opening section). Status: `escape hatch`.
+If the sheet names none, there is no escape hatch: log the step as
+`failed`.
 
 **Write something down** (a prediction, a list, a verdict): into the run
 log, as "Reading the sheet" says. Kind `write-down`.
@@ -188,15 +218,22 @@ an exact command is not a key prompt. Slash commands and your answers to
 Claude's questions are not key prompts. At most four key prompts get three
 runs: the first four in sheet order. Log the others as not repeated.
 
-1. Just before run 1, copy the workspace twice, in one Bash call:
+Order matters, because copying is not participant time:
+
+1. Before you start the step's clock, copy the workspace twice, in one
+   Bash call:
    `R2="$(mktemp -d)/ws"; cp -R '/abs/WORKSPACE' "$R2"; R3="$(mktemp -d)/ws"; cp -R '/abs/WORKSPACE' "$R3"; echo "$R2 $R3"`.
-   Write both paths into the run log.
-2. Run 1 is the prompt in `WORKSPACE`; the exercise continues from it.
-3. Runs 2 and 3: the same prompt in R2 and R3, each a new session, with
-   transcripts `NN-taskT-stepS-run2.jsonl` and `-run3.jsonl`. If run 1
-   was resumed, say so: runs 2 and 3 lack that conversation. Time them
-   separately; their time goes only into the key-prompt table, not into
-   step or task time.
+   Write both paths into the run log right then, as a short line
+   `Key prompt copies: R2 = <path>, R3 = <path>` before the step entry.
+2. Start the step's clock. Run 1 is the prompt in `WORKSPACE`; the
+   exercise continues from it. End the step's clock and append the step
+   entry.
+3. Then do runs 2 and 3: the same prompt in R2 and R3, each a new
+   session, with transcripts `NN-taskT-stepS-run2.jsonl` and
+   `-run3.jsonl`. If run 1 was resumed, say so: runs 2 and 3 lack that
+   conversation. Time them separately. Afterwards append the key-prompt
+   table to that step entry. Their time goes only into the table, not
+   into step or task time.
 4. For each run, record the observable the sheet cares about (for example:
    files changed in `git status --short`, files Claude read, the status
    code the new code returns). Use the same observable for all three.
