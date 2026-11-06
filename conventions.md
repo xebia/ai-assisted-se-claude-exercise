@@ -62,6 +62,23 @@ Rules that follow from this:
   finished versions of what exercises 3 and 4 build. Each project's
   `CLAUDE.md` tells Claude not to read it unless asked about the plugin.
 
+## Evaluating a sheet: `/evaluate-exercise`
+
+`/evaluate-exercise <session> <lang>` (trainer-only; `.claude/commands/`
+and `.claude/agents/` are never packaged) dry-runs one sheet the way a
+participant meets it. `scripts/evaluate-prepare.sh` builds the package and
+copies it to a `bookstore` folder outside this repo. The
+`exercise-participant` agent sees only that folder: it follows the sheet,
+sends each prompt to a nested headless `claude`, runs key prompts three
+times, and writes a run log. That nested Claude runs without permission prompts, and without the trainer's own plugins, user settings and personal MCP connectors, so it behaves like a participant's Claude. The `exercise-reviewer` agent then judges
+eight criteria (works, understandable, learning goal, slide coverage,
+timing, repeatability, house rules, port drift) and writes
+`output/evaluations/<date>-session<N>-<lang>/report.md`. It reports only;
+fixes stay Go first, then port. Slide coverage needs the course repo
+checked out beside this one as `ai-assisted-se-claude`. A run takes 15 to
+40 minutes. Agent time is a lower bound: the Timing rule above (expert dry
+run × 1.3) still needs a human run before a Duration changes.
+
 ## Naming: sessions, not blocks
 
 The teaching units are **sessions** (Session 1–8), in exercise headers, prose,
