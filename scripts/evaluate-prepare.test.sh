@@ -3,6 +3,9 @@
 set -uo pipefail
 cd "$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
 fail=0
+# Never touch the real output/evaluations: every script call uses a temp output root.
+out_root="$(mktemp -d)"; export EVALUATE_OUTPUT_ROOT="$out_root"
+workspaces=()
 # Check expressions are single-quoted and read the variables lazily, so paths with spaces are safe.
 check() { if eval "$2"; then echo "ok   $1"; else echo "FAIL $1"; fail=1; fi; }
 # Dependent checks: FAIL outright when the run did not succeed, never pass on defaults.
@@ -30,23 +33,29 @@ dep "workspace is its own git repo with one commit" '[ "$(git -C "$WORKSPACE" re
 dep "workspace tree is clean" '[ -d "$WORKSPACE/.git" ] && [ -z "$(git -C "$WORKSPACE" status --porcelain 2>/dev/null)" ]'
 dep "workspace has the html sheet" '[ -f "$WORKSPACE/exercises/session2.html" ]'
 dep "workspace has no evaluator files" '[ -d "$WORKSPACE" ] && [ ! -e "$WORKSPACE/.claude/agents" ] && [ ! -e "$WORKSPACE/.claude/commands" ] && [ ! -e "$WORKSPACE/scripts" ]'
-dep "run dir is under output/evaluations" 'case "$RUN_DIR" in "$PWD"/output/evaluations/*-session2-go) true;; *) false;; esac'
+dep "run dir is <temp output root>/<date>-session2-go" '[ "$RUN_DIR" = "$out_root/$(date +%F)-session2-go" ]'
+check "default output root is inside the repo (by inspection)" 'grep -q "EVALUATE_OUTPUT_ROOT:-\$repo/output/evaluations}" scripts/evaluate-prepare.sh'
 dep "sheet text exists and has the title" 'grep -q "Exercise 2" "$SHEET"'
 dep "sheet text keeps Done when lines" 'grep -qi "done when" "$SHEET"'
 dep "sheet text is small (no embedded fonts)" '[ -f "$SHEET" ] && [ "$(wc -c < "$SHEET")" -lt 200000 ]'
 dep "commit hash is printed" '[ -n "$COMMIT" ]'
 
 # Second run on the same day: stale run-log.md must not survive beside the fresh sheet.
-prev_glob=
+[ -n "$WORKSPACE" ] && workspaces+=("$WORKSPACE")
 if [ "$rc" -eq 0 ] && [ -d "$RUN_DIR" ]; then
   echo stale > "$RUN_DIR/run-log.md"
   out2="$(scripts/evaluate-prepare.sh 2 go 2>/dev/null)"; rc2=$?
-  prev_glob="$RUN_DIR-prev-*"
+  ws2="$(printf '%s\n' "$out2" | sed -n 's/^WORKSPACE=//p')"; [ -n "$ws2" ] && workspaces+=("$ws2")
   check "second run exits 0" '[ $rc2 -eq 0 ]'
   check "second run has no stale run-log.md" '[ -f "$RUN_DIR/sheet.md" ] && [ ! -e "$RUN_DIR/run-log.md" ]'
-  check "earlier run was moved to a -prev- sibling" 'ls -d $prev_glob >/dev/null 2>&1 && [ -f "$(ls -d $prev_glob | head -1)/run-log.md" ]'
-  rm -rf $prev_glob
+  check "earlier run was moved to a -prev- sibling" 'prevs=("$RUN_DIR"-prev-*); [ -f "${prevs[0]}/run-log.md" ]'
 else
   echo "FAIL second-run checks (first run failed, rc=$rc)"; fail=1
 fi
+
+# Remove only what this test created: the temp output root and the temp parents of the workspaces.
+for ws in "${workspaces[@]+"${workspaces[@]}"}"; do
+  if [ -n "$ws" ] && [ "$(basename "$ws")" = bookstore ]; then rm -rf "$(dirname "$ws")"; fi
+done
+if [ -n "$out_root" ] && [ -d "$out_root" ]; then rm -rf "$out_root"; fi
 exit $fail

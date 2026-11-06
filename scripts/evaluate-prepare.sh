@@ -8,6 +8,10 @@
 # participant's clone), converts the HTML sheet to text for the participant
 # agent, and prints the paths as KEY=value lines on stdout.
 #
+# Environment (for tests): EVALUATE_OUTPUT_ROOT, an absolute path, replaces the
+# default output root $repo/output/evaluations. RUN_DIR is
+# <root>/<date>-session<N>-<lang>.
+#
 # Exit codes: 2 bad arguments, 3 package build failed, 4 sheet missing,
 # 5 pandoc missing or the sheet conversion failed.
 set -euo pipefail
@@ -46,7 +50,8 @@ git -C "$workspace" add -A
 git -C "$workspace" -c user.name=participant -c user.email=participant@example.com \
   -c commit.gpgsign=false commit -q -m "Participant package"
 
-run_dir="$repo/output/evaluations/$(date +%F)-session$session-$lang"
+output_root="${EVALUATE_OUTPUT_ROOT:-$repo/output/evaluations}"
+run_dir="$output_root/$(date +%F)-session$session-$lang"
 if [ -e "$run_dir/run-log.md" ] || [ -e "$run_dir/report.md" ]; then
   prev="$run_dir-prev-$(date +%H%M%S)"
   mv "$run_dir" "$prev"
