@@ -12,7 +12,7 @@ Files for the exercise "Claude Without You Watching". The sheet
 | `night-full.txt` | One night of server log. |
 | `night-cut.txt` | The same night, but the log was rotated at 01:40. |
 | `nightly-tests.txt` | The result of the nightly test run. |
-| `claude-review.yml` | Take-home: the gate as a GitHub Actions workflow. |
+| `claude-review.yml` | Appendix: the gate as a check on every pull request. |
 
 Your own files go in `headless/out/` and `headless/brief-prompt.txt`. Git
 ignores them.
