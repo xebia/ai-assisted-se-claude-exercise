@@ -64,7 +64,8 @@ list, and give the cost of both runs.
 ### 2. The review gate
 
 The gate is the script `headless/gate.py`. It sends your newest commit to
-Claude, and stops on any verdict but `pass`.
+Claude, and stops on any verdict but `pass`. It is the quality gate from
+the slides.
 
 1. **Write the answer shape.** In `headless/gate.py`, replace
    `# (I write this)` under `SCHEMA` with the lines below, inside the
@@ -82,8 +83,8 @@ Claude, and stops on any verdict but `pass`.
 
 2. **Add the team rules.** Read `headless/team-rules.md`. In `gate.py`,
    replace `# (I write this)` under `RULES` with two strings. The first
-   is the flag that adds a file to Claude's instructions (slide *The
-   Gate: A Review Before Every Push*). The shape is
+   is the flag that adds a file to Claude's instructions (slide *Quality
+   Gate · Example: A Review Before Every Push*). The shape is
    `"<the flag>", "headless/team-rules.md",`.
 3. **Commit your gate.**
 
@@ -164,16 +165,20 @@ still decides. If the gate passed the endpoint in task 2, skip this task.
    again. `fix.py` reads the newest gate answer.
 
 Why: the gate only reads, so it cannot break anything. The fix run may
-edit files, so a person reads the diff before it is committed. This is the
-responder from the slides, on your laptop.
+edit files, so a person reads the diff before it is committed. This is a
+small event-triggered run, on your laptop: the gate's finding starts the
+fix, as a bug report does on the slides.
 
 **Done when**: the gate gave `Verdict: pass` on your fix commit. Your notes
 say why the fix run may edit files and the gate may not.
 
 ### 4. The morning brief
 
-This task produces two briefs: one for a night with errors, and one for
-a night where the log stops at 01:40.
+The slides show a scheduled run that writes a nightly test report. This
+task builds the same kind of run on a different input, last night's
+server log, and its report is called the morning brief. The task
+produces two briefs: one for a night with errors, and one for a night
+where the log stops at 01:40.
 
 1. **Write the prompt.** Create `headless/brief-prompt.txt`. The script
    `headless/brief.py` sends this file to Claude, with the night's log (an
@@ -256,15 +261,17 @@ Pick one check you do by hand before every push. Write it as a rule in
 the style of `headless/team-rules.md`, and run the gate on your own
 repository.
 
-## Appendix: the gate in GitHub Actions
+## Appendix: the quality gate on every pull request
 
-`headless/claude-review.yml` is the same gate as a workflow that runs on
-every pull request. It posts what it finds as one comment on the pull
-request. Copy it to `.github/workflows/` in a repository of
-your own. Run `claude setup-token`: it prints a token for your Claude
-subscription. In GitHub, save it under *Settings → Secrets and variables
-→ Actions* as `CLAUDE_CODE_OAUTH_TOKEN`. The workflow reads the team
-rules from the branch you merge into, not from the pull request.
+`headless/claude-review.yml` runs the same gate, `headless/gate.py`, as a
+check on every pull request. When the gate says `block`, the check
+fails. Copy the workflow file to `.github/workflows/` in a repository of
+your own that also holds the `headless` folder. Run `claude setup-token`:
+it prints a token for your Claude subscription. In GitHub, save the token
+under *Settings → Secrets and variables → Actions* as
+`CLAUDE_CODE_OAUTH_TOKEN`. The slides show this workflow with an API key
+and `--bare`. With a subscription token the gate keeps `--safe-mode`,
+because `--bare` does not read that token.
 
 ## Appendix: who runs it, and who pays
 
@@ -272,7 +279,7 @@ rules from the branch you merge into, not from the pull request.
 | --- | --- | --- | --- |
 | `claude -p` or `claude --safe-mode -p` on your laptop | your login | you | your plan |
 | `claude --bare -p` in a script | an API key | the API key | API billing |
-| GitHub Actions | a token from `claude setup-token`, or an API key | the Claude GitHub App | the token owner's plan, or API billing, plus GitHub Actions time |
+| A check in GitHub Actions | a token from `claude setup-token`, or an API key | the workflow | the token owner's plan, or API billing, plus GitHub Actions time |
 | A cloud scheduled task | your claude.ai account | you | your plan |
 
 ## Closing round
