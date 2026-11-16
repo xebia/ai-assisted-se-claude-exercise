@@ -255,7 +255,7 @@ git push ../gate-target.git HEAD</code></pre></li>
 <h2 id="appendix-who-runs-it-and-who-pays">Appendix: who runs it, and who pays</h2>
 <table>
 <thead>
-<tr class="header">
+<tr>
 <th>Where it runs</th>
 <th>Logs in with</th>
 <th>Who acted</th>
@@ -263,25 +263,25 @@ git push ../gate-target.git HEAD</code></pre></li>
 </tr>
 </thead>
 <tbody>
-<tr class="odd">
+<tr>
 <td><code>claude -p</code> or <code>claude --safe-mode -p</code> on your laptop</td>
 <td>your login</td>
 <td>you</td>
 <td>your plan</td>
 </tr>
-<tr class="even">
+<tr>
 <td><code>claude --bare -p</code> in a script</td>
 <td>an API key</td>
 <td>the API key</td>
 <td>API billing</td>
 </tr>
-<tr class="odd">
+<tr>
 <td>GitHub Actions</td>
 <td>a token from <code>claude setup-token</code>, or an API key</td>
 <td>the Claude GitHub App</td>
 <td>the token owner's plan, or API billing, plus GitHub Actions time</td>
 </tr>
-<tr class="even">
+<tr>
 <td>A cloud scheduled task</td>
 <td>your claude.ai account</td>
 <td>you</td>
