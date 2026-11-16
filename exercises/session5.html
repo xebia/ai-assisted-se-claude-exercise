@@ -174,7 +174,7 @@ tr:nth-child(even) td { background: #fbfafd; }
 <p>Why: without <code>--safe-mode</code>, a headless run loads everything in the folder: <code>CLAUDE.md</code>, the course skills, the MCP server from session 4, and the hooks from session 3. With <code>--safe-mode</code>, it loads nothing from the folder. It loads only what you name on the command line, and here that is nothing.</p>
 <p><strong>Done when</strong>: your notes say in one sentence what the second run did not list, and give the cost of both runs.</p>
 <h3 id="2-the-review-gate">2. The review gate</h3>
-<p>The gate is the script <code>headless/gate.py</code>. It sends your newest commit to Claude, and stops on any verdict but <code>pass</code>.</p>
+<p>The gate is the script <code>headless/gate.py</code>. It sends your newest commit to Claude, and stops on any verdict but <code>pass</code>. It is the quality gate from the slides.</p>
 <ol type="1">
 <li><p><strong>Write the answer shape.</strong> In <code>headless/gate.py</code>, replace <code># (I write this)</code> under <code>SCHEMA</code> with the lines below, inside the braces. Then write down which line allows only two verdicts, and which line makes both fields required.</p>
 <pre class="python"><code>&quot;type&quot;: &quot;object&quot;,
@@ -183,7 +183,7 @@ tr:nth-child(even) td { background: #fbfafd; }
     &quot;verdict&quot;: {&quot;enum&quot;: [&quot;pass&quot;, &quot;block&quot;]},
     &quot;findings&quot;: {&quot;type&quot;: &quot;array&quot;, &quot;items&quot;: {&quot;type&quot;: &quot;string&quot;}},
 },</code></pre></li>
-<li><p><strong>Add the team rules.</strong> Read <code>headless/team-rules.md</code>. In <code>gate.py</code>, replace <code># (I write this)</code> under <code>RULES</code> with two strings. The first is the flag that adds a file to Claude's instructions (slide <em>The Gate: A Review Before Every Push</em>). The shape is <code>"&lt;the flag&gt;", "headless/team-rules.md",</code>.</p></li>
+<li><p><strong>Add the team rules.</strong> Read <code>headless/team-rules.md</code>. In <code>gate.py</code>, replace <code># (I write this)</code> under <code>RULES</code> with two strings. The first is the flag that adds a file to Claude's instructions (slide <em>Quality Gate · Example: A Review Before Every Push</em>). The shape is <code>"&lt;the flag&gt;", "headless/team-rules.md",</code>.</p></li>
 <li><p><strong>Commit your gate.</strong></p>
 <pre><code>git add -A .
 git commit -m &quot;Add the review gate&quot;</code></pre></li>
@@ -215,10 +215,10 @@ uv run headless/gate.py</code></pre></li>
 uv run headless/gate.py</code></pre>
 <p>If it says <code>block</code> again, read the new finding and do steps 3 to 5 again. <code>fix.py</code> reads the newest gate answer.</p></li>
 </ol>
-<p>Why: the gate only reads, so it cannot break anything. The fix run may edit files, so a person reads the diff before it is committed. This is the responder from the slides, on your laptop.</p>
+<p>Why: the gate only reads, so it cannot break anything. The fix run may edit files, so a person reads the diff before it is committed. This is a small event-triggered run, on your laptop: the gate's finding starts the fix, as a bug report does on the slides.</p>
 <p><strong>Done when</strong>: the gate gave <code>Verdict: pass</code> on your fix commit. Your notes say why the fix run may edit files and the gate may not.</p>
 <h3 id="4-the-morning-brief">4. The morning brief</h3>
-<p>This task produces two briefs: one for a night with errors, and one for a night where the log stops at 01:40.</p>
+<p>The slides show a scheduled run that writes a nightly test report. This task builds the same kind of run on a different input, last night's server log, and its report is called the morning brief. The task produces two briefs: one for a night with errors, and one for a night where the log stops at 01:40.</p>
 <ol type="1">
 <li><p><strong>Write the prompt.</strong> Create <code>headless/brief-prompt.txt</code>. The script <code>headless/brief.py</code> sends this file to Claude, with the night's log (an export from a logging platform). Ask for four things in your own words. The first: <em>Write at most 10 lines.</em> Then: the worst problem first; every number with the log line it came from; one line when nothing went wrong.</p></li>
 <li><p><strong>Run it on the full night.</strong></p>
@@ -250,8 +250,8 @@ git push ../gate-target.git HEAD</code></pre></li>
 <p>The gate checks your last commit. If it says <code>pass</code>, the push goes through. If it says <code>block</code>, the push stops.</p>
 <h2 id="back-at-work">Back at work</h2>
 <p>Pick one check you do by hand before every push. Write it as a rule in the style of <code>headless/team-rules.md</code>, and run the gate on your own repository.</p>
-<h2 id="appendix-the-gate-in-github-actions">Appendix: the gate in GitHub Actions</h2>
-<p><code>headless/claude-review.yml</code> is the same gate as a workflow that runs on every pull request. It posts what it finds as one comment on the pull request. Copy it to <code>.github/workflows/</code> in a repository of your own. Run <code>claude setup-token</code>: it prints a token for your Claude subscription. In GitHub, save it under <em>Settings → Secrets and variables → Actions</em> as <code>CLAUDE_CODE_OAUTH_TOKEN</code>. The workflow reads the team rules from the branch you merge into, not from the pull request.</p>
+<h2 id="appendix-the-quality-gate-on-every-pull-request">Appendix: the quality gate on every pull request</h2>
+<p><code>headless/claude-review.yml</code> runs the same gate, <code>headless/gate.py</code>, as a check on every pull request. When the gate says <code>block</code>, the check fails. Copy the workflow file to <code>.github/workflows/</code> in a repository of your own that also holds the <code>headless</code> folder. Run <code>claude setup-token</code>: it prints a token for your Claude subscription. In GitHub, save the token under <em>Settings → Secrets and variables → Actions</em> as <code>CLAUDE_CODE_OAUTH_TOKEN</code>. The slides show this workflow with an API key and <code>--bare</code>. With a subscription token the gate keeps <code>--safe-mode</code>, because <code>--bare</code> does not read that token.</p>
 <h2 id="appendix-who-runs-it-and-who-pays">Appendix: who runs it, and who pays</h2>
 <table>
 <thead>
@@ -276,9 +276,9 @@ git push ../gate-target.git HEAD</code></pre></li>
 <td>API billing</td>
 </tr>
 <tr>
-<td>GitHub Actions</td>
+<td>A check in GitHub Actions</td>
 <td>a token from <code>claude setup-token</code>, or an API key</td>
-<td>the Claude GitHub App</td>
+<td>the workflow</td>
 <td>the token owner's plan, or API billing, plus GitHub Actions time</td>
 </tr>
 <tr>
@@ -299,7 +299,7 @@ git push ../gate-target.git HEAD</code></pre></li>
 <li>The gate treats "no verdict" as "block". Why is that the safe choice?</li>
 </ul>
 </main>
-<footer class="xb-footer"><span>Mastering AI-Assisted Software Engineering · Xebia Academy</span><span>Version 2026-10-28</span></footer>
+<footer class="xb-footer"><span>Mastering AI-Assisted Software Engineering · Xebia Academy</span><span>Version 2026-11-16</span></footer>
 <script>
 // Copy button on every code block. Works from file:// too: falls back to execCommand
 // where the async clipboard API is not allowed.
