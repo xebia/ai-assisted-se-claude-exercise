@@ -57,16 +57,20 @@ Training mode is off in `web`: Claude answers directly. Stuck? Type
 
 ### 1. Create the spec and find what it leaves open
 
-You create `specs/001-*/spec.md`. The spec says *what* the frontend does
-and *why*. Not how.
+One Spec Kit command writes the spec for you. You do not create the spec
+file yourself. The spec says *what* the frontend does and *why*. Not how.
 
-1. **Start the spec**. In terminal 2, run `/speckit-specify` with
-   this text, exactly as written:
+1. **Start the spec**. In terminal 2, paste this command into Claude,
+   exactly as written:
 
-   > A web UI for the BookStore API. Users can browse books and open a book to see
-   > its details and its author. The API is already running behind `/api`.
+   ```text
+   /speckit-specify A web UI for the BookStore API. Users can browse books and open a book to see its details and its author. The API is already running behind `/api`.
+   ```
 
-   The command takes one to two minutes. Do not wait for it. Claude does
+   The command creates a folder such as `specs/001-browse-books/` and
+   writes `spec.md` in that folder. Spec Kit picks the folder name, so
+   this sheet writes the folder as `specs/001-*/`. The command takes one to two
+   minutes. Do not wait for it. Claude does
    not know `/speckit-specify`? Run the Spec Kit steps in
    `preparation.md` again, then restart Claude.
 2. **Read the constitution while it runs**. Open
