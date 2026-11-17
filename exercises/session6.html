@@ -161,13 +161,11 @@ specify check</code></pre>
 <p>Training mode is off in <code>web</code>: Claude answers directly. Stuck? Type <em>just tell me</em>.</p>
 <h2 id="tasks">Tasks</h2>
 <h3 id="1-create-the-spec-and-find-what-it-leaves-open">1. Create the spec and find what it leaves open</h3>
-<p>You create <code>specs/001-*/spec.md</code>. The spec says <em>what</em> the frontend does and <em>why</em>. Not how.</p>
+<p>One Spec Kit command writes the spec for you. You do not create the spec file yourself. The spec says <em>what</em> the frontend does and <em>why</em>. Not how.</p>
 <ol type="1">
-<li><p><strong>Start the spec</strong>. In terminal 2, run <code>/speckit-specify</code> with this text, exactly as written:</p>
-<blockquote>
-<p>A web UI for the BookStore API. Users can browse books and open a book to see its details and its author. The API is already running behind <code>/api</code>.</p>
-</blockquote>
-<p>The command takes one to two minutes. Do not wait for it. Claude does not know <code>/speckit-specify</code>? Run the Spec Kit steps in <code>preparation.html</code> again, then restart Claude.</p></li>
+<li><p><strong>Start the spec</strong>. In terminal 2, paste this command into Claude, exactly as written:</p>
+<pre class="text"><code>/speckit-specify A web UI for the BookStore API. Users can browse books and open a book to see its details and its author. The API is already running behind `/api`.</code></pre>
+<p>The command creates a folder such as <code>specs/001-browse-books/</code> and writes <code>spec.md</code> in that folder. Spec Kit picks the folder name, so this sheet writes the folder as <code>specs/001-*/</code>. The command takes one to two minutes. Do not wait for it. Claude does not know <code>/speckit-specify</code>? Run the Spec Kit steps in <code>preparation.html</code> again, then restart Claude.</p></li>
 <li><p><strong>Read the constitution while it runs</strong>. Open <code>.specify/memory/constitution.md</code>. The constitution holds the rules that every spec, plan and task must follow. It is written for you. It has six principles on one page. Answer two questions in one written sentence. What does the constitution say about the API contract? Where does it say the contract comes from?</p></li>
 <li><p><strong>Find the gaps</strong>. When the command is done, open <code>specs/001-*/spec.md</code>. Scroll to <strong>Assumptions</strong> at the end. This is where Spec Kit writes what it invented. Nothing has called the API yet, so each assumption is a guess. Now read the <strong>Requirements</strong> section with three questions in mind:</p>
 <ul>
@@ -273,7 +271,7 @@ git commit -m &quot;spec: bookstore-web frontend&quot;</code></pre>
   tasks.md           the work list, with [P] marks</code></pre>
 <p>No application code. <code>/speckit-implement</code> is Exercise 7.</p>
 </main>
-<footer class="xb-footer"><span>Mastering AI-Assisted Software Engineering · Xebia Academy</span><span>Version 2026-10-29</span></footer>
+<footer class="xb-footer"><span>Mastering AI-Assisted Software Engineering · Xebia Academy</span><span>Version 2026-11-17</span></footer>
 <script>
 // Copy button on every code block. Works from file:// too: falls back to execCommand
 // where the async clipboard API is not allowed.
