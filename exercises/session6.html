@@ -81,6 +81,10 @@ pre { position: relative; margin: .9rem 0; padding: .85rem 1rem; padding-right: 
   white-space: pre-wrap; overflow-wrap: anywhere; } /* wraps on screen only; a copy still gets one line */
 pre code { background: none; border: 0; padding: 0; font-size: inherit; white-space: inherit; }
 
+.xb-figure { margin: 1.2rem 0; }
+.xb-figure svg { display: block; width: 100%; max-width: 40rem; }
+.xb-figure figcaption { font-size: .85rem; color: var(--xb-grey4); margin-top: .4rem; }
+
 .xb-copy { position: absolute; top: .5rem; right: .5rem; display: inline-flex; align-items: center; gap: .35rem;
   font: 600 .75rem/1 "Inter", sans-serif; color: var(--xb-cta); background: #fff;
   border: 1px solid var(--xb-grey3); border-radius: 999px; padding: .4rem .7rem; cursor: pointer;
@@ -149,10 +153,10 @@ tr:nth-child(even) td { background: #fbfafd; }
 <h2 id="what-you-specify-a-frontend-for-the-bookstore-api">What you specify: a frontend for the BookStore API</h2>
 <p>The API has no user interface yet. So nothing tells you what an empty list looks like, what a failed request shows, or which fields a book page has. Those are decisions, and a spec is the place to write decisions down.</p>
 <h2 id="start-here">Start here</h2>
-<p><strong>Terminal 1</strong>, in the <code>bookstore</code> folder, runs the backend:</p>
-<pre class="bash"><code>bun run start</code></pre>
-<p><strong>Terminal 2</strong>, in the <code>web</code> folder inside <code>bookstore</code>, runs Claude. The <code>..</code> gives Claude your backend's code:</p>
+<p><strong>Terminal 1</strong>, in the <code>web</code> folder inside <code>bookstore</code>, runs Claude. The <code>..</code> gives Claude your backend's code:</p>
 <pre class="bash"><code>claude --add-dir ..</code></pre>
+<p><strong>Terminal 2</strong>, in the <code>bookstore</code> folder, runs the backend:</p>
+<pre class="bash"><code>bun run start</code></pre>
 <p><strong>Terminal 3</strong>, a plain shell in <code>web</code>, for <code>curl</code> and <code>git</code>. Check the backend and Spec Kit there:</p>
 <pre class="bash"><code>curl http://localhost:8080/api/books
 specify check</code></pre>
@@ -162,7 +166,7 @@ specify check</code></pre>
 <h3 id="1-create-the-spec-and-find-what-it-leaves-open">1. Create the spec and find what it leaves open</h3>
 <p>One Spec Kit command writes the spec for you. You do not create the spec file yourself. The spec says <em>what</em> the frontend does and <em>why</em>. Not how.</p>
 <ol type="1">
-<li><p><strong>Start the spec</strong>. In terminal 2, paste this command into Claude, exactly as written:</p>
+<li><p><strong>Start the spec</strong>. In terminal 1, paste this command into Claude, exactly as written:</p>
 <pre class="text"><code>/speckit-specify A web UI for the BookStore API. Users can browse books and open a book to see its details and its author. The API is already running behind `/api`.</code></pre>
 <p>The command creates a folder such as <code>specs/001-browse-books/</code> and writes <code>spec.md</code> in that folder. Spec Kit picks the folder name, so this sheet writes the folder as <code>specs/001-*/</code>. The command takes one to two minutes. Do not wait for it. Claude does not know <code>/speckit-specify</code>? Run the Spec Kit steps in <code>preparation.html</code> again, then restart Claude.</p></li>
 <li><p><strong>Read the constitution while it runs</strong>. Open <code>.specify/memory/constitution.md</code>. The constitution holds the rules that every spec, plan and task must follow. It is written for you. It has six principles on one page. Answer two questions in one written sentence. What does the constitution say about the API contract? Where does it say the contract comes from?</p></li>
@@ -194,7 +198,7 @@ specify check</code></pre>
 <h3 id="3-create-the-plan-and-review-the-spec-while-it-runs">3. Create the plan, and review the spec while it runs</h3>
 <p>You create five files under <code>specs/001-*/</code>: <code>plan.md</code>, <code>research.md</code>, <code>data-model.md</code>, <code>contracts/</code> and <code>quickstart.md</code>. Together they are the plan. The plan says <em>how</em> the frontend gets built.</p>
 <ol type="1">
-<li><p><strong>Start the plan</strong>. In terminal 2, run <code>/speckit-plan</code>. It runs two to four minutes without you. Do not wait. Do not edit the spec while it runs: the command is reading that file.</p></li>
+<li><p><strong>Start the plan</strong>. In terminal 1, run <code>/speckit-plan</code>. It runs two to four minutes without you. Do not wait. Do not edit the spec while it runs: the command is reading that file.</p></li>
 <li><p><strong>Read the diff</strong>. In terminal 3:</p>
 <pre class="bash"><code>git diff -- specs</code></pre>
 <p>The <code>## Clarifications</code> section near the top lists the questions you were asked. The rest of the diff shows where your answers went. Look for three things:</p>
@@ -233,7 +237,7 @@ curl -s &quot;http://localhost:8080/api/books/1&quot;</code></pre>
 <h3 id="5-create-the-task-list-and-check-the-p-marks">5. Create the task list and check the <code>[P]</code> marks</h3>
 <p>You create <code>specs/001-*/tasks.md</code>. The task list holds small steps, in order, for building the frontend.</p>
 <ol type="1">
-<li><strong>Start the task list</strong>. In terminal 2, run <code>/speckit-tasks</code>. It takes one to two minutes. While it runs, look at your task 4 list: which difference would do the most damage once it is code?</li>
+<li><strong>Start the task list</strong>. In terminal 1, run <code>/speckit-tasks</code>. It takes one to two minutes. While it runs, look at your task 4 list: which difference would do the most damage once it is code?</li>
 <li><strong>Read the format</strong>. Open <code>specs/001-*/tasks.md</code>. Each task looks like <code>[ID] [P?] [Story]</code>. <code>[P]</code> means: different files, no dependencies, so it can run at the same time as other <code>[P]</code> tasks. <code>[US1]</code> and <code>[US2]</code> name the user story. Find the sections <strong>Parallel Opportunities</strong> and <strong>Parallel Team Strategy</strong> near the end. That is the work split for the agents in Exercise 7.</li>
 <li><strong>Check for a collision</strong>. Pick two <code>[P]</code> tasks from <strong>different</strong> user stories. Do they write the same file? Then check the shared files: the API client, the stylesheet, <code>index.html</code>. The constitution (principle IV) says these belong to the foundation phase, not to a story. If a story task writes one of them, two agents will edit the same file at the same time. One of them loses its work without an error (<em>Can These Run at the Same Time?</em>). Write down: <em>collision: yes or no</em>, and the file name if yes.</li>
 </ol>
@@ -244,7 +248,7 @@ curl -s &quot;http://localhost:8080/api/books/1&quot;</code></pre>
 <pre class="bash"><code>git add specs
 git commit -m &quot;spec: bookstore-web frontend&quot;</code></pre>
 <p>Exercise 7 starts from this commit.</p></li>
-<li><p><strong>Start the check</strong>. In terminal 2, run <code>/verify-exercise 6</code>. This is a course command. It compares what the plan says about the API with what your backend really does. It asks you for two file names: <code>research.md</code> and the contract file. Give them. It calls your backend, compares, and reports. Read the report during the closing round.</p></li>
+<li><p><strong>Start the check</strong>. In terminal 1, run <code>/verify-exercise 6</code>. This is a course command. It compares what the plan says about the API with what your backend really does. It asks you for two file names: <code>research.md</code> and the contract file. Give them. It calls your backend, compares, and reports. Read the report during the closing round.</p></li>
 </ol>
 <p><strong>Done when</strong>: <code>git log</code> shows the commit, and <code>/verify-exercise 6</code> is running.</p>
 <h2 id="bonus-only-if-time-remains">Bonus (only if time remains)</h2>
@@ -297,13 +301,17 @@ git commit -m &quot;spec: bookstore-web frontend&quot;</code></pre>
 
   document.querySelectorAll('pre').forEach(function (pre) {
     var code = pre.querySelector('code') || pre;
+    var isPrompt = /\bprompt\b/.test(pre.className + ' ' + code.className);
     var btn = document.createElement('button');
     btn.type = 'button'; btn.className = 'xb-copy';
     btn.innerHTML = icon + '<span>Copy</span>';
     btn.setAttribute('aria-label', 'Copy to clipboard');
     btn.addEventListener('click', function () {
       // Drop the final newline so a pasted command does not run on its own.
-      copy(code.innerText.replace(/\n$/, '')).then(function () {
+      var text = code.innerText.replace(/\n$/, '');
+      // A prompt block (```prompt) shows paragraphs on screen, but copies as one line.
+      if (isPrompt) { text = text.replace(/\s*\n\s*/g, ' '); }
+      copy(text).then(function () {
         btn.classList.add('is-done'); btn.innerHTML = tick + '<span>Copied</span>';
       }, function () {
         btn.innerHTML = icon + '<span>Select and copy</span>';
