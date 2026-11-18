@@ -25,7 +25,7 @@ bookstore/                 <- bookstore-<lang>/: code, tests, CLAUDE.md, README.
   web/                     <- bookstore-web/ (sessions 6 and 7)
   mcp-sqlite/server.py     <- mcp-sqlite/ (session 4)
   bookstore-plugin/        <- bookstore-plugin/ (session 4 bonus)
-  headless/                <- headless/ (session 5: gate, brief, night logs)
+  headless/                <- headless/ (session 5: gate, fix run)
 ```
 
 Rules that follow from this:
