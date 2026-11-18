@@ -6,23 +6,20 @@
 
 ## Goal
 
-You run a spec-driven flow from a one-sentence idea to a reviewed task list.
-Spec Kit writes the files: a spec, a plan and a task list. You read them,
-answer its questions, and check what they claim against the running API.
-You will **not** write any application code. Exercise 7 builds what you specify here, with a team of
-agents working in parallel.
+You learn spec-driven development: you agree with Claude on what to
+build, before any code exists. You do the first half of the spec-driven
+loop: you align on the intent, and you approve the files that hold it, a
+spec, a plan and a task list. You write no application code. Exercise 7
+builds what you specify here.
 
 Spec Kit is a practice tool here: it shows every step of a good spec. It is
 not a recommendation. Your team's version can be much lighter.
 
-## Why a frontend
+## What you specify: a frontend for the BookStore API
 
-The BookStore API has no user interface. So nothing tells you what an empty
-list looks like, what a failed request shows, or which fields a book page
-has. Those are decisions. Decisions are what a specification is for.
-
-A frontend also splits into parts that different agents can build at the
-same time. Exercise 7 depends on that.
+The API has no user interface yet. So nothing tells you what an empty list
+looks like, what a failed request shows, or which fields a book page has.
+Those are decisions, and a spec is the place to write decisions down.
 
 ## Start here
 
