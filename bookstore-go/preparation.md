@@ -185,7 +185,7 @@ spec-driven development toolkit, to specify a frontend for the BookStore API.
 **Node.js 20+** — https://nodejs.org/ (the frontend's dev server runs on it)
 
 **uv** — Exercise 4 starts a small Python MCP server with `uv`, Exercise 5
-runs its gate and brief scripts with `uv`, and Spec Kit is a Python tool
+runs its gate and fix scripts with `uv`, and Spec Kit is a Python tool
 installed via `uv`:
 
 ```bash
