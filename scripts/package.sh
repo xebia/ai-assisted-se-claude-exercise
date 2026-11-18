@@ -11,7 +11,7 @@
 #     web/                 <- bookstore-web/      (sessions 6 and 7)
 #     mcp-sqlite/          <- mcp-sqlite/         (session 4: server.py, run with uv)
 #     bookstore-plugin/    <- bookstore-plugin/   (session 4 bonus)
-#     headless/            <- headless/           (session 5: gate, brief, logs; run with uv)
+#     headless/            <- headless/           (session 5: gate, fix run; run with uv)
 #     exercises/*.html     <- the sheets, rendered by scripts/render-sheets.sh
 #     preparation.html
 #
@@ -59,7 +59,7 @@ copy bookstore-web web
 # participants start it with `uv run --script`, so nothing is built here.
 copy mcp-sqlite mcp-sqlite
 copy bookstore-plugin bookstore-plugin
-# Exercise 5 (headless): two uv scripts, the team rules and two nights of log.
+# Exercise 5 (headless): two uv scripts (gate, fix run) and the team rules.
 copy headless headless
 
 # Inside the package the sheets are HTML pages, so point every mention of them at

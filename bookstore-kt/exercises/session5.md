@@ -1,18 +1,15 @@
 # Exercise 5: Claude Without You Watching
 
 **Session**: 5 — Headless & Automation\
-**Duration**: 35 minutes, plus a 4-minute closing round\
+**Duration**: 30 minutes, plus a 4-minute closing round\
 **Project**: The same BookStore API, and the `headless` folder in it.
 
 ## Goal
 
-You run Claude without a chat, and you check if you can trust the
-result. You:
-
-1. Run one prompt headless, twice, and see what loads.
-2. Build a review gate, and watch it pass one commit and block another.
-3. Let a second run fix what the gate found, and check the fix yourself.
-4. Write the prompt for a morning brief, and test it on two nights.
+You learn how to run Claude in headless mode, without a chat, and how far
+you can trust the result. In a chat you steer, approve and read. In a
+headless run you decide all three before the run starts. You apply this to
+a quality gate and an event-triggered fix.
 
 ## Start here
 
@@ -136,32 +133,42 @@ missing verdict counts as `block`.
 The gate blocked a commit. A second headless run can fix it, but a person
 still decides. If the gate passed the endpoint in task 2, skip this task.
 
-1. **Read the command.** Open `headless/fix.py` and find the `claude`
-   command. Write down its permission mode, and the one in `gate.py`.
-   `dontAsk` means: Claude may not use a tool that would ask you.
-   `acceptEdits` means: Claude may edit files without asking. Why does the
-   fix run get a different mode?
-2. **Predict.** The fix run gets only the gate's verdict and findings.
+1. **Set the permission mode.** Open `headless/fix.py`. Replace
+   `<define-permission-mode>` in the line
+   `"--permission-mode", "<define-permission-mode>",`
+   with the mode this run needs.
+
+   Claude must edit files, and nobody is there to answer a prompt. See the
+   slide *Approve: Set the Permissions Before the Run*. Write down your
+   mode, and why it differs from the mode in `gate.py`.
+2. **Commit the mode.** The script reads the gate's answer for the commit
+   before this one.
+
+   ```
+   git commit -am "Set the fix permission mode"
+   ```
+
+3. **Predict.** The fix run gets only the gate's verdict and findings.
    Claude fixes the code, and you commit it. Will the gate say `pass`?
    Write *yes* or *no*.
-3. **Run the fix.** The script sends the gate's last answer to Claude.
+4. **Run the fix.** The script sends the gate's last answer to Claude.
    Claude edits the code. It does not commit.
 
    ```
    uv run headless/fix.py
    ```
 
-4. **Check the fix.** Run `git diff`. Does it change only what the finding
+5. **Check the fix.** Run `git diff`. Does it change only what the finding
    asks for? You decide. If not, undo it with `git restore .` and run
-   step 3 again.
-5. **Commit, and run the gate.**
+   step 4 again.
+6. **Commit, and run the gate.**
 
    ```
    git commit -am "Fix the gate findings"
    uv run headless/gate.py
    ```
 
-   If it says `block` again, read the new finding and do steps 3 to 5
+   If it says `block` again, read the new finding and do steps 4 to 6
    again. `fix.py` reads the newest gate answer.
 
 Why: the gate only reads, so it cannot break anything. The fix run may
@@ -170,56 +177,16 @@ small event-triggered run, on your laptop: the gate's finding starts the
 fix, as a bug report does on the slides.
 
 **Done when**: the gate gave `Verdict: pass` on your fix commit. Your notes
-say why the fix run may edit files and the gate may not.
+name your permission mode, and say why the fix run may edit files and the
+gate may not.
 
-### 4. The morning brief
-
-The slides show a scheduled run that writes a nightly test report. This
-task builds the same kind of run on a different input, last night's
-server log, and its report is called the morning brief. The task
-produces two briefs: one for a night with errors, and one for a night
-where the log stops at 01:40.
-
-1. **Write the prompt.** Create `headless/brief-prompt.txt`. The script
-   `headless/brief.py` sends this file to Claude, with the night's log (an
-   export from a logging platform). Ask
-   for four things in your own words. The first: *Write at most 10 lines.* Then: the worst
-   problem first; every number with the log line it came from; one line
-   when nothing went wrong.
-2. **Run it on the full night.**
-
-   ```
-   uv run headless/brief.py headless/night-full.txt
-   ```
-
-   The script prints the brief and saves it in `headless/out/`, next to
-   the input Claude got. Does the brief name the endpoint with the
-   errors, give the count, and quote a line? If not, improve your prompt
-   and run again.
-3. **Predict, then run it on the second night.** This log stops at 01:40,
-   because the log file was replaced by a new one (log rotation). Will your brief say that the night
-   is not complete? Write *yes* or *no*. Then run:
-
-   ```
-   uv run headless/brief.py headless/night-cut.txt
-   ```
-
-4. **Improve one sentence.** If your brief does not say that the log
-   stops at 01:40, add one sentence to your prompt. For example: ask for
-   the time range the log covers. Then run the command of step 3 again.
-
-**Done when**: the full-night brief names the endpoint with the errors,
-gives the count and quotes a log line. The second brief says which time
-range it covers.
-
-### 5. Closing: check your work
+### 4. Closing: check your work
 
 1. **Start the check.** Close Claude if it is open. Start `claude` again,
    and run `/verify-exercise 5`. This
-   course command came with the project. It reads your gate, the files
-   `gate.py` and `fix.py` saved in `headless/out/`, and both briefs.
-   First it asks if your second brief noticed that the log stops at
-   01:40. Answer in one line.
+   course command came with the project. It reads your gate and the files
+   `gate.py` and `fix.py` saved in `headless/out/`. First it asks what the
+   gate said about your endpoint commit. Answer in one line.
 2. **Read the report.** Write down one line from it.
 
 **Done when**: one line from the report is in your notes. Bring it to the
@@ -289,6 +256,4 @@ The trainer asks the room. Have these answers ready:
 - Why did the two runs in task 1 answer differently?
 - In the gate, what does Claude decide, and what does the script decide?
 - Why may the fix run edit files, while the gate may not?
-- Did your brief notice that the log stops at 01:40? Which sentence in
-  your prompt made the difference?
 - The gate treats "no verdict" as "block". Why is that the safe choice?

@@ -6,37 +6,34 @@
 
 ## Goal
 
-You run a spec-driven flow from a one-sentence idea to a reviewed task list.
-Spec Kit writes the files: a spec, a plan and a task list. You read them,
-answer its questions, and check what they claim against the running API.
-You will **not** write any application code. Exercise 7 builds what you specify here, with a team of
-agents working in parallel.
+You learn spec-driven development: you agree with Claude on what to
+build, before any code exists. You do the first half of the spec-driven
+loop: you align on the intent, and you approve the files that hold it, a
+spec, a plan and a task list. You write no application code. Exercise 7
+builds what you specify here.
 
 Spec Kit is a practice tool here: it shows every step of a good spec. It is
 not a recommendation. Your team's version can be much lighter.
 
-## Why a frontend
+## What you specify: a frontend for the BookStore API
 
-The BookStore API has no user interface. So nothing tells you what an empty
-list looks like, what a failed request shows, or which fields a book page
-has. Those are decisions. Decisions are what a specification is for.
-
-A frontend also splits into parts that different agents can build at the
-same time. Exercise 7 depends on that.
+The API has no user interface yet. So nothing tells you what an empty list
+looks like, what a failed request shows, or which fields a book page has.
+Those are decisions, and a spec is the place to write decisions down.
 
 ## Start here
 
-**Terminal 1**, in the `bookstore` folder, runs the backend:
-
-```bash
-python3 main.py
-```
-
-**Terminal 2**, in the `web` folder inside `bookstore`, runs Claude. The
+**Terminal 1**, in the `web` folder inside `bookstore`, runs Claude. The
 `..` gives Claude your backend's code:
 
 ```bash
 claude --add-dir ..
+```
+
+**Terminal 2**, in the `bookstore` folder, runs the backend:
+
+```bash
+python3 main.py
 ```
 
 **Terminal 3**, a plain shell in `web`, for `curl` and `git`. Check the
@@ -60,7 +57,7 @@ Training mode is off in `web`: Claude answers directly. Stuck? Type
 One Spec Kit command writes the spec for you. You do not create the spec
 file yourself. The spec says *what* the frontend does and *why*. Not how.
 
-1. **Start the spec**. In terminal 2, paste this command into Claude,
+1. **Start the spec**. In terminal 1, paste this command into Claude,
    exactly as written:
 
    ```text
@@ -132,7 +129,7 @@ You create five files under `specs/001-*/`: `plan.md`, `research.md`,
 `data-model.md`, `contracts/` and `quickstart.md`. Together they are the
 plan. The plan says *how* the frontend gets built.
 
-1. **Start the plan**. In terminal 2, run `/speckit-plan`. It runs
+1. **Start the plan**. In terminal 1, run `/speckit-plan`. It runs
    two to four minutes without you. Do not wait. Do not edit the spec while
    it runs: the command is reading that file.
 2. **Read the diff**. In terminal 3:
@@ -206,7 +203,7 @@ have a list of differences (possibly empty).
 You create `specs/001-*/tasks.md`. The task list holds small steps, in
 order, for building the frontend.
 
-1. **Start the task list**. In terminal 2, run `/speckit-tasks`. It
+1. **Start the task list**. In terminal 1, run `/speckit-tasks`. It
    takes one to two minutes. While it runs, look at your task 4 list: which
    difference would do the most damage once it is code?
 2. **Read the format**. Open `specs/001-*/tasks.md`. Each task looks
@@ -237,7 +234,7 @@ order, for building the frontend.
    ```
 
    Exercise 7 starts from this commit.
-2. **Start the check**. In terminal 2, run `/verify-exercise 6`.
+2. **Start the check**. In terminal 1, run `/verify-exercise 6`.
    This is a course command. It compares what the plan says about the API
    with what your backend really does. It asks you for two file names:
    `research.md` and the contract file. Give them. It calls your backend,
