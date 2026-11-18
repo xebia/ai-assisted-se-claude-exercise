@@ -62,8 +62,14 @@ def main():
         stop("You have changes that are not committed. Commit them or undo them "
              "(git restore .) first, so the fix is the only change.")
 
-    sha = git("rev-parse", "--short", "HEAD").stdout.strip()
-    subject = git("log", "-1", "--format=%s").stdout.strip()
+    # Task 3, step 1: you commit your change to this file first. That commit
+    # changes only fix.py, so the gate answer to read is the one for the commit before it.
+    target = "HEAD"
+    changed = git("diff", "--name-only", "HEAD~1", "HEAD").stdout.split()
+    if changed == ["headless/fix.py"]:
+        target = "HEAD~1"
+    sha = git("rev-parse", "--short", target).stdout.strip()
+    subject = git("log", "-1", "--format=%s", target).stdout.strip()
     saved, data = newest_gate_run(sha)
     if not data:
         stop(f"No gate run for your last commit ({sha} {subject}). "
@@ -87,10 +93,14 @@ def main():
     cmd = [
         claude, "--safe-mode", "-p", PROMPT,
         "--append-system-prompt-file", "headless/team-rules.md",
-        "--permission-mode", "acceptEdits",
+        # Task 3, step 1: replace <define-permission-mode> with the mode this run needs.
+        "--permission-mode", "<define-permission-mode>",
         "--max-turns", "10",
         "--output-format", "json",
     ]
+    if "<define-permission-mode>" in cmd:
+        stop("Task 3, step 1: the permission mode in headless/fix.py is still "
+             "<define-permission-mode>.")
     run = subprocess.run(cmd, input=gate_answer, capture_output=True, text=True,
                          encoding="utf-8")
     try:
