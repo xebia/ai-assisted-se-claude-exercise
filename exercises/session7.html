@@ -145,108 +145,87 @@ tr:nth-child(even) td { background: #fbfafd; }
 <strong>Project</strong>: <code>web</code>, the frontend you specified in Exercise 6.</p>
 <h2 id="goal">Goal</h2>
 <p>In Exercise 6 you wrote a spec, a plan and a task list, and no code. In this exercise an agent team builds the code.</p>
-<p>The teammates in an agent team can send messages to each other, without the lead. You use that here. One teammate reviews the work of the others. It sends what it finds straight to the teammate that wrote the code.</p>
-<p>You do five things:</p>
-<ol type="1">
-<li>Build the shared part of the frontend, in one Claude session.</li>
-<li>Write one prompt that starts a team: one builder per user story and one reviewer. Improve that prompt with a coach.</li>
-<li>Start the team and watch it work.</li>
-<li>Follow one finding from the reviewer to the builder, and check the result in the browser.</li>
-<li>Let three subagents design a new look for your frontend, each in its own worktree.</li>
-</ol>
+<p>One teammate reviews the work of the others. It sends what it finds straight to the teammate that wrote the code, without the lead. At the end, three subagents each design a new look for your frontend.</p>
 <p>You will not write application code yourself.</p>
 <h2 id="start-here">Start here</h2>
 <ul>
 <li><strong>Terminal 1</strong>, in <code>bookstore</code>: <code>./gradlew run</code></li>
 <li><strong>Terminal 2</strong>, in <code>web</code> (inside <code>bookstore</code>): <code>claude</code>. This is your <strong>lead</strong> session for the whole exercise.</li>
-<li><strong>Terminal 3</strong>, in <code>web</code>. Leave it open: you start the frontend there in task 1.</li>
-<li>You need the task list from Exercise 6. No task list? Task 1 gives you one.</li>
+<li><strong>Terminal 3</strong>, in <code>web</code>. You start the frontend there in task 1.</li>
 <li>Training mode is off in <code>web</code>: Claude answers directly. Stuck? Type <em>just tell me</em>.</li>
 </ul>
 <hr />
 <h2 id="tasks">Tasks</h2>
 <h3 id="1-build-the-foundation-one-session">1. Build the foundation, one session</h3>
-<p>You produce the <strong>foundation</strong>: Phase 1 and Phase 2 of <code>tasks.md</code>. These are the files every story needs, such as the API client, the page shell and the stylesheet. The constitution says no story may start before the foundation is done, so the lead builds it alone.</p>
+<p>You produce the <strong>foundation</strong>: Phase 1 and Phase 2 of <code>tasks.md</code>. These are the files every story needs, such as the API client and the page shell. The lead builds them alone, before any story starts.</p>
 <ol type="1">
-<li><p><strong>Check your spec.</strong> Your own spec from Exercise 6 is complete if <code>specs/001-*/tasks.md</code> exists and has at most three user stories. If it is complete, go to step 2. If not, or if you are not sure, use the reference spec. Paste this into the lead:</p>
+<li><p><strong>Check your spec.</strong> You can use your own spec from Exercise 6 if <code>specs/001-*/tasks.md</code> exists and has at most three user stories. Then go to step 2. If not, or if you are not sure, paste this into the lead:</p>
 <blockquote>
 <p>Copy the folder <code>specs-reference/001-browse-books</code> to <code>specs/001-browse-books</code>. If <code>specs/</code> already holds another folder, move that folder to <code>specs-old/</code> first. Then commit with the message "spec: reference spec for exercise 7".</p>
 </blockquote></li>
-<li><p>Open <code>specs/001-*/tasks.md</code> and find <strong>Phase 1</strong> and <strong>Phase 2</strong>.</p></li>
 <li><p>Send the lead this prompt. Copy it as written:</p>
 <blockquote>
 <p>Read <code>specs/001-*/tasks.md</code> and <code>.specify/memory/constitution.md</code>. First fix the task list. If a user-story task writes a file that more than one story needs (page shell, stylesheet, API client, router), or two stories write the same file, move that work into Phase 2. Give each story its own page file, created as a stub in Phase 2, so no story edits the router. Tell me what you moved. Then implement Phase 1 and Phase 2, and nothing from any user story. Tick each task off in <code>tasks.md</code> when it is done. Then commit everything with the message "foundation" and add the git tag <code>foundation</code>. When you finish, list the files you created, and for each story the one file it owns.</p>
 </blockquote>
-<p>The run takes one to three minutes. Wait for it. While you wait, read the introduction of task 2. When the lead reports back, write down its file list. Task 2 needs it.</p></li>
-<li><p>When the lead reports back, start the frontend in terminal 3:</p>
+<p>The run takes one to three minutes. While you wait, read the introduction of task 2. Then write down the file list from the lead's report. Task 2 needs it.</p></li>
+<li><p>Start the frontend in terminal 3:</p>
 <pre class="bash"><code>npm run dev</code></pre>
 <p>Open http://localhost:5173. You should see the page shell, and no errors in the browser console.</p></li>
 </ol>
-<p>Why step 3 asks for this: if two stories need the same file, such as the router, two builders would edit it at the same time. Step 3 moves that work into the foundation before any code exists. You solve the problem in the plan, not later in the code. The tag <code>foundation</code> marks where the story work starts. The reviewer and the check in task 4 compare against it.</p>
+<p>Why the prompt in step 2 fixes the task list first: two builders must never edit the same file. The prompt moves every shared file into the foundation before any code exists. The tag <code>foundation</code> marks where the story work starts. The reviewer compares against it.</p>
 <p><strong>Done when</strong>: Phase 1 and 2 are ticked in <code>tasks.md</code>, the page shell loads on port 5173, and the lead reports the commit and the tag <code>foundation</code>.</p>
 <h3 id="2-draft-the-team-prompt">2. Draft the team prompt</h3>
 <p>You produce one prompt that turns the lead into a team lead. This is the core of the exercise.</p>
 <p>The lead starts <strong>teammates</strong>: separate Claude Code sessions. Together they are the <strong>agent team</strong>. A teammate starts with an empty context and does not see this chat. Everything it must know is in your prompt, or in a file your prompt names.</p>
-<p>Your team has two kinds of teammates:</p>
-<ul>
-<li>A <strong>builder</strong> for each user story. It writes the code for that story.</li>
-<li>One <strong>reviewer</strong>. It writes no code. It checks each story and tells the builder what to fix.</li>
-</ul>
-<p>A builder and the reviewer send messages to each other directly, by name. The lead does not pass the messages on. A subagent is different: it reports back only to the session that started it.</p>
-<p>The reviewer also checks two <strong>house rules</strong>: rules your team agreed on that are not in the spec.</p>
-<ul>
-<li>Every page sets its own browser tab title.</li>
-<li>Everything you can click is a real link or button, so it works with the keyboard.</li>
-</ul>
-<p>Only the reviewer gets these rules, so it will likely find something to send back. That is normal in a team: the spec says what to build, and the review checks how it is built.</p>
-<p>Each user story in <code>tasks.md</code> has an <strong>Independent Test</strong>. It lists the steps from <code>quickstart.md</code> that must pass for that story. The example prompt below uses this test.</p>
+<p>Your team has one <strong>builder</strong> per user story, and one <strong>reviewer</strong> that writes no code. The reviewer checks each story and tells the builder what to fix. The two send messages to each other directly, by name. A subagent cannot do that: it reports only to the session that started it.</p>
+<p>The reviewer also checks two <strong>house rules</strong>: rules your team agreed on that are not in the spec. Only the reviewer gets them, so it will likely find something to send back.</p>
 <ol type="1">
-<li><p><strong>Draft</strong>. Open <code>tasks.md</code> and find the section <strong>Parallel Team Strategy</strong> near the bottom. It says how to split the work. Your prompt turns that plan into instructions the lead can follow. Start from the worked example below. It is not complete: the coach tells you what is missing. Words in <code>&lt;angle brackets&gt;</code> are placeholders. Replace each one with a name from your own <code>tasks.md</code>, and remove the brackets. Do not run the prompt yet.</p>
+<li><p><strong>Draft.</strong> Start from the example below. Replace each <code>&lt;placeholder&gt;</code> with a name from your own <code>tasks.md</code>. The example is not complete: the coach tells you what is missing. Do not run the prompt yet.</p>
 <blockquote>
 <p>Read <code>specs/&lt;your spec folder&gt;/tasks.md</code>. Spawn an agent team. Spawn one builder per user story, named after the story: <code>&lt;us1-short-name&gt;</code>, <code>&lt;us2-short-name&gt;</code>. Each builder works only on the tasks tagged with its story. Also spawn a teammate named <code>reviewer</code> that writes no code. When a builder's Independent Test in <code>tasks.md</code> passes against the running backend, the builder sends <code>reviewer</code> the list of files it changed. The reviewer first checks our two house rules. One: every page sets its own browser tab title, such as "Book list · BookStore". Two: everything you can click is a real link or button, so it works with the keyboard. Then it checks three more things: no foundation file changed (<code>git diff --stat foundation</code>), no backend address is in the code (<code>grep -rn "8080\|localhost" src/ index.html</code>), and every error path shows a fixed sentence, as principle V in <code>.specify/memory/constitution.md</code> says. Report per story: files changed, and what the reviewer found.</p>
-</blockquote></li>
-<li><p><strong>Coach and revise</strong>. Run <code>/parallel-coach 2</code> and paste your draft as your next message. The coach points out gaps. It never writes the prompt for you. Revise until the coach says the prompt is ready. Disagree with the coach? Say <em>"run it anyway"</em>. It will let you, and tell you what to watch for.</p></li>
+</blockquote>
+<p>Two things in <code>tasks.md</code> help you. Each user story has an <strong>Independent Test</strong>: the steps that must pass for that story. The section <strong>Parallel Team Strategy</strong> says how to split the work.</p></li>
+<li><p><strong>Coach and revise.</strong> Run <code>/parallel-coach 2</code> and paste your draft as your next message. The coach names what is missing. It never writes the prompt for you. Revise until the coach says the prompt is ready. Disagree with the coach? Say <em>"run it anyway"</em>.</p></li>
 </ol>
 <p><strong>Done when</strong>: the coach says your team prompt is ready, and task 1 is done.</p>
 <h3 id="3-start-the-team-and-watch-it">3. Start the team and watch it</h3>
-<p>You start the team. Then you only watch. In this task you type nothing, except in the two cases at the end.</p>
+<p>You start the team. Then you only watch.</p>
 <ol type="1">
-<li>Paste your prompt into the lead, in terminal 2. The coach does not run this one for you. A team can only start from the session you type in.</li>
-<li>Look at the agent panel below the prompt input. Within a minute you should see one row per teammate: each builder and the reviewer, with the names from your prompt. Rows without your names are plain subagents, not a team. In that case, tell the lead: <em>"Use an agent team, not subagents."</em> Still no team? Agent teams are experimental. Tell the trainer, do not spend more time on it, and go on with task 5.</li>
-<li>Watch. Keep <code>tasks.md</code> open in your editor: ticks appear as builders finish tasks. Refresh http://localhost:5173 now and then. Stories appear while you watch. To see what one teammate does, select its row with the <strong>up and down arrows</strong> and press <strong>Enter</strong>. To leave, select the lead's row again. Do not press <strong>Escape</strong> in a transcript: that interrupts the teammate.</li>
+<li>Paste your prompt into the lead, in terminal 2. The coach does not run it for you.</li>
+<li>Look at the agent panel below the prompt input. Within a minute it shows one row per teammate, with the names from your prompt. Rows without your names are subagents, not a team. In that case, tell the lead: <em>"Use an agent team, not subagents."</em> Still no team? Agent teams are experimental. Tell the trainer and go on with task 5.</li>
+<li>Watch. Ticks appear in <code>tasks.md</code> as builders finish tasks. Stories appear at http://localhost:5173 when you refresh. To read what one teammate does, select its row with the <strong>up and down arrows</strong> and press <strong>Enter</strong>. To leave, select the lead's row again. Do not press <strong>Escape</strong> in a transcript: that interrupts the teammate.</li>
 </ol>
 <p>You type something only in these two cases:</p>
 <ul>
 <li>A permission prompt from a teammate appears in the <strong>lead's</strong> row. Answer it there.</li>
-<li>The lead starts editing story files itself, or fixes a finding of the reviewer itself. Tell it: <em>"Wait for your teammates to finish."</em></li>
+<li>The lead edits story files itself, or fixes a finding of the reviewer itself. Tell it: <em>"Wait for your teammates to finish."</em></li>
 </ul>
 <p><strong>Done when</strong>: the lead's report says the reviewer approved every story, every story task in <code>tasks.md</code> is ticked, and both stories show in the browser.</p>
 <h3 id="4-follow-one-finding-then-check-it-yourself">4. Follow one finding, then check it yourself</h3>
-<p>The teammates still exist after the run, each with its own memory of what it did. You follow one finding from the reviewer to the builder that fixed it. Most findings are about the two house rules from task 2: a tab title per page, and links and buttons that work with the keyboard. Then you check the result in the browser, which the reviewer did not open.</p>
+<p>You follow one finding from the reviewer to the builder that fixed it. Then you check the result in the browser, which the reviewer did not open.</p>
 <ol type="1">
-<li><p><strong>Bring back the reviewer.</strong> When no teammate is working, their rows disappear from the panel after a short time. They are not stopped. Tell the lead:</p>
+<li><p><strong>Bring back the reviewer.</strong> The rows of teammates that do no work disappear from the panel. The teammates are not stopped, and each still knows what it did. Tell the lead:</p>
 <blockquote>
 <p>Ask reviewer to list every finding it sent, and to which builder.</p>
 </blockquote>
-<p>The reviewer's row comes back while it works. Select it with the arrows and press <strong>Enter</strong>. The row stays while you are in its transcript.</p></li>
-<li><p><strong>Read and ask.</strong> Scroll up in the reviewer's transcript. Find a message from a builder: its list of files. Then find what the reviewer sent back to that builder, for example a page without its own tab title. Now ask the reviewer a question yourself. Type:</p>
+<p>The reviewer's row comes back. Select it and press <strong>Enter</strong>.</p></li>
+<li><p><strong>Read and ask.</strong> Scroll up in the reviewer's transcript. Find a builder's list of files, and what the reviewer sent back to that builder. Then ask the reviewer a question yourself. Type:</p>
 <blockquote>
 <p>Which builder fixed what you sent back? How did you check the fix?</p>
 </blockquote>
-<p>This message goes to the reviewer only. The lead does not see it. When you have the answer, select the lead's row again. Did the reviewer approve every story the first time? Then ask it how it checked the house rules, and skip step 3.</p></li>
+<p>This message goes to the reviewer only. The lead does not see it. Then select the lead's row again. Did the reviewer approve every story the first time? Then ask it how it checked the house rules, and skip step 3.</p></li>
 <li><p><strong>Ask the builder.</strong> Tell the lead:</p>
 <blockquote>
 <p>Ask <code>&lt;builder&gt;</code> what it changed after the reviewer's message, and show me its answer.</p>
-</blockquote>
-<p>The builder still knows the finding. The lead never saw it.</p></li>
-<li><p><strong>Check the house rules in the browser.</strong> Click through each page and look at the browser tab: does the title change per page? Then click once in the page and press <strong>Tab</strong> a few times. You should reach every link and button, and see which one is selected.</p></li>
-<li><p><strong>Quick check against the spec.</strong> Follow the steps in <code>specs/001-*/quickstart.md</code>. Then test the three gaps from Exercise 6:</p>
+</blockquote></li>
+<li><p><strong>Check the house rules in the browser.</strong> Open each page. Does the title in the browser tab change per page? Then click once in the page and press <strong>Tab</strong> a few times. You should reach every link and button, and see which one is selected.</p></li>
+<li><p><strong>Check against the spec.</strong> Follow the steps in <code>specs/001-*/quickstart.md</code>. Then test the three gaps from Exercise 6:</p>
 <ul>
 <li>Go to page 2 of the book list. Does it show different books?</li>
 <li>Go past the last page. What does an empty page show?</li>
 <li>Open a book id that does not exist, such as <code>#/books/9999</code>. Do you see a fixed sentence, or raw error text from the backend?</li>
 </ul></li>
-<li><p><strong>Run the check</strong>: type <code>/verify-exercise 7</code>. Paste your team prompt when it asks. It grades the prompt first. Then it checks the files, including the checks the reviewer did. Bring its report to the closing round.</p></li>
+<li><p><strong>Run the check.</strong> Type <code>/verify-exercise 7</code> and paste your team prompt when it asks. It grades the prompt, then it checks the files. Bring its report to the closing round.</p></li>
 <li><p><strong>Commit.</strong> Tell the lead:</p>
 <blockquote>
 <p>Commit everything with the message "feat: bookstore-web, built by agent team".</p>
@@ -259,7 +238,7 @@ tr:nth-child(even) td { background: #fbfafd; }
 <li><code>/verify-exercise 7</code> has run, and the lead has committed</li>
 </ul>
 <h3 id="5-three-designs-three-worktrees">5. Three designs, three worktrees</h3>
-<p>The frontend works, but it looks plain. Three subagents now give it a new look, each a different one, at the same time. Each subagent works in its own <strong>worktree</strong>: its own branch and folder, so it cannot edit the files of the others. The three do not need to talk to each other. That is why you use subagents here, not an agent team.</p>
+<p>Three subagents give the frontend a new look, each a different one, at the same time. Each works in its own <strong>worktree</strong>: its own branch and folder, so it cannot edit the files of the others. The three do not need to talk to each other. That is why you use subagents here, not a team.</p>
 <ol type="1">
 <li><p>Send the lead this prompt. Replace the three styles with your own ideas if you like:</p>
 <blockquote>
@@ -269,7 +248,7 @@ tr:nth-child(even) td { background: #fbfafd; }
 <blockquote>
 <p>Check out <code>&lt;branch&gt;</code> in detached mode.</p>
 </blockquote>
-<p>Detached means you look at that branch without switching your own branch. Then refresh http://localhost:5173. The dev server shows that design.</p></li>
+<p>Detached means you look at that branch without switching your own branch. Then refresh http://localhost:5173.</p></li>
 <li><p><strong>Merge your favourite.</strong> Tell the lead:</p>
 <blockquote>
 <p>Switch back to the branch you started on, and merge <code>&lt;favourite&gt;</code>.</p>
@@ -278,19 +257,19 @@ tr:nth-child(even) td { background: #fbfafd; }
 <blockquote>
 <p>Now also merge <code>&lt;second branch&gt;</code>. If there is a conflict, do not solve it. Show me the files with a conflict.</p>
 </blockquote>
-<p>Read what the lead reports. Then tell it: <em>"Abort that merge."</em> No conflict? Then the two designs changed different files. Tell the trainer.</p></li>
+<p>Read the lead's report. Then tell it: <em>"Abort that merge."</em> No conflict? Then the two designs changed different files. Tell the trainer.</p></li>
 </ol>
-<p>While the subagents worked, the worktrees kept them out of each other's files. The conflict came only when you merged two designs that changed the same file.</p>
+<p>The worktrees kept the subagents out of each other's files while they worked. The conflict came only when you merged two designs that changed the same file.</p>
 <p><strong>Done when</strong>: you have seen all three designs, your favourite is merged, and you have seen what the second merge does.</p>
 <hr />
 <h2 id="closing-round">Closing round</h2>
 <p>The trainer asks people at random. Have answers ready:</p>
 <ul>
-<li>What did the coach say was missing in your team prompt before it said the prompt was ready?</li>
+<li>What did the coach say was missing in your team prompt?</li>
 <li>What did the reviewer send back? What did the builder change? Did it hold up in the browser?</li>
 <li>In Exercise 6 you marked some answers as guesses. Find one in the running frontend. Does the code treat it as a fact?</li>
 <li>Task 3 used an agent team. Task 5 used subagents in worktrees. Why the difference?</li>
-<li>Close with <strong>one take-away</strong>. Which part of this exercise needed teammates that talk to each other? Which part would have been faster in a single session?</li>
+<li>Your <strong>one take-away</strong>: which part needed teammates that talk to each other? Which part would have been faster in a single session?</li>
 </ul>
 <hr />
 <h2 id="what-you-should-have">What you should have</h2>
@@ -298,10 +277,9 @@ tr:nth-child(even) td { background: #fbfafd; }
   index.html, styles.css, src/     built from your spec
   specs/001-*/tasks.md             every story task ticked
   git log                          &quot;spec&quot; → &quot;foundation&quot; → &quot;feat&quot; → your design</code></pre>
-<p>Every line of application code in this project was written from a spec you wrote. You typed none of it yourself.</p>
 <p><strong>Before Session 8</strong>: think of one real team that you know well, with one codebase. Exercise 8 is about that team. You need no laptop project.</p>
 </main>
-<footer class="xb-footer"><span>Mastering AI-Assisted Software Engineering · Xebia Academy</span><span>Version 2026-10-09</span></footer>
+<footer class="xb-footer"><span>Mastering AI-Assisted Software Engineering · Xebia Academy</span><span>Version 2026-11-18</span></footer>
 <script>
 // Copy button on every code block. Works from file:// too: falls back to execCommand
 // where the async clipboard API is not allowed.
