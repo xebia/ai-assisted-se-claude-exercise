@@ -54,8 +54,12 @@ In all four: Node 22.23.5, uv 0.13.9 and Spec Kit v1.4.1 were installed,
 `git status` was clean afterwards. A cold `mise run setup` for Go took about
 two minutes, of which 78 s was Spec Kit.
 
-Not tested: Windows, Linux, mise shims, `mise run test`, `mise run web`, and a
-network behind a company proxy.
+Activation was checked too: after `mise activate zsh`, a non-interactive child
+shell (which is how Claude Code runs commands) finds `go`, `node` and `specify`,
+also from `web/`. The same holds with the shims folder on PATH.
+
+Not tested: Windows, Linux, `mise run test`, `mise run web`, and a network
+behind a company proxy.
 
 ## What gets simpler
 
@@ -94,8 +98,9 @@ Further gains:
   Without that, `mise run …` still works, but a bare `go run .`, `npm run dev`
   or `specify` (which the sheets and Claude Code use) is not found.
 - Claude Code runs commands in a non-interactive shell. It inherits the tools
-  when `claude` is started from an activated shell inside `bookstore/`. Shims
-  are the more robust choice for this course; that path is not tested yet.
+  when `claude` is started from an activated shell inside `bookstore/`, so the
+  sheet tells participants to start it there. Both activation and shims passed
+  this check on macOS.
 - The first `mise run setup` still downloads every toolchain (size not measured). It must still
   happen before the training day.
 
@@ -139,10 +144,9 @@ manual instructions should stay as the fallback.
 
 1. Run `mise run setup` and `mise run doctor` once on Windows 11 (PowerShell)
    and once on Linux.
-2. Decide on activation: recommend shims, and test that Claude Code finds `go`,
-   `node` and `specify`.
-3. Rewrite section 2 and 6 of the four `preparation.md` files around the three
-   steps above; keep the manual steps as a fallback section.
+2. Test the PowerShell activation line from the sheet on Windows.
+3. Done on this branch: the four `preparation.md` files are rewritten around
+   the three steps above, with the manual steps kept as section 6.
 4. Pin Spec Kit to a tag (`…spec-kit.git@v1.4.1`) and commit a `mise.lock`, so
    the whole room gets the version the sheets were tested with.
 5. Optional: use the same file in `.github/workflows/package.yml`

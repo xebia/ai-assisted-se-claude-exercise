@@ -101,7 +101,14 @@ Shapes are not uniform, which matters when you write the spec:
 
 ## Setup
 
-See `preparation.md` in the `bookstore` folder, one up. In short:
+See `preparation.md` in the `bookstore` folder, one up. With mise, one command
+in the `bookstore` folder does all of it:
+
+```bash
+mise run setup
+```
+
+Without mise, in this folder:
 
 ```bash
 uv tool install specify-cli --from git+https://github.com/github/spec-kit.git

@@ -16,21 +16,6 @@ If you have no preference, [Visual Studio Code](https://code.visualstudio.com/)
 is a safe choice. The instructions below use VSCode where a step depends on the
 editor.
 
-### 2. Kotlin
-
-Make sure the **Kotlin compiler** (`kotlinc` 1.9+) and a **JDK** (Java
-21+) are installed on your machine:
-
-- Kotlin: https://kotlinlang.org/docs/command-line.html
-- JDK 21+: https://adoptium.net/ (Temurin builds work well)
-
-Verify both work by running:
-
-```bash
-kotlinc -version
-java -version
-```
-
 Your IDE also needs to understand Kotlin. IntelliJ IDEA supports it out of the
 box, including the free Community Edition. In VSCode, install a **Kotlin
 extension**:
@@ -40,7 +25,7 @@ extension**:
   is a good lightweight option)
 - Click **Install**
 
-### 3. Claude Code subscription and plugins
+### 2. Claude Code subscription and plugins
 
 We will be using **Claude Code** as our AI coding assistant during the training.
 Please set up your account and tools before the session:
@@ -57,7 +42,7 @@ Please set up your account and tools before the session:
   (`Ctrl+Shift+X` / `Cmd+Shift+X`), search for **"Claude Code"** by Anthropic,
   and click **Install**.
 
-### 4. Git
+### 3. Git
 
 Make sure **Git** is installed on your machine: https://git-scm.com/downloads
 
@@ -67,26 +52,137 @@ Verify it works by running:
 git --version
 ```
 
+### 4. mise
+
+[mise](https://mise.jdx.dev/) is a tool that installs other tools. In this
+course it installs a JDK (Java 17), Node.js, uv and Spec Kit for you, in the
+versions the exercises were tested with.
+
+The Kotlin compiler is not in this list. `./gradlew` downloads it during the
+first build.
+
+mise installs these tools for the `bookstore` folder only. Tools that are
+already on your machine do not change.
+
+1. Install mise.
+
+   macOS and Linux:
+
+   ```bash
+   curl -fsSL https://mise.run | sh
+   ```
+
+   Windows (PowerShell):
+
+   ```powershell
+   irm https://mise.run/powershell | iex
+   ```
+
+2. Add mise to your shell. Run the one command for the shell you use.
+
+   zsh (the default on macOS):
+
+   ```bash
+   echo 'eval "$(~/.local/bin/mise activate zsh)"' >> ~/.zshrc
+   ```
+
+   bash:
+
+   ```bash
+   echo 'eval "$(~/.local/bin/mise activate bash)"' >> ~/.bashrc
+   ```
+
+   Windows (PowerShell):
+
+   ```powershell
+   if (-not (Test-Path $PROFILE)) { New-Item $PROFILE -Force }; Add-Content $PROFILE '(&mise activate pwsh) | Out-String | Invoke-Expression'
+   ```
+
+3. Close the terminal and open a new one. Then verify that mise works:
+
+   ```bash
+   mise --version
+   ```
+
+Is mise blocked on your company laptop? Then skip this section and follow
+section 6 instead.
+
 ### 5. Course materials on GitHub
 
 We will be working with the **BookStore API** starter project during the
-training. The repository has one branch per language. Clone the Kotlin
-one into a folder named `bookstore`, before the session:
+training. The repository has one branch per language.
+
+1. Clone the Kotlin branch into a folder named `bookstore`:
+
+   ```bash
+   git clone -b kt https://github.com/xebia/ai-assisted-se-claude-exercise bookstore
+   ```
+
+2. Enter the folder and let mise set everything up:
+
+   ```bash
+   cd bookstore
+   mise run setup
+   ```
+
+   This command installs a JDK (Java 17), Node.js, uv and Spec Kit. It also
+   prepares the frontend project in `bookstore/web` for Exercises 6 and 7.
+   The first run downloads a lot and takes a few minutes.
+
+3. Check the result:
+
+   ```bash
+   mise run doctor
+   ```
+
+   The command prints the version of every tool. Your machine is ready when
+   it ends without an error. Look at the line under `claude --version`: it
+   must show **2.1.178 or newer**. Exercise 7 needs that version.
+
+4. Start the project to verify that it runs:
+
+   ```bash
+   mise run start
+   ```
+
+   Open http://localhost:8080/api/books in your browser. You see a list of
+   books as JSON. Stop the project with `Ctrl+C`.
+
+Two notes. The tools from mise work only inside the `bookstore` folder, so
+always start `claude` from that folder. And please do all of this **before the
+training day**: thirty laptops that download the same tools at once on
+conference wifi is not a good start to a session.
+
+### 6. Without mise: install the tools by hand
+
+Follow this section only if you cannot use mise. It installs the same tools
+one by one. If `mise run doctor` ended without an error, skip it.
+
+#### Kotlin
+
+Make sure the **Kotlin compiler** (`kotlinc` 1.9+) and a **JDK** (Java
+21+) are installed on your machine:
+
+- Kotlin: https://kotlinlang.org/docs/command-line.html
+- JDK 21+: https://adoptium.net/ (Temurin builds work well)
+
+Verify both work by running:
 
 ```bash
-git clone -b kt https://github.com/xebia/ai-assisted-se-claude-exercise bookstore
+kotlinc -version
+java -version
 ```
 
-Then enter the folder and build it to verify everything works
-(the first build downloads the `sqlite-jdbc` JAR):
+#### The project
+
+Enter the `bookstore` folder and run the project to verify everything works:
 
 ```bash
 cd bookstore
 ./gradlew run
-# or: ./mvnw package -DskipTests && java -jar target/bookstore-1.0-SNAPSHOT.jar
 ```
 
-### 6. uv, Spec Kit and Node (for Exercises 4 to 7)
+#### uv, Spec Kit and Node (for Exercises 4 to 7)
 
 In Exercise 6 we use [Spec Kit](https://github.com/github/spec-kit), GitHub's
 spec-driven development toolkit, to specify a frontend for the BookStore API.
@@ -147,25 +243,22 @@ on http://localhost:5173.
 ## Quick checklist
 
 - Your editor or IDE is installed and can open Kotlin files
-- Kotlin compiler is installed (`kotlinc -version` works in your terminal)
-- JDK 21+ is installed (`java -version` shows 21 or higher)
 - You have an active Claude Pro subscription ($20/month)
-- Claude Code CLI is installed and working (`claude --version` works in your
-  terminal)
+- Claude Code CLI is installed and working (`claude --version` shows 2.1.178
+  or newer)
 - Optional: the Claude Code editor integration is installed
 - Git is installed (`git --version` works in your terminal)
+- mise is installed (`mise --version` works in a new terminal)
 - You have cloned the `kt` branch of the exercise repository into a folder
-  named `bookstore`, and the project runs and `./gradlew run` (or `./mvnw package -DskipTests`) finishes
-  without errors
+  named `bookstore`
+- `mise run setup` finished without an error
+- `mise run doctor` ends without an error
+- `mise run start` starts the project on http://localhost:8080
 
-- Node.js 20+ is installed (`node --version` works in your terminal)
-- `uv` is installed (`uv --version` works in your terminal)
-- Spec Kit is installed (`specify check` runs without problems)
-- `bookstore/web` is set up (`npm install` finished, `.specify/` exists,
-  `.specify/memory/constitution.md` starts with "# BookStore Web Constitution"
-  and `git status` shows it unmodified)
-- Claude Code is 2.1.178 or newer, and `web/.claude/settings.json`
-  is present and unmodified (`git status` shows nothing for it)
+Did you install the tools by hand (section 6)? Then check these instead of the
+three `mise run` lines: `java -version`, `node --version` and
+`uv --version` work, `specify check` reports no problems, and in
+`bookstore/web` the command `git status --short` prints nothing.
 
 ## Questions?
 
