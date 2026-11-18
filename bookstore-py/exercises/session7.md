@@ -146,8 +146,9 @@ will likely find something to send back.
 
    The section **Parallel Team Strategy** in `tasks.md` says how to split
    the work.
-2. **Coach and revise.** Run `/parallel-coach 1` and paste your draft as
-   your next message. The coach names what is missing. It never writes the
+2. **Coach and revise.** In terminal 1, in the Claude session from the
+   setup, run `/parallel-coach 1`. Then paste your draft as your next
+   message. The coach names what is missing. It never writes the
    prompt for you. Revise until the coach says the prompt is ready.
    Disagree with the coach? Say *"run it anyway"*.
 
