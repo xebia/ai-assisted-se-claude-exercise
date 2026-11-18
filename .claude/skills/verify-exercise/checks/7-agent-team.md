@@ -5,8 +5,8 @@
 team's work started.
 
 **What the participant was asked to produce.** A team prompt: the lead
-reads `tasks.md` and spawns one builder per user story plus a `reviewer`
-that writes no code. Each builder owns its story's file, and the
+reads `tasks.md` and spawns one builder per user story plus a reviewer
+that writes no code, each with a name the participant chose. Each builder owns its story's file, and the
 foundation stays untouched. When a builder's Independent Test passes, it
 sends its file list to the reviewer. The reviewer sends its findings back
 to that builder, and a story is done only after the reviewer approves it.
@@ -23,7 +23,7 @@ predicted defect.
 | Check | Present when the prompt… |
 | --- | --- |
 | **Source of work** | names `tasks.md` and that story tags decide who does what |
-| **Team, not subagents** | says agent team / teammates: one named builder per story, and a `reviewer` that writes no code |
+| **Team, not subagents** | says agent team / teammates: one named builder per story, and a named reviewer that writes no code (the participant chooses the names) |
 | **File ownership** | names the foundation files as finished; each builder edits only its story's file |
 | **Closed review loop** | builder sends its files to the reviewer, the reviewer sends findings back to that builder by name, and a story is done only when its Independent Test passes and the reviewer approves it |
 | **Lead waits** | the lead does not implement stories, does not fix findings, and waits for all teammates |
@@ -34,8 +34,8 @@ Run these yourself. Do not take the participant's notes on trust.
 
 0. Take the file lists from the participant's own `tasks.md`, not from
    the reference spec. Foundation files are the files Phase 1 and 2
-   create. Story files are the files each story phase writes. Task 1 had
-   the lead move shared work into Phase 2, so layouts differ: `src/views/`
+   create. Story files are the files each story phase writes. The setup had
+   Claude move shared work into Phase 2, so layouts differ: `src/views/`
    or other names are fine. The reference spec's list (`index.html`,
    `styles.css`, `src/main.js`, `src/api.js`, `src/ui.js`, one file per
    story under `src/pages/`) applies only when they used that spec.
@@ -56,14 +56,14 @@ Run these yourself. Do not take the participant's notes on trust.
    modules" in the report, never "fetched the page".
 6. Read the story files for `import` lines. Any import from
    `node_modules` or a CDN is a constitution I violation.
-7. House rules (task 2's worked example gives them to the reviewer): each
+7. House rules (task 1's worked example gives them to the reviewer): each
    page module sets `document.title` for its own page, and every element
    with a click handler is an `<a href>` or a `<button>`, not a `div` or
    `span`. Grep for `document.title` and for `onclick` /
    `addEventListener('click'` on other elements.
 
 8. Ask the participant what the reviewer sent back to a builder, and what
-   the builder said it changed (task 4, steps 2 and 3). Their answer is
+   the reviewer said the builder changed (task 3, step 2). Their answer is
    the only evidence of the loop: you cannot read the teammates'
    transcripts. Compare it with steps 1, 4, 5 and 7. A
    defect that is still in the code after the reviewer approved the story
@@ -87,7 +87,7 @@ Run these yourself. Do not take the participant's notes on trust.
 - **Approved but broken.** The reviewer approved a story that still shows
   backend text, breaks a house rule, or changed a foundation file. Say which check the prompt
   told the reviewer to run, or that it named none. Browser problems from
-  task 4 are expected misses: the reviewer reads code and does not open
+  task 3 are expected misses: the reviewer reads code and does not open
   the browser.
 - **Ticked but not tested.** Tasks are ticked, but the browser shows "Not
   built yet" or a console error for one story. Map it to Closed review
@@ -121,13 +121,13 @@ Run these yourself. Do not take the participant's notes on trust.
 ## No retry
 
 No retry. A second team run costs many minutes and tokens, and the
-exercise moves on to task 5. Do not offer to re-run the team. Name the
+exercise moves on to task 4. Do not offer to re-run the team. Name the
 smallest fix as the clause to take into their next team prompt.
 
 ## Held back
 
 None for the verifier. The held-back fact for this session lives in the
-`/parallel-coach` card for task 2 (nothing enforces file ownership except
+`/parallel-coach` card for task 1 (nothing enforces file ownership except
 the prompt). By the time the verifier runs, the run has already taught it —
 say it plainly if the evidence shows it. Add the second half: the reviewer
 is the check behind the prompt, and it catches only what it was told to

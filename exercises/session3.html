@@ -81,6 +81,10 @@ pre { position: relative; margin: .9rem 0; padding: .85rem 1rem; padding-right: 
   white-space: pre-wrap; overflow-wrap: anywhere; } /* wraps on screen only; a copy still gets one line */
 pre code { background: none; border: 0; padding: 0; font-size: inherit; white-space: inherit; }
 
+.xb-figure { margin: 1.2rem 0; }
+.xb-figure svg { display: block; width: 100%; max-width: 40rem; }
+.xb-figure figcaption { font-size: .85rem; color: var(--xb-grey4); margin-top: .4rem; }
+
 .xb-copy { position: absolute; top: .5rem; right: .5rem; display: inline-flex; align-items: center; gap: .35rem;
   font: 600 .75rem/1 "Inter", sans-serif; color: var(--xb-cta); background: #fff;
   border: 1px solid var(--xb-grey3); border-radius: 999px; padding: .4rem .7rem; cursor: pointer;
@@ -276,13 +280,17 @@ git branch -D session3-playground</code></pre>
 
   document.querySelectorAll('pre').forEach(function (pre) {
     var code = pre.querySelector('code') || pre;
+    var isPrompt = /\bprompt\b/.test(pre.className + ' ' + code.className);
     var btn = document.createElement('button');
     btn.type = 'button'; btn.className = 'xb-copy';
     btn.innerHTML = icon + '<span>Copy</span>';
     btn.setAttribute('aria-label', 'Copy to clipboard');
     btn.addEventListener('click', function () {
       // Drop the final newline so a pasted command does not run on its own.
-      copy(code.innerText.replace(/\n$/, '')).then(function () {
+      var text = code.innerText.replace(/\n$/, '');
+      // A prompt block (```prompt) shows paragraphs on screen, but copies as one line.
+      if (isPrompt) { text = text.replace(/\s*\n\s*/g, ' '); }
+      copy(text).then(function () {
         btn.classList.add('is-done'); btn.innerHTML = tick + '<span>Copied</span>';
       }, function () {
         btn.innerHTML = icon + '<span>Select and copy</span>';
