@@ -70,6 +70,10 @@ pre { position: relative; margin: .9rem 0; padding: .85rem 1rem; padding-right: 
   white-space: pre-wrap; overflow-wrap: anywhere; } /* wraps on screen only; a copy still gets one line */
 pre code { background: none; border: 0; padding: 0; font-size: inherit; white-space: inherit; }
 
+.xb-figure { margin: 1.2rem 0; }
+.xb-figure svg { display: block; width: 100%; max-width: 40rem; }
+.xb-figure figcaption { font-size: .85rem; color: var(--xb-grey4); margin-top: .4rem; }
+
 .xb-copy { position: absolute; top: .5rem; right: .5rem; display: inline-flex; align-items: center; gap: .35rem;
   font: 600 .75rem/1 "Inter", sans-serif; color: var(--xb-cta); background: #fff;
   border: 1px solid var(--xb-grey3); border-radius: 999px; padding: .4rem .7rem; cursor: pointer;

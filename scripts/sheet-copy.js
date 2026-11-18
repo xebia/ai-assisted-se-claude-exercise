@@ -23,13 +23,17 @@
 
   document.querySelectorAll('pre').forEach(function (pre) {
     var code = pre.querySelector('code') || pre;
+    var isPrompt = /\bprompt\b/.test(pre.className + ' ' + code.className);
     var btn = document.createElement('button');
     btn.type = 'button'; btn.className = 'xb-copy';
     btn.innerHTML = icon + '<span>Copy</span>';
     btn.setAttribute('aria-label', 'Copy to clipboard');
     btn.addEventListener('click', function () {
       // Drop the final newline so a pasted command does not run on its own.
-      copy(code.innerText.replace(/\n$/, '')).then(function () {
+      var text = code.innerText.replace(/\n$/, '');
+      // A prompt block (```prompt) shows paragraphs on screen, but copies as one line.
+      if (isPrompt) { text = text.replace(/\s*\n\s*/g, ' '); }
+      copy(text).then(function () {
         btn.classList.add('is-done'); btn.innerHTML = tick + '<span>Copied</span>';
       }, function () {
         btn.innerHTML = icon + '<span>Select and copy</span>';

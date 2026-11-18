@@ -47,6 +47,10 @@ Rules that follow from this:
   is no line-length limit for copying. Keep a shell command on one line
   anyway: never split it with `\`, which PowerShell does not accept.
   Indentation in YAML or Python blocks survives the copy.
+  A long prompt goes in a block with the language `prompt` (three
+  backticks, then `prompt`): write it as short paragraphs with an empty
+  line between them. The page shows the paragraphs, and the Copy button
+  joins them to one line (`sheet-copy.js`). Session 7 uses it.
 - **The header block** (`**Session**`, `**Duration**`, `**Project**`) ends
   the first two lines with `\`, otherwise the three run together on the page.
 - **Dry-run in a package, not in the source folder.** `just package go`

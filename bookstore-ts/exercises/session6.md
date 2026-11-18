@@ -23,17 +23,17 @@ Those are decisions, and a spec is the place to write decisions down.
 
 ## Start here
 
-**Terminal 1**, in the `bookstore` folder, runs the backend:
-
-```bash
-bun run start
-```
-
-**Terminal 2**, in the `web` folder inside `bookstore`, runs Claude. The
+**Terminal 1**, in the `web` folder inside `bookstore`, runs Claude. The
 `..` gives Claude your backend's code:
 
 ```bash
 claude --add-dir ..
+```
+
+**Terminal 2**, in the `bookstore` folder, runs the backend:
+
+```bash
+bun run start
 ```
 
 **Terminal 3**, a plain shell in `web`, for `curl` and `git`. Check the
@@ -57,7 +57,7 @@ Training mode is off in `web`: Claude answers directly. Stuck? Type
 One Spec Kit command writes the spec for you. You do not create the spec
 file yourself. The spec says *what* the frontend does and *why*. Not how.
 
-1. **Start the spec**. In terminal 2, paste this command into Claude,
+1. **Start the spec**. In terminal 1, paste this command into Claude,
    exactly as written:
 
    ```text
@@ -129,7 +129,7 @@ You create five files under `specs/001-*/`: `plan.md`, `research.md`,
 `data-model.md`, `contracts/` and `quickstart.md`. Together they are the
 plan. The plan says *how* the frontend gets built.
 
-1. **Start the plan**. In terminal 2, run `/speckit-plan`. It runs
+1. **Start the plan**. In terminal 1, run `/speckit-plan`. It runs
    two to four minutes without you. Do not wait. Do not edit the spec while
    it runs: the command is reading that file.
 2. **Read the diff**. In terminal 3:
@@ -203,7 +203,7 @@ have a list of differences (possibly empty).
 You create `specs/001-*/tasks.md`. The task list holds small steps, in
 order, for building the frontend.
 
-1. **Start the task list**. In terminal 2, run `/speckit-tasks`. It
+1. **Start the task list**. In terminal 1, run `/speckit-tasks`. It
    takes one to two minutes. While it runs, look at your task 4 list: which
    difference would do the most damage once it is code?
 2. **Read the format**. Open `specs/001-*/tasks.md`. Each task looks
@@ -234,7 +234,7 @@ order, for building the frontend.
    ```
 
    Exercise 7 starts from this commit.
-2. **Start the check**. In terminal 2, run `/verify-exercise 6`.
+2. **Start the check**. In terminal 1, run `/verify-exercise 6`.
    This is a course command. It compares what the plan says about the API
    with what your backend really does. It asks you for two file names:
    `research.md` and the contract file. Give them. It calls your backend,
