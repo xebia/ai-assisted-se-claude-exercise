@@ -1,10 +1,12 @@
-# Task 2 — Draft the team prompt
+# Task 1 — Draft the team prompt
 
-**What they're drafting:** one prompt that turns the lead into a team lead:
+**What they're drafting:** one prompt that makes their Claude session the
+lead of an agent team:
 it reads `specs/001-*/tasks.md`, spawns one builder per user story and one
-`reviewer`, and collects the results. The builders and the reviewer send
+reviewer, each with a name the participant chose, and collects the results. The builders and the reviewer send
 messages to each other directly. The foundation (Phase 1 and 2) is already
-built and committed.
+built and committed in the sheet's setup, by the same session, before it
+was a lead.
 
 **Slide anchors:** *Same Task, Two Shapes* (the subagents versus agent team
 diagram, with the reviewer loop at the end) · *Who Starts the Team?*
@@ -31,8 +33,9 @@ everything at once, and the loop has nothing to carry.
 **Load-bearing (5):**
 
 - names the task list as the source of work
-- an agent team with one named builder per story and a teammate named
-  `reviewer` that writes no code
+- an agent team with one named builder per story and a named reviewer
+  that writes no code (the participant chooses every name; placeholders
+  such as `<name of builder 1>` left in the draft are not names)
 - file ownership per builder, and the foundation files named as finished
 - a closed review loop: the reviewer sends its findings to the builder by
   name, the builder fixes them and sends the reviewer a new file list, and
@@ -58,7 +61,7 @@ Nudge toward missing elements from this list. Never paste it as a prompt.
 
 - The path of `tasks.md`, and that its `[Story]` tags decide who does what
 - "Spawn an agent team" or "teammates" said explicitly, with one builder
-  per user story and a `reviewer`, each with a name the participant can use
+  per user story and a reviewer, each with a name the participant can use
 - The foundation files listed by name, marked as finished. No builder
   edits them. A builder that needs a change there stops and reports.
 - The loop, in both directions: builder to reviewer when the Independent
@@ -101,7 +104,7 @@ Nudge toward missing elements from this list. Never paste it as a prompt.
   subagents. No rows with the teammates' names appear in the agent panel.
   There is no reviewer to open or message.
 - Teammates not named → the builders cannot send messages to the reviewer.
-  The participant cannot ask the lead to wake "the list builder" in task 4.
+  The participant cannot ask the lead to wake "the list builder" in task 3.
 
 ## Ready bar
 
@@ -146,5 +149,5 @@ not the constitution unless the prompt names it.
 
 Also held back until asked: a lead that is not told to wait will usually
 start a story itself, or fix a reviewer finding itself. The exercise sheet
-gives the remedy in task 3, after the team has started; the coach lets the
+gives the remedy in task 2, after the team has started; the coach lets the
 participant find the clause before that without quoting the sheet.
