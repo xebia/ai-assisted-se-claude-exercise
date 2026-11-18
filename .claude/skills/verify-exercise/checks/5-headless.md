@@ -1,23 +1,22 @@
 # Exercise 5 — Claude Without You Watching
 
 **Under review: observable state, not a prompt.** The participant built a
-review gate, let a fix run repair what it blocked, and wrote a
-morning-brief prompt, and ran all three. Everything is on
+review gate and let a fix run repair what it blocked, and ran both. Everything is on
 disk. Grade the files and the saved answers, not the chat.
 
-**When this runs.** Task 5 (the closing task), in a fresh session. Do not ask for the files:
+**When this runs.** Task 4 (the closing task), in a fresh session. Do not ask for the files:
 read them from disk. Ask exactly one question first, and wait for the
 answer:
 
-> Did your brief on the second night notice that the log stops at 01:40?
-> Yes, no, or only after you changed the prompt. One line, then I check.
+> What did the gate say about your endpoint commit: block, or pass? One
+> line, then I check.
 
 Take any answer and start. Never ask a second question. The report must
 stand on its own: no question at the end.
 
 **Words.** The sheet says: the gate, the verdict (*pass* or *block*), the
 findings, the team rules (rule 1 bad input, rule 2 small changes), the
-answer shape (the schema), the fix run, the fix commit, the full night, the second night (its log stops early), the brief, the time range. Never say harness, arm, baseline,
+answer shape (the schema), the fix run, the fix commit. Never say harness, arm, baseline,
 structured output (say "the verdict Claude returned"), grader.
 
 ## What the participant produced
@@ -41,15 +40,14 @@ All paths are relative to the bookstore folder.
    with `block`, or with `pass` if the new endpoint answers 400.
 3. `headless/out/fix-*.json`: one file per fix run (task 3). Each holds
    the commit it fixed, the gate run it read (`gate_run`) and Claude's
-   full JSON answer (`answer.result`, `answer.total_cost_usd`). `fix.py`
-   is given; the participant does not edit it. After it, a commit named
+   full JSON answer (`answer.result`, `answer.total_cost_usd`). In
+   `fix.py` the participant replaced `<define-permission-mode>` with
+   `acceptEdits` (committed as "Set the fix permission mode"). Another mode
+   that lets Claude edit without asking also works; `dontAsk` or `plan`
+   means the fix run could not edit: a fault. After the fix run, a commit named
    "Fix the gate findings" (or the participant's own subject) and a
    `gate-*.json` for that commit, expected `pass`. No fix file is correct
    when the gate passed the endpoint in task 2: the sheet says to skip.
-4. `headless/brief-prompt.txt`: the participant's own prompt.
-5. `headless/out/brief-night-full.md` and `headless/out/brief-night-cut.md`
-   (the latest run of each), with the input beside them in
-   `headless/out/input-night-*.txt`.
 
 ## Establish ground truth
 
@@ -61,18 +59,14 @@ All paths are relative to the bookstore folder.
   and read it (`git show --stat <commit>` and the handler diff): does the
   new endpoint now answer a non-numeric id with 400? Does the commit touch
   only the files the finding needs (rule 2)? Match it to its `gate-*.json`.
-- Read `brief-prompt.txt`, both briefs and both inputs. The full night has
-  312 lines of `POST /api/books/{id}/reviews` answering 500 with
-  "database is locked", all between 02:00 and 03:00, plus a few 404s and
-  one slow-query warning. The cut night ends at 01:39 and has no 500s.
 - Run nothing that edits the project, and do not run `claude`.
 
 ## Report shape
 
 Headings the participant can find by scrolling.
 
-1. **Your answer** — one sentence: what they said, and what the second
-   brief shows.
+1. **Your answer** — one sentence: what they said, and what the saved
+   gate runs show.
 2. **The gate** — the answer shape (complete, or what is missing: the
    `enum`, `required`), the rules flag, and a table of the saved runs:
    commit, verdict, the first finding in a short quote. If two runs on the
@@ -86,13 +80,6 @@ Headings the participant can find by scrolling.
    tests or other handlers, name rule 2. If there is no fix run, say why
    from the files (the gate passed the endpoint, or the gate never ran on
    it).
-5. **The briefs** — for the full night: does it name the endpoint, give a
-   count that matches the input (312), and quote a line? For the cut
-   night: does it say the time range, or that the log stops at 01:39? Name
-   the sentence in `brief-prompt.txt` that caused it, or the sentence that
-   is missing. Show a tighter version of that one sentence.
-6. **Your prompt** — four lines: length limit, worst first, evidence per
-   number, the quiet-night line. Present or missing, one word each.
 
 No score, no question at the end.
 
@@ -115,11 +102,6 @@ No score, no question at the end.
   point of step 5.
 - **`fix.py` stopped with "changes that are not committed"** — the
   participant ran it with an open diff. No fix file, nothing to grade.
-- **Brief counts wrong** — the brief says another number than the
-  input. That is the quiet-failure lesson in a smaller form: name it.
-- **Second brief says "quiet night" and nothing else** — the expected
-  first result. It is fixed by a prompt sentence that asks for the time
-  range or for the first and last line of the log.
 
 ## Held back
 
@@ -129,5 +111,4 @@ Do not lecture them; answer only if asked directly: a gate that passes when
 Claude said nothing would let a change through without a review, and
 nobody would notice; the gate only reads, so a stranger's pull request
 cannot make it change anything, while the fix run edits and a person
-reads its diff. That a gate fails loudly and a brief fails quietly
-is on the slides; you may name it in the report.
+reads its diff.

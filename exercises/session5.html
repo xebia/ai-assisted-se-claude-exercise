@@ -141,16 +141,10 @@ tr:nth-child(even) td { background: #fbfafd; }
 <main>
 <h1 id="exercise-5-claude-without-you-watching">Exercise 5: Claude Without You Watching</h1>
 <p><strong>Session</strong>: 5 — Headless &amp; Automation<br />
-<strong>Duration</strong>: 35 minutes, plus a 4-minute closing round<br />
+<strong>Duration</strong>: 30 minutes, plus a 4-minute closing round<br />
 <strong>Project</strong>: The same BookStore API, and the <code>headless</code> folder in it.</p>
 <h2 id="goal">Goal</h2>
-<p>You run Claude without a chat, and you check if you can trust the result. You:</p>
-<ol type="1">
-<li>Run one prompt headless, twice, and see what loads.</li>
-<li>Build a review gate, and watch it pass one commit and block another.</li>
-<li>Let a second run fix what the gate found, and check the fix yourself.</li>
-<li>Write the prompt for a morning brief, and test it on two nights.</li>
-</ol>
+<p>You learn how to run Claude in headless mode, without a chat, and how far you can trust the result. In a chat you steer, approve and read. In a headless run you decide all three before the run starts. You apply this to a quality gate and an event-triggered fix.</p>
 <h2 id="start-here">Start here</h2>
 <ul>
 <li>Open a terminal in the <code>bookstore</code> folder you cloned. Run every command there.</li>
@@ -205,33 +199,24 @@ uv run headless/gate.py</code></pre></li>
 <h3 id="3-the-fix-run">3. The fix run</h3>
 <p>The gate blocked a commit. A second headless run can fix it, but a person still decides. If the gate passed the endpoint in task 2, skip this task.</p>
 <ol type="1">
-<li><p><strong>Read the command.</strong> Open <code>headless/fix.py</code> and find the <code>claude</code> command. Write down its permission mode, and the one in <code>gate.py</code>. <code>dontAsk</code> means: Claude may not use a tool that would ask you. <code>acceptEdits</code> means: Claude may edit files without asking. Why does the fix run get a different mode?</p></li>
+<li><p><strong>Set the permission mode.</strong> Open <code>headless/fix.py</code>. Replace <code>&lt;define-permission-mode&gt;</code> in the line <code>"--permission-mode", "&lt;define-permission-mode&gt;",</code> with the mode this run needs.</p>
+<p>Claude must edit files, and nobody is there to answer a prompt. See the slide <em>Approve: Set the Permissions Before the Run</em>. Write down your mode, and why it differs from the mode in <code>gate.py</code>.</p></li>
+<li><p><strong>Commit the mode.</strong> The script reads the gate's answer for the commit before this one.</p>
+<pre><code>git commit -am &quot;Set the fix permission mode&quot;</code></pre></li>
 <li><p><strong>Predict.</strong> The fix run gets only the gate's verdict and findings. Claude fixes the code, and you commit it. Will the gate say <code>pass</code>? Write <em>yes</em> or <em>no</em>.</p></li>
 <li><p><strong>Run the fix.</strong> The script sends the gate's last answer to Claude. Claude edits the code. It does not commit.</p>
 <pre><code>uv run headless/fix.py</code></pre></li>
-<li><p><strong>Check the fix.</strong> Run <code>git diff</code>. Does it change only what the finding asks for? You decide. If not, undo it with <code>git restore .</code> and run step 3 again.</p></li>
+<li><p><strong>Check the fix.</strong> Run <code>git diff</code>. Does it change only what the finding asks for? You decide. If not, undo it with <code>git restore .</code> and run step 4 again.</p></li>
 <li><p><strong>Commit, and run the gate.</strong></p>
 <pre><code>git commit -am &quot;Fix the gate findings&quot;
 uv run headless/gate.py</code></pre>
-<p>If it says <code>block</code> again, read the new finding and do steps 3 to 5 again. <code>fix.py</code> reads the newest gate answer.</p></li>
+<p>If it says <code>block</code> again, read the new finding and do steps 4 to 6 again. <code>fix.py</code> reads the newest gate answer.</p></li>
 </ol>
 <p>Why: the gate only reads, so it cannot break anything. The fix run may edit files, so a person reads the diff before it is committed. This is a small event-triggered run, on your laptop: the gate's finding starts the fix, as a bug report does on the slides.</p>
-<p><strong>Done when</strong>: the gate gave <code>Verdict: pass</code> on your fix commit. Your notes say why the fix run may edit files and the gate may not.</p>
-<h3 id="4-the-morning-brief">4. The morning brief</h3>
-<p>The slides show a scheduled run that writes a nightly test report. This task builds the same kind of run on a different input, last night's server log, and its report is called the morning brief. The task produces two briefs: one for a night with errors, and one for a night where the log stops at 01:40.</p>
+<p><strong>Done when</strong>: the gate gave <code>Verdict: pass</code> on your fix commit. Your notes name your permission mode, and say why the fix run may edit files and the gate may not.</p>
+<h3 id="4-closing-check-your-work">4. Closing: check your work</h3>
 <ol type="1">
-<li><p><strong>Write the prompt.</strong> Create <code>headless/brief-prompt.txt</code>. The script <code>headless/brief.py</code> sends this file to Claude, with the night's log (an export from a logging platform). Ask for four things in your own words. The first: <em>Write at most 10 lines.</em> Then: the worst problem first; every number with the log line it came from; one line when nothing went wrong.</p></li>
-<li><p><strong>Run it on the full night.</strong></p>
-<pre><code>uv run headless/brief.py headless/night-full.txt</code></pre>
-<p>The script prints the brief and saves it in <code>headless/out/</code>, next to the input Claude got. Does the brief name the endpoint with the errors, give the count, and quote a line? If not, improve your prompt and run again.</p></li>
-<li><p><strong>Predict, then run it on the second night.</strong> This log stops at 01:40, because the log file was replaced by a new one (log rotation). Will your brief say that the night is not complete? Write <em>yes</em> or <em>no</em>. Then run:</p>
-<pre><code>uv run headless/brief.py headless/night-cut.txt</code></pre></li>
-<li><p><strong>Improve one sentence.</strong> If your brief does not say that the log stops at 01:40, add one sentence to your prompt. For example: ask for the time range the log covers. Then run the command of step 3 again.</p></li>
-</ol>
-<p><strong>Done when</strong>: the full-night brief names the endpoint with the errors, gives the count and quotes a log line. The second brief says which time range it covers.</p>
-<h3 id="5-closing-check-your-work">5. Closing: check your work</h3>
-<ol type="1">
-<li><strong>Start the check.</strong> Close Claude if it is open. Start <code>claude</code> again, and run <code>/verify-exercise 5</code>. This course command came with the project. It reads your gate, the files <code>gate.py</code> and <code>fix.py</code> saved in <code>headless/out/</code>, and both briefs. First it asks if your second brief noticed that the log stops at 01:40. Answer in one line.</li>
+<li><strong>Start the check.</strong> Close Claude if it is open. Start <code>claude</code> again, and run <code>/verify-exercise 5</code>. This course command came with the project. It reads your gate and the files <code>gate.py</code> and <code>fix.py</code> saved in <code>headless/out/</code>. First it asks what the gate said about your endpoint commit. Answer in one line.</li>
 <li><strong>Read the report.</strong> Write down one line from it.</li>
 </ol>
 <p><strong>Done when</strong>: one line from the report is in your notes. Bring it to the closing round.</p>
@@ -295,11 +280,10 @@ git push ../gate-target.git HEAD</code></pre></li>
 <li>Why did the two runs in task 1 answer differently?</li>
 <li>In the gate, what does Claude decide, and what does the script decide?</li>
 <li>Why may the fix run edit files, while the gate may not?</li>
-<li>Did your brief notice that the log stops at 01:40? Which sentence in your prompt made the difference?</li>
 <li>The gate treats "no verdict" as "block". Why is that the safe choice?</li>
 </ul>
 </main>
-<footer class="xb-footer"><span>Mastering AI-Assisted Software Engineering · Xebia Academy</span><span>Version 2026-11-16</span></footer>
+<footer class="xb-footer"><span>Mastering AI-Assisted Software Engineering · Xebia Academy</span><span>Version 2026-11-18</span></footer>
 <script>
 // Copy button on every code block. Works from file:// too: falls back to execCommand
 // where the async clipboard API is not allowed.
