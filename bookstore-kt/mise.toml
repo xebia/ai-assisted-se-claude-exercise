@@ -28,8 +28,15 @@ run = [
   "specify check",
 ]
 
+[tasks.build]
+description = "Compile the project"
+run = "./gradlew classes"
+run_windows = "gradlew.bat classes"
+
 [tasks.doctor]
 description = "Check that this machine is ready for the training"
+# Compile first, so a JDK that cannot build the project fails here.
+depends = ["build"]
 run = [
   "java -version",
   "node --version",

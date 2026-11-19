@@ -30,6 +30,8 @@ run = [
 description = "Check that this machine is ready for the training"
 run = [
   "python --version",
+  # Start the project code without the server, so a broken toolchain fails here.
+  'python -c "import main"',
   "node --version",
   "uv --version",
   "git --version",

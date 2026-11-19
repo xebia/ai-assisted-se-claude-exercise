@@ -35,6 +35,8 @@ run = [
 description = "Check that this machine is ready for the training"
 run = [
   "bun --version",
+  # Start the project code without the server, so a broken toolchain fails here.
+  "bun -e \"await import('./src/server.ts'); await import('./src/store/db.ts')\"",
   "node --version",
   "uv --version",
   "git --version",
