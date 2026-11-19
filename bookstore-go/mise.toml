@@ -10,7 +10,9 @@
 min_version = "2026.1.0"
 
 [tools]
-go = "1.22"
+# Newer than the "go 1.22" line in go.mod on purpose: programs built by Go 1.22
+# do not start on macOS 27 (dyld: missing LC_UUID load command).
+go = "1.25"
 node = "22"
 uv = "latest"
 "pypi:git+https://github.com/github/spec-kit.git" = "latest"
@@ -30,6 +32,9 @@ run = [
 description = "Check that this machine is ready for the training"
 run = [
   "go version",
+  # Build and start a program, so a toolchain whose programs do not run fails here.
+  # No test matches the name, so the planted test failures do not show up.
+  "go test -run=NoSuchTest ./...",
   "node --version",
   "uv --version",
   "git --version",

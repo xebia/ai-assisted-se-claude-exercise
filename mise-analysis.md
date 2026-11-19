@@ -44,7 +44,7 @@ Each package was built with `HTML=skip scripts/package.sh <lang>`.
 
 | Package | `mise run setup` | `mise run doctor` | `mise run start` answers on :8080 |
 |---|---|---|---|
-| go | pass (Go 1.22.12) | pass | yes |
+| go | pass (Go 1.25) | pass | yes |
 | kt | pass (Temurin 17.0.21, Gradle wrapper) | pass | yes |
 | py | pass (Python 3.12.16) | pass | yes |
 | ts | pass (Bun 1.4.4) | pass | yes |
