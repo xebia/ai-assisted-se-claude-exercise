@@ -1,0 +1,54 @@
+# Tool versions and setup tasks for the course, managed by mise (https://mise.jdx.dev).
+#
+#   mise run setup     install every tool below and prepare web/ for exercises 6 and 7
+#   mise run doctor    check that the machine is ready for the training
+#   mise run start     start the BookStore API on :8080
+#
+# This file ships as the root of the participant package, so the paths below
+# (web/) are package paths. Keep it free of [env] and [settings]: with only
+# tools and tasks, mise reads it without asking the participant to trust it.
+min_version = "2026.1.0"
+
+[tools]
+python = "3.12"
+node = "22"
+uv = "latest"
+"pypi:git+https://github.com/github/spec-kit.git" = "latest"
+
+[tasks.setup]
+description = "Install the tools and prepare web/ (Spec Kit, npm packages)"
+dir = "{{ config_root }}/web"
+run = [
+  "npm install",
+  "specify init --here --force --non-interactive --integration claude",
+  # init overwrites the committed constitution and may touch settings.json: put both back
+  "git checkout -- .specify/memory/constitution.md .claude/settings.json",
+  "specify check",
+]
+
+[tasks.doctor]
+description = "Check that this machine is ready for the training"
+run = [
+  "python --version",
+  # Start the project code without the server, so a broken toolchain fails here.
+  'python -c "import main"',
+  "node --version",
+  "uv --version",
+  "git --version",
+  "claude --version",
+  "specify check",
+  "git diff --exit-code --stat -- web/.specify/memory/constitution.md web/.claude/settings.json",
+]
+
+[tasks.start]
+description = "Start the BookStore API on http://localhost:8080"
+run = "python main.py"
+
+[tasks.test]
+description = "Run the test suite"
+run = "python -m unittest"
+
+[tasks.web]
+description = "Start the frontend dev server on http://localhost:5173"
+dir = "{{ config_root }}/web"
+run = "npm run dev"
